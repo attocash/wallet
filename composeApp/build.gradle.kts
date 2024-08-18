@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
@@ -19,24 +20,29 @@ kotlin {
 
     jvm("desktop")
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "ComposeApp"
+//            isStatic = true
+//        }
+//    }
 
     sourceSets {
         val desktopMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
+
+            implementation(libs.androidx.datastore)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation("com.auth0:java-jwt:4.4.0")
+            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -45,19 +51,46 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
+            implementation(libs.atto.commons)
+
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.content.negotiation)
+
+            implementation("com.auth0:java-jwt:4.4.0")
+            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+
+
+//
+//            val attoCommons = libs.atto.commons.get()
+//            implementation("${attoCommons.module.group}:${attoCommons.module.name}:${attoCommons.versionConstraint.displayName}") {
+//                capabilities {
+//                    requireCapability("cash.atto:commons-json")
+//                }
+//            }
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
+
+        }
+        commonTest.dependencies {
+            implementation(libs.junit.jupiter)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.jna)
+            implementation("com.auth0:java-jwt:4.4.0")
+            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+
         }
 
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
-        }
+//        iosMain.dependencies {
+//            implementation(libs.ktor.client.darwin)
+//        }
     }
 }
 
@@ -96,6 +129,10 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
+}
+
+dependencies {
+    testImplementation(libs.junit.jupiter)
 }
 
 compose.desktop {
