@@ -1,8 +1,6 @@
 package cash.atto.wallet
 
 import cash.atto.commons.AttoMnemonic
-import cash.atto.commons.AttoPrivateKey
-import cash.atto.commons.fromHexToByteArray
 import cash.atto.commons.toHex
 import cash.atto.commons.toPrivateKey
 import cash.atto.commons.toSeed

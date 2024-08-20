@@ -21,6 +21,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -52,7 +53,7 @@ class AccountManager(
     private var autoReceive: Boolean,
     transactions: List<AttoTransaction> = arrayListOf()
 ) : AutoCloseable {
-    private val httpClient = HttpClient {
+    private val httpClient = HttpClient() {
         install(ContentNegotiation) {
             json()
         }
@@ -132,7 +133,7 @@ class AccountManager(
         run("auto receive") {
             _receivableFlow
                 .filter { autoReceive }
-                .onEach {
+                .collect {
                     receive(it)
                 }
         }
@@ -155,7 +156,7 @@ class AccountManager(
                 .execute { response ->
                     val channel: ByteReadChannel = response.body()
                     while (!channel.isClosedForRead && scope.isActive) {
-                        val json = channel.readUTF8Line(1000)
+                        val json = channel.readUTF8Line()
                         if (json != null) {
                             val account = Json.decodeFromString<AttoAccount>(json)
                             val height = _accountState.value?.height
@@ -186,7 +187,7 @@ class AccountManager(
                 .execute { response ->
                     val channel: ByteReadChannel = response.body()
                     while (!channel.isClosedForRead && scope.isActive) {
-                        val json = channel.readUTF8Line(1000)
+                        val json = channel.readUTF8Line()
                         if (json != null) {
                             println("Received from $uri $json")
                             val receivable = Json.decodeFromString<AttoReceivable>(json)
@@ -198,7 +199,7 @@ class AccountManager(
 
         run("transactions") {
             val fromHeight = accountState.value?.height ?: 1U
-            val toHeight = Long.MAX_VALUE
+            val toHeight = ULong.MAX_VALUE
             val uri =
                 "$endpoint/accounts/$publicKey/transactions/stream?fromHeight=$fromHeight&toHeight=$toHeight"
             val jwt = authenticator.getAuthorization()
@@ -217,7 +218,7 @@ class AccountManager(
                 .execute { response ->
                     val channel: ByteReadChannel = response.body()
                     while (!channel.isClosedForRead && scope.isActive) {
-                        val json = channel.readUTF8Line(1000)
+                        val json = channel.readUTF8Line()
                         if (json != null) {
                             println("Received from $uri $json")
                             val transaction = Json.decodeFromString<AttoTransaction>(json)
