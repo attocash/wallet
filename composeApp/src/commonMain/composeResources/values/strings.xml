@@ -1,0 +1,11 @@
+<resources>
+    <!-- secret -->
+    <string name="secret_backup">I've Backed It Up</string>
+    <string name="secret_copy">Copy</string>
+    <string name="secret_title">Secret Phrase</string>
+
+    <!-- welcome -->
+    <string name="welcome_create_wallet">Create Wallet</string>
+    <string name="welcome_import_wallet">Import Wallet</string>
+    <string name="welcome_message">Welcome screen message stub</string>
+</resources>
