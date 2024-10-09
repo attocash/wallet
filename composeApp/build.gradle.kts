@@ -40,6 +40,7 @@ kotlin {
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.navigation.compose)
             implementation("com.auth0:java-jwt:4.4.0")
             implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
