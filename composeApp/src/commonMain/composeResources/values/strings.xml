@@ -1,4 +1,15 @@
 <resources>
+    <!-- overview -->
+    <string name="overview_hint_amount_from">A lot of Atto</string>
+    <string name="overview_hint_amount_to">A little Atto</string>
+    <string name="overview_hint_destination">someone</string>
+    <string name="overview_hint_source">someone</string>
+    <string name="overview_hint_type_from">Received</string>
+    <string name="overview_hint_type_to">Sent</string>
+    <string name="overview_transactions_title">TRANSACTIONS</string>
+    <string name="overview_transaction_from">from %s</string>
+    <string name="overview_transaction_to">to %s</string>
+
     <!-- secret -->
     <string name="secret_backup">I've Backed It Up</string>
     <string name="secret_copy">Copy</string>
