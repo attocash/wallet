@@ -22,21 +22,25 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun OverviewScreen(
+    onSettingsClicked: () -> Unit,
     viewModel: OverviewViewModel = OverviewViewModel()
 ) {
     val uiState = viewModel.state.collectAsState()
-    Overview(uiState.value)
+    Overview(uiState.value, onSettingsClicked)
 }
 
 @Composable
-fun Overview(uiState: OverviewUiState) {
+fun Overview(
+    uiState: OverviewUiState,
+    onSettingsClicked: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(16.dp)
     ) {
         OverviewHeader(
             uiState = uiState.headerUiState,
-            onSettingsClicked = {}
+            onSettingsClicked = onSettingsClicked
         )
 
         TransactionsList(
@@ -73,7 +77,8 @@ fun OverviewPreview() {
                     ),
                     showHint = true
                 )
-            )
+            ),
+            onSettingsClicked = {}
         )
     }
 }
