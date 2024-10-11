@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.settings.Profile
 import cash.atto.wallet.components.settings.SettingsList
@@ -20,7 +21,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun SettingsScreen(
     onBackNavigation: () -> Unit,
-    viewModel: SettingsViewModel = SettingsViewModel()
+    viewModel: SettingsViewModel = viewModel { SettingsViewModel() }
 ) {
     val settings = viewModel.state.collectAsState()
 

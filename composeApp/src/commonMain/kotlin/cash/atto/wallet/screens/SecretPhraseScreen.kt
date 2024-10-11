@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.secret_backup
 import attowallet.composeapp.generated.resources.secret_copy
@@ -31,7 +32,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun SecretPhraseScreen(
     onBackNavigation: () -> Unit,
     onBackupConfirmClicked: () -> Unit,
-    viewModel: SecretPhraseViewModel = SecretPhraseViewModel()
+    viewModel: SecretPhraseViewModel = viewModel { SecretPhraseViewModel() }
 ) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val uiState = viewModel.state.collectAsState()
