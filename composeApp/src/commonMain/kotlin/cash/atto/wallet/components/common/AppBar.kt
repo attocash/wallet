@@ -1,5 +1,6 @@
 package cash.atto.wallet.components.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,12 +14,12 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun AppBar() {
-    Box(
-        modifier = Modifier.fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 32.dp)
-    ) {
+fun AppBar(onBackNavigation: () -> Unit) {
+    Box(Modifier.fillMaxWidth()) {
         Icon(
+            modifier = Modifier
+                .clickable { onBackNavigation.invoke() }
+                .padding(16.dp),
             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
             contentDescription = "backIcon"
         )
@@ -29,6 +30,6 @@ fun AppBar() {
 @Composable
 fun AppBarPreview() {
     AttoWalletTheme {
-        AppBar()
+        AppBar {}
     }
 }

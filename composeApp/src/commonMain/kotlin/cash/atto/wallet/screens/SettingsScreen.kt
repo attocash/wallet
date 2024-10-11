@@ -18,21 +18,28 @@ import cash.atto.wallet.viewmodel.SettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = SettingsViewModel()) {
+fun SettingsScreen(
+    onBackNavigation: () -> Unit,
+    viewModel: SettingsViewModel = SettingsViewModel()
+) {
     val settings = viewModel.state.collectAsState()
 
     Settings(
         uiState = SettingsUiState(
             profileUiState = ProfileUiState.DEFAULT,
             settingsListUiState = settings.value
-        )
+        ),
+        onBackNavigation = onBackNavigation
     )
 }
 
 @Composable
-fun Settings(uiState: SettingsUiState) {
+fun Settings(
+    uiState: SettingsUiState,
+    onBackNavigation: () -> Unit
+) {
     Scaffold(
-        topBar = { AppBar() },
+        topBar = { AppBar(onBackNavigation) },
         content = {
             Column(Modifier.fillMaxSize()) {
                 Profile(
@@ -53,6 +60,6 @@ fun Settings(uiState: SettingsUiState) {
 @Composable
 fun SettingsPreview() {
     AttoWalletTheme {
-        Settings(SettingsUiState.PREVIEW)
+        Settings(SettingsUiState.PREVIEW) {}
     }
 }

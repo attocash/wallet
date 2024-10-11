@@ -2,6 +2,7 @@ package cash.atto.wallet.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -23,6 +24,12 @@ val attoColors = lightColors(
     primaryVariant = atto_purple_700
 )
 
+val attoShapes = Shapes(
+    small = RoundedCornerShape(24.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(8.dp)
+)
+
 val BottomSheetShape = RoundedCornerShape(
     topStart = 20.dp,
     topEnd = 20.dp,
@@ -30,9 +37,15 @@ val BottomSheetShape = RoundedCornerShape(
     bottomEnd = 0.dp
 )
 
+val ButtonShape = RoundedCornerShape(16.dp)
+
 @Composable
 fun AttoWalletTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colors = attoColors, typography = attoWalletTypography()) {
+    MaterialTheme(
+        colors = attoColors,
+        typography = attoWalletTypography(),
+        shapes = attoShapes
+    ) {
         content()
     }
 }

@@ -31,8 +31,11 @@ data class TransactionUiState(
     val shownSource
         @Composable
         get() = when (type) {
-            TransactionType.SEND -> stringResource(Res.string.overview_transaction_to, source)
-            TransactionType.RECEIVE -> stringResource(Res.string.overview_transaction_from, source)
+            TransactionType.SEND ->
+                "${stringResource(Res.string.overview_transaction_to)} $source"
+
+            TransactionType.RECEIVE ->
+                "${stringResource(Res.string.overview_transaction_from)} $source"
         }
 }
 
