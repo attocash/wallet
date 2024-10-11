@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
@@ -30,7 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun OverviewScreen(
     onSettingsClicked: () -> Unit,
-    viewModel: OverviewViewModel = OverviewViewModel()
+    viewModel: OverviewViewModel = viewModel { OverviewViewModel() }
 ) {
     val uiState = viewModel.state.collectAsState()
     Overview(uiState.value, onSettingsClicked)
