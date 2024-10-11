@@ -17,6 +17,7 @@ import attowallet.composeapp.generated.resources.welcome_create_wallet
 import attowallet.composeapp.generated.resources.welcome_import_wallet
 import attowallet.composeapp.generated.resources.welcome_message
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.ButtonShape
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -35,7 +36,6 @@ fun WelcomeScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Button(
                 modifier = Modifier.fillMaxWidth(),

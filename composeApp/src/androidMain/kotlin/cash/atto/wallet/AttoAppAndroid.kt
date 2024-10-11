@@ -41,6 +41,7 @@ fun AttoNavHost(
 
         composable(route = SecretPhrase.route) {
             SecretPhraseScreen(
+                onBackNavigation = { navController.navigateUp() },
                 onBackupConfirmClicked = {
                     navController.navigate(Overview.route)
                 }
@@ -48,7 +49,9 @@ fun AttoNavHost(
         }
 
         composable(route = Settings.route) {
-            SettingsScreen()
+            SettingsScreen(
+                onBackNavigation = { navController.navigateUp() }
+            )
         }
 
         composable(route = Welcome.route) {

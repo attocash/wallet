@@ -8,7 +8,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.secret_backup
@@ -17,15 +22,43 @@ import attowallet.composeapp.generated.resources.secret_title
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.secret.SecretPhraseGrid
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.uistate.secret.SecretPhraseUiState
+import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SecretPhraseScreen(
-    onBackupConfirmClicked: () -> Unit
+    onBackNavigation: () -> Unit,
+    onBackupConfirmClicked: () -> Unit,
+    viewModel: SecretPhraseViewModel = SecretPhraseViewModel()
+) {
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val uiState = viewModel.state.collectAsState()
+
+    SecretPhrase(
+        uiState = uiState.value,
+        onBackNavigation = onBackNavigation,
+        onBackupConfirmClicked = onBackupConfirmClicked,
+        onCopyClick = { clipboardManager.setText(
+            AnnotatedString(
+                uiState.value
+                    .words
+                    .joinToString(" ")
+            )
+        )}
+    )
+}
+
+@Composable
+fun SecretPhrase(
+    uiState: SecretPhraseUiState,
+    onBackNavigation: () -> Unit,
+    onBackupConfirmClicked: () -> Unit,
+    onCopyClick: () -> Unit
 ) {
     Scaffold(
-        topBar = { AppBar() },
+        topBar = { AppBar(onBackNavigation) },
         content = {
             Column(
                 modifier = Modifier
@@ -35,19 +68,22 @@ fun SecretPhraseScreen(
                 Column(Modifier.fillMaxWidth().weight(1f)) {
                     Text(text = stringResource(Res.string.secret_title))
 
-                    SecretPhraseGrid(
-                        columns = 3,
-                        words = (1..24)
-                            .map { "Word$it" }
-                            .toList()
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        SecretPhraseGrid(
+                            columns = 3,
+                            words = uiState.words
+                        )
 
-                    Button(onClick = {}) {
-                        Text(text = stringResource(Res.string.secret_copy))
+                        Button(onClick = onCopyClick) {
+                            Text(text = stringResource(Res.string.secret_copy))
+                        }
                     }
                 }
 
-                Button(onClick = onBackupConfirmClicked) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onBackupConfirmClicked
+                ) {
                     Text(text = stringResource(Res.string.secret_backup))
                 }
             }
@@ -57,8 +93,13 @@ fun SecretPhraseScreen(
 
 @Preview
 @Composable
-fun SecretPhraseScreenPreview() {
+fun SecretPhrasePreview() {
     AttoWalletTheme {
-        SecretPhraseScreen(onBackupConfirmClicked = {})
+        SecretPhrase(
+            uiState = SecretPhraseUiState.DEFAULT,
+            onBackNavigation = {},
+            onBackupConfirmClicked = {},
+            onCopyClick = {}
+        )
     }
 }

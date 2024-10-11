@@ -1,14 +1,20 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.overview_receive
+import attowallet.composeapp.generated.resources.overview_send
 import cash.atto.wallet.components.overview.OverviewHeader
 import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -18,6 +24,7 @@ import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -40,7 +47,8 @@ fun Overview(
     ) {
         OverviewHeader(
             uiState = uiState.headerUiState,
-            onSettingsClicked = onSettingsClicked
+            onSettingsClicked = onSettingsClicked,
+            modifier = Modifier.fillMaxWidth()
         )
 
         TransactionsList(
@@ -48,9 +56,23 @@ fun Overview(
             modifier = Modifier.weight(1f)
         )
 
-        Row {
-            Button(onClick = {}) {}
-            Button(onClick = {}) {}
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Button(
+                onClick = {},
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(Res.string.overview_receive))
+            }
+
+            Button(
+                onClick = {},
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(Res.string.overview_send))
+            }
         }
     }
 }

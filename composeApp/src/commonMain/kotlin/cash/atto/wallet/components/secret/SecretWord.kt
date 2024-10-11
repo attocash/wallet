@@ -14,7 +14,7 @@ fun SecretWord(
     ordinal: Int,
     word: String
 ) {
-    Row {
+    Row(Modifier.padding(vertical = 8.dp)) {
         Text("${ordinal})")
         Text(
             text = word,
