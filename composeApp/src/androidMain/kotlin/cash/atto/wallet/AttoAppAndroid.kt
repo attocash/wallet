@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cash.atto.wallet.screens.OverviewScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
+import cash.atto.wallet.screens.SettingsScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
 
@@ -31,7 +32,11 @@ fun AttoNavHost(
         modifier = modifier
     ) {
         composable(route = Overview.route) {
-            OverviewScreen()
+            OverviewScreen(
+                onSettingsClicked = {
+                    navController.navigate(Settings.route)
+                }
+            )
         }
 
         composable(route = SecretPhrase.route) {
@@ -40,6 +45,10 @@ fun AttoNavHost(
                     navController.navigate(Overview.route)
                 }
             )
+        }
+
+        composable(route = Settings.route) {
+            SettingsScreen()
         }
 
         composable(route = Welcome.route) {

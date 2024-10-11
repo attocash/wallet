@@ -15,6 +15,14 @@
     <string name="secret_copy">Copy</string>
     <string name="secret_title">Secret Phrase</string>
 
+    <!-- settings -->
+    <string name="settings_contacts">Contacts</string>
+    <string name="settings_load">Load from Paper Wallet</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_representative">Change Representative</string>
+    <string name="settings_security">Security</string>
+
     <!-- welcome -->
     <string name="welcome_create_wallet">Create Wallet</string>
     <string name="welcome_import_wallet">Import Wallet</string>
