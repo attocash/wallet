@@ -1,5 +1,6 @@
 package cash.atto.wallet.components.overview
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
@@ -25,7 +27,12 @@ fun OverviewHeader(
     onSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier) {
+    Card(
+        modifier = modifier,
+//        border = BorderStroke(1.dp, attoColors.primary),
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = MaterialTheme.colors.onPrimary
+    ) {
         Box {
             Icon(
                 modifier = Modifier.align(Alignment.TopEnd)

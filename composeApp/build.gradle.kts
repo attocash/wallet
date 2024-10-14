@@ -44,6 +44,9 @@ kotlin {
             implementation("com.auth0:java-jwt:4.4.0")
             implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
+            // Koin support for Android
+            implementation(libs.koin.android)
+//            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -56,6 +59,7 @@ kotlin {
             implementation(libs.atto.commons)
 
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
 
             implementation("com.auth0:java-jwt:4.4.0")
@@ -73,6 +77,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
+
+            // Koin
+            //api(libs.koin.core)
+//            implementation(libs.koin.compose)
+            implementation(libs.koin.composeVM)
 
         }
         commonTest.dependencies {
@@ -133,6 +142,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.transport.runtime)
     testImplementation(libs.junit.jupiter)
 }
 

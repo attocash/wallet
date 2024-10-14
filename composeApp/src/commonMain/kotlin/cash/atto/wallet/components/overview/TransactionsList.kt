@@ -1,14 +1,19 @@
 package cash.atto.wallet.components.overview
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_transactions_title
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoColors
 import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -21,9 +26,13 @@ fun TransactionsList(
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
-        Text(text = stringResource(Res.string.overview_transactions_title))
+        Text(
+            modifier = Modifier.padding(vertical = 16.dp),
+            text = stringResource(Res.string.overview_transactions_title),
+            color = MaterialTheme.colors.onSurface
+        )
 
-        LazyColumn {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             items(uiState.transactions) { transaction ->
                 transaction?.let { TransactionItem(it) }
             }

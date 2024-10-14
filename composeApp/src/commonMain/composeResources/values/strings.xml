@@ -28,5 +28,5 @@
     <!-- welcome -->
     <string name="welcome_create_wallet">Create Wallet</string>
     <string name="welcome_import_wallet">Import Wallet</string>
-    <string name="welcome_message">Welcome screen message stub</string>
+    <string name="welcome_message">Welcome to Atto! To start, import your existing Atto wallet, or create a new one</string>
 </resources>
