@@ -84,6 +84,13 @@ kotlin {
 //            implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
 
+            // Window size class
+            implementation(libs.material3.window.size)
+
+            // decompose
+            implementation(libs.decompose)
+            implementation(libs.decompose.extensions.compose)
+//            implementation(libs.decompose.extensions.compose.jetbrains)
         }
         commonTest.dependencies {
             implementation(libs.junit.jupiter)
@@ -96,7 +103,6 @@ kotlin {
             implementation(libs.jna)
             implementation("com.auth0:java-jwt:4.4.0")
             implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-
         }
 
 //        iosMain.dependencies {

@@ -30,7 +30,7 @@ fun AttoNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Welcome.route,
+        startDestination = AttoDestination.Welcome.route,
         modifier = modifier,
         enterTransition = { slideIntoContainer(
             AnimatedContentTransitionScope.SlideDirection.Start,
@@ -46,33 +46,33 @@ fun AttoNavHost(
         ) },
         popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(700)) }
     ) {
-        composable(route = Overview.route) {
+        composable(route = AttoDestination.Overview.route) {
             OverviewScreen(
                 onSettingsClicked = {
-                    navController.navigate(Settings.route)
+                    navController.navigate(AttoDestination.Settings.route)
                 }
             )
         }
 
-        composable(route = SecretPhrase.route) {
+        composable(route = AttoDestination.SecretPhrase.route) {
             SecretPhraseScreen(
                 onBackNavigation = { navController.navigateUp() },
                 onBackupConfirmClicked = {
-                    navController.navigate(Overview.route)
+                    navController.navigate(AttoDestination.Overview.route)
                 }
             )
         }
 
-        composable(route = Settings.route) {
+        composable(route = AttoDestination.Settings.route) {
             SettingsScreen(
                 onBackNavigation = { navController.navigateUp() }
             )
         }
 
-        composable(route = Welcome.route) {
+        composable(route = AttoDestination.Welcome.route) {
             WelcomeScreen(
                 onCreateSecretClicked = {
-                    navController.navigate(SecretPhrase.route)
+                    navController.navigate(AttoDestination.SecretPhrase.route)
                 }
             )
         }

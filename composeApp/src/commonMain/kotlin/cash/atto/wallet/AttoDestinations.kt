@@ -1,37 +1,48 @@
 package cash.atto.wallet
 
-interface AttoDestination {
-    val route: String
-}
+import kotlinx.serialization.Serializable
 
-object ConfirmPin : AttoDestination {
-    override val route = "confirmPin"
-}
+@Serializable
+sealed class AttoDestination {
+    abstract val route: String
 
-object CreatePin : AttoDestination {
-    override val route = "createPin"
-}
+    @Serializable
+    object ConfirmPin : AttoDestination() {
+        override val route = "confirmPin"
+    }
 
-object Overview : AttoDestination {
-    override val route = "overview"
-}
+    @Serializable
+    object CreatePin : AttoDestination() {
+        override val route = "createPin"
+    }
 
-object SafetyWarning : AttoDestination {
-    override val route = "overview"
-}
+    @Serializable
+    object Overview : AttoDestination() {
+        override val route = "overview"
+    }
 
-object SecretBackupConfirmation : AttoDestination {
-    override val route = "safetyWarning"
-}
+    @Serializable
+    object SafetyWarning : AttoDestination() {
+        override val route = "overview"
+    }
 
-object SecretPhrase : AttoDestination {
-    override val route = "secretPhrase"
-}
+    @Serializable
+    object SecretBackupConfirmation : AttoDestination() {
+        override val route = "safetyWarning"
+    }
 
-object Settings : AttoDestination {
-    override val route = "settings"
-}
+    @Serializable
+    object SecretPhrase : AttoDestination() {
+        override val route = "secretPhrase"
+    }
 
-object Welcome : AttoDestination {
-    override val route = "welcome"
+    @Serializable
+    object Settings : AttoDestination() {
+        override val route = "settings"
+    }
+
+    @Serializable
+    object Welcome : AttoDestination() {
+        override val route = "welcome"
+    }
 }
