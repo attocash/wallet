@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.welcome_create_wallet
@@ -39,6 +40,7 @@ fun WelcomeScreen(
                 .padding(horizontal = 16.dp),
             text = stringResource(Res.string.welcome_message),
             color = MaterialTheme.colors.onSurface,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6
         )
 

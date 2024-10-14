@@ -29,7 +29,7 @@ val attoColors = lightColors(
 //    primaryVariant = brown_600,
 //    secondary = blue_900,
 //    secondaryVariant = blue_800,
-    background = gray_500,
+    background = gray_900,
     surface = Color.Black,
     error = red_900,
     onPrimary = Color.Black,
@@ -41,7 +41,7 @@ val attoColors = lightColors(
 
 val Colors.divider: Color
     @Composable
-    get() = gray_500
+    get() = gray_800
 
 val attoShapes = Shapes(
     small = RoundedCornerShape(24.dp),
