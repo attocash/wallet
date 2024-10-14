@@ -2,8 +2,12 @@ package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -15,7 +19,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AppBar(onBackNavigation: () -> Unit) {
-    Box(Modifier.fillMaxWidth()) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = WindowInsets.systemBars
+                    .asPaddingValues()
+                    .calculateTopPadding()
+            )
+    ) {
         Icon(
             modifier = Modifier
                 .clickable { onBackNavigation.invoke() }

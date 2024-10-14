@@ -1,12 +1,16 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +21,6 @@ import attowallet.composeapp.generated.resources.welcome_create_wallet
 import attowallet.composeapp.generated.resources.welcome_import_wallet
 import attowallet.composeapp.generated.resources.welcome_message
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.ButtonShape
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -25,11 +28,18 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun WelcomeScreen(
     onCreateSecretClicked: () -> Unit
 ) {
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.surface)
+            .safeDrawingPadding()
+    ) {
         Text(
             modifier = Modifier
-                .align(Alignment.Center),
-            text = stringResource(Res.string.welcome_message)
+                .align(Alignment.Center)
+                .padding(horizontal = 16.dp),
+            text = stringResource(Res.string.welcome_message),
+            color = MaterialTheme.colors.onSurface,
+            style = MaterialTheme.typography.h6
         )
 
         Column(

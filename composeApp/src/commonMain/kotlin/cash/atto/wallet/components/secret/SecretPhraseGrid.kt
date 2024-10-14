@@ -5,10 +5,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.divider
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -29,7 +31,7 @@ fun SecretPhraseGrid(
         ) { index, item ->
             item?.let {
                 SecretWord(index + 1, it)
-            } ?: Divider(color = Color.Black)
+            } ?: Divider(color = MaterialTheme.colors.divider)
         }
     }
 }

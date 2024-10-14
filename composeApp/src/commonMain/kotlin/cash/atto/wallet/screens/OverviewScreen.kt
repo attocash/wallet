@@ -1,18 +1,27 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
@@ -27,14 +36,16 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.KoinContext
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreen(
-    onSettingsClicked: () -> Unit,
-    viewModel: OverviewViewModel = viewModel { OverviewViewModel() }
-) {
-    val uiState = viewModel.state.collectAsState()
-    Overview(uiState.value, onSettingsClicked)
+fun OverviewScreen(onSettingsClicked: () -> Unit) {
+    KoinContext {
+        val viewModel = koinViewModel<OverviewViewModel>()
+        val uiState = viewModel.state.collectAsState()
+        Overview(uiState.value, onSettingsClicked)
+    }
 }
 
 @Composable
@@ -44,6 +55,8 @@ fun Overview(
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.surface)
+            .safeDrawingPadding()
             .padding(16.dp)
     ) {
         OverviewHeader(
@@ -63,14 +76,19 @@ fun Overview(
         ) {
             Button(
                 onClick = {},
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(text = stringResource(Res.string.overview_receive))
             }
 
-            Button(
+            OutlinedButton(
                 onClick = {},
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.onPrimary,
+                    contentColor = MaterialTheme.colors.primary
+                )
             ) {
                 Text(text = stringResource(Res.string.overview_send))
             }
