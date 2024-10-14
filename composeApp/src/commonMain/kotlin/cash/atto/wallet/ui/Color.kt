@@ -12,7 +12,8 @@ import androidx.compose.ui.graphics.Color
 //
 
 val gray_100 = Color(0xFFF5F5F5)
-val gray_500 = Color(0x33FFFFFF)
+val gray_800 = Color(0xFF424242)
+val gray_900 = Color(0xFF212121)
 
 val red_900 = Color(0xFF5A1D08)
 

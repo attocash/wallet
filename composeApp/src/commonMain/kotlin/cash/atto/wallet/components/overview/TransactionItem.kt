@@ -1,6 +1,7 @@
 package cash.atto.wallet.components.overview
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -22,15 +24,30 @@ fun TransactionItem(uiState: TransactionUiState) {
     Card(
         backgroundColor = MaterialTheme.colors.background,
     ) {
-        Row(Modifier.fillMaxWidth().padding(16.dp)) {
-            Icon(uiState.icon, "operation type icon")
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = uiState.icon,
+                contentDescription = "operation type icon",
+                tint = MaterialTheme.colors.primary
+            )
 
             Column(Modifier.weight(1f)) {
                 Text(uiState.typeString)
-                Text(uiState.amount)
+                Text(
+                    text = uiState.amount,
+                    style = MaterialTheme.typography.body2
+                )
             }
 
-            Text(uiState.shownSource)
+            Text(
+                text = uiState.shownSource,
+                style = MaterialTheme.typography.body2
+            )
         }
     }
 }
