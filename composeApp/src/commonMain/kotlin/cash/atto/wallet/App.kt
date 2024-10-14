@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.compose_multiplatform
 import cash.atto.commons.AttoMnemonic
+import cash.atto.commons.AttoMnemonicDictionary
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -33,11 +34,10 @@ fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         var inputText by remember { mutableStateOf("") }
-        val dictionary = AttoMnemonic.dictionary.toSortedSet()
 
         val words = inputText.trim().lowercase().split("\\s+".toRegex())
         val wordsCount = words.size
-        val allWordsValid = words.all { it in dictionary }
+        val allWordsValid = words.all { it in AttoMnemonicDictionary.set }
 
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             // Button to generate 24 words
