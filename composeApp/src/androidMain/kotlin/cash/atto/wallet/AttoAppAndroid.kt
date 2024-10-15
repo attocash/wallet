@@ -18,7 +18,7 @@ import cash.atto.wallet.ui.AttoWalletTheme
 fun AttoAppAndroid() {
     AttoWalletTheme {
         val navController = rememberNavController()
-        
+
         AttoNavHost(navController = navController)
     }
 }

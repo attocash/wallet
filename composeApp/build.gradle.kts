@@ -10,6 +10,15 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
 }
 
+repositories {
+    google()
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
+}
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -42,8 +51,6 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.core.splashscreen)
-            implementation("com.auth0:java-jwt:4.4.0")
-            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
             // Koin support for Android
             implementation(libs.koin.android)
@@ -57,7 +64,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            implementation(libs.atto.commons)
+            implementation(libs.atto.commons.wallet)
 
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
@@ -143,6 +150,7 @@ android {
     buildFeatures {
         compose = true
     }
+    buildToolsVersion = "35.0.0"
     dependencies {
         debugImplementation(compose.uiTooling)
     }

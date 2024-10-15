@@ -19,13 +19,13 @@ junit = "4.13.2"
 kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.1"
 ktor = "2.3.12"
-atto-commons = "2.15.0"
+atto-commons = "cca429c-SNAPSHOT"
 jna = "5.14.0"
 junitJupiter = "5.8.1"
-material3WindowSize = "0.5.0"
 navigationCompose = "2.8.2"
 koin = "4.0.0"
 transportRuntime = "3.3.0"
+material3WindowSize = "0.5.0"
 
 [libraries]
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
@@ -52,7 +52,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-atto-commons = { module = "cash.atto:commons", version.ref = "atto-commons" }
+atto-commons-wallet = { module = "cash.atto:commons-wallet", version.ref = "atto-commons" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }

@@ -4,6 +4,7 @@ import cash.atto.commons.AttoMnemonic
 import cash.atto.commons.AttoPrivateKey
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.toPrivateKey
+import cash.atto.commons.toPublicKey
 import cash.atto.commons.toSeed
 import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +28,12 @@ class AppStateRepository {
         private: AttoPrivateKey,
         public: AttoPublicKey
     ) {
-        _state.emit(AppState(
-            privateKey = private,
-            publicKey = public
-        ))
+        _state.emit(
+            AppState(
+                privateKey = private,
+                publicKey = public
+            )
+        )
     }
 
     suspend fun deleteKeys() {

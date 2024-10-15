@@ -36,7 +36,7 @@ class OverviewViewModel(
                     state.value.copy(
                         headerUiState = OverviewHeaderUiState(
                             attoCoins = it?.balance
-                                ?.toBigDecimal(AttoUnit.ATTO)
+                                ?.toString(AttoUnit.ATTO)?.toBigDecimal()
                                 ?: BigDecimal.ZERO
                         )
                     )
