@@ -17,11 +17,11 @@ object Overview : AttoDestination {
 }
 
 object SafetyWarning : AttoDestination {
-    override val route = "overview"
+    override val route = "safetyWarning"
 }
 
 object SecretBackupConfirmation : AttoDestination {
-    override val route = "safetyWarning"
+    override val route = "secretBackupConfirm"
 }
 
 object SecretPhrase : AttoDestination {
