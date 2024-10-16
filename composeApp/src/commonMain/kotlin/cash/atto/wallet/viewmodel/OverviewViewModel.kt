@@ -43,7 +43,9 @@ class OverviewViewModel(
 
         CoroutineScope(Dispatchers.Default).launch {
             walletState.filterNotNull().collect { wallet ->
+                println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
                 wallet.accountFlow.collect { account ->
+                    println("Account $account")
                     _state.emit(
                         state.value.copy(
                             headerUiState = OverviewHeaderUiState(
