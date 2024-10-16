@@ -16,5 +16,6 @@ data class AppState(
 
     companion object {
         val DEFAULT = AppState(null)
+//        val DEFAULT = AppState(AttoMnemonic("ring mask spirit scissors best differ mean pet print century loyal major brain path already version jaguar rescue elder slender anxiety behind leg pigeon"))
     }
 }

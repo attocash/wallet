@@ -3,6 +3,7 @@ package cash.atto.wallet.di
 import cash.atto.wallet.repository.AccountsRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.AuthRepository
+import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
@@ -44,6 +45,7 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     includes(repositoryModule)
+    viewModelOf(::AppViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::SecretPhraseViewModel)
     viewModelOf(::SettingsViewModel)

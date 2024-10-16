@@ -58,8 +58,10 @@ class OverviewViewModel(
     }
 }
 
-private fun createWalletManager(state: AppState): AttoWalletManager {
-    require(state.privateKey != null) {}
+private fun createWalletManager(state: AppState): AttoWalletManager? {
+    if (state.privateKey == null)
+        return null
+
     val signer = state.privateKey.toSigner()
     val client = AttoClient.createAtto(AttoNetwork.DEV, signer)
     val transactionRepository = AttoTransactionRepository.inMemory() // TODO persist
