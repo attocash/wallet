@@ -14,6 +14,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -36,8 +37,11 @@ val httpClientModule = module {
     }
 }
 
+expect val dataSourceModule: Module
+
 val repositoryModule = module {
     includes(httpClientModule)
+    includes(dataSourceModule)
     singleOf(::AccountsRepository)
     singleOf(::AppStateRepository)
     singleOf(::AuthRepository)

@@ -1,9 +1,13 @@
 package cash.atto.wallet.uistate
 
 data class AppUiState(
-    val skipWelcome: Boolean
+    val shownScreen: ShownScreen
 ) {
+    enum class ShownScreen {
+        LOADER, WELCOME, OVERVIEW
+    }
+
     companion object {
-        val DEFAULT = AppUiState(false)
+        val DEFAULT = AppUiState(ShownScreen.LOADER)
     }
 }

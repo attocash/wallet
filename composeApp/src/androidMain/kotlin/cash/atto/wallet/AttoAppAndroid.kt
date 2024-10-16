@@ -2,8 +2,17 @@ package cash.atto.wallet
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -24,11 +33,11 @@ fun AttoAppAndroid() {
     AttoWalletTheme {
         KoinContext {
             val viewModel = koinViewModel<AppViewModel>()
-            val uiState = viewModel.getAppState()
+            val uiState = viewModel.state.collectAsState()
             val navController = rememberNavController()
 
             AttoNavHost(
-                uiState = uiState,
+                uiState = uiState.value,
                 navController = navController
             )
         }
@@ -41,70 +50,84 @@ fun AttoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = if (uiState.skipWelcome)
-            AttoDestination.Overview.route
-        else AttoDestination.Welcome.route,
-        modifier = modifier,
-        enterTransition = { slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.Start,
-            tween(700)
-        ) },
-        exitTransition = { slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.Start,
-            tween(700)
-        ) },
-        popEnterTransition = { slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.End,
-            tween(700)
-        ) },
-        popExitTransition = { slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.End,
-            tween(700)
-        ) }
-    ) {
-        composable(route = AttoDestination.Overview.route) {
-            OverviewScreen(
-                onSettingsClicked = {
-                    navController.navigate(AttoDestination.Settings.route)
-                }
+    if (uiState.shownScreen == AppUiState.ShownScreen.LOADER) {
+        Box(
+            modifier = modifier.fillMaxSize()
+                .background(color = MaterialTheme.colors.surface)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+                    .width(64.dp),
+                color = MaterialTheme.colors.primary
             )
         }
+    } else {
+        NavHost(
+            navController = navController,
+            startDestination =
+                if (uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW)
+                    AttoDestination.Overview.route
+                else AttoDestination.Welcome.route,
+            modifier = modifier,
+            enterTransition = { slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(700)
+            ) },
+            exitTransition = { slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(700)
+            ) },
+            popEnterTransition = { slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(700)
+            ) },
+            popExitTransition = { slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(700)
+            ) }
+        ) {
+            composable(route = AttoDestination.Overview.route) {
+                OverviewScreen(
+                    onSettingsClicked = {
+                        navController.navigate(AttoDestination.Settings.route)
+                    }
+                )
+            }
 
-        composable(route = AttoDestination.SecretPhrase.route) {
-            SecretPhraseScreen(
-                onBackNavigation = { navController.navigateUp() },
-                onBackupConfirmClicked = {
-                    navController.navigate(AttoDestination.Overview.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            inclusive = true
-                            saveState = true
+            composable(route = AttoDestination.SecretPhrase.route) {
+                SecretPhraseScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onBackupConfirmClicked = {
+                        navController.navigate(AttoDestination.Overview.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = true
+                                saveState = true
+                            }
                         }
                     }
-                }
-            )
-        }
+                )
+            }
 
-        composable(route = AttoDestination.Settings.route) {
-            SettingsScreen(
-                onBackNavigation = { navController.navigateUp() },
-                onLogoutNavigation = {
-                    navController.navigate(AttoDestination.Welcome.route) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = false
+            composable(route = AttoDestination.Settings.route) {
+                SettingsScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onLogoutNavigation = {
+                        navController.navigate(AttoDestination.Welcome.route) {
+                            popUpTo(navController.graph.id) {
+                                inclusive = false
+                            }
                         }
                     }
-                }
-            )
-        }
+                )
+            }
 
-        composable(route = AttoDestination.Welcome.route) {
-            WelcomeScreen(
-                onCreateSecretClicked = {
-                    navController.navigate(AttoDestination.SecretPhrase.route)
-                }
-            )
+            composable(route = AttoDestination.Welcome.route) {
+                WelcomeScreen(
+                    onCreateSecretClicked = {
+                        navController.navigate(AttoDestination.SecretPhrase.route)
+                    }
+                )
+            }
         }
     }
 }
