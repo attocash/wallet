@@ -96,37 +96,37 @@ fun AttoNavHost(
                 )
             }
 
-        composable(route = AttoDestination.SafetyWarning.route) {
-            SafetyWarningScreen(
-                onBackNavigation = { navController.navigateUp() },
-                onConfirmClicked = {
-                    navController.navigate(AttoDestination.SecretPhrase.route)
-                }
-            )
-        }
+            composable(route = AttoDestination.SafetyWarning.route) {
+                SafetyWarningScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onConfirmClicked = {
+                        navController.navigate(AttoDestination.SecretPhrase.route)
+                    }
+                )
+            }
 
-        composable(route = AttoDestination.SecretBackupConfirmation.route) {
-            SecretBackupConfirmScreen(
-                onBackNavigation = { navController.navigateUp() },
-                onConfirmClicked = {
-                    navController.navigate(AttoDestination.Overview.route)
-                }
-            )
-        }
-
-        composable(route = AttoDestination.SecretPhrase.route) {
-            SecretPhraseScreen(
-                onBackNavigation = { navController.navigateUp() },
-                onBackupConfirmClicked = {
-                    navController.navigate(AttoDestination.Overview.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            inclusive = true
-                            saveState = true
+            composable(route = AttoDestination.SecretBackupConfirmation.route) {
+                SecretBackupConfirmScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onConfirmClicked = {
+                        navController.navigate(AttoDestination.Overview.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = true
+                                saveState = true
+                            }
                         }
                     }
-                }
-            )
-        }
+                )
+            }
+
+            composable(route = AttoDestination.SecretPhrase.route) {
+                SecretPhraseScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onBackupConfirmClicked = {
+                        navController.navigate(AttoDestination.SecretBackupConfirmation.route)
+                    }
+                )
+            }
 
             composable(route = AttoDestination.Settings.route) {
                 SettingsScreen(
@@ -141,12 +141,13 @@ fun AttoNavHost(
                 )
             }
 
-        composable(route = AttoDestination.Welcome.route) {
-            WelcomeScreen(
-                onCreateSecretClicked = {
-                    navController.navigate(AttoDestination.SafetyWarning.route)
-                }
-            )
+            composable(route = AttoDestination.Welcome.route) {
+                WelcomeScreen(
+                    onCreateSecretClicked = {
+                        navController.navigate(AttoDestination.SafetyWarning.route)
+                    }
+                )
+            }
         }
     }
 }

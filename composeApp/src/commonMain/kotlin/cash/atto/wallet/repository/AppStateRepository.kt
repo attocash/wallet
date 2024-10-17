@@ -32,15 +32,6 @@ class AppStateRepository(
             mnemonic.words.joinToString(" ")
         )
 
-        println(
-            "Address: ${
-                AttoAddress(
-                    AttoAlgorithm.V1,
-                    _state.value.publicKey!!
-                )
-            }"
-        ) // TODO: remove me
-
         return mnemonic.words
     }
 

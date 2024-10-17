@@ -21,6 +21,7 @@ import attowallet.composeapp.generated.resources.backup_confirm_subtitle
 import attowallet.composeapp.generated.resources.backup_confirm_title
 import attowallet.composeapp.generated.resources.backup_confirm_yes
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -68,7 +69,7 @@ fun SecretBackupConfirmScreen(
                         Text(text = stringResource(Res.string.backup_confirm_yes))
                     }
 
-                    Button(
+                    AttoOutlinedButton(
                         onClick = onBackNavigation,
                         modifier = Modifier.fillMaxWidth()
                     ) {

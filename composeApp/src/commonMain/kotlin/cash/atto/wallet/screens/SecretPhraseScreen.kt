@@ -93,13 +93,13 @@ fun SecretPhrase(
                             words = uiState.words
                         )
 
-                        Button(onClick = onCopyClick) {
+                        AttoOutlinedButton(onClick = onCopyClick) {
                             Text(text = stringResource(Res.string.secret_copy))
                         }
                     }
                 }
 
-                AttoOutlinedButton(
+                Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onBackupConfirmClicked
                 ) {
