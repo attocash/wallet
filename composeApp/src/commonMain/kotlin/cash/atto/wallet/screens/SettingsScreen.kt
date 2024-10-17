@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.components.settings.Profile
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -20,17 +20,23 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SettingsScreen(onBackNavigation: () -> Unit) {
+fun SettingsScreen(
+    onBackNavigation: () -> Unit,
+    onLogoutNavigation: () -> Unit
+) {
     KoinContext {
         val viewModel = koinViewModel<SettingsViewModel>()
         val uiState = viewModel.state.collectAsState()
 
         Settings(
-            uiState = SettingsUiState(
-                profileUiState = uiState.value.profileUiState,
-                settingsListUiState = uiState.value.settingsListUiState
-            ),
-            onBackNavigation = onBackNavigation
+            uiState = uiState.value,
+            onBackNavigation = onBackNavigation,
+            onDismissLogout = { viewModel.hideLogoutDialog() },
+            onConfirmLogout = {
+                viewModel.logout()
+                viewModel.hideLogoutDialog()
+                onLogoutNavigation()
+            }
         )
     }
 }
@@ -38,7 +44,9 @@ fun SettingsScreen(onBackNavigation: () -> Unit) {
 @Composable
 fun Settings(
     uiState: SettingsUiState,
-    onBackNavigation: () -> Unit
+    onBackNavigation: () -> Unit,
+    onDismissLogout: () -> Unit,
+    onConfirmLogout: () -> Unit
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
@@ -55,6 +63,12 @@ fun Settings(
                     uiState = uiState.settingsListUiState
                 )
             }
+
+            if (uiState.showLogoutDialog)
+                LogoutDialog(
+                    onDismiss = onDismissLogout,
+                    onConfirm = onConfirmLogout
+                )
         }
     )
 }
@@ -63,6 +77,11 @@ fun Settings(
 @Composable
 fun SettingsPreview() {
     AttoWalletTheme {
-        Settings(SettingsUiState.PREVIEW) {}
+        Settings(
+            uiState = SettingsUiState.PREVIEW,
+            onBackNavigation = {},
+            onDismissLogout = {},
+            onConfirmLogout = {}
+        )
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import cash.atto.commons.AttoMnemonic
+import cash.atto.wallet.util.dataStore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 

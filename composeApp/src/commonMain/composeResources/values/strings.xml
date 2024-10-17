@@ -5,6 +5,12 @@
     <string name="backup_confirm_title">Are you sure that you have backed up your secret phrase?</string>
     <string name="backup_confirm_yes">Yes</string>
 
+    <!-- logout -->
+    <string name="logout_cancel">CANCEL</string>
+    <string name="logout_confirm">DELETE INFO AND LOGOUT</string>
+    <string name="logout_text">Logging out will remove your keys and account information from your device. If your secret phrase is not backed up, you will never be able to access your funds again.</string>
+    <string name="logout_title">WARNING</string>
+
     <!-- overview -->
     <string name="overview_hint">Welcome to Atto. Once you receive some, transactions will show up like this:</string>
     <string name="overview_hint_amount_from">A lot of Atto</string>

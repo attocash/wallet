@@ -1,4 +1,4 @@
-package cash.atto.wallet
+package cash.atto.wallet.util
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
