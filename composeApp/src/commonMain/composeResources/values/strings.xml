@@ -1,4 +1,10 @@
 <resources>
+    <!-- backup confirm -->
+    <string name="backup_confirm_no">No</string>
+    <string name="backup_confirm_subtitle">You will need your secret phrase to recover your funds if you lose your device or uninstall the application.</string>
+    <string name="backup_confirm_title">Are you sure that you have backed up your secret phrase?</string>
+    <string name="backup_confirm_yes">Yes</string>
+
     <!-- overview -->
     <string name="overview_hint">Welcome to Atto. Once you receive some, transactions will show up like this:</string>
     <string name="overview_hint_amount_from">A lot of Atto</string>
@@ -12,6 +18,12 @@
     <string name="overview_transactions_title">TRANSACTIONS</string>
     <string name="overview_transaction_from">from</string>
     <string name="overview_transaction_to">to</string>
+
+    <!-- safety warning -->
+    <string name="safety_warning_confirm">Got It!</string>
+    <string name="safety_warning_description">In the next screen, you will see your secret phrase. It is a password to access your funds. It is crucial that you back it up and never share it with anyone.</string>
+    <string name="safety_warning_hint">If you lose your device or uninstall your application, you will need your secret phrase to recover your funds!</string>
+    <string name="safety_warning_title">Safety First!</string>
 
     <!-- secret -->
     <string name="secret_backup">I've Backed It Up</string>

@@ -23,12 +23,12 @@ sealed class AttoDestination {
 
     @Serializable
     object SafetyWarning : AttoDestination() {
-        override val route = "overview"
+        override val route = "safetyWarning"
     }
 
     @Serializable
     object SecretBackupConfirmation : AttoDestination() {
-        override val route = "safetyWarning"
+        override val route = "secretBackupConfirm"
     }
 
     @Serializable

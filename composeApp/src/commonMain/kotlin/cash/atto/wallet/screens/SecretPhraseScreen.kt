@@ -72,7 +72,7 @@ fun SecretPhrase(
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
-        content = { padding ->
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

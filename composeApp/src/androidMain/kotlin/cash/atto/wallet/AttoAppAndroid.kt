@@ -9,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cash.atto.wallet.screens.OverviewScreen
+import cash.atto.wallet.screens.SafetyWarningScreen
+import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.SettingsScreen
 import cash.atto.wallet.screens.WelcomeScreen
@@ -54,11 +56,29 @@ fun AttoNavHost(
             )
         }
 
+        composable(route = SafetyWarning.route) {
+            SafetyWarningScreen(
+                onBackNavigation = { navController.navigateUp() },
+                onConfirmClicked = {
+                    navController.navigate(SecretPhrase.route)
+                }
+            )
+        }
+
+        composable(route = SecretBackupConfirmation.route) {
+            SecretBackupConfirmScreen(
+                onBackNavigation = { navController.navigateUp() },
+                onConfirmClicked = {
+                    navController.navigate(Overview.route)
+                }
+            )
+        }
+
         composable(route = AttoDestination.SecretPhrase.route) {
             SecretPhraseScreen(
                 onBackNavigation = { navController.navigateUp() },
                 onBackupConfirmClicked = {
-                    navController.navigate(AttoDestination.Overview.route)
+                    navController.navigate(SecretBackupConfirmation.route)
                 }
             )
         }
@@ -72,7 +92,7 @@ fun AttoNavHost(
         composable(route = AttoDestination.Welcome.route) {
             WelcomeScreen(
                 onCreateSecretClicked = {
-                    navController.navigate(AttoDestination.SecretPhrase.route)
+                    navController.navigate(SafetyWarning.route)
                 }
             )
         }
