@@ -56,20 +56,20 @@ fun AttoNavHost(
             )
         }
 
-        composable(route = SafetyWarning.route) {
+        composable(route = AttoDestination.SafetyWarning.route) {
             SafetyWarningScreen(
                 onBackNavigation = { navController.navigateUp() },
                 onConfirmClicked = {
-                    navController.navigate(SecretPhrase.route)
+                    navController.navigate(AttoDestination.SecretPhrase.route)
                 }
             )
         }
 
-        composable(route = SecretBackupConfirmation.route) {
+        composable(route = AttoDestination.SecretBackupConfirmation.route) {
             SecretBackupConfirmScreen(
                 onBackNavigation = { navController.navigateUp() },
                 onConfirmClicked = {
-                    navController.navigate(Overview.route)
+                    navController.navigate(AttoDestination.Overview.route)
                 }
             )
         }
@@ -78,7 +78,7 @@ fun AttoNavHost(
             SecretPhraseScreen(
                 onBackNavigation = { navController.navigateUp() },
                 onBackupConfirmClicked = {
-                    navController.navigate(SecretBackupConfirmation.route)
+                    navController.navigate(AttoDestination.SecretBackupConfirmation.route)
                 }
             )
         }
@@ -92,7 +92,7 @@ fun AttoNavHost(
         composable(route = AttoDestination.Welcome.route) {
             WelcomeScreen(
                 onCreateSecretClicked = {
-                    navController.navigate(SafetyWarning.route)
+                    navController.navigate(AttoDestination.SafetyWarning.route)
                 }
             )
         }
