@@ -1,22 +1,15 @@
 package cash.atto.wallet.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
+import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.overview.OverviewHeader
 import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -81,14 +75,9 @@ fun Overview(
                 Text(text = stringResource(Res.string.overview_receive))
             }
 
-            OutlinedButton(
+            AttoOutlinedButton(
                 onClick = {},
                 modifier = Modifier.weight(1f),
-                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.onPrimary,
-                    contentColor = MaterialTheme.colors.primary
-                )
             ) {
                 Text(text = stringResource(Res.string.overview_send))
             }

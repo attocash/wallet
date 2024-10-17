@@ -21,6 +21,7 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.welcome_create_wallet
 import attowallet.composeapp.generated.resources.welcome_import_wallet
 import attowallet.composeapp.generated.resources.welcome_message
+import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -56,7 +57,7 @@ fun WelcomeScreen(
                 Text(stringResource(Res.string.welcome_create_wallet))
             }
 
-            Button(
+            AttoOutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {}
             ) {

@@ -28,6 +28,7 @@ import attowallet.composeapp.generated.resources.secret_backup
 import attowallet.composeapp.generated.resources.secret_copy
 import attowallet.composeapp.generated.resources.secret_title
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.secret.SecretPhraseGrid
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
@@ -98,7 +99,7 @@ fun SecretPhrase(
                     }
                 }
 
-                Button(
+                AttoOutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onBackupConfirmClicked
                 ) {
