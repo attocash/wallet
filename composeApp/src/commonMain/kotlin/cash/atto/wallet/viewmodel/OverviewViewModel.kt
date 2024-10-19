@@ -5,6 +5,7 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoUnit
+import cash.atto.commons.toAddress
 import cash.atto.commons.toSigner
 import cash.atto.commons.wallet.AttoClient
 import cash.atto.commons.wallet.AttoTransactionRepository
@@ -38,6 +39,11 @@ class OverviewViewModel(
 
             appStateRepository.state.collect {
                 walletState.emit(createWalletManager(it))
+                _state.emit(state.value.copy(
+                    receiveAddress = it.publicKey
+                        ?.toAddress(AttoAlgorithm.V1)
+                        ?.value
+                ))
             }
         }
 

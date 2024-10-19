@@ -1,5 +1,6 @@
 package cash.atto.wallet.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,8 +22,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
@@ -39,14 +42,15 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreen(onSettingsClicked: () -> Unit) {
+fun OverviewScreenAndroid(onSettingsClicked: () -> Unit) {
     KoinContext {
         val viewModel = koinViewModel<OverviewViewModel>()
         val uiState = viewModel.state.collectAsState()
 
         val clipboardManager: ClipboardManager = LocalClipboardManager.current
+        val context = LocalContext.current
 
-        Overview(
+        OverviewAndroid(
             uiState = uiState.value,
             onSettingsClicked = onSettingsClicked,
             onReceiveCopyClick = {
@@ -54,14 +58,23 @@ fun OverviewScreen(onSettingsClicked: () -> Unit) {
                     clipboardManager.setText(AnnotatedString(it))
                 }
             },
-            onReceiveShareClick = {}
+            onReceiveShareClick = {
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, uiState.value.receiveAddress)
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                context.startActivity(shareIntent)
+            }
         )
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Overview(
+fun OverviewAndroid(
     uiState: OverviewUiState,
     onSettingsClicked: () -> Unit,
     onReceiveCopyClick: () -> Unit,

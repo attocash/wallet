@@ -20,6 +20,8 @@
     <string name="overview_hint_type_from">Received</string>
     <string name="overview_hint_type_to">Sent</string>
     <string name="overview_receive">Receive</string>
+    <string name="overview_receive_copy">Copy</string>
+    <string name="overview_receive_share">Share</string>
     <string name="overview_send">Send</string>
     <string name="overview_transactions_title">TRANSACTIONS</string>
     <string name="overview_transaction_from">from</string>

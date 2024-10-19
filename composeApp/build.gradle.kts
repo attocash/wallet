@@ -98,6 +98,9 @@ kotlin {
             implementation(libs.decompose)
             implementation(libs.decompose.extensions.compose)
 //            implementation(libs.decompose.extensions.compose.jetbrains)
+
+            //qr
+            implementation(libs.qr.kit)
         }
         commonTest.dependencies {
             implementation(libs.junit.jupiter)

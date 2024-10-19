@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cash.atto.wallet.screens.OverviewScreen
+import cash.atto.wallet.screens.OverviewScreenAndroid
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
@@ -89,7 +90,7 @@ fun AttoNavHost(
             ) }
         ) {
             composable(route = AttoDestination.Overview.route) {
-                OverviewScreen(
+                OverviewScreenAndroid(
                     onSettingsClicked = {
                         navController.navigate(AttoDestination.Settings.route)
                     }

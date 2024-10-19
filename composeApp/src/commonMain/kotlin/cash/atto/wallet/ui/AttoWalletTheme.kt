@@ -49,6 +49,11 @@ val attoShapes = Shapes(
     large = RoundedCornerShape(8.dp)
 )
 
+val BottomSheetShape = RoundedCornerShape(
+    topStart = 20.dp,
+    topEnd = 20.dp
+)
+
 @Composable
 fun AttoWalletTheme(content: @Composable () -> Unit) {
     MaterialTheme(
