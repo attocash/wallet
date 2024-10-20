@@ -1,6 +1,9 @@
 package cash.atto.wallet.di
 
-import org.koin.core.module.Module
+import cash.atto.wallet.datasource.SeedDataSource
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 
-actual val dataSourceModule: Module
-    get() = TODO("Not yet implemented")
+actual val dataSourceModule = module {
+    singleOf(::SeedDataSource)
+}
