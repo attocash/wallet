@@ -1,13 +1,14 @@
 package cash.atto.wallet.datasource
 
+import cash.atto.wallet.PlatformType
+import cash.atto.wallet.getPlatform
 import kotlinx.coroutines.flow.Flow
 
 actual class SeedDataSource {
 
-    private val dataSourceDesktopImpl: SeedDataSourceDesktopImpl
-
-    init {
-        dataSourceDesktopImpl = UnsafeSeedDataSource()
+    private val dataSourceDesktopImpl = when (getPlatform().type) {
+        PlatformType.WINDOWS -> SeedDataSourceWindows()
+        else -> UnsafeSeedDataSource()
     }
 
     actual val seed: Flow<String?>

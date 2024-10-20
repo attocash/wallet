@@ -111,6 +111,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.jna)
+            implementation(libs.jna.platform)
             implementation("com.auth0:java-jwt:4.4.0")
             implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
         }
