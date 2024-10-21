@@ -86,7 +86,6 @@ class LinuxCred {
             secretSchema.pointer,
             null,
             error,
-            "key_type", "seed"
         )
 
 
@@ -102,7 +101,6 @@ class LinuxCred {
             seed,
             null,
             error,
-            "key_type", "seed",
         )
 
         if (getSeed() == null) {
@@ -118,7 +116,6 @@ class LinuxCred {
             secretSchema.pointer,
             null,
             error,
-            "key_type", "seed",
         )
 
         if (getSeed() != null) {
