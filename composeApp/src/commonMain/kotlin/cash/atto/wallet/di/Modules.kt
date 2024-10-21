@@ -1,6 +1,5 @@
 package cash.atto.wallet.di
 
-import cash.atto.wallet.repository.AccountsRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.AuthRepository
 import cash.atto.wallet.viewmodel.AppViewModel
@@ -42,7 +41,6 @@ expect val dataSourceModule: Module
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
-    singleOf(::AccountsRepository)
     singleOf(::AppStateRepository)
     singleOf(::AuthRepository)
 }

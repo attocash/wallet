@@ -46,7 +46,7 @@ fun OverviewScreenDesktop(onSettingsClicked: () -> Unit) {
 
         val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
-        Overview(
+        OverviewDesktop(
             uiState = uiState.value,
             onSettingsClicked = onSettingsClicked,
             onReceiveCopyClick = {
