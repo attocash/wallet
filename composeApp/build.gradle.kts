@@ -29,16 +29,7 @@ kotlin {
 
     jvm("desktop")
 
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach { iosTarget ->
-//        iosTarget.binaries.framework {
-//            baseName = "ComposeApp"
-//            isStatic = true
-//        }
-//    }
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val desktopMain by getting
@@ -54,8 +45,8 @@ kotlin {
 
             // Koin support for Android
             implementation(libs.koin.android)
-//            implementation(libs.koin.androidx.compose)
         }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -70,36 +61,17 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
 
-            implementation("com.auth0:java-jwt:4.4.0")
-            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-
-
-//
-//            val attoCommons = libs.atto.commons.get()
-//            implementation("${attoCommons.module.group}:${attoCommons.module.name}:${attoCommons.versionConstraint.displayName}") {
-//                capabilities {
-//                    requireCapability("cash.atto:commons-json")
-//                }
-//            }
-
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
 
-            // Koin
-            //api(libs.koin.core)
-//            implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
 
-            // Window size class
             implementation(libs.material3.window.size)
 
-            // decompose
             implementation(libs.decompose)
             implementation(libs.decompose.extensions.compose)
-//            implementation(libs.decompose.extensions.compose.jetbrains)
 
-            //qr
             implementation(libs.qr.kit)
         }
         commonTest.dependencies {
@@ -112,13 +84,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.jna)
             implementation(libs.jna.platform)
-            implementation("com.auth0:java-jwt:4.4.0")
-            implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
         }
-
-//        iosMain.dependencies {
-//            implementation(libs.ktor.client.darwin)
-//        }
     }
 }
 

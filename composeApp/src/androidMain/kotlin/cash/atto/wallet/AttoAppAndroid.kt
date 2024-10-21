@@ -14,11 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import cash.atto.wallet.screens.OverviewScreen
 import cash.atto.wallet.screens.OverviewScreenAndroid
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen

@@ -68,7 +68,6 @@ fun AttoNavHost(
 
         Children(
             stack = component.childStack,
-//            animation = stackAnimation(fade() + scale()),
         ) { screen ->
             when (screen.instance) {
                 is AttoDestination.Welcome -> WelcomeScreen {
