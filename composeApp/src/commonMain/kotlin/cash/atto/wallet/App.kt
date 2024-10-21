@@ -24,61 +24,61 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-@Composable
-@Preview
-fun App() {
-    val coroutineScope = rememberCoroutineScope()
-    val mnemonicManager = mnemonicManager()
-
-
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        var inputText by remember { mutableStateOf("") }
-
-        val words = inputText.trim().lowercase().split("\\s+".toRegex())
-        val wordsCount = words.size
-        val allWordsValid = words.all { it in AttoMnemonicDictionary.set }
-
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            // Button to generate 24 words
-            Button(onClick = {
-                inputText = AttoMnemonic.generate().words.joinToString(" ")
-            }) {
-                Text("Generate 24 Words")
-            }
-
-            BasicTextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text("Words entered: $wordsCount/24")
-            if (!allWordsValid) {
-                Text("One or more words are not valid", color = MaterialTheme.colors.error)
-            }
-
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        mnemonicManager.save(AttoMnemonic(words))
-                        showContent = true  // Show the content after saving
-                    }
-                },
-                enabled = wordsCount == 24 && allWordsValid
-            ) {
-                Text("Submit")
-            }
-
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
-    }
-}
+//@Composable
+//@Preview
+//fun App() {
+//    val coroutineScope = rememberCoroutineScope()
+//    val mnemonicManager = mnemonicManager()
+//
+//
+//    MaterialTheme {
+//        var showContent by remember { mutableStateOf(false) }
+//        var inputText by remember { mutableStateOf("") }
+//
+//        val words = inputText.trim().lowercase().split("\\s+".toRegex())
+//        val wordsCount = words.size
+//        val allWordsValid = words.all { it in AttoMnemonicDictionary.set }
+//
+//        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+//            // Button to generate 24 words
+//            Button(onClick = {
+//                inputText = AttoMnemonic.generate().words.joinToString(" ")
+//            }) {
+//                Text("Generate 24 Words")
+//            }
+//
+//            BasicTextField(
+//                value = inputText,
+//                onValueChange = { inputText = it },
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//            Text("Words entered: $wordsCount/24")
+//            if (!allWordsValid) {
+//                Text("One or more words are not valid", color = MaterialTheme.colors.error)
+//            }
+//
+//            Button(
+//                onClick = {
+//                    coroutineScope.launch {
+//                        mnemonicManager.save(AttoMnemonic(words))
+//                        showContent = true  // Show the content after saving
+//                    }
+//                },
+//                enabled = wordsCount == 24 && allWordsValid
+//            ) {
+//                Text("Submit")
+//            }
+//
+//            AnimatedVisibility(showContent) {
+//                val greeting = remember { Greeting().greet() }
+//                Column(
+//                    Modifier.fillMaxWidth(),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+//                    Text("Compose: $greeting")
+//                }
+//            }
+//        }
+//    }
+//}

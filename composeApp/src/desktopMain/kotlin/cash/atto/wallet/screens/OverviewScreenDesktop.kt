@@ -39,7 +39,7 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreen(onSettingsClicked: () -> Unit) {
+fun OverviewScreenDesktop(onSettingsClicked: () -> Unit) {
     KoinContext {
         val viewModel = koinViewModel<OverviewViewModel>()
         val uiState = viewModel.state.collectAsState()
@@ -61,7 +61,7 @@ fun OverviewScreen(onSettingsClicked: () -> Unit) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Overview(
+fun OverviewDesktop(
     uiState: OverviewUiState,
     onSettingsClicked: () -> Unit,
     onReceiveCopyClick: () -> Unit,

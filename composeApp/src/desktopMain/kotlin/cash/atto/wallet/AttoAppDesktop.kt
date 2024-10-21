@@ -8,18 +8,16 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cash.atto.wallet.screens.OverviewScreen
+import cash.atto.wallet.screens.OverviewScreenDesktop
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
@@ -84,7 +82,7 @@ fun AttoNavHost(
                     }
                 )
 
-                is AttoDestination.Overview -> OverviewScreen {  }
+                is AttoDestination.Overview -> OverviewScreenDesktop {  }
                 else -> {}
             }
         }
