@@ -10,13 +10,8 @@ import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
 class WinCred : CredAdvapi32 {
-    inner class Credential(target: String?, username: String?, password: String?) {
-        var target: String = target.orEmpty()
-        var username: String = username.orEmpty()
-        var password: String = password.orEmpty()
-    }
 
-    fun getCredential(target: String?): Credential {
+    fun getCredential(target: String?): String {
         val pcredMem = PCREDENTIAL()
 
         try {
@@ -26,8 +21,7 @@ class WinCred : CredAdvapi32 {
                     credMem.CredentialBlob!!.getByteArray(0, credMem.CredentialBlobSize)
 
                 val password = String(passwordBytes, Charset.forName("UTF-16LE"))
-                val cred: Credential = Credential(credMem.TargetName, credMem.UserName, password)
-                return cred
+                return password
             } else {
                 val err: Int = Native.getLastError()
                 throw LastErrorException(err)
