@@ -37,6 +37,21 @@ sealed class AttoDestination {
     }
 
     @Serializable
+    object SendConfirm : AttoDestination() {
+        override val route = "sendConfirm"
+    }
+
+    @Serializable
+    object SendFrom : AttoDestination() {
+        override val route = "sendFrom"
+    }
+
+    @Serializable
+    object SendResult : AttoDestination() {
+        override val route = "sendResult"
+    }
+
+    @Serializable
     object Settings : AttoDestination() {
         override val route = "settings"
     }

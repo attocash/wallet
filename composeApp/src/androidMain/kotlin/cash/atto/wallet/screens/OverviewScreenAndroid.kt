@@ -42,7 +42,10 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreenAndroid(onSettingsClicked: () -> Unit) {
+fun OverviewScreenAndroid(
+    onSettingsClicked: () -> Unit,
+    onSendClicked: () -> Unit
+) {
     KoinContext {
         val viewModel = koinViewModel<OverviewViewModel>()
         val uiState = viewModel.state.collectAsState()
@@ -53,6 +56,7 @@ fun OverviewScreenAndroid(onSettingsClicked: () -> Unit) {
         OverviewAndroid(
             uiState = uiState.value,
             onSettingsClicked = onSettingsClicked,
+            onSendClicked = onSendClicked,
             onReceiveCopyClick = {
                 uiState.value.receiveAddress?.let {
                     clipboardManager.setText(AnnotatedString(it))
@@ -77,6 +81,7 @@ fun OverviewScreenAndroid(onSettingsClicked: () -> Unit) {
 fun OverviewAndroid(
     uiState: OverviewUiState,
     onSettingsClicked: () -> Unit,
+    onSendClicked: () -> Unit,
     onReceiveCopyClick: () -> Unit,
     onReceiveShareClick: () -> Unit
 ) {
@@ -127,8 +132,8 @@ fun OverviewAndroid(
                     Text(text = stringResource(Res.string.overview_receive))
                 }
 
-                AttoOutlinedButton(
-                    onClick = {},
+                Button(
+                    onClick = onSendClicked,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(text = stringResource(Res.string.overview_send))

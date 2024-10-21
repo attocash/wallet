@@ -22,6 +22,9 @@ import cash.atto.wallet.screens.OverviewScreenAndroid
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
+import cash.atto.wallet.screens.SendConfirmScreen
+import cash.atto.wallet.screens.SendFromScreen
+import cash.atto.wallet.screens.SendResultScreen
 import cash.atto.wallet.screens.SettingsScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -54,11 +57,13 @@ fun AttoNavHost(
 ) {
     if (uiState.shownScreen == AppUiState.ShownScreen.LOADER) {
         Box(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier
+                .fillMaxSize()
                 .background(color = MaterialTheme.colors.surface)
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier
+                    .align(Alignment.Center)
                     .width(64.dp),
                 color = MaterialTheme.colors.primary
             )
@@ -92,6 +97,9 @@ fun AttoNavHost(
                 OverviewScreenAndroid(
                     onSettingsClicked = {
                         navController.navigate(AttoDestination.Settings.route)
+                    },
+                    onSendClicked = {
+                        navController.navigate(AttoDestination.SendFrom.route)
                     }
                 )
             }
@@ -126,6 +134,25 @@ fun AttoNavHost(
                         navController.navigate(AttoDestination.SecretBackupConfirmation.route)
                     }
                 )
+            }
+
+            composable(route = AttoDestination.SendConfirm.route) {
+                SendConfirmScreen(
+                    onBackNavigation = { navController.navigateUp() }
+                )
+            }
+
+            composable(route = AttoDestination.SendFrom.route) {
+                SendFromScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onSendClicked = {
+                        navController.navigate(AttoDestination.SendConfirm.route)
+                    }
+                )
+            }
+
+            composable(route = AttoDestination.SendResult.route) {
+                SendResultScreen()
             }
 
             composable(route = AttoDestination.Settings.route) {

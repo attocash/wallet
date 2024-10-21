@@ -4,6 +4,7 @@ import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
+import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -48,5 +49,6 @@ val viewModelModule = module {
     viewModelOf(::AppViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::SecretPhraseViewModel)
+    viewModelOf(::SendTransactionViewModel)
     viewModelOf(::SettingsViewModel)
 }

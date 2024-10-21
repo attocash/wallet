@@ -16,6 +16,7 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_receive_copy
 import attowallet.composeapp.generated.resources.overview_receive_share
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.components.common.BottomSheetStud
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
@@ -28,14 +29,7 @@ fun ReceiveAttoBottomSheet(
     onCopy: () -> Unit,
     onShare: () -> Unit
 ) = address?.let {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-            .padding(16.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        BottomSheetStud()
+    BottomSheet {
         Text(address)
 
         QRCodeImage(
