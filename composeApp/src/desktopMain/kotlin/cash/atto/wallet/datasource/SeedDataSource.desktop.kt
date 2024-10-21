@@ -8,7 +8,8 @@ actual class SeedDataSource {
 
     private val dataSourceDesktopImpl = when (getPlatform().type) {
         PlatformType.WINDOWS -> SeedDataSourceWindows()
-        else -> UnsafeSeedDataSource()
+        PlatformType.LINUX -> SeedDataSourceLinux()
+        else -> throw UnsupportedOperationException("Unsupported platform ${getPlatform()}")
     }
 
     actual val seed: Flow<String?>

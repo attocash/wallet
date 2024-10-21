@@ -6,9 +6,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
-class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
+class SeedDataSourceLinux : SeedDataSourceDesktopImpl {
 
-    private val winCred = WinCred()
+    private val linuxCred = LinuxCred()
 
     private val _seedChannel = Channel<String?>()
     override val seed = _seedChannel.consumeAsFlow()
@@ -20,25 +20,19 @@ class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
     }
 
     override suspend fun setSeed(seed: String) {
-        winCred.setCredential(
-            target = APP_NAME,
-            userName = USERNAME,
-            password = seed
-        )
-
+        linuxCred.store(seed)
         getSeed()
     }
 
     override suspend fun clearSeed() {
-        winCred.deleteCredential(APP_NAME)
+        linuxCred.delete()
         getSeed()
     }
 
     private suspend fun getSeed() {
         try {
             _seedChannel.send(
-                winCred.getCredential(APP_NAME)
-                    .ifEmpty { null }
+                linuxCred.getSeed()
             )
         } catch (ex: Exception) {
             _seedChannel.send(null)
@@ -47,6 +41,5 @@ class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
 
     companion object {
         private const val APP_NAME = "Atto Wallet"
-        private const val USERNAME = "Main Account"
     }
 }
