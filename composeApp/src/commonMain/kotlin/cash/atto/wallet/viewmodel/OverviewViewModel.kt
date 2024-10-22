@@ -18,6 +18,7 @@ import cash.atto.commons.wallet.attoBackend
 import cash.atto.commons.wallet.inMemory
 import cash.atto.commons.work.AttoWorker
 import cash.atto.commons.work.attoBackend
+import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.uistate.overview.OverviewHeaderUiState
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 
 class OverviewViewModel(
     private val appStateRepository: AppStateRepository,
+    private val createWalletManagerInteractor: CreateWalletManagerInteractor
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -42,7 +44,7 @@ class OverviewViewModel(
             _state.value = OverviewUiState.empty()
 
             appStateRepository.state.collect {
-                walletState.emit(createWalletManager(it))
+                walletState.emit(createWalletManagerInteractor.invoke(it))
                 _state.emit(state.value.copy(
                     receiveAddress = it.publicKey
                         ?.toAddress(AttoAlgorithm.V1)
@@ -60,7 +62,8 @@ class OverviewViewModel(
                         state.value.copy(
                             headerUiState = OverviewHeaderUiState(
                                 attoCoins = account.balance
-                                    .toString(AttoUnit.ATTO).toBigDecimal()
+                                    .toString(AttoUnit.ATTO)
+                                    .toBigDecimal()
                             )
                         )
                     )
@@ -68,22 +71,4 @@ class OverviewViewModel(
             }
         }
     }
-}
-
-private fun createWalletManager(state: AppState): AttoWalletManager? {
-    if (state.privateKey == null)
-        return null
-
-    val signer = state.privateKey.toSigner()
-    val authenticator = AttoAuthenticator.attoBackend(AttoNetwork.DEV, signer)
-    val client = AttoNodeClient.attoBackend(AttoNetwork.DEV, authenticator)
-    val transactionRepository = AttoTransactionRepository.inMemory() // TODO persist
-    val viewer = AttoWalletViewer(signer.publicKey, client, transactionRepository)
-    val worker = AttoWorker.attoBackend(authenticator)
-    val workCache = AttoWorkCache.inMemory()
-    val walletManager = AttoWalletManager(viewer, signer, client, worker, workCache) {
-        AttoAddress(AttoAlgorithm.V1, signer.publicKey)
-    }
-    walletManager.start()
-    return walletManager
 }

@@ -1,5 +1,6 @@
 package cash.atto.wallet.di
 
+import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -44,8 +45,13 @@ val repositoryModule = module {
     singleOf(::AppStateRepository)
 }
 
+val interactorModule = module {
+    singleOf(::CreateWalletManagerInteractor)
+}
+
 val viewModelModule = module {
     includes(repositoryModule)
+    includes(interactorModule)
     viewModelOf(::AppViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::SecretPhraseViewModel)

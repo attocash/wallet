@@ -38,6 +38,7 @@ kotlin {
             implementation(compose.preview)
 
             implementation(libs.androidx.datastore)
+            implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.navigation.compose)
@@ -45,6 +46,9 @@ kotlin {
 
             // Koin support for Android
             implementation(libs.koin.android)
+
+            // Permissions
+            implementation(libs.accompanist.permissions)
         }
 
         commonMain.dependencies {

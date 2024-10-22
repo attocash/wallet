@@ -40,6 +40,10 @@
 
     <!-- send -->
     <string name="send_button">Send</string>
+    <string name="send_confirm">Confirm</string>
+    <string name="send_confirm_cancel">Cancel</string>
+    <string name="send_confirm_sending">SENDING</string>
+    <string name="send_confirm_to">TO</string>
     <string name="send_from_address_hint">Enter Address</string>
     <string name="send_from_amount_hint">Enter Amount</string>
     <string name="send_from_title">SEND FROM</string>

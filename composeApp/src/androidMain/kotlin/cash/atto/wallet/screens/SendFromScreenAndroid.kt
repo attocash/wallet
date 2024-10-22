@@ -1,5 +1,8 @@
 package cash.atto.wallet.screens
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_button
@@ -30,21 +34,24 @@ import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SendFromScreen(
+fun SendFromScreenAndroid(
     onBackNavigation: () -> Unit,
-    onSendClicked: () -> Unit,
+    onSendClicked: () -> Unit
 ) {
     KoinContext {
         val viewModel = koinViewModel<SendTransactionViewModel>()
         val uiState = viewModel.state.collectAsState()
 
-        SendFrom(
+        SendFromAndroid(
             uiState = uiState.value.sendFromUiState,
             onBackNavigation = onBackNavigation,
             onSendClicked = onSendClicked
@@ -53,41 +60,71 @@ fun SendFromScreen(
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SendFrom(
+fun SendFromAndroid(
     uiState: SendFromUiState,
     onBackNavigation: () -> Unit,
     onSendClicked: () -> Unit
 ) {
+    val cameraPermissionState = rememberPermissionState(
+        permission = Manifest.permission.CAMERA
+    )
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            if (granted) openQRScanner()
+        }
+    )
+
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
-        content = {
+        content = { padding ->
             Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                                + 16.dp
                     ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(Res.string.send_from_title))
+                Text(
+                    text = stringResource(Res.string.send_from_title),
+                    color = MaterialTheme.colors.primary,
+                    style = MaterialTheme.typography.h5
+                )
+
                 uiState.accountName?.let { Text(text = it) }
-                uiState.accountSeed?.let { Text(text = it) }
+                uiState.accountSeed?.let {
+                    Text(
+                        text = it,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
                 Text(text = "(${uiState.accountBalance})")
 
                 TextField(
                     value = uiState.amount?.toString().orEmpty(),
                     onValueChange = {},
-                    placeholder = { stringResource(Res.string.send_from_amount_hint) }
+                    placeholder = {
+                        Text(text = stringResource(Res.string.send_from_amount_hint))
+                    }
                 )
 
                 TextField(
                     value = uiState.address.orEmpty(),
                     onValueChange = {},
-                    placeholder = { stringResource(Res.string.send_from_address_hint) }
+                    placeholder = {
+                        Text(text = stringResource(Res.string.send_from_address_hint))
+                    }
                 )
 
                 Spacer(Modifier.weight(1f))
@@ -100,7 +137,11 @@ fun SendFrom(
                 }
 
                 AttoOutlinedButton(
-                    onClick = {},
+                    onClick = {
+                        if (cameraPermissionState.status.isGranted)
+                            openQRScanner()
+                        else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = stringResource(Res.string.send_scan_qr))
@@ -110,11 +151,13 @@ fun SendFrom(
     )
 }
 
+fun openQRScanner() {}
+
 @Preview
 @Composable
-fun SendFromPreview() {
+fun SendFromAndroidPreview() {
     AttoWalletTheme {
-        SendFrom(
+        SendFromAndroid(
             uiState = SendFromUiState.DEFAULT,
             onBackNavigation = {},
             onSendClicked = {}

@@ -23,7 +23,7 @@ import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.SendConfirmScreen
-import cash.atto.wallet.screens.SendFromScreen
+import cash.atto.wallet.screens.SendFromScreenAndroid
 import cash.atto.wallet.screens.SendResultScreen
 import cash.atto.wallet.screens.SettingsScreen
 import cash.atto.wallet.screens.WelcomeScreen
@@ -138,12 +138,15 @@ fun AttoNavHost(
 
             composable(route = AttoDestination.SendConfirm.route) {
                 SendConfirmScreen(
-                    onBackNavigation = { navController.navigateUp() }
+                    onBackNavigation = { navController.navigateUp() },
+                    onConfirm = {
+//                        navController.navigate(AttoDestination.SendResult.route)
+                    }
                 )
             }
 
             composable(route = AttoDestination.SendFrom.route) {
-                SendFromScreen(
+                SendFromScreenAndroid(
                     onBackNavigation = { navController.navigateUp() },
                     onSendClicked = {
                         navController.navigate(AttoDestination.SendConfirm.route)
