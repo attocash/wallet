@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -19,8 +20,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -31,32 +34,46 @@ import attowallet.composeapp.generated.resources.send_from_title
 import attowallet.composeapp.generated.resources.send_scan_qr
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.di.AppScope
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
+import org.koin.compose.getKoin
 import org.koin.compose.viewmodel.koinViewModel
+import java.math.BigDecimal
 
 @Composable
 fun SendFromScreenAndroid(
     onBackNavigation: () -> Unit,
     onSendClicked: () -> Unit
 ) {
-    KoinContext {
-        val viewModel = koinViewModel<SendTransactionViewModel>()
-        val uiState = viewModel.state.collectAsState()
+    val viewModel = koinViewModel<SendTransactionViewModel>()
+    val uiState = viewModel.state.collectAsState()
 
-        SendFromAndroid(
-            uiState = uiState.value.sendFromUiState,
-            onBackNavigation = onBackNavigation,
-            onSendClicked = onSendClicked
-        )
-    }
+    SendFromAndroid(
+        uiState = uiState.value.sendFromUiState,
+        onBackNavigation = onBackNavigation,
+        onSendClicked = onSendClicked,
+        onAmountChanged = { amount ->
+            viewModel.updateSendInfo(
+                amount = amount,
+                address = uiState.value.sendFromUiState.address
+            )
+        },
+        onAddressChanged = { address ->
+            viewModel.updateSendInfo(
+                amount = uiState.value.sendFromUiState.amount,
+                address = address
+            )
+        }
+    )
 }
 
 
@@ -65,7 +82,9 @@ fun SendFromScreenAndroid(
 fun SendFromAndroid(
     uiState: SendFromUiState,
     onBackNavigation: () -> Unit,
-    onSendClicked: () -> Unit
+    onSendClicked: () -> Unit,
+    onAmountChanged: suspend (BigDecimal?) -> Unit,
+    onAddressChanged: suspend (String?) -> Unit
 ) {
     val cameraPermissionState = rememberPermissionState(
         permission = Manifest.permission.CAMERA
@@ -77,6 +96,8 @@ fun SendFromAndroid(
             if (granted) openQRScanner()
         }
     )
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
@@ -113,15 +134,24 @@ fun SendFromAndroid(
 
                 TextField(
                     value = uiState.amount?.toString().orEmpty(),
-                    onValueChange = {},
+                    onValueChange = {
+                        coroutineScope.launch {
+                            onAmountChanged.invoke(it.toBigDecimalOrNull())
+                        }
+                    },
                     placeholder = {
                         Text(text = stringResource(Res.string.send_from_amount_hint))
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
                 TextField(
                     value = uiState.address.orEmpty(),
-                    onValueChange = {},
+                    onValueChange = {
+                        coroutineScope.launch {
+                            onAddressChanged.invoke(it)
+                        }
+                    },
                     placeholder = {
                         Text(text = stringResource(Res.string.send_from_address_hint))
                     }
@@ -160,7 +190,9 @@ fun SendFromAndroidPreview() {
         SendFromAndroid(
             uiState = SendFromUiState.DEFAULT,
             onBackNavigation = {},
-            onSendClicked = {}
+            onSendClicked = {},
+            onAmountChanged = {},
+            onAddressChanged = {}
         )
     }
 }

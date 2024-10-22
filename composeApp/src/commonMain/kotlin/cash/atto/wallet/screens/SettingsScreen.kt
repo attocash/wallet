@@ -24,21 +24,19 @@ fun SettingsScreen(
     onBackNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
 ) {
-    KoinContext {
-        val viewModel = koinViewModel<SettingsViewModel>()
-        val uiState = viewModel.state.collectAsState()
+    val viewModel = koinViewModel<SettingsViewModel>()
+    val uiState = viewModel.state.collectAsState()
 
-        Settings(
-            uiState = uiState.value,
-            onBackNavigation = onBackNavigation,
-            onDismissLogout = { viewModel.hideLogoutDialog() },
-            onConfirmLogout = {
-                viewModel.logout()
-                viewModel.hideLogoutDialog()
-                onLogoutNavigation()
-            }
-        )
-    }
+    Settings(
+        uiState = uiState.value,
+        onBackNavigation = onBackNavigation,
+        onDismissLogout = { viewModel.hideLogoutDialog() },
+        onConfirmLogout = {
+            viewModel.logout()
+            viewModel.hideLogoutDialog()
+            onLogoutNavigation()
+        }
+    )
 }
 
 @Composable

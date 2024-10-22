@@ -43,24 +43,24 @@ fun SecretPhraseScreen(
     onBackNavigation: () -> Unit,
     onBackupConfirmClicked: () -> Unit
 ) {
-    KoinContext {
-        val viewModel = koinViewModel<SecretPhraseViewModel>()
-        val clipboardManager: ClipboardManager = LocalClipboardManager.current
-        val uiState = viewModel.state.collectAsState()
+    val viewModel = koinViewModel<SecretPhraseViewModel>()
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val uiState = viewModel.state.collectAsState()
 
-        SecretPhrase(
-            uiState = uiState.value,
-            onBackNavigation = onBackNavigation,
-            onBackupConfirmClicked = onBackupConfirmClicked,
-            onCopyClick = { clipboardManager.setText(
+    SecretPhrase(
+        uiState = uiState.value,
+        onBackNavigation = onBackNavigation,
+        onBackupConfirmClicked = onBackupConfirmClicked,
+        onCopyClick = {
+            clipboardManager.setText(
                 AnnotatedString(
                     uiState.value
                         .words
                         .joinToString(" ")
                 )
-            )}
-        )
-    }
+            )
+        }
+    )
 }
 
 @Composable

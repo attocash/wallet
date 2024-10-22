@@ -46,34 +46,32 @@ fun OverviewScreenAndroid(
     onSettingsClicked: () -> Unit,
     onSendClicked: () -> Unit
 ) {
-    KoinContext {
-        val viewModel = koinViewModel<OverviewViewModel>()
-        val uiState = viewModel.state.collectAsState()
+    val viewModel = koinViewModel<OverviewViewModel>()
+    val uiState = viewModel.state.collectAsState()
 
-        val clipboardManager: ClipboardManager = LocalClipboardManager.current
-        val context = LocalContext.current
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
 
-        OverviewAndroid(
-            uiState = uiState.value,
-            onSettingsClicked = onSettingsClicked,
-            onSendClicked = onSendClicked,
-            onReceiveCopyClick = {
-                uiState.value.receiveAddress?.let {
-                    clipboardManager.setText(AnnotatedString(it))
-                }
-            },
-            onReceiveShareClick = {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, uiState.value.receiveAddress)
-                    type = "text/plain"
-                }
-
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
+    OverviewAndroid(
+        uiState = uiState.value,
+        onSettingsClicked = onSettingsClicked,
+        onSendClicked = onSendClicked,
+        onReceiveCopyClick = {
+            uiState.value.receiveAddress?.let {
+                clipboardManager.setText(AnnotatedString(it))
             }
-        )
-    }
+        },
+        onReceiveShareClick = {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, uiState.value.receiveAddress)
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

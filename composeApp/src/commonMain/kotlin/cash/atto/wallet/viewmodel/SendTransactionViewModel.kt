@@ -10,6 +10,7 @@ import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.uistate.overview.OverviewHeaderUiState
+import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.uistate.settings.ProfileUiState
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 class SendTransactionViewModel(
     private val appStateRepository: AppStateRepository,
@@ -37,16 +39,6 @@ class SendTransactionViewModel(
             appStateRepository.state.collect { appState ->
                 if (appState.publicKey != null) {
                     walletState.emit(createWalletManagerInteractor.invoke(appState))
-                    _state.emit(state.value.copy(
-                        sendFromUiState = state.value
-                            .sendFromUiState
-                            .copy(
-                                accountName = "Main Account",
-                                accountSeed = appState.publicKey
-                                    .toAddress(AttoAlgorithm.V1)
-                                    .value
-                            )
-                    ))
                 }
             }
         }
@@ -56,20 +48,25 @@ class SendTransactionViewModel(
                 println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
                 wallet.accountFlow.collect { account ->
                     println("Account $account")
-                    _state.emit(
-                        state.value.copy(
-                            sendFromUiState = state.value
-                                .sendFromUiState
-                                .copy(
-                                    accountBalance = account.balance
-                                        .toString(AttoUnit.ATTO)
-                                        .toBigDecimal()
-                                )
-                        )
-                    )
+                    _state.emit(state.value.copy(
+                        account = account
+                    ))
                 }
             }
         }
     }
-//    private suspend fun updateBalance(account: AttoAccount) {}
+
+    suspend fun updateSendInfo(
+        amount: BigDecimal?,
+        address: String?
+    ) {
+        _state.emit(state.value.copy(
+            amount = amount,
+            address = address
+        ))
+    }
+
+    suspend fun send(): Boolean {
+        return true
+    }
 }

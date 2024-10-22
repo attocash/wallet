@@ -2,7 +2,8 @@ package cash.atto.wallet.uistate.send
 
 import java.math.BigDecimal
 
-data class SendConfirmUiState(
+class SendResultUiState(
+    val result: SendTransactionUiState.SendOperationResult,
     val amount: BigDecimal?,
     val address: String?
 )

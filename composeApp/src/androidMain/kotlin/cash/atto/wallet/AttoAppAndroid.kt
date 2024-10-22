@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -55,6 +57,10 @@ fun AttoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    }
+
     if (uiState.shownScreen == AppUiState.ShownScreen.LOADER) {
         Box(
             modifier = modifier
@@ -137,25 +143,45 @@ fun AttoNavHost(
             }
 
             composable(route = AttoDestination.SendConfirm.route) {
-                SendConfirmScreen(
-                    onBackNavigation = { navController.navigateUp() },
-                    onConfirm = {
-//                        navController.navigate(AttoDestination.SendResult.route)
-                    }
-                )
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides viewModelStoreOwner
+                ) {
+                    SendConfirmScreen(
+                        onBackNavigation = { navController.navigateUp() },
+                        onConfirm = {
+                            navController.navigate(AttoDestination.SendResult.route)
+                        },
+                        onCancel = {
+                            navController.popBackStack(
+                                route = AttoDestination.Overview.route,
+                                inclusive = false
+                            )
+
+                            navController.navigateUp()
+                        }
+                    )
+                }
             }
 
             composable(route = AttoDestination.SendFrom.route) {
-                SendFromScreenAndroid(
-                    onBackNavigation = { navController.navigateUp() },
-                    onSendClicked = {
-                        navController.navigate(AttoDestination.SendConfirm.route)
-                    }
-                )
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides viewModelStoreOwner
+                ) {
+                    SendFromScreenAndroid(
+                        onBackNavigation = { navController.navigateUp() },
+                        onSendClicked = {
+                            navController.navigate(AttoDestination.SendConfirm.route)
+                        }
+                    )
+                }
             }
 
             composable(route = AttoDestination.SendResult.route) {
-                SendResultScreen()
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides viewModelStoreOwner
+                ) {
+                    SendResultScreen()
+                }
             }
 
             composable(route = AttoDestination.Settings.route) {
