@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -26,6 +27,7 @@ fun AttoOutlinedButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
     shape: Shape = MaterialTheme.shapes.small,
+    color: Color = MaterialTheme.colors.primary,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable() (RowScope.() -> Unit)
 ) {
@@ -36,10 +38,10 @@ fun AttoOutlinedButton(
         interactionSource = interactionSource,
         elevation = elevation,
         shape = shape,
-        border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+        border = BorderStroke(1.dp, color),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.onPrimary,
-            contentColor = MaterialTheme.colors.primary
+            contentColor = color
         ),
         contentPadding = contentPadding,
         content = content

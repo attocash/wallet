@@ -15,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import cash.atto.wallet.di.AppScope
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
@@ -45,10 +47,17 @@ fun SendConfirmScreen(
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+
     SendConfirm(
         uiState = uiState.value.sendConfirmUiState,
         onBackNavigation = onBackNavigation,
-        onConfirm = onConfirm,
+        onConfirm = {
+            coroutineScope.launch {
+                viewModel.send()
+                onConfirm.invoke()
+            }
+        },
         onCancel = onCancel
     )
 }

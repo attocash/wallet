@@ -180,7 +180,16 @@ fun AttoNavHost(
                 CompositionLocalProvider(
                     LocalViewModelStoreOwner provides viewModelStoreOwner
                 ) {
-                    SendResultScreen()
+                    SendResultScreen(
+                        onClose = {
+                            navController.popBackStack(
+                                route = AttoDestination.Overview.route,
+                                inclusive = false
+                            )
+
+                            navController.navigateUp()
+                        }
+                    )
                 }
             }
 

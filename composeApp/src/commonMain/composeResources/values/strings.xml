@@ -40,14 +40,18 @@
 
     <!-- send -->
     <string name="send_button">Send</string>
+    <string name="send_close">Close</string>
     <string name="send_confirm">Confirm</string>
     <string name="send_confirm_cancel">Cancel</string>
     <string name="send_confirm_sending">SENDING</string>
     <string name="send_confirm_to">TO</string>
+    <string name="send_failure_title">WE COULDN'T SEND</string>
+    <string name="send_failure_to">TO</string>
     <string name="send_from_address_hint">Enter Address</string>
     <string name="send_from_amount_hint">Enter Amount</string>
     <string name="send_from_title">SEND FROM</string>
     <string name="send_scan_qr">Scan QR Code</string>
+    <string name="send_success_to">SENT TO</string>
 
     <!-- settings -->
     <string name="settings_contacts">Contacts</string>

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
+import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
 import cash.atto.commons.wallet.AttoWalletManager
@@ -67,6 +68,41 @@ class SendTransactionViewModel(
     }
 
     suspend fun send(): Boolean {
+        try {
+            walletState.value!!.send(
+                receiverAddress = AttoAddress.parse(
+                    state.value
+                        .sendConfirmUiState
+                        .address!!
+                ),
+                amount = AttoAmount(
+                    state.value
+                        .sendConfirmUiState
+                        .amount!!
+                        .toLong()
+                        .toULong()
+                )
+            )
+        }
+        catch (ex: Exception) {
+            _state.emit(state.value.copy(
+                operationResult = SendTransactionUiState.SendOperationResult.FAILURE
+            ))
+
+            return false
+        }
+
+        _state.emit(state.value.copy(
+            operationResult = SendTransactionUiState.SendOperationResult.SUCCESS
+        ))
+
         return true
     }
+
+    suspend fun clearTransactionData() = _state.emit(
+        state.value.copy(
+            amount = null,
+            address = null
+        )
+    )
 }
