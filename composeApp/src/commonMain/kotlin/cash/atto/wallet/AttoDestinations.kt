@@ -17,6 +17,11 @@ sealed class AttoDestination {
     }
 
     @Serializable
+    object DesktopMain : AttoDestination() {
+        override val route = "desktopMain"
+    }
+
+    @Serializable
     object Overview : AttoDestination() {
         override val route = "overview"
     }

@@ -11,6 +11,11 @@
     <string name="logout_text">Logging out will remove your keys and account information from your device. If your secret phrase is not backed up, you will never be able to access your funds again.</string>
     <string name="logout_title">WARNING</string>
 
+    <!-- desktop main navigation destinations -->
+    <string name="main_nav_overview">Overview</string>
+    <string name="main_nav_receive">Receive</string>
+    <string name="main_nav_send">Send</string>
+
     <!-- overview -->
     <string name="overview_hint">Welcome to Atto. Once you receive some, transactions will show up like this:</string>
     <string name="overview_hint_amount_from">A lot of Atto</string>

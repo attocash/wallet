@@ -1,10 +1,15 @@
 package cash.atto.wallet
 
+import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.main_nav_overview
+import attowallet.composeapp.generated.resources.main_nav_receive
+import attowallet.composeapp.generated.resources.main_nav_send
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
+import org.jetbrains.compose.resources.StringResource
 
 class NavigationComponent(
     componentContext: ComponentContext
@@ -25,4 +30,12 @@ class NavigationComponent(
         destination: AttoDestination,
         componentContext: ComponentContext
     ): AttoDestination = destination
+}
+
+enum class MainScreenNavDestination(
+    val destinationName: StringResource
+) {
+    OVERVIEW(Res.string.main_nav_overview),
+    SEND(Res.string.main_nav_send),
+    RECEIVE(Res.string.main_nav_receive);
 }

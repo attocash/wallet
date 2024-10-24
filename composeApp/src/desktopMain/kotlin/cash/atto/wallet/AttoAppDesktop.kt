@@ -11,7 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cash.atto.wallet.screens.OverviewScreenDesktop
+import cash.atto.wallet.screens.MainScreenDesktop
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -63,7 +63,7 @@ fun AttoNavHost(
             uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW
             && component.childStack.active.instance == AttoDestination.Welcome
         ) {
-            component.navigation.push(AttoDestination.Overview)
+            component.navigation.push(AttoDestination.DesktopMain)
         }
 
         Children(
@@ -77,11 +77,11 @@ fun AttoNavHost(
                 is AttoDestination.SecretPhrase -> SecretPhraseScreen(
                     onBackNavigation = { component.navigation.pop() },
                     onBackupConfirmClicked = {
-                        component.navigation.push(AttoDestination.Overview)
+                        component.navigation.push(AttoDestination.DesktopMain)
                     }
                 )
 
-                is AttoDestination.Overview -> OverviewScreenDesktop {  }
+                is AttoDestination.DesktopMain -> MainScreenDesktop()
                 else -> {}
             }
         }
