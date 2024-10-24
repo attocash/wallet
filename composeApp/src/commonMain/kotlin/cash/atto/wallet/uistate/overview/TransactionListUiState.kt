@@ -1,11 +1,12 @@
 package cash.atto.wallet.uistate.overview
 
+import androidx.compose.runtime.Composable
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.overview_hint_amount_from
 import attowallet.composeapp.generated.resources.overview_hint_amount_to
 import attowallet.composeapp.generated.resources.overview_hint_destination
 import attowallet.composeapp.generated.resources.overview_hint_source
-import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 
 data class TransactionListUiState(
     val transactions: List<TransactionUiState?>,
@@ -17,20 +18,18 @@ data class TransactionListUiState(
             showHint = false
         )
 
-        suspend fun empty() = TransactionListUiState(
-            transactions = listOf(
-                TransactionUiState(
-                    type = TransactionType.SEND,
-                    amount = getString(Res.string.overview_hint_amount_to),
-                    source = getString(Res.string.overview_hint_destination)
-                ),
-                TransactionUiState(
-                    type = TransactionType.RECEIVE,
-                    amount = getString(Res.string.overview_hint_amount_from),
-                    source = getString(Res.string.overview_hint_source)
-                ),
+        @Composable
+        fun Empty() = listOf(
+            TransactionUiState(
+                type = TransactionType.SEND,
+                amount = stringResource(Res.string.overview_hint_amount_to),
+                source = stringResource(Res.string.overview_hint_destination)
             ),
-            showHint = true
+            TransactionUiState(
+                type = TransactionType.RECEIVE,
+                amount = stringResource(Res.string.overview_hint_amount_from),
+                source = stringResource(Res.string.overview_hint_source)
+            ),
         )
     }
 }

@@ -7,6 +7,7 @@ import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
+import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository

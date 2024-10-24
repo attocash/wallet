@@ -57,8 +57,12 @@ fun TransactionsList(
             }
         }
 
+        val shownItems = if (uiState.showHint) {
+            TransactionListUiState.Empty()
+        } else uiState.transactions
+
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(uiState.transactions) { transaction ->
+            items(shownItems) { transaction ->
                 transaction?.let { TransactionItem(it) }
             }
         }
