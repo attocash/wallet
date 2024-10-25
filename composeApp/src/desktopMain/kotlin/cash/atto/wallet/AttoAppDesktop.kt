@@ -20,6 +20,8 @@ import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.popToFirst
+import com.arkivanov.decompose.router.stack.popWhile
 import com.arkivanov.decompose.router.stack.push
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
@@ -81,7 +83,12 @@ fun AttoNavHost(
                     }
                 )
 
-                is AttoDestination.DesktopMain -> MainScreenDesktop()
+                is AttoDestination.DesktopMain -> MainScreenDesktop(
+                    onLogoutNavigation = {
+                        component.navigation.popToFirst()
+                    }
+                )
+
                 else -> {}
             }
         }

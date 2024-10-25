@@ -4,6 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -21,10 +22,19 @@ fun PermanentNavigationDrawer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Row(modifier = modifier.fillMaxSize().background(color = MaterialTheme.colors.surface)) {
-        Surface(Modifier.width(200.dp)) {
+    Row(
+        modifier = modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.surface)
+    ) {
+        Surface(Modifier.width(280.dp)) {
             drawerContent()
         }
+
+        Box(
+            modifier = Modifier.fillMaxHeight()
+                .width(4.dp)
+                .background(color = MaterialTheme.colors.background)
+        )
 
         Box { content() }
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,7 +42,10 @@ fun TransactionsList(
         )
 
         if (uiState.showHint) {
-            Card(backgroundColor = MaterialTheme.colors.primary) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = MaterialTheme.colors.primary
+            ) {
                 Box(
                     modifier = Modifier.padding(horizontal = 8.dp)
                         .background(color = MaterialTheme.colors.background)

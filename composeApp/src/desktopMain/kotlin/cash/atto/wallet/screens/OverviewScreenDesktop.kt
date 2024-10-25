@@ -39,7 +39,7 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreenDesktop(onSettingsClicked: () -> Unit) {
+fun OverviewScreenDesktop() {
     KoinContext {
         val overviewViewModel = koinViewModel<OverviewViewModel>()
         val overviewUiState = overviewViewModel.state.collectAsState()
@@ -48,7 +48,6 @@ fun OverviewScreenDesktop(onSettingsClicked: () -> Unit) {
 
         OverviewDesktop(
             uiState = overviewUiState.value,
-            onSettingsClicked = onSettingsClicked,
             onReceiveCopyClick = {
                 overviewUiState.value.receiveAddress?.let {
                     clipboardManager.setText(AnnotatedString(it))
@@ -63,7 +62,6 @@ fun OverviewScreenDesktop(onSettingsClicked: () -> Unit) {
 @Composable
 fun OverviewDesktop(
     uiState: OverviewUiState,
-    onSettingsClicked: () -> Unit,
     onReceiveCopyClick: () -> Unit,
     onReceiveShareClick: () -> Unit
 ) {
@@ -89,7 +87,6 @@ fun OverviewDesktop(
         ) {
             OverviewHeader(
                 uiState = uiState.headerUiState,
-                onSettingsClicked = onSettingsClicked,
                 modifier = Modifier.fillMaxWidth()
             )
 

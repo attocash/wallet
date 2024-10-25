@@ -24,7 +24,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun OverviewHeader(
     uiState: OverviewHeaderUiState,
-    onSettingsClicked: () -> Unit,
+    onSettingsClicked: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -34,13 +34,15 @@ fun OverviewHeader(
         contentColor = MaterialTheme.colors.onPrimary
     ) {
         Box {
-            Icon(
-                modifier = Modifier.align(Alignment.TopEnd)
-                    .clickable { onSettingsClicked.invoke() }
-                    .padding(16.dp),
-                imageVector = Icons.Outlined.Settings,
-                contentDescription = "settings"
-            )
+            onSettingsClicked?.let {
+                Icon(
+                    modifier = Modifier.align(Alignment.TopEnd)
+                        .clickable { it.invoke() }
+                        .padding(16.dp),
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "settings"
+                )
+            }
 
             Column(
                 Modifier.align(Alignment.Center)
