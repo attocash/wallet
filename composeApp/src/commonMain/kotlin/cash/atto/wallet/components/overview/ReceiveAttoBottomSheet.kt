@@ -54,6 +54,15 @@ fun ReceiveAttoBottomSheet(
     }
 }
 
+@Composable
+fun ReceiveAttoContent() {}
+
+@Preview
+@Composable
+fun ReceiveAttoContentPreview() {
+    AttoWalletTheme {}
+}
+
 @Preview
 @Composable
 fun ReceiveAttoBottomSheetPreview() {

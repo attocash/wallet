@@ -73,7 +73,7 @@ fun SendConfirm(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
         content = {
-            Column(
+            SendConfirmContent(
                 modifier = Modifier.fillMaxSize()
                     .padding(16.dp)
                     .padding(bottom = WindowInsets.systemBars
@@ -81,43 +81,72 @@ fun SendConfirm(
                         .calculateBottomPadding()
                             + 16.dp
                     ),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(Res.string.send_confirm_sending),
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.h5
-                )
-
-                Text(text = uiState.amount?.toString().orEmpty())
-
-                Text(
-                    text = stringResource(Res.string.send_confirm_to),
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.h5
-                )
-
-                Text(text = uiState.address.orEmpty())
-
-                Spacer(Modifier.weight(1f))
-
-                Button(
-                    onClick = onConfirm,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.send_confirm))
-                }
-
-                AttoOutlinedButton(
-                    onClick = onCancel,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.send_confirm_cancel))
-                }
-            }
+                uiState = uiState,
+                onConfirm = onConfirm,
+                onCancel = onCancel
+            )
         }
     )
+}
+
+@Composable
+fun SendConfirmContent(
+    modifier: Modifier = Modifier,
+    uiState: SendConfirmUiState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.send_confirm_sending),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h5
+        )
+
+        Text(text = uiState.amount?.toString().orEmpty())
+
+        Text(
+            text = stringResource(Res.string.send_confirm_to),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h5
+        )
+
+        Text(text = uiState.address.orEmpty())
+
+        Spacer(Modifier.weight(1f))
+
+        Button(
+            onClick = onConfirm,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(Res.string.send_confirm))
+        }
+
+        AttoOutlinedButton(
+            onClick = onCancel,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(Res.string.send_confirm_cancel))
+        }
+    }
+}
+
+@Composable
+fun SendConfirmContentPreview() {
+    AttoWalletTheme {
+        SendConfirmContent(
+            uiState = SendConfirmUiState(
+                amount = BigDecimal.TEN,
+                address = "atto://address"
+            ),
+            onConfirm = {},
+            onCancel = {}
+        )
+    }
 }
 
 @Preview

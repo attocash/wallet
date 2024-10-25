@@ -110,13 +110,6 @@ fun OverviewDesktop(
                 ) {
                     Text(text = stringResource(Res.string.overview_receive))
                 }
-
-                AttoOutlinedButton(
-                    onClick = {},
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = stringResource(Res.string.overview_send))
-                }
             }
         }
     }
