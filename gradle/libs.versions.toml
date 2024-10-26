@@ -20,7 +20,7 @@ junit = "4.13.2"
 kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.1"
 ktor = "2.3.12"
-atto-commons = "85924ce-SNAPSHOT"
+atto-commons = "99a76d4-SNAPSHOT"
 jna = "5.14.0"
 junitJupiter = "5.8.1"
 navigationCompose = "2.8.2"
@@ -29,6 +29,7 @@ qrKit = "1.0.8"
 transportRuntime = "3.3.0"
 material3WindowSize = "0.5.0"
 activityKtx = "1.9.3"
+slf4j = "2.0.16"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -71,6 +72,8 @@ material3-window-size = { module = "dev.chrisbanes.material3:material3-window-si
 qr-kit = { module = "network.chaintech:qr-kit", version.ref = "qrKit" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
