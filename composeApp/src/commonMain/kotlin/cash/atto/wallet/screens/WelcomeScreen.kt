@@ -28,7 +28,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun WelcomeScreen(
-    onCreateSecretClicked: () -> Unit
+    onCreateSecretClicked: () -> Unit,
+    onImportSecretClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -59,7 +60,7 @@ fun WelcomeScreen(
 
             AttoOutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {}
+                onClick = onImportSecretClicked
             ) {
                 Text(stringResource(Res.string.welcome_import_wallet))
             }
@@ -71,6 +72,9 @@ fun WelcomeScreen(
 @Preview
 fun WelcomeScreenPreview() {
     AttoWalletTheme {
-        WelcomeScreen(onCreateSecretClicked = {})
+        WelcomeScreen(
+            onCreateSecretClicked = {},
+            onImportSecretClicked = {}
+        )
     }
 }

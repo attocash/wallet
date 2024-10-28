@@ -5,6 +5,7 @@ import cash.atto.commons.wallet.inMemory
 import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.viewmodel.AppViewModel
+import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -58,6 +59,7 @@ val viewModelModule = module {
     includes(repositoryModule)
     includes(interactorModule)
     viewModelOf(::AppViewModel)
+    viewModelOf(::ImportSecretViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::SecretPhraseViewModel)
     viewModelOf(::SendTransactionViewModel)

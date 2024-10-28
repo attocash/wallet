@@ -42,6 +42,8 @@
     <!-- secret -->
     <string name="secret_backup">I've Backed It Up</string>
     <string name="secret_copy">Copy</string>
+    <string name="secret_import_hint">Please enter your 24-word secret phrase below. Each word should be separated by a space.</string>
+    <string name="secret_import_title">Import Secret Phrase</string>
     <string name="secret_title">Secret Phrase</string>
 
     <!-- send -->

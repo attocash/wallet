@@ -22,6 +22,11 @@ sealed class AttoDestination {
     }
 
     @Serializable
+    object ImportSecret : AttoDestination() {
+        override val route = "importSecret"
+    }
+
+    @Serializable
     object Overview : AttoDestination() {
         override val route = "overview"
     }

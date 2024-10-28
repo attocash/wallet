@@ -35,6 +35,10 @@ class AppStateRepository(
         return mnemonic.words
     }
 
+    suspend fun importSecret(secret: List<String>) {
+        seedDataSource.setSeed(secret.joinToString(" "))
+    }
+
     private suspend fun setKeys(
         mnemonic: AttoMnemonic?,
     ) {

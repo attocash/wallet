@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.OverviewScreenAndroid
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
@@ -99,6 +100,15 @@ fun AttoNavHost(
                 tween(700)
             ) }
         ) {
+            composable(route = AttoDestination.ImportSecret.route) {
+                ImportSecretScreen(
+                    onBackNavigation = { navController.navigateUp() },
+                    onImportAccount = {
+                        navController.navigate(AttoDestination.Overview.route)
+                    }
+                )
+            }
+
             composable(route = AttoDestination.Overview.route) {
                 OverviewScreenAndroid(
                     onSettingsClicked = {
@@ -210,6 +220,9 @@ fun AttoNavHost(
                 WelcomeScreen(
                     onCreateSecretClicked = {
                         navController.navigate(AttoDestination.SafetyWarning.route)
+                    },
+                    onImportSecretClicked = {
+                        navController.navigate(AttoDestination.ImportSecret.route)
                     }
                 )
             }
