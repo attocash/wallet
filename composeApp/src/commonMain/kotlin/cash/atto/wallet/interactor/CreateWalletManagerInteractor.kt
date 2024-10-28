@@ -13,8 +13,8 @@ import cash.atto.commons.wallet.AttoWalletViewer
 import cash.atto.commons.wallet.AttoWorkCache
 import cash.atto.commons.wallet.attoBackend
 import cash.atto.commons.wallet.inMemory
-import cash.atto.commons.work.AttoWorker
-import cash.atto.commons.work.attoBackend
+import cash.atto.commons.worker.AttoWorker
+import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.state.AppState
 
 class CreateWalletManagerInteractor() {

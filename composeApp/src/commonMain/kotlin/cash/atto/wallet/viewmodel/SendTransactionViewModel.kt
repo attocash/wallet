@@ -76,13 +76,7 @@ class SendTransactionViewModel(
                         .sendConfirmUiState
                         .address!!
                 ),
-                amount = AttoAmount(
-                    state.value
-                        .sendConfirmUiState
-                        .amount!!
-                        .toLong()
-                        .toULong()
-                )
+                amount = AttoAmount.from(AttoUnit.ATTO,  state.value.sendConfirmUiState.amount.toString())
             )
         }
         catch (ex: Exception) {

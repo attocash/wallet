@@ -49,6 +49,8 @@ kotlin {
 
             // Permissions
             implementation(libs.accompanist.permissions)
+
+            implementation(libs.slf4j.simple)
         }
 
         commonMain.dependencies {
@@ -88,6 +90,8 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.jna)
             implementation(libs.jna.platform)
+
+            implementation(libs.slf4j.simple)
         }
     }
 }
