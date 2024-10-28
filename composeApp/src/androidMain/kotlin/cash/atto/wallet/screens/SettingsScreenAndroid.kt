@@ -1,12 +1,16 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.settings.LogoutDialog
@@ -15,19 +19,27 @@ import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.SettingsViewModel
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SettingsScreen(
+fun SettingsScreenAndroid(
     onBackNavigation: () -> Unit,
+    onRepresentativeNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val uiState = viewModel.state.collectAsState()
 
-    Settings(
+    LaunchedEffect(uiState.value.navigateToRepresentative) {
+        if (uiState.value.navigateToRepresentative) {
+            viewModel.handleRepresentativeNavigation()
+            onRepresentativeNavigation.invoke()
+        }
+    }
+
+    SettingsAndroid(
         uiState = uiState.value,
         onBackNavigation = onBackNavigation,
         onDismissLogout = { viewModel.hideLogoutDialog() },
@@ -40,7 +52,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun Settings(
+fun SettingsAndroid(
     uiState: SettingsUiState,
     onBackNavigation: () -> Unit,
     onDismissLogout: () -> Unit,
@@ -49,8 +61,12 @@ fun Settings(
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
-        content = {
-            Column(Modifier.fillMaxSize()) {
+        content = { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
                 Profile(
                     modifier = Modifier.fillMaxWidth(),
                     uiState = uiState.profileUiState
@@ -73,9 +89,9 @@ fun Settings(
 
 @Preview
 @Composable
-fun SettingsPreview() {
+fun SettingsAndroidPreview() {
     AttoWalletTheme {
-        Settings(
+        SettingsAndroid(
             uiState = SettingsUiState.PREVIEW,
             onBackNavigation = {},
             onDismissLogout = {},

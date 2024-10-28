@@ -3,6 +3,7 @@ package cash.atto.wallet.uistate.settings
 data class SettingsUiState(
     val profileUiState: ProfileUiState,
     val settingsListUiState: SettingsListUiState,
+    val navigateToRepresentative: Boolean = false,
     val showLogoutDialog: Boolean = false
 ) {
     companion object {

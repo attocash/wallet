@@ -32,6 +32,11 @@ sealed class AttoDestination {
     }
 
     @Serializable
+    object Representative : AttoDestination() {
+        override val route = "representative"
+    }
+
+    @Serializable
     object SafetyWarning : AttoDestination() {
         override val route = "safetyWarning"
     }

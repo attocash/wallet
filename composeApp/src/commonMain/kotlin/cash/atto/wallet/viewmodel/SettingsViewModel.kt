@@ -60,8 +60,8 @@ class SettingsViewModel(
         }
     }
 
-    fun showLogoutDialog() = viewModelScope.launch {
-        _state.emit(state.value.copy(showLogoutDialog = true))
+    fun handleRepresentativeNavigation() = viewModelScope.launch {
+        _state.emit(state.value.copy(navigateToRepresentative = false))
     }
 
     fun hideLogoutDialog() = viewModelScope.launch {
@@ -70,6 +70,14 @@ class SettingsViewModel(
 
     fun logout() = viewModelScope.launch {
         appStateRepository.deleteKeys()
+    }
+
+    fun navigateToRepresentative() = viewModelScope.launch {
+        _state.emit(state.value.copy(navigateToRepresentative = true))
+    }
+
+    fun showLogoutDialog() = viewModelScope.launch {
+        _state.emit(state.value.copy(showLogoutDialog = true))
     }
 
     private suspend fun settingsList() = SettingsListUiState(listOf(
@@ -92,7 +100,7 @@ class SettingsViewModel(
         SettingItemUiState(
             icon = Icons.Filled.Home,
             title = getString(Res.string.settings_representative)
-        ) {},
+        ) { navigateToRepresentative() },
         SettingItemUiState(
             icon = Icons.AutoMirrored.Filled.ExitToApp,
             title = getString(Res.string.settings_logout)

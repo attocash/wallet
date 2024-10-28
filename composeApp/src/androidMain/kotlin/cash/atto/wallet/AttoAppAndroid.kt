@@ -22,13 +22,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.OverviewScreenAndroid
+import cash.atto.wallet.screens.RepresentativeScreen
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.SendConfirmScreen
 import cash.atto.wallet.screens.SendFromScreenAndroid
 import cash.atto.wallet.screens.SendResultScreen
-import cash.atto.wallet.screens.SettingsScreen
+import cash.atto.wallet.screens.SettingsScreenAndroid
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.AppUiState
@@ -120,6 +121,10 @@ fun AttoNavHost(
                 )
             }
 
+            composable(route = AttoDestination.Representative.route) {
+                RepresentativeScreen()
+            }
+
             composable(route = AttoDestination.SafetyWarning.route) {
                 SafetyWarningScreen(
                     onBackNavigation = { navController.navigateUp() },
@@ -204,8 +209,11 @@ fun AttoNavHost(
             }
 
             composable(route = AttoDestination.Settings.route) {
-                SettingsScreen(
+                SettingsScreenAndroid(
                     onBackNavigation = { navController.navigateUp() },
+                    onRepresentativeNavigation = {
+                        navController.navigate(AttoDestination.Representative.route)
+                    },
                     onLogoutNavigation = {
                         navController.navigate(AttoDestination.Welcome.route) {
                             popUpTo(navController.graph.id) {
