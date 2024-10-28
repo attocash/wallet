@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.MainScreenDesktop
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
@@ -72,9 +73,18 @@ fun AttoNavHost(
             stack = component.childStack,
         ) { screen ->
             when (screen.instance) {
-                is AttoDestination.Welcome -> WelcomeScreen {
-                    component.navigation.push(AttoDestination.SecretPhrase)
-                }
+                is AttoDestination.DesktopMain -> MainScreenDesktop(
+                    onLogoutNavigation = {
+                        component.navigation.popToFirst()
+                    }
+                )
+
+                is AttoDestination.ImportSecret -> ImportSecretScreen(
+                    onBackNavigation = { component.navigation.pop() },
+                    onImportAccount = {
+                        component.navigation.push(AttoDestination.DesktopMain)
+                    }
+                )
 
                 is AttoDestination.SecretPhrase -> SecretPhraseScreen(
                     onBackNavigation = { component.navigation.pop() },
@@ -83,9 +93,12 @@ fun AttoNavHost(
                     }
                 )
 
-                is AttoDestination.DesktopMain -> MainScreenDesktop(
-                    onLogoutNavigation = {
-                        component.navigation.popToFirst()
+                is AttoDestination.Welcome -> WelcomeScreen(
+                    onCreateSecretClicked = {
+                        component.navigation.push(AttoDestination.SecretPhrase)
+                    },
+                    onImportSecretClicked = {
+                        component.navigation.push(AttoDestination.ImportSecret)
                     }
                 )
 

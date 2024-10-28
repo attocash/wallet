@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.FloatingActionButton
@@ -55,8 +56,8 @@ fun ImportSecretScreen(
         },
         onDoneClicked = {
             coroutineScope.launch {
-                viewModel.importWallet()
-                onImportAccount.invoke()
+                if (viewModel.importWallet())
+                    onImportAccount.invoke()
             }
         }
     )
@@ -84,7 +85,8 @@ fun ImportSecret(
                     )
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -103,6 +105,10 @@ fun ImportSecret(
                             onInputChanged.invoke(it)
                         }
                     )
+
+                    if (!uiState.inputValid) {
+                        Text(text = uiState.errorMessage.orEmpty())
+                    }
                 }
 
                 FloatingActionButton(
@@ -126,7 +132,8 @@ fun ImportSecretPreview() {
     AttoWalletTheme {
         ImportSecret(
             uiState = ImportSecretUiState(
-                input = "ring mask spirit scissors best differ mean pet print century loyal major brain path already version jaguar rescue elder slender anxiety behind leg pigeon"
+                input = "ring mask spirit scissors best differ mean pet print century loyal major brain path already version jaguar rescue elder slender anxiety behind leg pigeon",
+                errorMessage = "Input not valid"
             ),
             onBackNavigation = {},
             onInputChanged = {},

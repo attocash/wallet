@@ -1,6 +1,8 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import cash.atto.commons.AttoMnemonic
+import cash.atto.commons.AttoMnemonicException
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +15,18 @@ class ImportSecretViewModel(
     private val _state = MutableStateFlow(ImportSecretUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    suspend fun updateInput(value: String) = _state.emit(
-        ImportSecretUiState(value)
-    )
+    suspend fun updateInput(value: String) {
+        _state.emit(state.value
+            .copy(input = value)
+        )
 
-    suspend fun importWallet() {
+        checkWallet()
+    }
+
+    suspend fun importWallet() : Boolean {
+        if (!checkWallet())
+            return false
+
         state.value
             .input
             ?.let {
@@ -26,5 +35,24 @@ class ImportSecretViewModel(
                 )
             }
 
+        return true
+    }
+
+    private suspend fun checkWallet() : Boolean {
+        try {
+            val mnemonic = AttoMnemonic(state.value.input.orEmpty())
+            _state.emit(state.value
+                .copy(errorMessage = null)
+            )
+        }
+        catch (ex: AttoMnemonicException) {
+            _state.emit(state.value
+                .copy(errorMessage = ex.message)
+            )
+
+            return false
+        }
+
+        return true
     }
 }
