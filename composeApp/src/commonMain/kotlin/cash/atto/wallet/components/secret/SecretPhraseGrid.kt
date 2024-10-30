@@ -16,7 +16,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun SecretPhraseGrid(
     columns: Int,
-    words: List<String>
+    words: List<String>,
+    hidden: Boolean
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns)
@@ -30,7 +31,11 @@ fun SecretPhraseGrid(
             }
         ) { index, item ->
             item?.let {
-                SecretWord(index + 1, it)
+                SecretWord(
+                    ordinal = index + 1,
+                    word = it,
+                    hidden = hidden
+                )
             } ?: Divider(color = MaterialTheme.colors.divider)
         }
     }
@@ -44,7 +49,8 @@ fun SecretPhraseGridPreview() {
             columns = 3,
             words = (1..24)
                 .map { "Word$it" }
-                .toList()
+                .toList(),
+            hidden = false
         )
     }
 }

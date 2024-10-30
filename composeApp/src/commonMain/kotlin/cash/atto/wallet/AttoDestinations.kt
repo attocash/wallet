@@ -7,6 +7,11 @@ sealed class AttoDestination {
     abstract val route: String
 
     @Serializable
+    object BackupSecret : AttoDestination() {
+        override val route = "backupSecret"
+    }
+
+    @Serializable
     object ConfirmPin : AttoDestination() {
         override val route = "confirmPin"
     }

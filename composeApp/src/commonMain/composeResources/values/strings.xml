@@ -69,6 +69,9 @@
     <string name="send_success_to">SENT TO</string>
 
     <!-- settings -->
+    <string name="settings_backup">Backup Secret Phrase</string>
+    <string name="settings_backup_hide">Tap to hide</string>
+    <string name="settings_backup_show">Tap to show</string>
     <string name="settings_contacts">Contacts</string>
     <string name="settings_load">Load from Paper Wallet</string>
     <string name="settings_logout">Logout</string>

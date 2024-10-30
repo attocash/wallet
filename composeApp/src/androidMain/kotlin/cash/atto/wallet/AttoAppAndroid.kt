@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.OverviewScreenAndroid
 import cash.atto.wallet.screens.RepresentativeScreen
@@ -101,6 +102,12 @@ fun AttoNavHost(
                 tween(700)
             ) }
         ) {
+            composable(route = AttoDestination.BackupSecret.route) {
+                BackupSecretPhraseScreen(
+                    onBackNavigation = { navController.navigateUp() }
+                )
+            }
+
             composable(route = AttoDestination.ImportSecret.route) {
                 ImportSecretScreen(
                     onBackNavigation = { navController.navigateUp() },
@@ -213,6 +220,9 @@ fun AttoNavHost(
             composable(route = AttoDestination.Settings.route) {
                 SettingsScreenAndroid(
                     onBackNavigation = { navController.navigateUp() },
+                    onBackupSecretNavigation = {
+                        navController.navigate(AttoDestination.BackupSecret.route)
+                    },
                     onRepresentativeNavigation = {
                         navController.navigate(AttoDestination.Representative.route)
                     },

@@ -12,12 +12,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun SecretWord(
     ordinal: Int,
-    word: String
+    word: String,
+    hidden: Boolean
 ) {
     Row(Modifier.padding(vertical = 8.dp)) {
         Text("${ordinal})")
         Text(
-            text = word,
+            text = if (hidden) "******" else word,
             modifier = Modifier.padding(start = 4.dp)
         )
     }
@@ -27,6 +28,10 @@ fun SecretWord(
 @Composable
 fun SecretWordPreview() {
     AttoWalletTheme {
-        SecretWord(1, "Word")
+        SecretWord(
+            ordinal = 1,
+            word = "Word",
+            hidden = false
+        )
     }
 }

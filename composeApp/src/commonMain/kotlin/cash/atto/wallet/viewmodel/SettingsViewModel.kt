@@ -5,10 +5,12 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.lifecycle.ViewModel
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.settings_backup
 import attowallet.composeapp.generated.resources.settings_contacts
 import attowallet.composeapp.generated.resources.settings_load
 import attowallet.composeapp.generated.resources.settings_logout
@@ -60,6 +62,10 @@ class SettingsViewModel(
         }
     }
 
+    fun handleBackupNavigation() = viewModelScope.launch {
+        _state.emit(state.value.copy(navigateToBackup = false))
+    }
+
     fun handleRepresentativeNavigation() = viewModelScope.launch {
         _state.emit(state.value.copy(navigateToRepresentative = false))
     }
@@ -72,11 +78,15 @@ class SettingsViewModel(
         appStateRepository.deleteKeys()
     }
 
-    fun navigateToRepresentative() = viewModelScope.launch {
+    private fun navigateToBackup() = viewModelScope.launch {
+        _state.emit(state.value.copy(navigateToBackup = true))
+    }
+
+    private fun navigateToRepresentative() = viewModelScope.launch {
         _state.emit(state.value.copy(navigateToRepresentative = true))
     }
 
-    fun showLogoutDialog() = viewModelScope.launch {
+    private fun showLogoutDialog() = viewModelScope.launch {
         _state.emit(state.value.copy(showLogoutDialog = true))
     }
 
@@ -93,6 +103,10 @@ class SettingsViewModel(
             icon = Icons.Filled.Warning,
             title = getString(Res.string.settings_security)
         ) {},
+        SettingItemUiState(
+            icon = Icons.Filled.Refresh,
+            title = getString(Res.string.settings_backup)
+        ) { navigateToBackup() },
         SettingItemUiState(
             icon = Icons.Filled.KeyboardArrowDown,
             title = getString(Res.string.settings_load)

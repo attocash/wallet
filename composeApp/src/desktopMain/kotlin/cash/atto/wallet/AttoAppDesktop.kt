@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.MainScreenDesktop
 import cash.atto.wallet.screens.RepresentativeScreen
@@ -74,7 +75,14 @@ fun AttoNavHost(
             stack = component.childStack,
         ) { screen ->
             when (screen.instance) {
+                is AttoDestination.BackupSecret -> BackupSecretPhraseScreen(
+                    onBackNavigation = { component.navigation.pop() }
+                )
+
                 is AttoDestination.DesktopMain -> MainScreenDesktop(
+                    onBackupSecretNavigation = {
+                        component.navigation.push(AttoDestination.BackupSecret)
+                    },
                     onRepresentativeNavigation = {
                         component.navigation.push(AttoDestination.Representative)
                     },

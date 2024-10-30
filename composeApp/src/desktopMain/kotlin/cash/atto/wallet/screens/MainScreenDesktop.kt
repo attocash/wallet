@@ -30,11 +30,19 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreenDesktop(
+    onBackupSecretNavigation: () -> Unit,
     onRepresentativeNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
 ) {
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val settingsUiState = settingsViewModel.state.collectAsState()
+
+    LaunchedEffect(settingsUiState.value.navigateToBackup) {
+        if (settingsUiState.value.navigateToBackup) {
+            settingsViewModel.handleBackupNavigation()
+            onBackupSecretNavigation.invoke()
+        }
+    }
 
     LaunchedEffect(settingsUiState.value.navigateToRepresentative) {
         if (settingsUiState.value.navigateToRepresentative) {
