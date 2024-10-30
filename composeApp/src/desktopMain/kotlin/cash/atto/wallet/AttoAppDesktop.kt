@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.MainScreenDesktop
+import cash.atto.wallet.screens.RepresentativeScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -74,6 +75,9 @@ fun AttoNavHost(
         ) { screen ->
             when (screen.instance) {
                 is AttoDestination.DesktopMain -> MainScreenDesktop(
+                    onRepresentativeNavigation = {
+                        component.navigation.push(AttoDestination.Representative)
+                    },
                     onLogoutNavigation = {
                         component.navigation.popToFirst()
                     }
@@ -84,6 +88,10 @@ fun AttoNavHost(
                     onImportAccount = {
                         component.navigation.push(AttoDestination.DesktopMain)
                     }
+                )
+
+                is AttoDestination.Representative -> RepresentativeScreen(
+                    onBackNavigation = { component.navigation.pop() }
                 )
 
                 is AttoDestination.SecretPhrase -> SecretPhraseScreen(

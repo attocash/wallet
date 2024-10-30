@@ -2,7 +2,6 @@ package cash.atto.wallet.di
 
 import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.inMemory
-import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.RepresentativeRepository
 import cash.atto.wallet.repository.WalletManagerRepository

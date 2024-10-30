@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +30,18 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreenDesktop(
+    onRepresentativeNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
 ) {
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val settingsUiState = settingsViewModel.state.collectAsState()
 
+    LaunchedEffect(settingsUiState.value.navigateToRepresentative) {
+        if (settingsUiState.value.navigateToRepresentative) {
+            settingsViewModel.handleRepresentativeNavigation()
+            onRepresentativeNavigation.invoke()
+        }
+    }
 
     val navState = remember {
         mutableStateOf(MainScreenNavDestination.OVERVIEW)

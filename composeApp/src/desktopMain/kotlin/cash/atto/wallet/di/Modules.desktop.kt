@@ -1,12 +1,31 @@
 package cash.atto.wallet.di
 
+import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import cash.atto.wallet.datasource.AppDatabase
+import cash.atto.wallet.datasource.RepresentativeDao
+import cash.atto.wallet.datasource.RepresentativeDataSource
 import cash.atto.wallet.datasource.SeedDataSource
-import org.koin.core.module.Module
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import java.io.File
+
+fun getDatabaseBuilder(): AppDatabase {
+    val dbFile = File(System.getProperty("java.io.tmpdir"), "atto-wallet.db")
+    return Room.databaseBuilder<AppDatabase>(dbFile.absolutePath)
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
+}
+
+actual val databaseModule = module {
+    single<AppDatabase> { getDatabaseBuilder() }
+}
 
 actual val dataSourceModule = module {
+    includes(databaseModule)
+    singleOf(::RepresentativeDataSource).bind(RepresentativeDao::class)
     singleOf(::SeedDataSource)
 }
-actual val databaseModule: Module
-    get() = TODO("Not yet implemented")
