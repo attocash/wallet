@@ -122,7 +122,9 @@ fun AttoNavHost(
             }
 
             composable(route = AttoDestination.Representative.route) {
-                RepresentativeScreen()
+                RepresentativeScreen(
+                    onBackNavigation = { navController.navigateUp() }
+                )
             }
 
             composable(route = AttoDestination.SafetyWarning.route) {

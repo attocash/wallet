@@ -9,8 +9,8 @@ import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
 import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.AttoWalletManager
-import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewHeaderUiState
 import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.uistate.send.SendFromUiState
@@ -26,35 +26,27 @@ import java.math.BigDecimal
 
 class SendTransactionViewModel(
     private val appStateRepository: AppStateRepository,
-    private val createWalletManagerInteractor: CreateWalletManagerInteractor
+    private val walletManagerRepository: WalletManagerRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SendTransactionUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val walletState = MutableStateFlow<AttoWalletManager?>(null)
-
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     init {
         viewModelScope.launch {
-            appStateRepository.state.collect { appState ->
-                if (appState.publicKey != null) {
-                    walletState.emit(createWalletManagerInteractor.invoke(appState))
+            walletManagerRepository.state
+                .filterNotNull()
+                .collect { wallet ->
+                    println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
+                    wallet.accountFlow.collect { account ->
+                        println("Account $account")
+                        _state.emit(state.value.copy(
+                            account = account
+                        ))
+                    }
                 }
-            }
-        }
-
-        viewModelScope.launch {
-            walletState.filterNotNull().collect { wallet ->
-                println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
-                wallet.accountFlow.collect { account ->
-                    println("Account $account")
-                    _state.emit(state.value.copy(
-                        account = account
-                    ))
-                }
-            }
         }
     }
 
@@ -70,14 +62,22 @@ class SendTransactionViewModel(
 
     suspend fun send(): Boolean {
         try {
-            walletState.value!!.send(
-                receiverAddress = AttoAddress.parse(
-                    state.value
-                        .sendConfirmUiState
-                        .address!!
-                ),
-                amount = AttoAmount.from(AttoUnit.ATTO,  state.value.sendConfirmUiState.amount.toString())
-            )
+            walletManagerRepository.state
+                .value!!
+                .send(
+                    receiverAddress = AttoAddress.parse(
+                        state.value
+                            .sendConfirmUiState
+                            .address!!
+                    ),
+                    amount = AttoAmount.from(
+                        unit = AttoUnit.ATTO,
+                        string = state.value
+                            .sendConfirmUiState
+                            .amount
+                            .toString()
+                    )
+                )
         }
         catch (ex: Exception) {
             _state.emit(state.value.copy(

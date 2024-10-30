@@ -1,4 +1,9 @@
 package cash.atto.wallet.uistate.settings
 
-class RepresentativeUIState {
+data class RepresentativeUIState(
+    val representative: String?
+) {
+    companion object {
+        val DEFAULT = RepresentativeUIState(null)
+    }
 }

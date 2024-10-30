@@ -4,9 +4,12 @@ import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.inMemory
 import cash.atto.wallet.interactor.CreateWalletManagerInteractor
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.RepresentativeRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
+import cash.atto.wallet.viewmodel.RepresentativeViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
@@ -42,25 +45,25 @@ val httpClientModule = module {
     }
 }
 
+expect val databaseModule: Module
+
 expect val dataSourceModule: Module
 
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
     singleOf(::AppStateRepository)
+    singleOf(::RepresentativeRepository)
+    singleOf(::WalletManagerRepository)
     single { AttoTransactionRepository.inMemory() }
-}
-
-val interactorModule = module {
-    singleOf(::CreateWalletManagerInteractor)
 }
 
 val viewModelModule = module {
     includes(repositoryModule)
-    includes(interactorModule)
     viewModelOf(::AppViewModel)
     viewModelOf(::ImportSecretViewModel)
     viewModelOf(::OverviewViewModel)
+    viewModelOf(::RepresentativeViewModel)
     viewModelOf(::SecretPhraseViewModel)
     viewModelOf(::SendTransactionViewModel)
     viewModelOf(::SettingsViewModel)

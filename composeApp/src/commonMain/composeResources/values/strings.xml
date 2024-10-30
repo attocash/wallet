@@ -33,6 +33,13 @@
     <string name="overview_transaction_from">from</string>
     <string name="overview_transaction_to">to</string>
 
+    <!-- representative -->
+    <string name="representative_change">Change</string>
+    <string name="representative_change_title">CHANGE REPRESENTATIVE</string>
+    <string name="representative_close">Close</string>
+    <string name="representative_subtitle">Currently Represented By</string>
+    <string name="representative_title">REPRESENTATIVE</string>
+
     <!-- safety warning -->
     <string name="safety_warning_confirm">Got It!</string>
     <string name="safety_warning_description">In the next screen, you will see your secret phrase. It is a password to access your funds. It is crucial that you back it up and never share it with anyone.</string>

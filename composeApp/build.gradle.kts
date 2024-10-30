@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.kspCompose)
+    alias(libs.plugins.room)
 }
 
 repositories {
@@ -31,6 +33,10 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
+    sourceSets.commonMain {
+        kotlin.srcDir("build/generated/ksp/metadata")
+    }
+
     sourceSets {
         val desktopMain by getting
 
@@ -51,6 +57,8 @@ kotlin {
             implementation(libs.accompanist.permissions)
 
             implementation(libs.slf4j.simple)
+
+            implementation(libs.room.runtime.android)
         }
 
         commonMain.dependencies {
@@ -79,6 +87,9 @@ kotlin {
             implementation(libs.decompose.extensions.compose)
 
             implementation(libs.qr.kit)
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.junit.jupiter)
@@ -134,9 +145,20 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
+    add("kspCommonMainMetadata", libs.room.compiler)
     implementation(libs.transport.runtime)
     testImplementation(libs.junit.jupiter)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata" ) {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
 }
 
 compose.desktop {
