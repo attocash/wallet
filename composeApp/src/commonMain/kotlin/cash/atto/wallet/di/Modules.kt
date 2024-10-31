@@ -7,6 +7,7 @@ import cash.atto.wallet.repository.RepresentativeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
+import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.RepresentativeViewModel
@@ -62,6 +63,7 @@ val viewModelModule = module {
     includes(repositoryModule)
     viewModelOf(::AppViewModel)
     viewModelOf(::BackupSecretViewModel)
+    viewModelOf(::CreatePasswordViewModel)
     viewModelOf(::ImportSecretViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::RepresentativeViewModel)

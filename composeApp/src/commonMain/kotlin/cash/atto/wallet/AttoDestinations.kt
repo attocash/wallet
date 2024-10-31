@@ -17,6 +17,11 @@ sealed class AttoDestination {
     }
 
     @Serializable
+    object CreatePassword : AttoDestination() {
+        override val route = "createPassword"
+    }
+
+    @Serializable
     object CreatePin : AttoDestination() {
         override val route = "createPin"
     }

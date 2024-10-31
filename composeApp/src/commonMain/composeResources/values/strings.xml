@@ -33,6 +33,16 @@
     <string name="overview_transaction_from">from</string>
     <string name="overview_transaction_to">to</string>
 
+    <!-- password -->
+    <string name="password_create_back">Go Back</string>
+    <string name="password_confirm_hint">Confirm the password</string>
+    <string name="password_create_hint">Create a password</string>
+    <string name="password_create_next">Next</string>
+    <string name="password_create_text">This password will be required to open Atto.</string>
+    <string name="password_create_title">CREATE A PASSWORD</string>
+    <string name="password_no_match">Passwords don't match.</string>
+    <string name="password_weak">Password must contain at least 6 characters, uppercase and lowercase letters, numbers and special symbols.</string>
+
     <!-- representative -->
     <string name="representative_change">Change</string>
     <string name="representative_change_title">CHANGE REPRESENTATIVE</string>
