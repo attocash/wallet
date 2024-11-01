@@ -8,7 +8,6 @@ import cash.atto.wallet.util.dataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -69,7 +68,7 @@ actual class PasswordDataSource(
     }
 
     private fun encryptSeed(seed: String): String {
-        return seed.filterNot { it == ' ' }
+        return seed.hashCode().toString()
     }
 
     companion object {

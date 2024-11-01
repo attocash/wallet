@@ -8,10 +8,15 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.screens.BackupSecretPhraseScreen
+import cash.atto.wallet.screens.CreatePasswordScreen
+import cash.atto.wallet.screens.EnterPassword
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.MainScreenDesktop
 import cash.atto.wallet.screens.RepresentativeScreen
@@ -26,6 +31,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.popToFirst
 import com.arkivanov.decompose.router.stack.popWhile
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.launch
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,7 +46,10 @@ fun AttoAppDesktop(
 
             AttoNavHost(
                 uiState = uiState.value,
-                component = component
+                component = component,
+                submitPassword = {
+                    viewModel.enterPassword(it)
+                }
             )
         }
     }
@@ -50,75 +59,111 @@ fun AttoAppDesktop(
 fun AttoNavHost(
     uiState: AppUiState,
     component: NavigationComponent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    submitPassword: suspend (String?) -> Boolean
 ) {
-    if (uiState.shownScreen == AppUiState.ShownScreen.LOADER) {
-        Box(
-            modifier = modifier.fillMaxSize()
-                .background(color = MaterialTheme.colors.surface)
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-                    .width(64.dp),
-                color = MaterialTheme.colors.primary
+    when (uiState.shownScreen) {
+        AppUiState.ShownScreen.LOADER -> {
+            Box(
+                modifier = modifier.fillMaxSize()
+                    .background(color = MaterialTheme.colors.surface)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                        .width(64.dp),
+                    color = MaterialTheme.colors.primary
+                )
+            }
+        }
+
+        AppUiState.ShownScreen.PASSWORD_ENTER -> {
+            val passwordValid = remember {
+                mutableStateOf(true)
+            }
+
+            val coroutineScope = rememberCoroutineScope()
+
+            EnterPassword(
+                onSubmitPassword = {
+                    coroutineScope.launch {
+                        passwordValid.value = (submitPassword.invoke(it))
+                    }
+                },
+                passwordValid = passwordValid.value
             )
         }
-    } else {
-        if (
-            uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW
-            && component.childStack.active.instance == AttoDestination.Welcome
-        ) {
-            component.navigation.push(AttoDestination.DesktopMain)
+
+        AppUiState.ShownScreen.PASSWORD_CREATE -> {
+            CreatePasswordScreen(
+                onBackNavigation = { component.navigation.pop() },
+                onConfirmClick = {}
+            )
         }
 
-        Children(
-            stack = component.childStack,
-        ) { screen ->
-            when (screen.instance) {
-                is AttoDestination.BackupSecret -> BackupSecretPhraseScreen(
-                    onBackNavigation = { component.navigation.pop() }
-                )
+        else -> {
+            if (
+                uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW
+                && component.childStack.active.instance == AttoDestination.Welcome
+            ) {
+                component.navigation.push(AttoDestination.DesktopMain)
+            }
 
-                is AttoDestination.DesktopMain -> MainScreenDesktop(
-                    onBackupSecretNavigation = {
-                        component.navigation.push(AttoDestination.BackupSecret)
-                    },
-                    onRepresentativeNavigation = {
-                        component.navigation.push(AttoDestination.Representative)
-                    },
-                    onLogoutNavigation = {
-                        component.navigation.popToFirst()
-                    }
-                )
+            Children(
+                stack = component.childStack,
+            ) { screen ->
+                when (screen.instance) {
+                    is AttoDestination.BackupSecret -> BackupSecretPhraseScreen(
+                        onBackNavigation = { component.navigation.pop() }
+                    )
 
-                is AttoDestination.ImportSecret -> ImportSecretScreen(
-                    onBackNavigation = { component.navigation.pop() },
-                    onImportAccount = {
-                        component.navigation.push(AttoDestination.DesktopMain)
-                    }
-                )
+                    is AttoDestination.CreatePassword -> CreatePasswordScreen(
+                        onBackNavigation = { component.navigation.pop() },
+                        onConfirmClick = {
+                            component.navigation.push(AttoDestination.DesktopMain)
+                        }
+                    )
 
-                is AttoDestination.Representative -> RepresentativeScreen(
-                    onBackNavigation = { component.navigation.pop() }
-                )
+                    is AttoDestination.DesktopMain -> MainScreenDesktop(
+                        onBackupSecretNavigation = {
+                            component.navigation.push(AttoDestination.BackupSecret)
+                        },
+                        onRepresentativeNavigation = {
+                            component.navigation.push(AttoDestination.Representative)
+                        },
+                        onLogoutNavigation = {
+                            component.navigation.popToFirst()
+                        }
+                    )
 
-                is AttoDestination.SecretPhrase -> SecretPhraseScreen(
-                    onBackNavigation = { component.navigation.pop() },
-                    onBackupConfirmClicked = {
-                        component.navigation.push(AttoDestination.DesktopMain)
-                    }
-                )
+                    is AttoDestination.ImportSecret -> ImportSecretScreen(
+                        onBackNavigation = { component.navigation.pop() },
+                        onImportAccount = {
+                            component.navigation.push(AttoDestination.DesktopMain)
+                        }
+                    )
 
-                is AttoDestination.Welcome -> WelcomeScreen(
-                    onCreateSecretClicked = {
-                        component.navigation.push(AttoDestination.SecretPhrase)
-                    },
-                    onImportSecretClicked = {
-                        component.navigation.push(AttoDestination.ImportSecret)
-                    }
-                )
+                    is AttoDestination.Representative -> RepresentativeScreen(
+                        onBackNavigation = { component.navigation.pop() }
+                    )
 
-                else -> {}
+                    is AttoDestination.SecretPhrase -> SecretPhraseScreen(
+                        onBackNavigation = { component.navigation.pop() },
+                        onBackupConfirmClicked = {
+                            component.navigation.push(AttoDestination.DesktopMain)
+                        }
+                    )
+
+                    is AttoDestination.Welcome -> WelcomeScreen(
+                        onCreateSecretClicked = {
+                            component.navigation.push(AttoDestination.SecretPhrase)
+                        },
+                        onImportSecretClicked = {
+                            component.navigation.push(AttoDestination.ImportSecret)
+                        }
+                    )
+
+                    else -> {}
+                }
             }
         }
     }
