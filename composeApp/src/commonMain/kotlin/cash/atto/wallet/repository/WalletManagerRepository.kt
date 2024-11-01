@@ -46,25 +46,23 @@ class WalletManagerRepository(
                 representativeRepository.getRepresentative(
                     it.publicKey.toString()
                 )
+
+                _state.emit(createWalletManager(it))
             }
         }
 
         collectorJob = collectorScope.launch {
-            appStateRepository.state.combine(
-                representativeRepository.state
-            ) { appState, representativeState ->
-                createWalletManager(appState, representativeState)
-            }.collect {
-                _state.emit(it)
+            representativeRepository.state.collect {
+                if (it.representative != null)
+                    state.value?.change(AttoAddress.parse(it.representative))
             }
         }
     }
 
     private fun createWalletManager(
-        appState: AppState,
-        representativeState: RepresentativeState
+        appState: AppState
     ): AttoWalletManager? {
-        if (appState.privateKey == null || representativeState.representative == null)
+        if (appState.privateKey == null)
             return null
 
         val signer = appState.privateKey.toSigner()
@@ -81,8 +79,7 @@ class WalletManagerRepository(
             worker = AttoWorker.attoBackend(authenticator),
             workCache = AttoWorkCache.inMemory()
         ) {
-            AttoAddress.parse(representativeState.representative)
-//            AttoAddress(AttoAlgorithm.V1, signer.publicKey)
+            AttoAddress(AttoAlgorithm.V1, signer.publicKey)
         }
 
         walletManager.start()
