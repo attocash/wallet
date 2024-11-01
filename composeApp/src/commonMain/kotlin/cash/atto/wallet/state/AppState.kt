@@ -7,21 +7,27 @@ import cash.atto.commons.toSeed
 
 data class AppState(
     val mnemonic: AttoMnemonic?,
-    val authState: AUTH_STATE,
-    val index: UInt = 0U
+    val authState: AuthState,
+    val password: String?,
+    val index: UInt = 0U,
 ) {
     val seed = mnemonic?.toSeed()
     val privateKey = seed?.toPrivateKey(index)
     val publicKey = privateKey?.toPublicKey()
 
-    enum class AUTH_STATE {
-        UNKNOWN, LOGGED, UNLOGGED
+    enum class AuthState {
+        UNKNOWN,
+        NO_PASSWORD,
+        NO_SEED,
+        SESSION_INVALID,
+        SESSION_VALID;
     }
 
     companion object {
         val DEFAULT = AppState(
             mnemonic = null,
-            authState = AUTH_STATE.UNKNOWN
+            authState = AuthState.UNKNOWN,
+            password = null
         )
     }
 }

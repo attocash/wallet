@@ -2,6 +2,7 @@ package cash.atto.wallet.di
 
 import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.inMemory
+import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.RepresentativeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
@@ -59,8 +60,13 @@ val repositoryModule = module {
     single { AttoTransactionRepository.inMemory() }
 }
 
+val interactorModule = module {
+    singleOf(::CheckPasswordInteractor)
+}
+
 val viewModelModule = module {
     includes(repositoryModule)
+    includes(interactorModule)
     viewModelOf(::AppViewModel)
     viewModelOf(::BackupSecretViewModel)
     viewModelOf(::CreatePasswordViewModel)

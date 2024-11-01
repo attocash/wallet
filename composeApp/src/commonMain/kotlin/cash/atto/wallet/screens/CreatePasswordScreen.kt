@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -28,6 +29,8 @@ import attowallet.composeapp.generated.resources.password_create_hint
 import attowallet.composeapp.generated.resources.password_create_next
 import attowallet.composeapp.generated.resources.password_create_text
 import attowallet.composeapp.generated.resources.password_create_title
+import attowallet.composeapp.generated.resources.password_no_match
+import attowallet.composeapp.generated.resources.password_weak
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -52,7 +55,8 @@ fun CreatePasswordScreen(
         onBackNavigation = onBackNavigation,
         onConfirmClick = {
             coroutineScope.launch {
-                onConfirmClick.invoke()
+                if (viewModel.savePassword())
+                    onConfirmClick.invoke()
             }
         },
         onPasswordChanged = {
@@ -109,7 +113,8 @@ fun CreatePassword(
                     onValueChange = { onPasswordChanged.invoke(it) },
                     placeholder = {
                         Text(text = stringResource(Res.string.password_create_hint))
-                    }
+                    },
+                    visualTransformation = PasswordVisualTransformation()
                 )
 
                 TextField(
@@ -117,8 +122,22 @@ fun CreatePassword(
                     onValueChange = { onPasswordConfirmChanged.invoke(it) },
                     placeholder = {
                         Text(text = stringResource(Res.string.password_confirm_hint))
-                    }
+                    },
+                    visualTransformation = PasswordVisualTransformation()
                 )
+
+                if (uiState.showError) {
+                    Text(
+                        text = stringResource(
+                            if (uiState.checkState == CreatePasswordUIState.PasswordCheckState.INVALID)
+                                Res.string.password_weak
+                            else Res.string.password_no_match
+                        ),
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.caption
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
 

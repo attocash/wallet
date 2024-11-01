@@ -40,8 +40,12 @@
     <string name="password_create_next">Next</string>
     <string name="password_create_text">This password will be required to open Atto.</string>
     <string name="password_create_title">CREATE A PASSWORD</string>
+    <string name="password_enter_hint">Enter password</string>
+    <string name="password_enter_submit">Submit</string>
+    <string name="password_enter_title">ENTER PASSWORD</string>
     <string name="password_no_match">Passwords don't match.</string>
     <string name="password_weak">Password must contain at least 6 characters, uppercase and lowercase letters, numbers and special symbols.</string>
+    <string name="password_wrong">Incorrect password.</string>
 
     <!-- representative -->
     <string name="representative_change">Change</string>

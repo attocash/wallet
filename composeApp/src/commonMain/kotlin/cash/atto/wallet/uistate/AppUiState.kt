@@ -4,7 +4,11 @@ data class AppUiState(
     val shownScreen: ShownScreen
 ) {
     enum class ShownScreen {
-        LOADER, WELCOME, OVERVIEW
+        LOADER,
+        OVERVIEW,
+        PASSWORD_CREATE,
+        PASSWORD_ENTER,
+        WELCOME;
     }
 
     companion object {
