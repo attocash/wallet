@@ -20,7 +20,6 @@ import cash.atto.commons.wallet.inMemory
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.repository.AppStateRepository
-import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import kotlinx.coroutines.CoroutineScope
@@ -102,7 +101,7 @@ class OverviewViewModel(
         }
     }
 
-    private fun createWalletManager(state: AppState): AttoWalletManager? {
+    private suspend fun createWalletManager(state: AppState): AttoWalletManager? {
         if (state.privateKey == null)
             return null
 

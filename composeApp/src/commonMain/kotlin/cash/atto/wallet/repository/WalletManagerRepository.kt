@@ -63,7 +63,7 @@ class WalletManagerRepository(
         }
     }
 
-    private fun createWalletManager(
+    private suspend fun createWalletManager(
         appState: AppState
     ): AttoWalletManager? {
         if (appState.privateKey == null)
