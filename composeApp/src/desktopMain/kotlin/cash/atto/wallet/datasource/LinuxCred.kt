@@ -2,7 +2,6 @@ package cash.atto.wallet.datasource
 
 import com.sun.jna.*
 import com.sun.jna.ptr.PointerByReference
-import java.io.UnsupportedEncodingException
 
 interface LibSecret : Library {
     companion object {
@@ -36,16 +35,17 @@ interface LibSecret : Library {
 
 
 @Structure.FieldOrder("name", "flags", "attributes")
-class SecretSchema : Structure() {
+class SecretSchema(key: String) : Structure() {
+
+    private val schemaName = "atto_wallet_${key}_schema"
 
     companion object {
         const val SECRET_SCHEMA_NONE = 0
         const val SECRET_SCHEMA_ATTRIBUTE_STRING = 0
-        val SCHEMA_NAME = "my_app_private_key_schema"
     }
 
     @JvmField
-    var name: String = SCHEMA_NAME
+    var name: String = schemaName
 
     @JvmField
     var flags: Int = SECRET_SCHEMA_NONE
@@ -53,7 +53,7 @@ class SecretSchema : Structure() {
     @JvmField
     var attributes: Array<Attribute> = arrayOf(
         Attribute("key_type", SECRET_SCHEMA_ATTRIBUTE_STRING),
-        Attribute("seed", SECRET_SCHEMA_ATTRIBUTE_STRING)
+        Attribute(key, SECRET_SCHEMA_ATTRIBUTE_STRING)
     )
 
     @Structure.FieldOrder("name", "type")
@@ -77,13 +77,21 @@ class SecretSchema : Structure() {
 
 
 class LinuxCred {
-    private val secretSchema = SecretSchema()
+    private val seedSecretSchema = SecretSchema(SEED_SCHEMA_KEY)
+    private val passwordSecretSchema = SecretSchema(PASSWORD_SCHEMA_KEY)
 
+    fun getSeed() = get(seedSecretSchema)
+    fun storeSeed(seed: String) = store(seedSecretSchema, seed)
+    fun deleteSeed() = delete(seedSecretSchema)
 
-    fun getSeed(): String? {
+    fun getPassword() = get(passwordSecretSchema)
+    fun storePassword(password: String) = store(passwordSecretSchema, password)
+    fun deletePassword() = delete(passwordSecretSchema)
+
+    private fun get(schema: SecretSchema): String? {
         val error = PointerByReference()
         val result = LibSecret.INSTANCE.secret_password_lookup_sync(
-            secretSchema.pointer,
+            schema.pointer,
             null,
             error,
         )
@@ -92,10 +100,10 @@ class LinuxCred {
         return result
     }
 
-    fun store(seed: String): Boolean {
+    private fun store(schema: SecretSchema, seed: String): Boolean {
         val error = PointerByReference()
         val result = LibSecret.INSTANCE.secret_password_store_sync(
-            secretSchema.pointer,
+            schema.pointer,
             "default",
             "Atto Wallet",
             seed,
@@ -103,27 +111,30 @@ class LinuxCred {
             error,
         )
 
-        if (getSeed() == null) {
+        if (get(schema) == null) {
             throw IllegalStateException("It wasn't possible to store the seed")
         }
 
         return result
     }
 
-    fun delete(): Boolean {
+    private fun delete(schema: SecretSchema): Boolean {
         val error = PointerByReference()
         val result = LibSecret.INSTANCE.secret_password_clear_sync(
-            secretSchema.pointer,
+            schema.pointer,
             null,
             error,
         )
 
-        if (getSeed() != null) {
+        if (get(schema) != null) {
             throw IllegalStateException("It wasn't possible to delete the seed")
         }
 
-
         return result
+    }
 
+    companion object {
+        private const val SEED_SCHEMA_KEY = "seed"
+        private const val PASSWORD_SCHEMA_KEY = "password"
     }
 }

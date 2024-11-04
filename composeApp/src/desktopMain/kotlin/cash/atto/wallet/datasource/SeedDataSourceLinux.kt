@@ -20,12 +20,12 @@ class SeedDataSourceLinux : SeedDataSourceDesktopImpl {
     }
 
     override suspend fun setSeed(seed: String) {
-        linuxCred.store(seed)
+        linuxCred.storeSeed(seed)
         getSeed()
     }
 
     override suspend fun clearSeed() {
-        linuxCred.delete()
+        linuxCred.deleteSeed()
         getSeed()
     }
 
@@ -37,9 +37,5 @@ class SeedDataSourceLinux : SeedDataSourceDesktopImpl {
         } catch (ex: Exception) {
             _seedChannel.send(null)
         }
-    }
-
-    companion object {
-        private const val APP_NAME = "Atto Wallet"
     }
 }

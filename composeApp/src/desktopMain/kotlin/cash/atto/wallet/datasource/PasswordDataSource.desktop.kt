@@ -7,8 +7,8 @@ actual class PasswordDataSource {
 
     private val dataSourceDesktopImpl = when (getPlatform().type) {
         PlatformType.WINDOWS -> PasswordDataSourceWindows()
-        PlatformType.LINUX -> UnsafePasswordDataSource()
-        else -> UnsafePasswordDataSource()
+        PlatformType.LINUX -> PasswordDataSourceLinux()
+        else -> throw UnsupportedOperationException("Unsupported platform ${getPlatform()}")
     }
 
     actual suspend fun getPassword(seed: String) =

@@ -5,10 +5,14 @@ class PasswordDataSourceLinux : PasswordDataSourceDesktopImpl {
     private val linuxCred = LinuxCred()
 
     override suspend fun getPassword(seed: String): String? {
-        TODO("Not yet implemented")
+        return try {
+            linuxCred.getPassword()
+        } catch (ex: Exception) {
+            null
+        }
     }
 
     override suspend fun setPassword(seed: String, password: String) {
-        TODO("Not yet implemented")
+        linuxCred.storePassword(password)
     }
 }
