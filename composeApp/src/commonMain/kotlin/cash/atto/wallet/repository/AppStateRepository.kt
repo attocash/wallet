@@ -31,12 +31,16 @@ class AppStateRepository(
 
                 seed?.let {
                     val password = passwordDataSource.getPassword(it)
-                    setPassword(password)
-                    setAuthState(
-                        password?.let {
-                            AppState.AuthState.SESSION_INVALID
-                        } ?: AppState.AuthState.NO_PASSWORD
-                    )
+                    if (state.value.authState != AppState.AuthState.NEW_ACCOUNT &&
+                        state.value.authState != AppState.AuthState.SESSION_VALID
+                    ) {
+                        setPassword(password)
+                        setAuthState(
+                            password?.let {
+                                AppState.AuthState.SESSION_INVALID
+                            } ?: AppState.AuthState.NO_PASSWORD
+                        )
+                    }
                 } ?: setAuthState(AppState.AuthState.NO_SEED)
             }
         }
@@ -47,6 +51,8 @@ class AppStateRepository(
         seedDataSource.setSeed(
             mnemonic.words.joinToString(" ")
         )
+
+        setAuthState(AppState.AuthState.NEW_ACCOUNT)
 
         return mnemonic.words
     }
@@ -80,13 +86,9 @@ class AppStateRepository(
     private suspend fun setMnemonic(
         mnemonic: AttoMnemonic?,
     ) {
-        _state.emit(
-            AppState(
-                mnemonic = mnemonic,
-                authState = AppState.AuthState.UNKNOWN,
-                password = null
-            )
-        )
+        _state.emit(state.value.copy(
+            mnemonic = mnemonic
+        ))
     }
 
     private suspend fun setAuthState(authState: AppState.AuthState) {

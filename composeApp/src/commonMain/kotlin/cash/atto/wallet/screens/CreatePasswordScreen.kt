@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -18,7 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -72,6 +78,7 @@ fun CreatePasswordScreen(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CreatePassword(
     uiState: CreatePasswordUIState,
@@ -80,6 +87,8 @@ fun CreatePassword(
     onPasswordChanged: (String) -> Unit,
     onPasswordConfirmChanged: (String) -> Unit
 ) {
+    val (focusRequester) = FocusRequester.createRefs()
+
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
@@ -114,16 +123,25 @@ fun CreatePassword(
                     placeholder = {
                         Text(text = stringResource(Res.string.password_create_hint))
                     },
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusRequester.requestFocus() }
+                    )
                 )
 
                 TextField(
                     value = uiState.passwordConfirm.orEmpty(),
                     onValueChange = { onPasswordConfirmChanged.invoke(it) },
+                    modifier = Modifier.focusRequester(focusRequester),
                     placeholder = {
                         Text(text = stringResource(Res.string.password_confirm_hint))
                     },
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { onConfirmClick.invoke() }
+                    )
                 )
 
                 if (uiState.showError) {

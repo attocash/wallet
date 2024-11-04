@@ -9,7 +9,7 @@ data class AppState(
     val mnemonic: AttoMnemonic?,
     val authState: AuthState,
     val password: String?,
-    val index: UInt = 0U,
+    val index: UInt = 0U
 ) {
     val seed = mnemonic?.toSeed()
     val privateKey = seed?.toPrivateKey(index)
@@ -17,6 +17,7 @@ data class AppState(
 
     enum class AuthState {
         UNKNOWN,
+        NEW_ACCOUNT,
         NO_PASSWORD,
         NO_SEED,
         SESSION_INVALID,

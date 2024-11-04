@@ -27,6 +27,7 @@ class AppViewModel(
                 _state.emit(
                     AppUiState(
                         shownScreen = when (it.authState) {
+                            AppState.AuthState.NEW_ACCOUNT -> AppUiState.ShownScreen.WELCOME
                             AppState.AuthState.NO_PASSWORD -> AppUiState.ShownScreen.PASSWORD_CREATE
                             AppState.AuthState.NO_SEED -> AppUiState.ShownScreen.WELCOME
                             AppState.AuthState.SESSION_INVALID -> AppUiState.ShownScreen.PASSWORD_ENTER
