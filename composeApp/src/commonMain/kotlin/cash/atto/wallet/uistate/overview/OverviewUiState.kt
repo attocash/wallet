@@ -1,71 +1,70 @@
 package cash.atto.wallet.uistate.overview
 
+import cash.atto.commons.AttoAccountEntry
+import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoBlockType
 import cash.atto.commons.AttoOpenBlock
 import cash.atto.commons.AttoReceiveBlock
 import cash.atto.commons.AttoSendBlock
-import cash.atto.commons.AttoTransaction
 import cash.atto.commons.AttoUnit
 import java.math.BigDecimal
 
 data class OverviewUiState(
     private val balance: BigDecimal?,
-    val transactions: List<AttoTransaction?>,
+    val entries: List<AttoAccountEntry?>,
     val receiveAddress: String?
 ) {
-    val headerUiState get() = OverviewHeaderUiState(
-        attoCoins = balance
-    )
+    val headerUiState
+        get() = OverviewHeaderUiState(
+            attoCoins = balance
+        )
 
-    val transactionListUiState get() = TransactionListUiState(
-        transactions = transactions
-            .filterNotNull()
-            .map {
-                when (it.block) {
-                    is AttoSendBlock -> TransactionUiState(
-                        type = TransactionType.SEND,
-                        amount = (it.block as AttoSendBlock)
-                            .amount
-                            .toString(AttoUnit.ATTO),
-                        source = (it.block as AttoSendBlock)
-                            .receiverPublicKey
-                            .toString()
-                    )
+    val transactionListUiState
+        get() = TransactionListUiState(
+            transactions = entries
+                .filterNotNull()
+                .map {
+                    when (it.blockType) {
+                         AttoBlockType.SEND -> TransactionUiState(
+                            type = TransactionType.SEND,
+                            amount = it.amount.toString(AttoUnit.ATTO),
+                            source = AttoAddress(it.subjectAlgorithm, it.subjectPublicKey).toString(),
+                        )
 
-                    is AttoReceiveBlock -> TransactionUiState(
-                        type = TransactionType.RECEIVE,
-                        amount = "Unknown amount",
-                        source = "Unknown Source"
-//                        amount = (it.block as AttoReceiveBlock).amount.toString(AttoUnit.ATTO),
-//                        source = it.block.receiverPublicKey.toString()
-                    )
+                        AttoBlockType.RECEIVE -> TransactionUiState(
+                            type = TransactionType.RECEIVE,
+                            amount = it.amount.toString(AttoUnit.ATTO),
+                            source = AttoAddress(it.subjectAlgorithm, it.subjectPublicKey).toString(),
+                        )
 
-                    is AttoOpenBlock -> TransactionUiState(
-                        type = TransactionType.RECEIVE,
-                        amount = "Unknown amount",
-                        source = "Unknown Source"
-//                        amount = (it.block as AttoOpenBlock).balance.toString(AttoUnit.ATTO),
-//                        source = (it.block as AttoOpenBlock)
-//                            .representativePublicKey
-//                            .toString()
-                    )
+                        AttoBlockType.OPEN -> TransactionUiState(
+                            type = TransactionType.RECEIVE,
+                            amount = it.amount.toString(AttoUnit.ATTO),
+                            source = AttoAddress(it.subjectAlgorithm, it.subjectPublicKey).toString(),
+                        )
 
-                    else -> null
-                }
-            },
-        showHint = transactions.isEmpty()
-    )
+                        AttoBlockType.CHANGE -> TransactionUiState(
+                            type = TransactionType.CHANGE,
+                            amount = it.amount.toString(AttoUnit.ATTO),
+                            source = AttoAddress(it.subjectAlgorithm, it.subjectPublicKey).toString(),
+                        )
+
+                        else -> null
+                    }
+                },
+            showHint = entries.isEmpty()
+        )
 
     companion object {
         val DEFAULT = OverviewUiState(
             balance = null,
-            transactions = List<AttoTransaction?>(2) { null },
+            entries = List<AttoAccountEntry?>(2) { null },
             receiveAddress = null
         )
 
         suspend fun empty() = OverviewUiState(
             balance = null,
-            transactions = emptyList(),
+            entries = emptyList(),
             receiveAddress = null
         )
     }

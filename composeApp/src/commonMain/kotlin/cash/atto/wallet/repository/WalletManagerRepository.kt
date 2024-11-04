@@ -6,8 +6,8 @@ import cash.atto.commons.AttoNetwork
 import cash.atto.commons.gatekeeper.AttoAuthenticator
 import cash.atto.commons.gatekeeper.attoBackend
 import cash.atto.commons.toSigner
+import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.commons.wallet.AttoNodeClient
-import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.commons.wallet.AttoWalletViewer
 import cash.atto.commons.wallet.AttoWorkCache
@@ -16,14 +16,11 @@ import cash.atto.commons.wallet.inMemory
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.state.AppState
-import cash.atto.wallet.state.RepresentativeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class WalletManagerRepository(
@@ -72,7 +69,7 @@ class WalletManagerRepository(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,
-                transactionRepository = AttoTransactionRepository.inMemory()
+                accountEntryRepository = AttoAccountEntryRepository.inMemory()
             ),
             signer = signer,
             client = client,

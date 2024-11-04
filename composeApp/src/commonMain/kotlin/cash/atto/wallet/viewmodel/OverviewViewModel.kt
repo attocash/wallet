@@ -5,7 +5,7 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
-import cash.atto.commons.wallet.AttoTransactionRepository
+import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class OverviewViewModel(
     private val appStateRepository: AppStateRepository,
     private val walletManagerRepository: WalletManagerRepository,
-    private val transactionRepository: AttoTransactionRepository,
+    private val accountEntryRepository: AttoAccountEntryRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -55,14 +55,14 @@ class OverviewViewModel(
                     accountCollectorJob = accountCollectorScope.launch {
                         wallet.accountFlow.collect { account ->
                             println("Account $account")
-                            val transactions = transactionRepository.list(account.publicKey)
+                            val entries = accountEntryRepository.list(account.publicKey)
 
                             _state.emit(
                                 state.value.copy(
                                     balance = account.balance
                                         .toString(AttoUnit.ATTO)
                                         .toBigDecimal(),
-                                    transactions = transactions
+                                    entries = entries
                                 )
                             )
                         }
@@ -70,12 +70,12 @@ class OverviewViewModel(
 
                     transactionsCollectorJob?.cancel()
                     transactionsCollectorJob = transactionsCollectorScope.launch {
-                        wallet.transactionFlow.collect { transaction ->
-                            transactionRepository.save(transaction)
+                        wallet.accountEntryFlow.collect { entries ->
+                            accountEntryRepository.save(entries)
 
                             _state.emit(
                                 state.value.copy(
-                                    transactions = state.value.transactions + transaction
+                                    entries = state.value.entries + entries
                                 )
                             )
                         }

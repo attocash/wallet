@@ -25,6 +25,7 @@
     <string name="overview_hint_source">someone</string>
     <string name="overview_hint_type_from">Received</string>
     <string name="overview_hint_type_to">Sent</string>
+    <string name="overview_hint_type_change">Changed</string>
     <string name="overview_receive">Receive</string>
     <string name="overview_receive_copy">Copy</string>
     <string name="overview_receive_share">Share</string>

@@ -1,5 +1,6 @@
 package cash.atto.wallet.di
 
+import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.inMemory
 import cash.atto.wallet.interactor.CheckPasswordInteractor
@@ -57,7 +58,7 @@ val repositoryModule = module {
     singleOf(::AppStateRepository)
     singleOf(::RepresentativeRepository)
     singleOf(::WalletManagerRepository)
-    single { AttoTransactionRepository.inMemory() }
+    single { AttoAccountEntryRepository.inMemory() }
 }
 
 val interactorModule = module {
