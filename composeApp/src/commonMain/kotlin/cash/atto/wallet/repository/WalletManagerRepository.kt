@@ -8,6 +8,7 @@ import cash.atto.commons.gatekeeper.attoBackend
 import cash.atto.commons.toSigner
 import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.commons.wallet.AttoNodeClient
+import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.commons.wallet.AttoWalletViewer
 import cash.atto.commons.wallet.AttoWorkCache
@@ -50,8 +51,14 @@ class WalletManagerRepository(
 
         collectorJob = collectorScope.launch {
             representativeRepository.state.collect {
-                if (it.representative != null)
-                    state.value?.change(AttoAddress.parse(it.representative))
+                if (it.representative != null) {
+                    try {
+                        state.value?.change(AttoAddress.parse(it.representative))
+                    }
+                    catch (ex: Exception) {
+                        println(ex.message)
+                    }
+                }
             }
         }
     }
@@ -69,7 +76,8 @@ class WalletManagerRepository(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,
-                accountEntryRepository = AttoAccountEntryRepository.inMemory()
+                accountEntryRepository = AttoAccountEntryRepository.inMemory(),
+                transactionRepository = AttoTransactionRepository.inMemory()
             ),
             signer = signer,
             client = client,
