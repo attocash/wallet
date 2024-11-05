@@ -48,7 +48,11 @@ fun OverviewHeader(
                 Modifier.align(Alignment.Center)
                     .padding(vertical = 8.dp)
             ) {
-                Text(text = uiState.attoCoins.toString())
+                Text(
+                    text = uiState.attoCoins
+                        ?.toString()
+                        ?: "..."
+                )
             }
         }
     }

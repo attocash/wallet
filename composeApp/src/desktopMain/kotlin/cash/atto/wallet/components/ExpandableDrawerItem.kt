@@ -21,8 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.ic_chevron_down
+import attowallet.composeapp.generated.resources.ic_chevron_up
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.divider
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun ExpandableDrawerItem(
@@ -46,8 +50,8 @@ fun ExpandableDrawerItem(
 
             Icon(
                 imageVector = if (drawerOpened.value)
-                    Icons.Outlined.Close
-                else Icons.Outlined.Check,
+                    vectorResource(Res.drawable.ic_chevron_up)
+                else vectorResource(Res.drawable.ic_chevron_down),
                 contentDescription = "Drawer toggle",
                 modifier = Modifier
                     .clickable { drawerOpened.value = !drawerOpened.value }

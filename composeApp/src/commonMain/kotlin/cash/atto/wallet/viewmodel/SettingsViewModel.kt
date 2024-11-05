@@ -92,25 +92,9 @@ class SettingsViewModel(
 
     private suspend fun settingsList() = SettingsListUiState(listOf(
         SettingItemUiState(
-            icon = Icons.Outlined.AccountBox,
-            title = getString(Res.string.settings_contacts)
-        ) {},
-        SettingItemUiState(
-            icon = Icons.Filled.Notifications,
-            title = getString(Res.string.settings_notifications)
-        ) {},
-        SettingItemUiState(
-            icon = Icons.Filled.Warning,
-            title = getString(Res.string.settings_security)
-        ) {},
-        SettingItemUiState(
             icon = Icons.Filled.Refresh,
             title = getString(Res.string.settings_backup)
         ) { navigateToBackup() },
-        SettingItemUiState(
-            icon = Icons.Filled.KeyboardArrowDown,
-            title = getString(Res.string.settings_load)
-        ) {},
         SettingItemUiState(
             icon = Icons.Filled.Home,
             title = getString(Res.string.settings_representative)

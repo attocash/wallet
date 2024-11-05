@@ -50,12 +50,15 @@ class OverviewViewModel(
             _state.value = OverviewUiState.empty()
 
             appStateRepository.state.collect {
+                val receiveAddress = it.publicKey
+                    ?.toAddress(AttoAlgorithm.V1)
+                    ?.value
+
+                if (receiveAddress != state.value.receiveAddress)
+                    clearAccountData()
+
                 _state.emit(
-                    state.value.copy(
-                        receiveAddress = it.publicKey
-                            ?.toAddress(AttoAlgorithm.V1)
-                            ?.value
-                    )
+                    state.value.copy(receiveAddress = receiveAddress)
                 )
             }
         }
@@ -85,16 +88,24 @@ class OverviewViewModel(
                     transactionsCollectorJob?.cancel()
                     transactionsCollectorJob = transactionsCollectorScope.launch {
                         wallet.accountEntryFlow.collect { entries ->
-                            accountEntryRepository.save(entries)
+//                            accountEntryRepository.save(entries)
 
                             _state.emit(
                                 state.value.copy(
-                                    entries = state.value.entries + entries
+                                    entries = (state.value.entries + entries)
+                                        .distinct()
                                 )
                             )
                         }
                     }
                 }
         }
+    }
+
+    private suspend fun clearAccountData() {
+        _state.emit(state.value.copy(
+            balance = null,
+            entries = emptyList()
+        ))
     }
 }

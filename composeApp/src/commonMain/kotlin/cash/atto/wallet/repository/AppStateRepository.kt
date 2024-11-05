@@ -104,6 +104,10 @@ class AppStateRepository(
             startSession()
         }
 
+    suspend fun deleteKeys() {
+        seedDataSource.clearSeed()
+    }
+
     private suspend fun setMnemonic(
         mnemonic: AttoMnemonic?,
     ) {
@@ -157,10 +161,6 @@ class AppStateRepository(
                 )
             }
         }
-    }
-
-    suspend fun deleteKeys() {
-        seedDataSource.clearSeed()
     }
 
     companion object {
