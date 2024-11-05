@@ -24,6 +24,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -120,6 +125,15 @@ fun CreatePassword(
                 TextField(
                     value = uiState.password.orEmpty(),
                     onValueChange = { onPasswordChanged.invoke(it) },
+                    modifier = Modifier.onPreviewKeyEvent {
+                        if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                            focusRequester.requestFocus()
+
+                            return@onPreviewKeyEvent true
+                        }
+
+                        return@onPreviewKeyEvent false
+                    },
                     placeholder = {
                         Text(text = stringResource(Res.string.password_create_hint))
                     },
@@ -133,7 +147,16 @@ fun CreatePassword(
                 TextField(
                     value = uiState.passwordConfirm.orEmpty(),
                     onValueChange = { onPasswordConfirmChanged.invoke(it) },
-                    modifier = Modifier.focusRequester(focusRequester),
+                    modifier = Modifier.focusRequester(focusRequester)
+                        .onPreviewKeyEvent {
+                            if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                                onConfirmClick.invoke()
+
+                                return@onPreviewKeyEvent true
+                            }
+
+                            return@onPreviewKeyEvent false
+                        },
                     placeholder = {
                         Text(text = stringResource(Res.string.password_confirm_hint))
                     },

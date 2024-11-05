@@ -138,7 +138,7 @@ fun AttoNavHost(
                     is AttoDestination.ImportSecret -> ImportSecretScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onImportAccount = {
-                            component.navigation.push(AttoDestination.DesktopMain)
+                            component.navigation.push(AttoDestination.CreatePassword)
                         }
                     )
 
@@ -149,7 +149,7 @@ fun AttoNavHost(
                     is AttoDestination.SecretPhrase -> SecretPhraseScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onBackupConfirmClicked = {
-                            component.navigation.push(AttoDestination.DesktopMain)
+                            component.navigation.push(AttoDestination.CreatePassword)
                         }
                     )
 

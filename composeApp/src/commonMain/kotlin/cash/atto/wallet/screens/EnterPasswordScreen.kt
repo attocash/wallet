@@ -20,6 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +67,15 @@ fun EnterPassword(
             TextField(
                 value = input.value.orEmpty(),
                 onValueChange = { input.value = it },
+                modifier = Modifier.onPreviewKeyEvent {
+                    if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                        onSubmitPassword.invoke(input.value)
+
+                        return@onPreviewKeyEvent true
+                    }
+
+                    return@onPreviewKeyEvent false
+                },
                 placeholder = {
                     Text(text = stringResource(Res.string.password_enter_hint))
                 },
