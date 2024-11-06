@@ -1,7 +1,12 @@
 package cash.atto.wallet.screens
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +38,7 @@ import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
 import attowallet.composeapp.generated.resources.send_scan_qr
+import cash.atto.wallet.QRScannerActivity
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.di.AppScope
@@ -87,6 +94,21 @@ fun SendFromAndroid(
     onAmountChanged: suspend (BigDecimal?) -> Unit,
     onAddressChanged: suspend (String?) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val activityResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val qr = it.data?.getStringExtra(QRScannerActivity.QR_TAG)
+
+            coroutineScope.launch {
+                onAddressChanged.invoke(qr)
+            }
+        }
+    }
+
     val cameraPermissionState = rememberPermissionState(
         permission = Manifest.permission.CAMERA
     )
@@ -94,11 +116,9 @@ fun SendFromAndroid(
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
-            if (granted) openQRScanner()
+            if (granted) openQRScanner(context, activityResultLauncher)
         }
     )
-
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
@@ -173,9 +193,9 @@ fun SendFromAndroid(
 
                 AttoOutlinedButton(
                     onClick = {
-                        if (cameraPermissionState.status.isGranted)
-                            openQRScanner()
-                        else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        if (cameraPermissionState.status.isGranted) {
+                            openQRScanner(context, activityResultLauncher)
+                        } else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -186,7 +206,13 @@ fun SendFromAndroid(
     )
 }
 
-fun openQRScanner() {}
+fun openQRScanner(
+    context: Context,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    val intent = Intent(context, QRScannerActivity::class.java)
+    launcher.launch(intent)
+}
 
 @Preview
 @Composable

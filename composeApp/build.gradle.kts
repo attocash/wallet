@@ -59,6 +59,13 @@ kotlin {
             implementation(libs.slf4j.simple)
 
             implementation(libs.room.runtime.android)
+
+            //QR scanning
+            implementation(libs.androidx.camera.camera2) // Update to the latest version
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+
+            implementation(libs.barcode.scanning)
         }
 
         commonMain.dependencies {

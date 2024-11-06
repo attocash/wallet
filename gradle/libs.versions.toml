@@ -14,6 +14,8 @@ androidx-lifecycle = "2.8.0"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 androidx-datastore = "1.1.1"
+barcodeScanning = "17.3.0"
+camera2 = "1.4.0"
 compose-plugin = "1.6.11"
 decompose = "3.1.0"
 junit = "4.13.2"
@@ -36,6 +38,10 @@ sqlite = "2.5.0-SNAPSHOT"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera2" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera2" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camera2" }
+barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 decompose-extensions-compose-jetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decompose" }
