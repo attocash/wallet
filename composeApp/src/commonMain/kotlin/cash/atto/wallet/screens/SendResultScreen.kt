@@ -28,6 +28,9 @@ import attowallet.composeapp.generated.resources.send_failure_title
 import attowallet.composeapp.generated.resources.send_failure_to
 import attowallet.composeapp.generated.resources.send_success_to
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.components.common.OutlinedTextCard
+import cash.atto.wallet.components.common.TextCard
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendResultUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
@@ -84,8 +87,8 @@ fun SendResult(
                     tint = MaterialTheme.colors.secondary
                 )
 
-                Text(
-                    text = uiState.amount?.toString().orEmpty(),
+                OutlinedTextCard(
+                    text = AttoFormatter.format(uiState.amount),
                     color = MaterialTheme.colors.secondary
                 )
 
@@ -95,7 +98,7 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                Text(
+                OutlinedTextCard(
                     text = uiState.address.orEmpty(),
                     color = MaterialTheme.colors.secondary
                 )
@@ -117,8 +120,8 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                Text(
-                    text = uiState.amount?.toString().orEmpty(),
+                OutlinedTextCard(
+                    text = AttoFormatter.format(uiState.amount),
                     color = MaterialTheme.colors.error
                 )
 
@@ -128,7 +131,7 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                Text(
+                OutlinedTextCard(
                     text = uiState.address.orEmpty(),
                     color = MaterialTheme.colors.error
                 )

@@ -32,6 +32,7 @@ import attowallet.composeapp.generated.resources.send_button
 import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -122,7 +123,11 @@ fun SendDesktop(
                 )
             }
 
-        Text(text = "(${uiState.sendFromUiState.accountBalance})")
+        Text(
+            text = "(${AttoFormatter.format(
+                uiState.sendFromUiState.accountBalance
+            )})"
+        )
 
         TextField(
             value = uiState.sendFromUiState

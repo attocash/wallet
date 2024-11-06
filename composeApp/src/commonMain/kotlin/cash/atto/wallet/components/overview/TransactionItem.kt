@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -42,7 +43,7 @@ fun TransactionItem(uiState: TransactionUiState) {
             Column(Modifier.weight(1f)) {
                 Text(uiState.typeString)
                 Text(
-                    text = uiState.amount,
+                    text = AttoFormatter.format(uiState.amount),
                     style = MaterialTheme.typography.body2
                 )
             }

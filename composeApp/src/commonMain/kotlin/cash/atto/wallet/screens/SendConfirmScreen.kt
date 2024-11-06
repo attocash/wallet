@@ -26,7 +26,9 @@ import attowallet.composeapp.generated.resources.send_confirm_sending
 import attowallet.composeapp.generated.resources.send_confirm_to
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.components.common.TextCard
 import cash.atto.wallet.di.AppScope
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -107,7 +109,10 @@ fun SendConfirmContent(
             style = MaterialTheme.typography.h5
         )
 
-        Text(text = uiState.amount?.toString().orEmpty())
+        TextCard(
+            text = AttoFormatter.format(uiState.amount),
+            color = MaterialTheme.colors.primary
+        )
 
         Text(
             text = stringResource(Res.string.send_confirm_to),
@@ -115,7 +120,10 @@ fun SendConfirmContent(
             style = MaterialTheme.typography.h5
         )
 
-        Text(text = uiState.address.orEmpty())
+        TextCard(
+            text = uiState.address.orEmpty(),
+            color = MaterialTheme.colors.primary
+        )
 
         Spacer(Modifier.weight(1f))
 

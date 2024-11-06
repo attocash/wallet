@@ -35,6 +35,7 @@ import attowallet.composeapp.generated.resources.send_scan_qr
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.di.AppScope
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -130,7 +131,11 @@ fun SendFromAndroid(
                     )
                 }
 
-                Text(text = "(${uiState.accountBalance})")
+                Text(
+                    text = "(${AttoFormatter.format(
+                        uiState.accountBalance
+                    )})"
+                )
 
                 TextField(
                     value = uiState.amount?.toString().orEmpty(),

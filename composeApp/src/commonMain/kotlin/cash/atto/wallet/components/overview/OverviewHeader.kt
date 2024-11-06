@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.OverviewHeaderUiState
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -48,11 +49,7 @@ fun OverviewHeader(
                 Modifier.align(Alignment.Center)
                     .padding(vertical = 8.dp)
             ) {
-                Text(
-                    text = uiState.attoCoins
-                        ?.toString()
-                        ?: "..."
-                )
+                Text(text = AttoFormatter.format(uiState.attoCoins))
             }
         }
     }
