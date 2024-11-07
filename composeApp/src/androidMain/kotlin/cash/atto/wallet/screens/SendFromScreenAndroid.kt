@@ -34,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_button
+import attowallet.composeapp.generated.resources.send_error_address
+import attowallet.composeapp.generated.resources.send_error_amount
 import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
@@ -65,21 +67,32 @@ fun SendFromScreenAndroid(
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+
     SendFromAndroid(
         uiState = uiState.value.sendFromUiState,
         onBackNavigation = onBackNavigation,
-        onSendClicked = onSendClicked,
+        onSendClicked = {
+            coroutineScope.launch {
+                if (viewModel.checkTransactionData())
+                    onSendClicked.invoke()
+            }
+        },
         onAmountChanged = { amount ->
-            viewModel.updateSendInfo(
-                amount = amount,
-                address = uiState.value.sendFromUiState.address
-            )
+            coroutineScope.launch {
+                viewModel.updateSendInfo(
+                    amount = amount,
+                    address = uiState.value.sendFromUiState.address
+                )
+            }
         },
         onAddressChanged = { address ->
-            viewModel.updateSendInfo(
-                amount = uiState.value.sendFromUiState.amount,
-                address = address
-            )
+            coroutineScope.launch {
+                viewModel.updateSendInfo(
+                    amount = uiState.value.sendFromUiState.amount,
+                    address = address
+                )
+            }
         }
     )
 }
@@ -91,10 +104,10 @@ fun SendFromAndroid(
     uiState: SendFromUiState,
     onBackNavigation: () -> Unit,
     onSendClicked: () -> Unit,
-    onAmountChanged: suspend (BigDecimal?) -> Unit,
-    onAddressChanged: suspend (String?) -> Unit
+    onAmountChanged: (BigDecimal?) -> Unit,
+    onAddressChanged: (String?) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
+
 
     val context = LocalContext.current
     val activityResultLauncher = rememberLauncherForActivityResult(
@@ -103,9 +116,7 @@ fun SendFromAndroid(
         if (it.resultCode == Activity.RESULT_OK) {
             val qr = it.data?.getStringExtra(QRScannerActivity.QR_TAG)
 
-            coroutineScope.launch {
-                onAddressChanged.invoke(qr)
-            }
+            onAddressChanged.invoke(qr)
         }
     }
 
@@ -160,9 +171,7 @@ fun SendFromAndroid(
                 TextField(
                     value = uiState.amount?.toString().orEmpty(),
                     onValueChange = {
-                        coroutineScope.launch {
-                            onAmountChanged.invoke(it.toBigDecimalOrNull())
-                        }
+                        onAmountChanged.invoke(it.toBigDecimalOrNull())
                     },
                     placeholder = {
                         Text(text = stringResource(Res.string.send_from_amount_hint))
@@ -170,17 +179,33 @@ fun SendFromAndroid(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
+                if (uiState.showAmountError) {
+                    Text(
+                        text = stringResource(Res.string.send_error_amount),
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.caption
+                    )
+                }
+
                 TextField(
                     value = uiState.address.orEmpty(),
                     onValueChange = {
-                        coroutineScope.launch {
-                            onAddressChanged.invoke(it)
-                        }
+                        onAddressChanged.invoke(it)
                     },
                     placeholder = {
                         Text(text = stringResource(Res.string.send_from_address_hint))
                     }
                 )
+
+                if (uiState.showAddressError) {
+                    Text(
+                        text = stringResource(Res.string.send_error_address),
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.caption
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
 

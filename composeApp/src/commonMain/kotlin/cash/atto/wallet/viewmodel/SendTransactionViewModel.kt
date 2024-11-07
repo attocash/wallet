@@ -97,7 +97,29 @@ class SendTransactionViewModel(
     suspend fun clearTransactionData() = _state.emit(
         state.value.copy(
             amount = null,
-            address = null
+            address = null,
+            showAmountError = false,
+            showAddressError = false
         )
     )
+
+    suspend fun checkTransactionData(): Boolean {
+        val amountCheckResult = state.value
+            .sendFromUiState
+            .amount != null
+
+        val addressCheckResult = AttoAddress.isValidPath(
+            state.value
+                .sendFromUiState
+                .address
+                .orEmpty()
+        )
+
+        _state.emit(state.value.copy(
+            showAmountError = !amountCheckResult,
+            showAddressError = !addressCheckResult
+        ))
+
+        return amountCheckResult && addressCheckResult
+    }
 }

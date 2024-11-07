@@ -10,7 +10,9 @@ data class SendTransactionUiState(
     private val account: AttoAccount?,
     private val amount: BigDecimal?,
     private val address: String?,
-    private val operationResult: SendOperationResult
+    private val operationResult: SendOperationResult,
+    private val showAmountError: Boolean = false,
+    private val showAddressError: Boolean = false
 ) {
     val sendFromUiState get() = account?.let {
         SendFromUiState(
@@ -22,7 +24,9 @@ data class SendTransactionUiState(
                 .toString(AttoUnit.ATTO)
                 .toBigDecimal(),
             amount = amount,
-            address = address
+            address = address,
+            showAmountError = showAmountError,
+            showAddressError = showAddressError
         )
     } ?: SendFromUiState.DEFAULT
 

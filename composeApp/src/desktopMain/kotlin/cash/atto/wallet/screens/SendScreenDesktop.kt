@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_button
+import attowallet.composeapp.generated.resources.send_error_address
+import attowallet.composeapp.generated.resources.send_error_amount
 import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
@@ -56,18 +58,28 @@ fun SendScreenDesktop() {
         uiState = uiState.value,
         navState = sendNavState.value,
         onAmountChanged = { amount ->
-            viewModel.updateSendInfo(
-                amount = amount,
-                address = uiState.value.sendFromUiState.address
-            )
+            coroutineScope.launch {
+                viewModel.updateSendInfo(
+                    amount = amount,
+                    address = uiState.value.sendFromUiState.address
+                )
+            }
+
         },
         onAddressChanged = { address ->
-            viewModel.updateSendInfo(
-                amount = uiState.value.sendFromUiState.amount,
-                address = address
-            )
+            coroutineScope.launch {
+                viewModel.updateSendInfo(
+                    amount = uiState.value.sendFromUiState.amount,
+                    address = address
+                )
+            }
         },
-        onSendClicked = { sendNavState.value = SendScreenState.CONFIRM },
+        onSendClicked = {
+            coroutineScope.launch {
+                if (viewModel.checkTransactionData())
+                    sendNavState.value = SendScreenState.CONFIRM
+            }
+        },
         onConfirmClicked = {
             coroutineScope.launch {
                 viewModel.send()
@@ -88,15 +100,13 @@ fun SendScreenDesktop() {
 fun SendDesktop(
     uiState: SendTransactionUiState,
     navState: SendScreenState,
-    onAmountChanged: suspend (BigDecimal?) -> Unit,
-    onAddressChanged: suspend (String?) -> Unit,
+    onAmountChanged: (BigDecimal?) -> Unit,
+    onAddressChanged: (String?) -> Unit,
     onSendClicked: () -> Unit,
     onConfirmClicked: () -> Unit,
     onCancelClicked: () -> Unit,
     onResultClosed: () -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -135,9 +145,7 @@ fun SendDesktop(
                 ?.toString()
                 .orEmpty(),
             onValueChange = {
-                coroutineScope.launch {
-                    onAmountChanged.invoke(it.toBigDecimalOrNull())
-                }
+                onAmountChanged.invoke(it.toBigDecimalOrNull())
             },
             placeholder = {
                 Text(text = stringResource(Res.string.send_from_amount_hint))
@@ -145,19 +153,35 @@ fun SendDesktop(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
+        if (uiState.sendFromUiState.showAmountError) {
+            Text(
+                text = stringResource(Res.string.send_error_amount),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+
         TextField(
             value = uiState.sendFromUiState
                 .address
                 .orEmpty(),
             onValueChange = {
-                coroutineScope.launch {
-                    onAddressChanged.invoke(it)
-                }
+                onAddressChanged.invoke(it)
             },
             placeholder = {
                 Text(text = stringResource(Res.string.send_from_address_hint))
             }
         )
+
+        if (uiState.sendFromUiState.showAddressError) {
+            Text(
+                text = stringResource(Res.string.send_error_address),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
 
         Spacer(Modifier.weight(1f))
 
