@@ -25,7 +25,7 @@ data class OverviewUiState(
                     when (it.blockType) {
                         AttoBlockType.SEND -> TransactionUiState(
                             type = TransactionType.SEND,
-                            amount = it.amount().toString(AttoUnit.ATTO),
+                            amount = "- " + it.amount().toString(AttoUnit.ATTO),
                             source = AttoAddress(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
@@ -34,7 +34,7 @@ data class OverviewUiState(
 
                         AttoBlockType.RECEIVE -> TransactionUiState(
                             type = TransactionType.RECEIVE,
-                            amount = it.amount().toString(AttoUnit.ATTO),
+                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
                             source = AttoAddress(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
@@ -43,7 +43,7 @@ data class OverviewUiState(
 
                         AttoBlockType.OPEN -> TransactionUiState(
                             type = TransactionType.RECEIVE,
-                            amount = it.amount().toString(AttoUnit.ATTO),
+                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
                             source = AttoAddress(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
@@ -52,7 +52,7 @@ data class OverviewUiState(
 
                         AttoBlockType.CHANGE -> TransactionUiState(
                             type = TransactionType.CHANGE,
-                            amount = it.amount().toString(AttoUnit.ATTO),
+                            amount = null,
                             source = AttoAddress(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
