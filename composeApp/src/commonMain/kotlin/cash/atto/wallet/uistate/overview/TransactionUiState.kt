@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.overview_hint_type_change
 import attowallet.composeapp.generated.resources.overview_hint_type_from
 import attowallet.composeapp.generated.resources.overview_hint_type_to
 import attowallet.composeapp.generated.resources.overview_transaction_from
@@ -15,7 +16,7 @@ import org.jetbrains.compose.resources.stringResource
 
 data class TransactionUiState(
     val type: TransactionType,
-    val amount: String,
+    val amount: String?,
     val source: String
 ) {
     val icon
@@ -30,7 +31,7 @@ data class TransactionUiState(
         get() = when (type) {
             TransactionType.SEND -> stringResource(Res.string.overview_hint_type_to)
             TransactionType.RECEIVE -> stringResource(Res.string.overview_hint_type_from)
-            TransactionType.CHANGE -> stringResource(Res.string.overview_hint_type_from)
+            TransactionType.CHANGE -> stringResource(Res.string.overview_hint_type_change)
         }
 
     val shownSource
