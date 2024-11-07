@@ -44,6 +44,10 @@ class CreatePasswordViewModel(
         return checkResult == CreatePasswordUIState.PasswordCheckState.VALID
     }
 
+    suspend fun clearPassword() {
+        _state.emit(CreatePasswordUIState.DEFAULT)
+    }
+
     private fun checkPasswordsMatch() : CreatePasswordUIState.PasswordCheckState =
         with (state.value) {
             if (password != passwordConfirm)

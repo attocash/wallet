@@ -66,8 +66,10 @@ fun CreatePasswordScreen(
         onBackNavigation = onBackNavigation,
         onConfirmClick = {
             coroutineScope.launch {
-                if (viewModel.savePassword())
+                if (viewModel.savePassword()) {
+                    viewModel.clearPassword()
                     onConfirmClick.invoke()
+                }
             }
         },
         onPasswordChanged = {
@@ -126,7 +128,10 @@ fun CreatePassword(
                     value = uiState.password.orEmpty(),
                     onValueChange = { onPasswordChanged.invoke(it) },
                     modifier = Modifier.onPreviewKeyEvent {
-                        if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                        if (
+                            it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
+                            it.key.nativeKeyCode == Key.Tab.nativeKeyCode
+                        ){
                             focusRequester.requestFocus()
 
                             return@onPreviewKeyEvent true
