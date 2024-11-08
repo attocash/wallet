@@ -27,6 +27,7 @@ import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.decompose.router.stack.backStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.popToFirst
 import com.arkivanov.decompose.router.stack.popWhile
@@ -103,7 +104,9 @@ fun AttoNavHost(
         else -> {
             if (
                 uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW
-                && component.childStack.active.instance == AttoDestination.Welcome
+                && !component.childStack
+                    .backStack
+                    .any { it.instance == AttoDestination.DesktopMain }
             ) {
                 component.navigation.push(AttoDestination.DesktopMain)
             }

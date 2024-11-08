@@ -79,7 +79,12 @@ class AppStateRepository(
     }
 
     suspend fun importSecret(secret: List<String>) {
-        seedDataSource.setSeed(secret.joinToString(" "))
+        val seed = secret.joinToString(" ")
+        seedDataSource.setSeed(seed)
+
+        val password = passwordDataSource.getPassword(seed)
+        if (password == null)
+            setAuthState(AppState.AuthState.NEW_ACCOUNT)
     }
 
     suspend fun submitPassword(password: String): Boolean {

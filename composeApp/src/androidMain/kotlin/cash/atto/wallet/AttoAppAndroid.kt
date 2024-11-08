@@ -157,7 +157,7 @@ fun AttoNavHost(
                     ImportSecretScreen(
                         onBackNavigation = { navController.navigateUp() },
                         onImportAccount = {
-                            navController.navigate(AttoDestination.Overview.route)
+                            navController.navigate(AttoDestination.CreatePassword.route)
                         }
                     )
                 }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -22,6 +24,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -103,7 +110,20 @@ fun ImportSecret(
                         value = uiState.input.orEmpty(),
                         onValueChange = {
                             onInputChanged.invoke(it)
-                        }
+                        },
+                        modifier = Modifier.onPreviewKeyEvent {
+                            if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                                onDoneClicked.invoke()
+
+                                return@onPreviewKeyEvent true
+                            }
+
+                            return@onPreviewKeyEvent false
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = { onDoneClicked.invoke() }
+                        )
                     )
 
                     if (!uiState.inputValid) {
