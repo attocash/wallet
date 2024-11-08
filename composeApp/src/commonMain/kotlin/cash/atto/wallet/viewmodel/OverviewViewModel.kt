@@ -67,7 +67,7 @@ class OverviewViewModel(
             walletManagerRepository.state
                 .filterNotNull()
                 .collect { wallet ->
-                    println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
+                    println("OverviewViewModel is collecting account information from wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)}")
                     accountCollectorJob?.cancel()
                     accountCollectorJob = accountCollectorScope.launch {
                         wallet.accountFlow.collect { account ->

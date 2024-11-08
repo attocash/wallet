@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.main_nav_overview
 import attowallet.composeapp.generated.resources.main_nav_receive
@@ -118,10 +120,18 @@ fun MainScreenContent(
             }
         }
     ) {
-        when (navState) {
-            MainScreenNavDestination.OVERVIEW -> OverviewScreenDesktop()
-            MainScreenNavDestination.SEND -> SendScreenDesktop()
-            MainScreenNavDestination.RECEIVE -> ReceiveScreenDesktop()
+        val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+        }
+
+        CompositionLocalProvider(
+            LocalViewModelStoreOwner provides viewModelStoreOwner
+        ) {
+            when (navState) {
+                MainScreenNavDestination.OVERVIEW -> OverviewScreenDesktop()
+                MainScreenNavDestination.SEND -> SendScreenDesktop()
+                MainScreenNavDestination.RECEIVE -> ReceiveScreenDesktop()
+            }
         }
     }
 

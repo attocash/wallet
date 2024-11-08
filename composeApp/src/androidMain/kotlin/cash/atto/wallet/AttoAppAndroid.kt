@@ -163,14 +163,18 @@ fun AttoNavHost(
                 }
 
                 composable(route = AttoDestination.Overview.route) {
-                    OverviewScreenAndroid(
-                        onSettingsClicked = {
-                            navController.navigate(AttoDestination.Settings.route)
-                        },
-                        onSendClicked = {
-                            navController.navigate(AttoDestination.SendFrom.route)
-                        }
-                    )
+                    CompositionLocalProvider(
+                        LocalViewModelStoreOwner provides viewModelStoreOwner
+                    ) {
+                        OverviewScreenAndroid(
+                            onSettingsClicked = {
+                                navController.navigate(AttoDestination.Settings.route)
+                            },
+                            onSendClicked = {
+                                navController.navigate(AttoDestination.SendFrom.route)
+                            }
+                        )
+                    }
                 }
 
                 composable(route = AttoDestination.Representative.route) {

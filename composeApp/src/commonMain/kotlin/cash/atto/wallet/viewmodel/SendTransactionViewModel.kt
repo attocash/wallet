@@ -39,7 +39,7 @@ class SendTransactionViewModel(
             walletManagerRepository.state
                 .filterNotNull()
                 .collect { wallet ->
-                    println("Wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)} is ready")
+                    println("SendTransactionViewModel is collecting account information from wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)}")
                     wallet.accountFlow.collect { account ->
                         println("Account $account")
                         _state.emit(state.value.copy(
