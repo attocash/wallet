@@ -108,7 +108,7 @@ class SendTransactionViewModel(
             .sendFromUiState
             .amount != null
 
-        val addressCheckResult = AttoAddress.isValidPath(
+        val addressCheckResult = AttoAddress.isValid(
             state.value
                 .sendFromUiState
                 .address
