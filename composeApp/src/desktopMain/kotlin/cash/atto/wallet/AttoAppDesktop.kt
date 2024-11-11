@@ -107,6 +107,7 @@ fun AttoNavHost(
                 && !component.childStack
                     .backStack
                     .any { it.instance == AttoDestination.DesktopMain }
+                && component.childStack.active.instance != AttoDestination.DesktopMain
             ) {
                 component.navigation.push(AttoDestination.DesktopMain)
             }
@@ -122,7 +123,16 @@ fun AttoNavHost(
                     is AttoDestination.CreatePassword -> CreatePasswordScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onConfirmClick = {
-                            component.navigation.push(AttoDestination.DesktopMain)
+                            if (
+                                !component.childStack
+                                    .backStack
+                                    .any { it.instance == AttoDestination.DesktopMain }
+                                && component.childStack
+                                    .active
+                                    .instance != AttoDestination.DesktopMain
+                            ) {
+                                component.navigation.push(AttoDestination.DesktopMain)
+                            }
                         }
                     )
 
