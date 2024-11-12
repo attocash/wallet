@@ -9,7 +9,8 @@ data class SendFromUiState(
     val amount: BigDecimal?,
     val address: String?,
     val showAmountError: Boolean,
-    val showAddressError: Boolean
+    val showAddressError: Boolean,
+    val showLoader: Boolean
 ) {
     companion object {
         val DEFAULT = SendFromUiState(
@@ -19,7 +20,8 @@ data class SendFromUiState(
             amount = null,
             address = null,
             showAmountError = false,
-            showAddressError = false
+            showAddressError = false,
+            showLoader = true
         )
     }
 }

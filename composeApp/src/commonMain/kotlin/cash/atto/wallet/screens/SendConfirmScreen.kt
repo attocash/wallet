@@ -1,6 +1,7 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -25,6 +26,7 @@ import attowallet.composeapp.generated.resources.send_confirm_cancel
 import attowallet.composeapp.generated.resources.send_confirm_sending
 import attowallet.composeapp.generated.resources.send_confirm_to
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.TextCard
 import cash.atto.wallet.di.AppScope
@@ -56,7 +58,10 @@ fun SendConfirmScreen(
         onBackNavigation = onBackNavigation,
         onConfirm = {
             coroutineScope.launch {
+                viewModel.showLoader()
                 viewModel.send()
+                viewModel.hideLoader()
+
                 onConfirm.invoke()
             }
         },
@@ -75,18 +80,23 @@ fun SendConfirm(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
         content = {
-            SendConfirmContent(
-                modifier = Modifier.fillMaxSize()
-                    .padding(16.dp)
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
-                    ),
-                uiState = uiState,
-                onConfirm = onConfirm,
-                onCancel = onCancel
-            )
+            Box(Modifier.fillMaxSize()
+                .padding(16.dp)
+                .padding(bottom = WindowInsets.systemBars
+                    .asPaddingValues()
+                    .calculateBottomPadding()
+                        + 16.dp
+                )
+            ) {
+                if (uiState.showLoader)
+                    AttoLoader(alpha = 0.7f)
+
+                SendConfirmContent(
+                    uiState = uiState,
+                    onConfirm = onConfirm,
+                    onCancel = onCancel
+                )
+            }
         }
     )
 }
@@ -149,7 +159,8 @@ fun SendConfirmContentPreview() {
         SendConfirmContent(
             uiState = SendConfirmUiState(
                 amount = BigDecimal.TEN,
-                address = "atto://address"
+                address = "atto://address",
+                showLoader = false
             ),
             onConfirm = {},
             onCancel = {}
@@ -164,7 +175,8 @@ fun SendConfirmPreview() {
         SendConfirm(
             uiState = SendConfirmUiState(
                 amount = BigDecimal.TEN,
-                address = "atto://address"
+                address = "atto://address",
+                showLoader = false
             ),
             onBackNavigation = {},
             onConfirm = {},

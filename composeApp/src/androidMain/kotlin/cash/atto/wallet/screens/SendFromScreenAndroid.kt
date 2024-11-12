@@ -9,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -42,6 +43,7 @@ import attowallet.composeapp.generated.resources.send_from_title
 import attowallet.composeapp.generated.resources.send_scan_qr
 import cash.atto.wallet.QRScannerActivity
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.di.AppScope
 import cash.atto.wallet.ui.AttoFormatter
@@ -107,8 +109,6 @@ fun SendFromAndroid(
     onAmountChanged: (BigDecimal?) -> Unit,
     onAddressChanged: (String?) -> Unit
 ) {
-
-
     val context = LocalContext.current
     val activityResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -135,8 +135,8 @@ fun SendFromAndroid(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
         content = { padding ->
-            Column(
-                modifier = Modifier
+            Box(
+                Modifier
                     .fillMaxSize()
                     .padding(16.dp)
                     .padding(
@@ -144,91 +144,114 @@ fun SendFromAndroid(
                             .asPaddingValues()
                             .calculateBottomPadding()
                                 + 16.dp
-                    ),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    )
             ) {
-                Text(
-                    text = stringResource(Res.string.send_from_title),
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.h5
-                )
+                if (uiState.showLoader)
+                    AttoLoader(alpha = 0.7f)
 
-                uiState.accountName?.let { Text(text = it) }
-                uiState.accountSeed?.let {
-                    Text(
-                        text = it,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Text(
-                    text = "(${AttoFormatter.format(
-                        uiState.accountBalance
-                    )})"
-                )
-
-                TextField(
-                    value = uiState.amount?.toString().orEmpty(),
-                    onValueChange = {
-                        onAmountChanged.invoke(it.toBigDecimalOrNull())
-                    },
-                    placeholder = {
-                        Text(text = stringResource(Res.string.send_from_amount_hint))
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
-                if (uiState.showAmountError) {
-                    Text(
-                        text = stringResource(Res.string.send_error_amount),
-                        color = MaterialTheme.colors.error,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.caption
-                    )
-                }
-
-                TextField(
-                    value = uiState.address.orEmpty(),
-                    onValueChange = {
-                        onAddressChanged.invoke(it)
-                    },
-                    placeholder = {
-                        Text(text = stringResource(Res.string.send_from_address_hint))
-                    }
-                )
-
-                if (uiState.showAddressError) {
-                    Text(
-                        text = stringResource(Res.string.send_error_address),
-                        color = MaterialTheme.colors.error,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.caption
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                Button(
-                    onClick = onSendClicked,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.send_button))
-                }
-
-                AttoOutlinedButton(
-                    onClick = {
+                SendFromAndroidContent(
+                    uiState = uiState,
+                    onSendClicked = onSendClicked,
+                    onScanClicked = {
                         if (cameraPermissionState.status.isGranted) {
                             openQRScanner(context, activityResultLauncher)
                         } else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
                     },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.send_scan_qr))
-                }
+                    onAmountChanged = onAmountChanged,
+                    onAddressChanged = onAddressChanged
+                )
             }
         }
     )
+}
+
+@Composable
+fun SendFromAndroidContent(
+    uiState: SendFromUiState,
+    onSendClicked: () -> Unit,
+    onScanClicked: () -> Unit,
+    onAmountChanged: (BigDecimal?) -> Unit,
+    onAddressChanged: (String?) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.send_from_title),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h5
+        )
+
+        uiState.accountName?.let { Text(text = it) }
+        uiState.accountSeed?.let {
+            Text(
+                text = it,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Text(
+            text = "(${AttoFormatter.format(
+                uiState.accountBalance
+            )})"
+        )
+
+        TextField(
+            value = uiState.amount?.toString().orEmpty(),
+            onValueChange = {
+                onAmountChanged.invoke(it.toBigDecimalOrNull())
+            },
+            placeholder = {
+                Text(text = stringResource(Res.string.send_from_amount_hint))
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        if (uiState.showAmountError) {
+            Text(
+                text = stringResource(Res.string.send_error_amount),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+
+        TextField(
+            value = uiState.address.orEmpty(),
+            onValueChange = {
+                onAddressChanged.invoke(it)
+            },
+            placeholder = {
+                Text(text = stringResource(Res.string.send_from_address_hint))
+            }
+        )
+
+        if (uiState.showAddressError) {
+            Text(
+                text = stringResource(Res.string.send_error_address),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        Button(
+            onClick = onSendClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(Res.string.send_button))
+        }
+
+        AttoOutlinedButton(
+            onClick = onScanClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(Res.string.send_scan_qr))
+        }
+    }
 }
 
 fun openQRScanner(
@@ -237,6 +260,20 @@ fun openQRScanner(
 ) {
     val intent = Intent(context, QRScannerActivity::class.java)
     launcher.launch(intent)
+}
+
+@Preview
+@Composable
+fun SendFromAndroidContentPreview() {
+    AttoWalletTheme {
+        SendFromAndroidContent(
+            uiState = SendFromUiState.DEFAULT,
+            onSendClicked = {},
+            onScanClicked = {},
+            onAmountChanged = {},
+            onAddressChanged = {}
+        )
+    }
 }
 
 @Preview

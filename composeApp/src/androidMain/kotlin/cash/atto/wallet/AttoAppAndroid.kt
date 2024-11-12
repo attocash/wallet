@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.CreatePasswordScreen
 import cash.atto.wallet.screens.EnterPassword
@@ -75,20 +76,7 @@ fun AttoNavHost(
     }
 
     when (uiState.shownScreen) {
-        AppUiState.ShownScreen.LOADER -> {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colors.surface)
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .width(64.dp),
-                    color = MaterialTheme.colors.primary
-                )
-            }
-        }
+        AppUiState.ShownScreen.LOADER -> AttoLoader(modifier)
 
         AppUiState.ShownScreen.PASSWORD_ENTER -> {
             val passwordValid = remember {

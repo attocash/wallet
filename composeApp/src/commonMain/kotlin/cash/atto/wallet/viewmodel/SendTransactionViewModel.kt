@@ -80,6 +80,7 @@ class SendTransactionViewModel(
                 )
         }
         catch (ex: Exception) {
+            println(ex.message)
             _state.emit(state.value.copy(
                 operationResult = SendTransactionUiState.SendOperationResult.FAILURE
             ))
@@ -121,5 +122,17 @@ class SendTransactionViewModel(
         ))
 
         return amountCheckResult && addressCheckResult
+    }
+
+    suspend fun showLoader() {
+        _state.emit(state.value.copy(
+            showLoader = true
+        ))
+    }
+
+    suspend fun hideLoader() {
+        _state.emit(state.value.copy(
+            showLoader = false
+        ))
     }
 }

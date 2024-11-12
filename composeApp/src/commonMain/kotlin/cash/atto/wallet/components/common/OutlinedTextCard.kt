@@ -35,8 +35,8 @@ fun OutlinedTextCard(
     letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
     lineHeight: TextUnit = TextUnit.Unspecified,
-    overflow: TextOverflow = TextOverflow.Clip,
-    softWrap: Boolean = true,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    softWrap: Boolean = false,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
     style: TextStyle = LocalTextStyle.current
 ) {

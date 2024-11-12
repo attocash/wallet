@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.CreatePasswordScreen
 import cash.atto.wallet.screens.EnterPassword
@@ -64,18 +65,7 @@ fun AttoNavHost(
     submitPassword: suspend (String?) -> Boolean
 ) {
     when (uiState.shownScreen) {
-        AppUiState.ShownScreen.LOADER -> {
-            Box(
-                modifier = modifier.fillMaxSize()
-                    .background(color = MaterialTheme.colors.surface)
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                        .width(64.dp),
-                    color = MaterialTheme.colors.primary
-                )
-            }
-        }
+        AppUiState.ShownScreen.LOADER -> AttoLoader(modifier)
 
         AppUiState.ShownScreen.PASSWORD_ENTER -> {
             val passwordValid = remember {

@@ -12,7 +12,8 @@ data class SendTransactionUiState(
     private val address: String?,
     private val operationResult: SendOperationResult,
     private val showAmountError: Boolean = false,
-    private val showAddressError: Boolean = false
+    private val showAddressError: Boolean = false,
+    private val showLoader: Boolean = false
 ) {
     val sendFromUiState get() = account?.let {
         SendFromUiState(
@@ -26,13 +27,15 @@ data class SendTransactionUiState(
             amount = amount,
             address = address,
             showAmountError = showAmountError,
-            showAddressError = showAddressError
+            showAddressError = showAddressError,
+            showLoader = showLoader
         )
     } ?: SendFromUiState.DEFAULT
 
     val sendConfirmUiState get() = SendConfirmUiState(
         amount = amount,
-        address = address
+        address = address,
+        showLoader = showLoader
     )
 
     val sendResultUiState get() = SendResultUiState(

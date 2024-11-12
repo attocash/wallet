@@ -44,8 +44,10 @@ import attowallet.composeapp.generated.resources.send_error_amount
 import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
+import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import kotlinx.coroutines.launch
@@ -74,7 +76,6 @@ fun SendScreenDesktop() {
                     address = uiState.value.sendFromUiState.address
                 )
             }
-
         },
         onAddressChanged = { address ->
             coroutineScope.launch {
@@ -92,7 +93,10 @@ fun SendScreenDesktop() {
         },
         onConfirmClicked = {
             coroutineScope.launch {
+                viewModel.showLoader()
                 viewModel.send()
+                viewModel.hideLoader()
+
                 sendNavState.value = SendScreenState.RESULT
             }
         },
@@ -106,7 +110,6 @@ fun SendScreenDesktop() {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SendDesktop(
     uiState: SendTransactionUiState,
@@ -118,130 +121,26 @@ fun SendDesktop(
     onCancelClicked: () -> Unit,
     onResultClosed: () -> Unit
 ) {
-    val (focusRequester) = FocusRequester.createRefs()
-
     Surface(Modifier
         .fillMaxSize()
         .padding(16.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(Res.string.send_from_title),
-                color = MaterialTheme.colors.primary,
-                style = MaterialTheme.typography.h5
-            )
+        if (navState == SendScreenState.SEND && uiState.sendFromUiState.showLoader)
+            AttoLoader(alpha = 0.7f)
 
-            uiState.sendFromUiState
-                .accountName
-                ?.let { Text(text = it) }
-
-            uiState.sendFromUiState
-                .accountSeed
-                ?.let {
-                    Text(
-                        text = it,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-            Text(
-                text = "(${AttoFormatter.format(
-                    uiState.sendFromUiState.accountBalance
-                )})"
-            )
-
-            TextField(
-                value = uiState.sendFromUiState
-                    .amount
-                    ?.toString()
-                    .orEmpty(),
-                onValueChange = {
-                    onAmountChanged.invoke(it.toBigDecimalOrNull())
-                },
-                modifier = Modifier.onPreviewKeyEvent {
-                    if (
-                        it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
-                        it.key.nativeKeyCode == Key.Tab.nativeKeyCode
-                    ){
-                        focusRequester.requestFocus()
-
-                        return@onPreviewKeyEvent true
-                    }
-
-                    return@onPreviewKeyEvent false
-                },
-                placeholder = {
-                    Text(text = stringResource(Res.string.send_from_amount_hint))
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { focusRequester.requestFocus() }
-                )
-            )
-
-            if (uiState.sendFromUiState.showAmountError) {
-                Text(
-                    text = stringResource(Res.string.send_error_amount),
-                    color = MaterialTheme.colors.error,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.caption
-                )
-            }
-
-            TextField(
-                value = uiState.sendFromUiState
-                    .address
-                    .orEmpty(),
-                onValueChange = {
-                    onAddressChanged.invoke(it)
-                },
-                modifier = Modifier.focusRequester(focusRequester)
-                    .onPreviewKeyEvent {
-                        if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
-                            onSendClicked.invoke()
-
-                            return@onPreviewKeyEvent true
-                        }
-
-                        return@onPreviewKeyEvent false
-                    },
-                placeholder = {
-                    Text(text = stringResource(Res.string.send_from_address_hint))
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = { onSendClicked.invoke() }
-                )
-            )
-
-            if (uiState.sendFromUiState.showAddressError) {
-                Text(
-                    text = stringResource(Res.string.send_error_address),
-                    color = MaterialTheme.colors.error,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.caption
-                )
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            Button(
-                onClick = onSendClicked,
-                modifier = Modifier.width(120.dp)
-            ) {
-                Text(text = stringResource(Res.string.send_button))
-            }
-        }
+        SendFromDesktop(
+            uiState = uiState.sendFromUiState,
+            onAmountChanged = onAmountChanged,
+            onAddressChanged = onAddressChanged,
+            onSendClicked = onSendClicked
+        )
 
         if (navState == SendScreenState.CONFIRM) {
             Dialog(onDismissRequest = onCancelClicked) {
                 Card(Modifier.size(width = 400.dp, height = 500.dp)) {
+                    if (uiState.sendConfirmUiState.showLoader)
+                        AttoLoader(alpha = 0.7f)
+
                     SendConfirmContent(
                         modifier = Modifier.padding(32.dp),
                         uiState = uiState.sendConfirmUiState,
@@ -265,8 +164,142 @@ fun SendDesktop(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SendFromDesktop(
+    uiState: SendFromUiState,
+    onAmountChanged: (BigDecimal?) -> Unit,
+    onAddressChanged: (String?) -> Unit,
+    onSendClicked: () -> Unit
+) {
+    val (focusRequester) = FocusRequester.createRefs()
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.send_from_title),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h5
+        )
+
+        uiState.accountName
+            ?.let { Text(text = it) }
+
+        uiState.accountSeed
+            ?.let {
+                Text(
+                    text = it,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        Text(
+            text = "(${AttoFormatter.format(
+                uiState.accountBalance
+            )})"
+        )
+
+        TextField(
+            value = uiState.amount
+                ?.toString()
+                .orEmpty(),
+            onValueChange = {
+                onAmountChanged.invoke(it.toBigDecimalOrNull())
+            },
+            modifier = Modifier.onPreviewKeyEvent {
+                if (
+                    it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
+                    it.key.nativeKeyCode == Key.Tab.nativeKeyCode
+                ){
+                    focusRequester.requestFocus()
+
+                    return@onPreviewKeyEvent true
+                }
+
+                return@onPreviewKeyEvent false
+            },
+            placeholder = {
+                Text(text = stringResource(Res.string.send_from_amount_hint))
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusRequester.requestFocus() }
+            )
+        )
+
+        if (uiState.showAmountError) {
+            Text(
+                text = stringResource(Res.string.send_error_amount),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+
+        TextField(
+            value = uiState.address.orEmpty(),
+            onValueChange = {
+                onAddressChanged.invoke(it)
+            },
+            modifier = Modifier.focusRequester(focusRequester)
+                .onPreviewKeyEvent {
+                    if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                        onSendClicked.invoke()
+
+                        return@onPreviewKeyEvent true
+                    }
+
+                    return@onPreviewKeyEvent false
+                },
+            placeholder = {
+                Text(text = stringResource(Res.string.send_from_address_hint))
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = { onSendClicked.invoke() }
+            )
+        )
+
+        if (uiState.showAddressError) {
+            Text(
+                text = stringResource(Res.string.send_error_address),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        Button(
+            onClick = onSendClicked,
+            modifier = Modifier.width(120.dp)
+        ) {
+            Text(text = stringResource(Res.string.send_button))
+        }
+    }
+}
+
 enum class SendScreenState {
     SEND, CONFIRM, RESULT;
+}
+
+@Preview
+@Composable
+fun SendFromDesktopPreview() {
+    AttoWalletTheme {
+        SendFromDesktop(
+            uiState = SendFromUiState.DEFAULT,
+            onAmountChanged = {},
+            onAddressChanged = {},
+            onSendClicked = {}
+        )
+    }
 }
 
 @Preview
