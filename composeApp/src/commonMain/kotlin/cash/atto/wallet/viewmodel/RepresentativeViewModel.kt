@@ -36,9 +36,15 @@ class RepresentativeViewModel(
         }
     }
 
-    suspend fun setRepresentative(address: String) {
-        with (representativeRepository.state.value.wallet ?: return) {
-            representativeRepository.setRepresentative(this, address)
+    suspend fun setRepresentative(address: String): Boolean {
+        with (representativeRepository.state.value.wallet ?: return false) {
+            if (checkAddress(address)) {
+                representativeRepository.setRepresentative(this, address)
+
+                return true
+            }
+
+            return false
         }
     }
 
@@ -64,5 +70,15 @@ class RepresentativeViewModel(
                 )
             }
         }
+    }
+
+    private suspend fun checkAddress(address: String): Boolean {
+        val result = AttoAddress.isValid(address)
+
+        _state.emit(
+            state.value.copy(showError = !result)
+        )
+
+        return result
     }
 }

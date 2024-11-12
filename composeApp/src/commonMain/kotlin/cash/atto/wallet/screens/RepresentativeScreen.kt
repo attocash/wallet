@@ -59,7 +59,7 @@ fun RepresentativeScreen(
 fun RepresentativeScreenContent(
     uiState: RepresentativeUIState,
     onBackNavigation: () -> Unit,
-    onChange: suspend (String) -> Unit,
+    onChange: suspend (String) -> Boolean,
 ) {
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
@@ -72,15 +72,16 @@ fun RepresentativeScreenContent(
             EnterRepresentativeBottomSheet(
                 onChange = {
                     coroutineScope.launch {
-                        onChange.invoke(it)
-                        sheetState.hide()
+                        if (onChange.invoke(it))
+                            sheetState.hide()
                     }
                 },
                 onClose = {
                     coroutineScope.launch {
                         sheetState.hide()
                     }
-                }
+                },
+                showError = uiState.showError
             )
         },
         sheetState = sheetState,
@@ -141,7 +142,7 @@ fun RepresentativeScreenContentPreview() {
         RepresentativeScreenContent(
             uiState = RepresentativeUIState("atto://address"),
             onBackNavigation = {},
-            onChange = {}
+            onChange = { false }
         )
     }
 }

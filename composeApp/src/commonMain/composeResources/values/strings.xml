@@ -52,6 +52,7 @@
     <string name="representative_change">Change</string>
     <string name="representative_change_title">CHANGE REPRESENTATIVE</string>
     <string name="representative_close">Close</string>
+    <string name="representative_error_address">Enter a valid Atto address</string>
     <string name="representative_subtitle">Currently Represented By</string>
     <string name="representative_title">REPRESENTATIVE</string>
 

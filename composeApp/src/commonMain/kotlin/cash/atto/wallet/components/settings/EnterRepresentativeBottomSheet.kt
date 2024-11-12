@@ -11,11 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.representative_change
 import attowallet.composeapp.generated.resources.representative_change_title
 import attowallet.composeapp.generated.resources.representative_close
+import attowallet.composeapp.generated.resources.representative_error_address
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -26,7 +28,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun EnterRepresentativeBottomSheet(
     onChange: (String) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    showError: Boolean
 ) {
     val input = remember {
         mutableStateOf("")
@@ -43,6 +46,15 @@ fun EnterRepresentativeBottomSheet(
             value = input.value,
             onValueChange = { input.value = it }
         )
+
+        if (showError) {
+            Text(
+                text = stringResource(Res.string.representative_error_address),
+                color = MaterialTheme.colors.error,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
 
         Spacer(Modifier.height(64.dp))
 
@@ -68,7 +80,8 @@ fun EnterRepresentativeBottomSheetPreview() {
     AttoWalletTheme {
         EnterRepresentativeBottomSheet(
             onChange = {},
-            onClose = {}
+            onClose = {},
+            showError = true
         )
     }
 }
