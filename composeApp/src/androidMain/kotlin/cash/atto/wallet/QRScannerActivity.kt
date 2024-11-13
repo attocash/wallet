@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -23,6 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import cash.atto.commons.AttoAddress
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -32,21 +37,35 @@ import java.util.concurrent.Executors
 class QRScannerActivity : ComponentActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
+    private var cameraProvider: ProcessCameraProvider? = null
     private var qrCode by mutableStateOf("")
+
+    private val timerHandler = Handler(Looper.getMainLooper())
+    private val analyzer = QrCodeAnalyzer { qrCode = it.rawValue ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        timerHandler.postDelayed({ finish() }, 25000)
+//
         cameraExecutor = Executors.newSingleThreadExecutor()
-
+//
         setContent {
             LaunchedEffect(qrCode) {
                 if (qrCode.isNotEmpty()) {
-                    val result = Intent()
-                    result.putExtra(QR_TAG, qrCode)
-                    setResult(RESULT_OK, result)
+                    if (AttoAddress.isValid(qrCode)) {
+                        val result = Intent()
+                        result.putExtra(QR_TAG, qrCode)
+                        setResult(RESULT_OK, result)
 
-                    finish()
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@QRScannerActivity,
+                            R.string.qr_error,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
 
@@ -57,7 +76,7 @@ class QRScannerActivity : ComponentActivity() {
                     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
                     cameraProviderFuture.addListener({
-                        val cameraProvider = cameraProviderFuture.get()
+                        cameraProvider = cameraProviderFuture.get()
                         val preview = Preview.Builder()
                             .build()
                             .also { it.surfaceProvider = previewView.surfaceProvider }
@@ -67,12 +86,12 @@ class QRScannerActivity : ComponentActivity() {
                             .build()
                             .also { it.setAnalyzer(
                                 cameraExecutor,
-                                QrCodeAnalyzer { qrCode = it.rawValue ?: "" }
+                                analyzer
                             ) }
 
                         try {
-                            cameraProvider.unbindAll()
-                            cameraProvider.bindToLifecycle(
+                            cameraProvider?.unbindAll()
+                            cameraProvider?.bindToLifecycle(
                                 this,
                                 CameraSelector.DEFAULT_BACK_CAMERA,
                                 preview,
@@ -91,15 +110,19 @@ class QRScannerActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        cameraProvider?.unbindAll()
         cameraExecutor.shutdown()
+        analyzer.close()
+//        timerHandler.removeCallbacksAndMessages(this)
+
+        super.onDestroy()
     }
 
     private class QrCodeAnalyzer(
         private val onQrCodeDetected: (barcode: Barcode) -> Unit
     ) : ImageAnalysis.Analyzer {
 
-        private val scanner = BarcodeScanning.getClient()
+        private var scanner = BarcodeScanning.getClient()
 
         @OptIn(ExperimentalGetImage::class)
         override fun analyze(imageProxy: ImageProxy) {
@@ -123,6 +146,10 @@ class QRScannerActivity : ComponentActivity() {
                         imageProxy.close()
                     }
             }
+        }
+
+        fun close() {
+            scanner.close()
         }
     }
 

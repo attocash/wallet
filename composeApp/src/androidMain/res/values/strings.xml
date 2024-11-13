@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Atto Wallet</string>
+
+    <string name="qr_error">QR code does not contain a valid Atto address</string>
 </resources>

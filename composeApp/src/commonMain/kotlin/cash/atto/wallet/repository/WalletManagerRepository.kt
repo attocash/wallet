@@ -17,6 +17,7 @@ import cash.atto.commons.wallet.inMemory
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.state.AppState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,6 +45,11 @@ class WalletManagerRepository(
                 representativeRepository.getRepresentative(
                     it.publicKey.toString()
                 )
+
+                try {
+                    state.value?.close()
+                }
+                catch (_: CancellationException) {}
 
                 _state.emit(createWalletManager(it))
             }
