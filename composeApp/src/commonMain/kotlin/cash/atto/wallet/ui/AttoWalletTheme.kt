@@ -25,17 +25,17 @@ import androidx.compose.ui.unit.dp
 //)
 
 val attoColors = lightColors(
-    primary = yellow_500,
+    primary = gold_600,
 //    primaryVariant = brown_600,
     secondary = lime_500,
     secondaryVariant = green_400,
     background = gray_900,
-    surface = Color.Black,
+    surface = Color.White,
     error = red_500,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
-    onSurface = Color.White,
+    onSurface = Color.Black,
     onError = Color.White
 )
 
