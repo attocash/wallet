@@ -1,12 +1,7 @@
 package cash.atto.wallet
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -24,10 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import cash.atto.commons.AttoAddress
-import com.google.mlkit.vision.barcode.BarcodeScanner
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -40,16 +32,13 @@ class QRScannerActivity : ComponentActivity() {
     private var cameraProvider: ProcessCameraProvider? = null
     private var qrCode by mutableStateOf("")
 
-    private val timerHandler = Handler(Looper.getMainLooper())
     private val analyzer = QrCodeAnalyzer { qrCode = it.rawValue ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        timerHandler.postDelayed({ finish() }, 25000)
-//
         cameraExecutor = Executors.newSingleThreadExecutor()
-//
+
         setContent {
             LaunchedEffect(qrCode) {
                 if (qrCode.isNotEmpty()) {
@@ -113,7 +102,6 @@ class QRScannerActivity : ComponentActivity() {
         cameraProvider?.unbindAll()
         cameraExecutor.shutdown()
         analyzer.close()
-//        timerHandler.removeCallbacksAndMessages(this)
 
         super.onDestroy()
     }

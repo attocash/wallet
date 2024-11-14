@@ -22,7 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AppStateRepository(
-    private val representativeRepository: RepresentativeRepository,
     private val seedDataSource: SeedDataSource,
     private val passwordDataSource: PasswordDataSource
 ) {
@@ -31,9 +30,6 @@ class AppStateRepository(
 
     private val sessionScope = CoroutineScope(Dispatchers.IO)
     private var sessionJob: Job? = null
-
-    private val representativeScope = CoroutineScope(Dispatchers.IO)
-    private var representativeJob: Job? = null
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
@@ -54,15 +50,6 @@ class AppStateRepository(
                         )
                     }
                 } ?: setAuthState(AppState.AuthState.NO_SEED)
-
-                mnemonic?.let {
-                    representativeJob?.cancel()
-                    representativeJob = representativeScope.launch {
-                        collectRepresentative(mnemonic.toSeed()
-                            .toPrivateKey(state.value.index)
-                        )
-                    }
-                }
             }
         }
     }
@@ -145,26 +132,6 @@ class AppStateRepository(
             _state.emit(state.value.copy(
                 authState = AppState.AuthState.SESSION_INVALID
             ))
-        }
-    }
-
-    private suspend fun collectRepresentative(
-        wallet: AttoPrivateKey
-    ) {
-        val publicKey = wallet.toPublicKey().toString()
-        representativeRepository.getRepresentative(publicKey)
-
-        representativeRepository.state.collect { representativeState ->
-            if (representativeState.representative == null) {
-                val signer = wallet.toSigner()
-                representativeRepository.setRepresentative(
-                    wallet = publicKey,
-                    address = AttoAddress(
-                        AttoAlgorithm.V1,
-                        signer.publicKey
-                    ).toString()
-                )
-            }
         }
     }
 

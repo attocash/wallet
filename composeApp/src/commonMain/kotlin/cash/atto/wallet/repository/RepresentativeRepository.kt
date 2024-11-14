@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@Deprecated("Wallet Manager handles representatives by itself now")
 class RepresentativeRepository(
     private val representativeDao: RepresentativeDao
 ) {

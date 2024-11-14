@@ -1,5 +1,6 @@
 package cash.atto.wallet.datasource
 
+@Deprecated("Wallet Manager handles representatives by itself now")
 class RepresentativeDataSource(
     private val appDatabase: AppDatabase
 ) : RepresentativeDao {

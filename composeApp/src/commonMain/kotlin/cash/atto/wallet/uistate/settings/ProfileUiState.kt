@@ -6,8 +6,8 @@ data class ProfileUiState(
 ) {
     companion object {
         val DEFAULT = ProfileUiState(
-            name = "Main Account",
-            hash = "hash"
+            name = "Loading...",
+            hash = "Loading..."
         )
     }
 }

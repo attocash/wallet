@@ -26,8 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WalletManagerRepository(
-    private val appStateRepository: AppStateRepository,
-    private val representativeRepository: RepresentativeRepository
+    private val appStateRepository: AppStateRepository
 ) {
 
     private val _state = MutableStateFlow<AttoWalletManager?>(null)
@@ -36,16 +35,9 @@ class WalletManagerRepository(
     private val appStateCollectorScope = CoroutineScope(Dispatchers.Default)
     private var appStateCollectorJob: Job? = null
 
-    private val collectorScope = CoroutineScope(Dispatchers.Default)
-    private var collectorJob: Job? = null
-
     init {
         appStateCollectorJob = appStateCollectorScope.launch {
             appStateRepository.state.collect {
-                representativeRepository.getRepresentative(
-                    it.publicKey.toString()
-                )
-
                 try {
                     state.value?.close()
                 }
@@ -54,18 +46,14 @@ class WalletManagerRepository(
                 _state.emit(createWalletManager(it))
             }
         }
+    }
 
-        collectorJob = collectorScope.launch {
-            representativeRepository.state.collect {
-                if (it.representative != null) {
-                    try {
-                        state.value?.change(AttoAddress.parse(it.representative))
-                    }
-                    catch (ex: Exception) {
-                        println(ex.message)
-                    }
-                }
-            }
+    suspend fun changeRepresentative(representative: AttoAddress) {
+        try {
+            state.value?.change(representative)
+        }
+        catch (ex: Exception) {
+            println(ex.message)
         }
     }
 

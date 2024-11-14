@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoPrivateKey
+import cash.atto.commons.toAddress
 import cash.atto.commons.toPublicKey
 import cash.atto.commons.toSigner
+import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.RepresentativeRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.settings.RepresentativeUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +20,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class RepresentativeViewModel(
-    private val appStateRepository: AppStateRepository,
-    private val representativeRepository: RepresentativeRepository
+    private val walletManagerRepository: WalletManagerRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RepresentativeUIState.DEFAULT)
@@ -28,48 +30,23 @@ class RepresentativeViewModel(
 
     init {
         viewModelScope.launch {
-            appStateRepository.state.collect { appState ->
-                appState.privateKey?.let { privateKey ->
-                    collectRepresentative(privateKey)
-                }
-            }
+            walletManagerRepository.state
+                .collect { updateRepresentative(it)}
         }
     }
 
     suspend fun setRepresentative(address: String): Boolean {
-        with (representativeRepository.state.value.wallet ?: return false) {
-            if (checkAddress(address)) {
-                representativeRepository.setRepresentative(this, address)
+        if (checkAddress(address)) {
+            walletManagerRepository.changeRepresentative(
+                AttoAddress.parse(address)
+            )
 
-                return true
-            }
+            updateRepresentative(walletManagerRepository.state.value)
 
-            return false
+            return true
         }
-    }
 
-    private suspend fun collectRepresentative(
-        wallet: AttoPrivateKey
-    ) {
-        val publicKey = wallet.toPublicKey().toString()
-        representativeRepository.getRepresentative(publicKey)
-
-        representativeRepository.state.collect { representativeState ->
-            if (representativeState.representative != null) {
-                _state.emit(RepresentativeUIState(
-                    representativeState.representative
-                ))
-            } else {
-                val signer = wallet.toSigner()
-                representativeRepository.setRepresentative(
-                    wallet = publicKey,
-                    address = AttoAddress(
-                        AttoAlgorithm.V1,
-                        signer.publicKey
-                    ).toString()
-                )
-            }
-        }
+        return false
     }
 
     private suspend fun checkAddress(address: String): Boolean {
@@ -80,5 +57,19 @@ class RepresentativeViewModel(
         )
 
         return result
+    }
+
+    private suspend fun updateRepresentative(
+        walletManager: AttoWalletManager?
+    ) {
+        if (walletManager?.account == null)
+            return
+
+        _state.emit(RepresentativeUIState(
+            walletManager.account!!
+                .representativePublicKey
+                .toAddress(AttoAlgorithm.V1)
+                .value
+        ))
     }
 }
