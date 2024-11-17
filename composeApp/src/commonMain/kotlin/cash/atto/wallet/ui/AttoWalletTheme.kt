@@ -9,21 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-//val attoColors = lightColors(
-//    primary = brown_700,
-//    primaryVariant = brown_600,
-//    secondary = blue_900,
-//    secondaryVariant = blue_800,
-//    background = brown_100,
-//    surface = brown_050,
-//    error = red_900,
-//    onPrimary = Color.White,
-//    onSecondary = Color.White,
-//    onBackground = Color.Black,
-//    onSurface = Color.Black,
-//    onError = Color.White
-//)
-
 val attoColors = lightColors(
     primary = gold_600,
 //    primaryVariant = brown_600,
@@ -32,12 +17,15 @@ val attoColors = lightColors(
     background = gray_900,
     surface = Color.White,
     error = red_500,
-    onPrimary = Color.Black,
+    onPrimary = gray_800,
     onSecondary = Color.White,
     onBackground = Color.White,
-    onSurface = Color.Black,
+    onSurface = gray_800,
     onError = Color.White
 )
+
+val Colors.back: Color
+    get() = gray_700
 
 val Colors.divider: Color
     @Composable
@@ -50,8 +38,8 @@ val attoShapes = Shapes(
 )
 
 val BottomSheetShape = RoundedCornerShape(
-    topStart = 20.dp,
-    topEnd = 20.dp
+    topStart = 50.dp,
+    topEnd = 50.dp
 )
 
 @Composable

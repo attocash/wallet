@@ -25,10 +25,16 @@ fun AttoOutlinedButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    elevation: ButtonElevation? = ButtonDefaults.elevation(
+        defaultElevation = 0.dp,
+        pressedElevation = 0.dp,
+        disabledElevation = 0.dp,
+        hoveredElevation = 0.dp,
+        focusedElevation = 0.dp
+    ),
     shape: Shape = MaterialTheme.shapes.small,
-    color: Color = MaterialTheme.colors.primary,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    color: Color = MaterialTheme.colors.onSurface,
+    contentPadding: PaddingValues = PaddingValues(19.dp),
     content: @Composable() (RowScope.() -> Unit)
 ) {
     OutlinedButton(
@@ -40,7 +46,7 @@ fun AttoOutlinedButton(
         shape = shape,
         border = BorderStroke(1.dp, color),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.surface,
             contentColor = color
         ),
         contentPadding = contentPadding,

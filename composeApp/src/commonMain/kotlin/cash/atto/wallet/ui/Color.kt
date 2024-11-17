@@ -14,7 +14,8 @@ import androidx.compose.ui.graphics.Color
 val gold_600 = Color(0xFFFAB005)
 
 val gray_100 = Color(0xFFF5F5F5)
-val gray_800 = Color(0xFF424242)
+val gray_700 = Color(0xFF54595E)
+val gray_800 = Color(0xFF373B3E)
 val gray_900 = Color(0xFF212121)
 
 val green_400 = Color(0xFF0EFD01)

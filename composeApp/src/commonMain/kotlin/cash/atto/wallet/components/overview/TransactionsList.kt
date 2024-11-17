@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,11 +36,13 @@ fun TransactionsList(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            modifier = Modifier.padding(top = 16.dp),
-            text = stringResource(Res.string.overview_transactions_title),
-            color = MaterialTheme.colors.onSurface
-        )
+        Row(modifier = Modifier.padding(top = 16.dp)) {
+            Text(
+                text = stringResource(Res.string.overview_transactions_title),
+                color = MaterialTheme.colors.onSurface,
+                style = MaterialTheme.typography.h6
+            )
+        }
 
         if (uiState.showHint) {
             Card(

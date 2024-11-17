@@ -28,29 +28,25 @@ fun OverviewHeader(
     onSettingsClicked: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier,
-//        border = BorderStroke(1.dp, attoColors.primary),
-        backgroundColor = MaterialTheme.colors.primary,
-        contentColor = MaterialTheme.colors.onPrimary
-    ) {
-        Box {
-            onSettingsClicked?.let {
-                Icon(
-                    modifier = Modifier.align(Alignment.TopEnd)
-                        .clickable { it.invoke() }
-                        .padding(16.dp),
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "settings"
-                )
-            }
+    Box(modifier) {
+        onSettingsClicked?.let {
+            Icon(
+                modifier = Modifier.align(Alignment.TopEnd)
+                    .clickable { it.invoke() }
+                    .padding(16.dp),
+                imageVector = Icons.Outlined.Settings,
+                contentDescription = "settings"
+            )
+        }
 
-            Column(
-                Modifier.align(Alignment.Center)
-                    .padding(vertical = 8.dp)
-            ) {
-                Text(text = AttoFormatter.format(uiState.attoCoins))
-            }
+        Column(
+            Modifier.align(Alignment.Center)
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = AttoFormatter.format(uiState.attoCoins),
+                style = MaterialTheme.typography.h1
+            )
         }
     }
 }

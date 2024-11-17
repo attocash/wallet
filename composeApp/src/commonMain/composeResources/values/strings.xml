@@ -30,7 +30,7 @@
     <string name="overview_receive_copy">Copy</string>
     <string name="overview_receive_share">Share</string>
     <string name="overview_send">Send</string>
-    <string name="overview_transactions_title">TRANSACTIONS</string>
+    <string name="overview_transactions_title">Transactions</string>
     <string name="overview_transaction_from">from</string>
     <string name="overview_transaction_to">to</string>
 
@@ -98,7 +98,8 @@
     <string name="settings_security">Security</string>
 
     <!-- welcome -->
-    <string name="welcome_create_wallet">Create Wallet</string>
+    <string name="welcome_create_wallet">New Wallet</string>
     <string name="welcome_import_wallet">Import Wallet</string>
-    <string name="welcome_message">Welcome to Atto! To start, import your existing Atto wallet, or create a new one</string>
+    <string name="welcome_message">To begin, you may create a new wallet\n or import an existing one.</string>
+    <string name="welcome_title">Welcome to Atto</string>
 </resources>

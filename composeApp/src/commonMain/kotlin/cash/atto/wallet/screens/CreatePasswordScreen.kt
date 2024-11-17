@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -43,6 +42,7 @@ import attowallet.composeapp.generated.resources.password_create_title
 import attowallet.composeapp.generated.resources.password_no_match
 import attowallet.composeapp.generated.resources.password_weak
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
@@ -187,7 +187,7 @@ fun CreatePassword(
 
                 Spacer(Modifier.weight(1f))
 
-                Button(
+                AttoButton(
                     onClick = onConfirmClick,
                     modifier = Modifier.fillMaxWidth()
                 ) {

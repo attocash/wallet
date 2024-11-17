@@ -20,15 +20,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
+import attowallet.composeapp.generated.resources.atto_welcome_cubes
 import attowallet.composeapp.generated.resources.ic_atto
 import attowallet.composeapp.generated.resources.welcome_create_wallet
 import attowallet.composeapp.generated.resources.welcome_import_wallet
 import attowallet.composeapp.generated.resources.welcome_message
+import attowallet.composeapp.generated.resources.welcome_title
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -49,7 +52,7 @@ fun WelcomeScreen(
                 painter = painterResource(Res.drawable.atto_welcome_background),
                 contentScale = ContentScale.FillBounds
             ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(160.dp))
@@ -62,25 +65,50 @@ fun WelcomeScreen(
         Text(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
+            text = stringResource(Res.string.welcome_title),
+            color = MaterialTheme.colors.onSurface,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h4
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp),
             text = stringResource(Res.string.welcome_message),
             color = MaterialTheme.colors.onSurface,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.caption
         )
 
-        Column(Modifier.padding(16.dp)) {
-            AttoButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onCreateSecretClicked
-            ) {
-                Text(stringResource(Res.string.welcome_create_wallet))
-            }
+        Box(Modifier.padding(top = 18.dp)
+            .weight(1f)
+        ) {
+            Image(
+                bitmap = imageResource(Res.drawable.atto_welcome_cubes),
+                contentDescription = "Atto Wallet",
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
 
-            AttoOutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onImportSecretClicked
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(stringResource(Res.string.welcome_import_wallet))
+                AttoButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onCreateSecretClicked
+                ) {
+                    Text(stringResource(Res.string.welcome_create_wallet))
+                }
+
+                AttoOutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onImportSecretClicked
+                ) {
+                    Text(stringResource(Res.string.welcome_import_wallet))
+                }
             }
         }
     }

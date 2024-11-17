@@ -20,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +30,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.atto_overview_background
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
 import cash.atto.wallet.components.common.AttoOutlinedButton
@@ -35,9 +39,12 @@ import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.ui.BottomSheetShape
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.components.overview.ReceiveAttoBottomSheet
+import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -98,10 +105,13 @@ fun OverviewAndroid(
         sheetShape = BottomSheetShape
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
-                .background(color = MaterialTheme.colors.surface)
+            modifier = Modifier
+                .fillMaxSize()
+                .paint(
+                    painter = painterResource(resource = Res.drawable.atto_overview_background),
+                    contentScale = ContentScale.FillBounds
+                )
                 .safeDrawingPadding()
-                .padding(16.dp)
         ) {
             OverviewHeader(
                 uiState = uiState.headerUiState,
@@ -109,34 +119,65 @@ fun OverviewAndroid(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            TransactionsList(
-                uiState = uiState.transactionListUiState,
-                modifier = Modifier.weight(1f)
+            OverviewAndroidContent(
+                uiState = uiState,
+                onSendClicked = onSendClicked,
+                onReceiveClicked = {
+                    scope.launch {
+                        if (uiState.receiveAddress != null)
+                            sheetState.show()
+                    }
+                }
             )
+        }
+    }
+}
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+@Composable
+fun OverviewAndroidContent(
+    uiState: OverviewUiState,
+    onSendClicked: () -> Unit,
+    onReceiveClicked: () -> Unit
+) {
+    Column(Modifier.clip(BottomSheetShape)
+        .background(color = MaterialTheme.colors.surface)
+        .padding(16.dp)
+    ) {
+        TransactionsList(
+            uiState = uiState.transactionListUiState,
+            modifier = Modifier.weight(1f)
+                .padding(horizontal = 16.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Button(
+                onClick = onReceiveClicked,
+                modifier = Modifier.weight(1f),
             ) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            if (uiState.receiveAddress != null)
-                                sheetState.show()
-                        }
-                    },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = stringResource(Res.string.overview_receive))
-                }
+                Text(text = stringResource(Res.string.overview_receive))
+            }
 
-                Button(
-                    onClick = onSendClicked,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = stringResource(Res.string.overview_send))
-                }
+            Button(
+                onClick = onSendClicked,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = stringResource(Res.string.overview_send))
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun OverviewAndroidContentPreview() {
+    AttoWalletTheme {
+        OverviewAndroidContent(
+            uiState = OverviewUiState.DEFAULT,
+            onSendClicked = {},
+            onReceiveClicked = {}
+        )
     }
 }
