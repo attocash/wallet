@@ -3,17 +3,20 @@ package cash.atto.wallet.screens
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -92,7 +95,8 @@ fun OverviewAndroid(
 ) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
     )
 
     ModalBottomSheetLayout(
@@ -139,15 +143,27 @@ fun OverviewAndroidContent(
     onSendClicked: () -> Unit,
     onReceiveClicked: () -> Unit
 ) {
-    Column(Modifier.clip(BottomSheetShape)
-        .background(color = MaterialTheme.colors.surface)
-        .padding(16.dp)
-    ) {
-        TransactionsList(
-            uiState = uiState.transactionListUiState,
+    Column(Modifier.padding(
+        top = 40.dp,
+        bottom = 16.dp
+    )) {
+        Surface(
             modifier = Modifier.weight(1f)
+                .padding(bottom = 16.dp),
+            elevation = 1.dp,
+            shape = RoundedCornerShape(50.dp)
+        ) {
+            Box(modifier = Modifier
+                .background(color = MaterialTheme.colors.surface)
                 .padding(horizontal = 16.dp)
-        )
+                .padding(top = 16.dp)
+            ) {
+                TransactionsList(
+                    uiState = uiState.transactionListUiState,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),

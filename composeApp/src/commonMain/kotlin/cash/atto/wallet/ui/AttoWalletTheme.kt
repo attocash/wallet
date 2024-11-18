@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 val attoColors = lightColors(
     primary = gold_600,
 //    primaryVariant = brown_600,
-    secondary = lime_500,
+    secondary = gold_900,
     secondaryVariant = green_400,
     background = gray_900,
     surface = Color.White,
@@ -28,12 +28,25 @@ val Colors.back: Color
     get() = gray_700
 
 val Colors.divider: Color
-    @Composable
     get() = gray_800
+
+val Colors.primaryGradient: List<Color>
+    get() = listOf(
+        Color(0xffFFE249),
+        Color(0xffFFD11F),
+        Color(0xffFF9C05)
+    )
+
+val Colors.secondaryGradient: List<Color>
+    get() = listOf(
+        Color(0xffFF9B36),
+        Color(0xffEC6C00),
+        Color(0xffFC8704)
+    )
 
 val attoShapes = Shapes(
     small = RoundedCornerShape(24.dp),
-    medium = RoundedCornerShape(16.dp),
+    medium = RoundedCornerShape(20.dp),
     large = RoundedCornerShape(8.dp)
 )
 

@@ -41,13 +41,13 @@ private fun attoFontFamily() = FontFamily(fonts = listOf(
 fun attoWalletTypography() = Typography(
     h1 = TextStyle(
         fontFamily = attoFontFamily(),
-        fontWeight = FontWeight.W300,
+        fontWeight = FontWeight.W400,
         fontSize = 80.sp
     ),
     h2 = TextStyle(
         fontFamily = attoFontFamily(),
-        fontWeight = FontWeight.W400,
-        fontSize = 60.sp
+        fontWeight = FontWeight.W600,
+        fontSize = 56.sp
     ),
     h3 = TextStyle(
         fontFamily = attoFontFamily(),
@@ -76,8 +76,9 @@ fun attoWalletTypography() = Typography(
     ),
     subtitle2 = TextStyle(
         fontFamily = attoFontFamily(),
-        fontWeight = FontWeight.W600,
-        fontSize = 14.sp
+        fontWeight = FontWeight.W400,
+        fontSize = 14.sp,
+        letterSpacing = 4.sp
     ),
     body1 = TextStyle(
         fontFamily = attoFontFamily(),

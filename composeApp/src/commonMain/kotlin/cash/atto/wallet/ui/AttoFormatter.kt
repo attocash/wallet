@@ -8,7 +8,7 @@ object AttoFormatter {
 
     fun format(value: String?): String {
         return value?.let {
-            "$it Atto"
+            "Ӿ$it"
         } ?: "..."
     }
 }

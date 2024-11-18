@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.primaryGradient
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Doesn't support interactionSource since this is actually a row
@@ -55,11 +56,7 @@ fun AttoButton(
                 modifier = Modifier.fillMaxWidth()
                     .background(
                         brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(0xffFFE249),
-                                Color(0xffFFD11F),
-                                Color(0xffFF9C05)
-                            )
+                            colors = MaterialTheme.colors.primaryGradient
                         )
                     )
             ) {
