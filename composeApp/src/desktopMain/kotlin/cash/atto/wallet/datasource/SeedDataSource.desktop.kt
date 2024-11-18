@@ -9,6 +9,7 @@ actual class SeedDataSource {
     private val dataSourceDesktopImpl = when (getPlatform().type) {
         PlatformType.WINDOWS -> SeedDataSourceWindows()
         PlatformType.LINUX -> SeedDataSourceLinux()
+        PlatformType.MACOS -> SeedDataSourceMac()
         else -> throw UnsupportedOperationException("Unsupported platform ${getPlatform()}")
     }
 
