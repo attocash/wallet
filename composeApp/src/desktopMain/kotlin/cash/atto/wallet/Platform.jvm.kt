@@ -9,7 +9,8 @@ class JVMPlatform: Platform {
             return when {
                 "windows" in osName -> PlatformType.WINDOWS
                 "mac" in osName -> PlatformType.MACOS
-                else -> PlatformType.LINUX
+                "linux" in osName-> PlatformType.LINUX
+                else -> throw UnsupportedOperationException("Unsupported platform $osName")
             }
         }
 }
