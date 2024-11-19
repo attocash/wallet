@@ -71,8 +71,8 @@ fun attoWalletTypography() = Typography(
     ),
     subtitle1 = TextStyle(
         fontFamily = attoFontFamily(),
-        fontWeight = FontWeight.W500,
-        fontSize = 16.sp
+        fontWeight = FontWeight.W600,
+        fontSize = 18.sp
     ),
     subtitle2 = TextStyle(
         fontFamily = attoFontFamily(),
@@ -82,7 +82,7 @@ fun attoWalletTypography() = Typography(
     ),
     body1 = TextStyle(
         fontFamily = attoFontFamily(),
-        fontWeight = FontWeight.W600,
+        fontWeight = FontWeight.W400,
         fontSize = 16.sp
     ),
     body2 = TextStyle(

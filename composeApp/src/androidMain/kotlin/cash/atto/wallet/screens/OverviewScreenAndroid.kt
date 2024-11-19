@@ -37,6 +37,8 @@ import attowallet.composeapp.generated.resources.atto_overview_background
 import attowallet.composeapp.generated.resources.overview_receive
 import attowallet.composeapp.generated.resources.overview_send
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.components.common.AttoReceiveButton
+import cash.atto.wallet.components.common.AttoSendButton
 import cash.atto.wallet.components.overview.OverviewHeader
 import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.ui.BottomSheetShape
@@ -148,7 +150,8 @@ fun OverviewAndroidContent(
         bottom = 16.dp
     )) {
         Surface(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .padding(bottom = 16.dp),
             elevation = 1.dp,
             shape = RoundedCornerShape(50.dp)
@@ -166,22 +169,20 @@ fun OverviewAndroidContent(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(
+            AttoSendButton(
+                onClick = onSendClicked,
+                modifier = Modifier.weight(1f)
+            )
+
+            AttoReceiveButton(
                 onClick = onReceiveClicked,
                 modifier = Modifier.weight(1f),
-            ) {
-                Text(text = stringResource(Res.string.overview_receive))
-            }
-
-            Button(
-                onClick = onSendClicked,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = stringResource(Res.string.overview_send))
-            }
+            )
         }
     }
 }

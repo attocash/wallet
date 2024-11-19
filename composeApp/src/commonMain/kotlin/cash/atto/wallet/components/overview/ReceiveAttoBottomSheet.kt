@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.ic_copy
+import attowallet.composeapp.generated.resources.ic_share
 import attowallet.composeapp.generated.resources.overview_receive_address
 import attowallet.composeapp.generated.resources.overview_receive_copy
 import attowallet.composeapp.generated.resources.overview_receive_share
@@ -30,6 +36,7 @@ import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.components.common.BottomSheetStud
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import qrgenerator.QRCodeImage
 
@@ -45,11 +52,30 @@ fun ReceiveAttoBottomSheet(
             onCopy = onCopy
         )
 
-        AttoOutlinedButton(
-            onClick = onShare,
-            modifier = Modifier.fillMaxWidth()
+        Button(
+            onClick = onCopy,
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentColor = MaterialTheme.colors.onSecondary
+            ),
+            contentPadding = PaddingValues(19.dp)
         ) {
-            Text(text = stringResource(Res.string.overview_receive_share))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_share),
+                    contentDescription = "Copy icon"
+                )
+
+                Text(text = stringResource(Res.string.overview_receive_share))
+            }
         }
     }
 }
@@ -77,7 +103,10 @@ fun ReceiveAttoContent(
             style = MaterialTheme.typography.subtitle2
         )
 
-        Text(displayAddress)
+        Text(
+            text = displayAddress,
+            style = MaterialTheme.typography.subtitle1
+        )
 
         Box(Modifier.height(qrCodeSize)) {
             Text(
@@ -111,9 +140,28 @@ fun ReceiveAttoContent(
 
         Button(
             onClick = onCopy,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondaryVariant,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            contentPadding = PaddingValues(19.dp)
         ) {
-            Text(text = stringResource(Res.string.overview_receive_copy))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_copy),
+                    contentDescription = "Copy icon"
+                )
+
+                Text(text = stringResource(Res.string.overview_receive_copy))
+            }
         }
     }
 }

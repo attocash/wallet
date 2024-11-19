@@ -1,5 +1,6 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +13,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.components.settings.Profile
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -68,7 +72,12 @@ fun SettingsAndroid(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        modifier = Modifier.background(
+            brush = Brush.horizontalGradient(
+                colors = MaterialTheme.colors.primaryGradient
+            )
+        ),
+        backgroundColor = Color.Transparent,
         content = { padding ->
             Column(
                 Modifier

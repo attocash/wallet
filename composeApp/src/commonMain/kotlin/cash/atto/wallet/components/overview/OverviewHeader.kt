@@ -1,17 +1,12 @@
 package cash.atto.wallet.components.overview
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -37,11 +32,10 @@ fun OverviewHeader(
         onSettingsClicked?.let {
             Box(Modifier.align(Alignment.TopEnd)
                 .padding(top = 32.dp, end = 16.dp)
-                .width(48.dp)
-                .height(48.dp)
+                .size(48.dp, 48.dp)
                 .clip(CircleShape)
                 .background(color = MaterialTheme.colors
-                    .onBackground
+                    .surface
                     .copy(alpha = 0.5f)
                 )
                 .clickable { it.invoke() }

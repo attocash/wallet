@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 //val brown_700 = Color(0xFF5A4508)
 //
 
+val gold_100 = Color(0xFFFFF8C6)
 val gold_600 = Color(0xFFFAB005)
 val gold_900 = Color(0xFFB85F05)
 

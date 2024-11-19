@@ -6,10 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -36,9 +35,7 @@ fun AppBar(onBackNavigation: () -> Unit) {
             )
             .padding(start = 16.dp, top = 30.dp)
     ) {
-        Box(Modifier
-            .width(48.dp)
-            .height(48.dp)
+        Box(Modifier.size(48.dp, 48.dp)
             .clip(CircleShape)
             .background(color = MaterialTheme.colors
                 .onSurface

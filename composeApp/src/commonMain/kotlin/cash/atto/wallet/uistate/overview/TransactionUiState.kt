@@ -18,6 +18,7 @@ import attowallet.composeapp.generated.resources.overview_hint_type_from
 import attowallet.composeapp.generated.resources.overview_hint_type_to
 import attowallet.composeapp.generated.resources.overview_transaction_from
 import attowallet.composeapp.generated.resources.overview_transaction_to
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.secondaryGradient
 import org.jetbrains.compose.resources.stringResource
@@ -28,6 +29,17 @@ data class TransactionUiState(
     val amount: String?,
     val source: String
 ) {
+
+    var shownAmount = amount?.let { a ->
+        //check if first element is a sign
+        if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
+            val sign = a.split(' ').getOrNull(0)
+            val number = a.split(' ').getOrNull(1)
+
+            "$sign ${AttoFormatter.format(number)}"
+        } else AttoFormatter.format(amount)
+    } ?: AttoFormatter.format(amount)
+
     val icon: ImageVector
         @Composable
         get() = when (type) {

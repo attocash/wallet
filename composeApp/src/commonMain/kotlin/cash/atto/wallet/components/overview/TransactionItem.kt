@@ -1,17 +1,14 @@
 package cash.atto.wallet.components.overview
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,7 +20,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -37,41 +33,47 @@ fun TransactionItem(uiState: TransactionUiState) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .padding(8.dp),
+                .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.width(52.dp)
-                .height(52.dp)
-                .clip(CircleShape)
-                .rotate(45f)
-                .background(brush = uiState.iconGradient)
+            Row(
+                Modifier.weight(0.57f),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = uiState.icon,
-                    contentDescription = "operation type icon",
-                    modifier = Modifier.align(Alignment.Center)
-                        .rotate(-45f),
-                    tint = MaterialTheme.colors.secondary
-                )
+                Box(Modifier.size(52.dp, 52.dp)
+                    .clip(CircleShape)
+                    .rotate(45f)
+                    .background(brush = uiState.iconGradient)
+                ) {
+                    Icon(
+                        imageVector = uiState.icon,
+                        contentDescription = "operation type icon",
+                        modifier = Modifier.align(Alignment.Center)
+                            .rotate(-45f),
+                        tint = MaterialTheme.colors.secondary
+                    )
+                }
+
+                Column {
+                    Text(uiState.typeString)
+                    Text(
+                        text = uiState.shownAmount,
+                        color = MaterialTheme.colors.secondary
+                    )
+                }
             }
 
-            Column(Modifier.weight(1f)) {
-                Text(uiState.typeString)
+            Box(Modifier.weight(0.43f)) {
                 Text(
-                    text = AttoFormatter.format(uiState.amount),
-                    style = MaterialTheme.typography.body2
+                    text = uiState.source,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.44f),
+                    textAlign = TextAlign.End,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
                 )
             }
-
-            Text(
-                text = uiState.shownSource,
-                modifier = Modifier.width(96.dp),
-                textAlign = TextAlign.End,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
-                style = MaterialTheme.typography.body2
-            )
         }
     }
 }

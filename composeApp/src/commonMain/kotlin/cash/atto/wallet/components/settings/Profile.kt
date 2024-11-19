@@ -1,6 +1,7 @@
 package cash.atto.wallet.components.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,8 +29,15 @@ fun Profile(
         modifier = modifier.padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(uiState.name)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = uiState.name,
+                style = MaterialTheme.typography.h6
+            )
+
             Text(
                 text = uiState.hash,
                 overflow = TextOverflow.Ellipsis,
@@ -37,13 +45,6 @@ fun Profile(
                 style = MaterialTheme.typography.body2
             )
         }
-
-        Icon(
-            modifier = Modifier.clickable {}
-                .padding(8.dp),
-            imageVector = Icons.Filled.Person,
-            contentDescription = "Accounts"
-        )
     }
 }
 
