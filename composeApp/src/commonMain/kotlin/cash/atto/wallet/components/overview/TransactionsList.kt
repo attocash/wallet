@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,15 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.ic_atto
 import attowallet.composeapp.generated.resources.ic_transactions
 import attowallet.composeapp.generated.resources.overview_hint
 import attowallet.composeapp.generated.resources.overview_transactions_title
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoColors
 import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
+import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -103,12 +100,14 @@ fun TransactionsListPreview() {
                     TransactionUiState(
                         type = TransactionType.SEND,
                         amount = "A little Atto",
-                        source = "someone"
+                        source = "someone",
+                        timestamp = Clock.System.now(),
                     ),
                     TransactionUiState(
                         type = TransactionType.RECEIVE,
                         amount = "A lot of Atto",
-                        source = "someone"
+                        source = "someone",
+                        timestamp = Clock.System.now(),
                     ),
                 ),
                 showHint = true

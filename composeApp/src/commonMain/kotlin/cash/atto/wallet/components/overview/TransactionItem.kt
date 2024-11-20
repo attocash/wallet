@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
+import kotlinx.datetime.Clock
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -42,10 +43,11 @@ fun TransactionItem(uiState: TransactionUiState) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(Modifier.size(52.dp, 52.dp)
-                    .clip(CircleShape)
-                    .rotate(45f)
-                    .background(brush = uiState.iconGradient)
+                Box(
+                    Modifier.size(52.dp, 52.dp)
+                        .clip(CircleShape)
+                        .rotate(45f)
+                        .background(brush = uiState.iconGradient)
                 ) {
                     Icon(
                         imageVector = uiState.icon,
@@ -86,7 +88,8 @@ fun TransactionItemPreview() {
             TransactionUiState(
                 type = TransactionType.SEND,
                 amount = "A little Atto",
-                source = "someone"
+                source = "someone",
+                timestamp = Clock.System.now()
             )
         )
     }
