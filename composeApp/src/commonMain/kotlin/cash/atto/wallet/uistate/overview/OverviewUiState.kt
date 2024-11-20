@@ -21,6 +21,7 @@ data class OverviewUiState(
         get() = TransactionListUiState(
             transactions = entries
                 .filterNotNull()
+                .sortedByDescending { it.height }
                 .map {
                     when (it.blockType) {
                         AttoBlockType.SEND -> TransactionUiState(
