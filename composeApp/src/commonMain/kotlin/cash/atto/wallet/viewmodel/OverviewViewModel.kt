@@ -3,25 +3,11 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
-import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoUnit
-import cash.atto.commons.gatekeeper.AttoAuthenticator
-import cash.atto.commons.gatekeeper.attoBackend
 import cash.atto.commons.toAddress
-import cash.atto.commons.toSigner
-import cash.atto.commons.wallet.AttoAccountEntryRepository
-import cash.atto.commons.wallet.AttoNodeClient
-import cash.atto.commons.wallet.AttoTransactionRepository
-import cash.atto.commons.wallet.AttoWalletManager
-import cash.atto.commons.wallet.AttoWalletViewer
-import cash.atto.commons.wallet.AttoWorkCache
-import cash.atto.commons.wallet.attoBackend
-import cash.atto.commons.wallet.inMemory
-import cash.atto.commons.worker.AttoWorker
-import cash.atto.commons.worker.attoBackend
+import cash.atto.wallet.repository.AccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.WalletManagerRepository
-import cash.atto.wallet.state.AppState
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,19 +20,18 @@ import kotlinx.coroutines.launch
 class OverviewViewModel(
     private val appStateRepository: AppStateRepository,
     private val walletManagerRepository: WalletManagerRepository,
-    private val accountEntryRepository: AttoAccountEntryRepository,
+    private val accountEntryRepository: AccountEntryRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
 
     private var accountCollectorJob: Job? = null
-    private var transactionsCollectorJob: Job? = null
+    private var accountEntriesCollectorJob: Job? = null
 
-    private val accountCollectorScope = CoroutineScope(Dispatchers.Default)
-    private val transactionsCollectorScope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     init {
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             _state.value = OverviewUiState.empty()
 
             appStateRepository.state.collect {
@@ -63,13 +48,20 @@ class OverviewViewModel(
             }
         }
 
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             walletManagerRepository.state
                 .filterNotNull()
                 .collect { wallet ->
-                    println("OverviewViewModel is collecting account information from wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)}")
+                    println(
+                        "OverviewViewModel is collecting account information from wallet ${
+                            AttoAddress(
+                                AttoAlgorithm.V1,
+                                wallet.publicKey
+                            )
+                        }"
+                    )
                     accountCollectorJob?.cancel()
-                    accountCollectorJob = accountCollectorScope.launch {
+                    accountCollectorJob = scope.launch {
                         wallet.accountFlow.collect { account ->
                             println("Account $account")
                             val entries = accountEntryRepository.list(account.publicKey)
@@ -85,15 +77,13 @@ class OverviewViewModel(
                         }
                     }
 
-                    transactionsCollectorJob?.cancel()
-                    transactionsCollectorJob = transactionsCollectorScope.launch {
-                        wallet.accountEntryFlow.collect { entries ->
-//                            accountEntryRepository.save(entries)
-
+                    accountEntriesCollectorJob?.cancel()
+                    accountEntryRepository.clear()
+                    accountEntriesCollectorJob = scope.launch {
+                        accountEntryRepository.flow(wallet.publicKey).collect { _ ->
                             _state.emit(
                                 state.value.copy(
-                                    entries = (state.value.entries + entries)
-                                        .distinct()
+                                    entries = accountEntryRepository.list(wallet.publicKey)
                                 )
                             )
                         }
@@ -103,9 +93,11 @@ class OverviewViewModel(
     }
 
     private suspend fun clearAccountData() {
-        _state.emit(state.value.copy(
-            balance = null,
-            entries = emptyList()
-        ))
+        _state.emit(
+            state.value.copy(
+                balance = null,
+                entries = emptyList()
+            )
+        )
     }
 }

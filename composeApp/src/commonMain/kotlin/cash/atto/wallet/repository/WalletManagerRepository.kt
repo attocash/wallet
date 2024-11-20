@@ -6,9 +6,7 @@ import cash.atto.commons.AttoNetwork
 import cash.atto.commons.gatekeeper.AttoAuthenticator
 import cash.atto.commons.gatekeeper.attoBackend
 import cash.atto.commons.toSigner
-import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.commons.wallet.AttoNodeClient
-import cash.atto.commons.wallet.AttoTransactionRepository
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.commons.wallet.AttoWalletViewer
 import cash.atto.commons.wallet.AttoWorkCache
@@ -26,9 +24,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WalletManagerRepository(
-    private val appStateRepository: AppStateRepository
+    private val appStateRepository: AppStateRepository,
+    private val accountEntryRepository: AccountEntryRepository,
 ) {
-
     private val _state = MutableStateFlow<AttoWalletManager?>(null)
     val state = _state.asStateFlow()
 
@@ -40,8 +38,8 @@ class WalletManagerRepository(
             appStateRepository.state.collect {
                 try {
                     state.value?.close()
+                } catch (_: CancellationException) {
                 }
-                catch (_: CancellationException) {}
 
                 _state.emit(createWalletManager(it))
             }
@@ -51,8 +49,7 @@ class WalletManagerRepository(
     suspend fun changeRepresentative(representative: AttoAddress) {
         try {
             state.value?.change(representative)
-        }
-        catch (ex: Exception) {
+        } catch (ex: Exception) {
             println(ex.message)
         }
     }
@@ -70,8 +67,7 @@ class WalletManagerRepository(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,
-                accountEntryRepository = AttoAccountEntryRepository.inMemory(),
-                transactionRepository = AttoTransactionRepository.inMemory()
+                accountEntryRepository = accountEntryRepository,
             ),
             signer = signer,
             client = client,
