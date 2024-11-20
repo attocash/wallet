@@ -1,0 +1,48 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yaml
+
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract Version
+        id: get-version
+        run: |
+          VERSION=$(grep -oP 'packageVersion = "\K[0-9]+\.[0-9]+\.[0-9]+' composeApp/build.gradle.kts)
+          echo "Version found: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.version }}
+          name: Release ${{ env.version }}
+          body: |
+            Changelog for release ${{ env.version }}
+          draft: true
+          prerelease: false
+          files: |
+            release-artifacts/ubuntu/*.deb
+            release-artifacts/macos/*.dmg
+            release-artifacts/windows/*.msi
