@@ -1,9 +1,7 @@
 package cash.atto.wallet.di
 
-import cash.atto.commons.wallet.AttoAccountEntryRepository
-import cash.atto.commons.wallet.AttoTransactionRepository
-import cash.atto.commons.wallet.inMemory
 import cash.atto.wallet.interactor.CheckPasswordInteractor
+import cash.atto.wallet.repository.AccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.RepresentativeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
@@ -18,12 +16,15 @@ import cash.atto.wallet.viewmodel.RepresentativeViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -60,7 +61,7 @@ val repositoryModule = module {
     singleOf(::AppStateRepository)
     singleOf(::RepresentativeRepository)
     singleOf(::WalletManagerRepository)
-    single { AttoAccountEntryRepository.inMemory() }
+    singleOf(::AccountEntryRepository)
 }
 
 val interactorModule = module {

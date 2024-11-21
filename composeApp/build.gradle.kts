@@ -163,7 +163,7 @@ dependencies {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
-    if (name != "kspCommonMainKotlinMetadata" ) {
+    if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
     }
 }
@@ -173,9 +173,23 @@ compose.desktop {
         mainClass = "cash.atto.wallet.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "cash.atto.wallet"
+            targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg)
+            packageName = "AttoWallet"
             packageVersion = "1.0.0"
+
+            linux {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.png"))
+                shortcut = true
+            }
+
+            windows {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.ico"))
+                shortcut = true
+            }
+
+            macOS {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.png"))
+            }
         }
     }
 }

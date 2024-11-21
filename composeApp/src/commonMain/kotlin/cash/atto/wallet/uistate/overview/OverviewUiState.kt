@@ -21,6 +21,7 @@ data class OverviewUiState(
         get() = TransactionListUiState(
             transactions = entries
                 .filterNotNull()
+                .sortedByDescending { it.height }
                 .map {
                     when (it.blockType) {
                         AttoBlockType.SEND -> TransactionUiState(
@@ -30,6 +31,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
+                            timestamp = it.timestamp
                         )
 
                         AttoBlockType.RECEIVE -> TransactionUiState(
@@ -39,6 +41,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
+                            timestamp = it.timestamp
                         )
 
                         AttoBlockType.OPEN -> TransactionUiState(
@@ -48,6 +51,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
+                            timestamp = it.timestamp
                         )
 
                         AttoBlockType.CHANGE -> TransactionUiState(
@@ -57,6 +61,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
+                            timestamp = it.timestamp
                         )
 
                         else -> null

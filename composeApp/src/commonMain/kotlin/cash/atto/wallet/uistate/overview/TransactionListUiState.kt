@@ -6,6 +6,7 @@ import attowallet.composeapp.generated.resources.overview_hint_amount_from
 import attowallet.composeapp.generated.resources.overview_hint_amount_to
 import attowallet.composeapp.generated.resources.overview_hint_destination
 import attowallet.composeapp.generated.resources.overview_hint_source
+import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 
 data class TransactionListUiState(
@@ -23,12 +24,14 @@ data class TransactionListUiState(
             TransactionUiState(
                 type = TransactionType.SEND,
                 amount = stringResource(Res.string.overview_hint_amount_to),
-                source = stringResource(Res.string.overview_hint_destination)
+                source = stringResource(Res.string.overview_hint_destination),
+                timestamp = Clock.System.now()
             ),
             TransactionUiState(
                 type = TransactionType.RECEIVE,
                 amount = stringResource(Res.string.overview_hint_amount_from),
-                source = stringResource(Res.string.overview_hint_source)
+                source = stringResource(Res.string.overview_hint_source),
+                timestamp = Clock.System.now()
             ),
         )
     }

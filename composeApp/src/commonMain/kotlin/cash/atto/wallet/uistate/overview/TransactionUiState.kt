@@ -21,13 +21,15 @@ import attowallet.composeapp.generated.resources.overview_transaction_to
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.secondaryGradient
+import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 data class TransactionUiState(
     val type: TransactionType,
     val amount: String?,
-    val source: String
+    val source: String,
+    val timestamp : Instant,
 ) {
 
     var shownAmount = amount?.let { a ->
