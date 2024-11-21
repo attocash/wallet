@@ -13,6 +13,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
 
@@ -22,19 +23,13 @@ fun PermanentNavigationDrawer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Row(
-        modifier = modifier.fillMaxSize()
-            .background(color = MaterialTheme.colors.surface)
-    ) {
-        Surface(Modifier.width(280.dp)) {
+    Row(Modifier.fillMaxSize().then(modifier)) {
+        Surface(
+            modifier = Modifier.width(280.dp),
+            color = Color.Transparent
+        ) {
             drawerContent()
         }
-
-        Box(
-            modifier = Modifier.fillMaxHeight()
-                .width(4.dp)
-                .background(color = MaterialTheme.colors.background)
-        )
 
         Box { content() }
     }

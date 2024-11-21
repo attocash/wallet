@@ -30,7 +30,7 @@ private fun medium() = Font(Res.font.helvetica_neue_medium, FontWeight.W500)
 private fun semibold() = Font(Res.font.pp_mori_semibold, FontWeight.W600)
 
 @Composable
-private fun attoFontFamily() = FontFamily(fonts = listOf(
+fun attoFontFamily() = FontFamily(fonts = listOf(
     light(),
     regular(),
     medium(),

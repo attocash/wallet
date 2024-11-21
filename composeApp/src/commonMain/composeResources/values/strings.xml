@@ -11,6 +11,9 @@
     <string name="logout_text">Logging out will remove your keys and account information from your device. If your secret phrase is not backed up, you will never be able to access your funds again.</string>
     <string name="logout_title">WARNING</string>
 
+    <!-- main -->
+    <string name="main_title">Atto</string>
+
     <!-- desktop main navigation destinations -->
     <string name="main_nav_overview">Overview</string>
     <string name="main_nav_receive">Receive</string>

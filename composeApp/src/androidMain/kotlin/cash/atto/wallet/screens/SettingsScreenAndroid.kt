@@ -1,6 +1,7 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,19 +12,20 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.settings.LogoutDialog
-import cash.atto.wallet.components.settings.Profile
+import cash.atto.wallet.components.settings.ProfileSmall
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.BottomSheetShape
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.SettingsViewModel
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -84,15 +86,25 @@ fun SettingsAndroid(
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                Profile(
-                    modifier = Modifier.fillMaxWidth(),
+                ProfileSmall(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     uiState = uiState.profileUiState
                 )
 
-                SettingsList(
-                    modifier = Modifier.fillMaxWidth(),
-                    uiState = uiState.settingsListUiState
-                )
+                Box(modifier = Modifier.fillMaxWidth()
+                    .weight(1f)
+                    .padding(top = 6.dp)
+                    .clip(BottomSheetShape)
+                    .background(color = MaterialTheme.colors.secondaryVariant)
+                ) {
+                    SettingsList(
+                        modifier = Modifier.fillMaxWidth(),
+                        uiState = uiState.settingsListUiState,
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                    )
+                }
             }
 
             if (uiState.showLogoutDialog)

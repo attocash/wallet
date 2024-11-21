@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.overview.OverviewHeader
 import cash.atto.wallet.components.overview.TransactionsList
@@ -34,15 +36,11 @@ fun OverviewDesktop(
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
-            .background(color = MaterialTheme.colors.surface)
             .safeDrawingPadding()
+            .clip(RoundedCornerShape(50.dp))
+            .background(color = MaterialTheme.colors.surface)
             .padding(16.dp)
     ) {
-        OverviewHeader(
-            uiState = uiState.headerUiState,
-            modifier = Modifier.fillMaxWidth()
-        )
-
         TransactionsList(
             uiState = uiState.transactionListUiState,
             modifier = Modifier.weight(1f)

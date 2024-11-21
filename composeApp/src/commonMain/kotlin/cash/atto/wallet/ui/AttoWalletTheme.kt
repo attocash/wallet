@@ -30,6 +30,9 @@ val Colors.back: Color
 val Colors.divider: Color
     get() = gray_800
 
+val Colors.setting: Color
+    get() = ochre_600
+
 val Colors.primaryGradient: List<Color>
     get() = listOf(
         Color(0xffFFE249),

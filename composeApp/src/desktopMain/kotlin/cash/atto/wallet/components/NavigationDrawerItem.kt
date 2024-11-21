@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -18,59 +17,46 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.divider
+import cash.atto.wallet.ui.primaryGradient
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NavigationDrawerItem(
-    label: @Composable () -> Unit,
+    label: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val backgroundModifier = if (selected)
+        Modifier.background(color = MaterialTheme.colors.secondaryVariant)
+    else Modifier.background(
+        brush = Brush.horizontalGradient(MaterialTheme.colors.primaryGradient)
+    )
+
     Surface(
         selected = selected,
         onClick = onClick,
         modifier = modifier
             .semantics { role = Role.Tab }
             .height(48.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        contentColor = MaterialTheme.colors.primary
     ) {
-        Column {
-            Row(
-                modifier = Modifier.padding(end = 24.dp)
-                    .weight(1f),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxHeight()
-                        .width(4.dp)
-                        .background(
-                            color = if (selected)
-                                MaterialTheme.colors.primary
-                            else MaterialTheme.colors.surface
-                        )
-                )
-
-                Surface(
-                    modifier = Modifier.weight(1f)
-                        .padding(start = 16.dp),
-                    contentColor = if (selected)
-                        MaterialTheme.colors.primary
-                    else MaterialTheme.colors.onSurface
-                ) {
-                    label()
-                }
-            }
-
-            Divider(
-                modifier = Modifier.padding(start = 4.dp),
-                color = MaterialTheme.colors.divider
+        Box(Modifier.fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .then(backgroundModifier)
+            .padding(start = 16.dp, end = 24.dp)
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }
@@ -81,7 +67,7 @@ fun NavigationDrawerItem(
 fun NavigationDrawerItemPreview() {
     AttoWalletTheme {
         NavigationDrawerItem(
-            label = { Text("Destination") },
+            label = "Destination",
             selected = true,
             onClick = {}
         )

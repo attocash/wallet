@@ -18,6 +18,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -27,6 +29,7 @@ import attowallet.composeapp.generated.resources.overview_hint
 import attowallet.composeapp.generated.resources.overview_transactions_title
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoColors
+import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -54,23 +57,28 @@ fun TransactionsList(
                 text = stringResource(Res.string.overview_transactions_title),
                 modifier = Modifier.padding(start = 8.dp),
                 color = MaterialTheme.colors.onSurface,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h4
             )
         }
 
         if (uiState.showHint) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                backgroundColor = MaterialTheme.colors.primary
+            Box(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(color = MaterialTheme.colors.primary)
+                    .padding(horizontal = 12.dp)
             ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                        .background(color = MaterialTheme.colors.background)
-                        .padding(16.dp)
+                Box(Modifier.background(color = MaterialTheme.colors.surface)
+                    .background(brush = Brush.horizontalGradient(
+                        colors = MaterialTheme.colors
+                            .primaryGradient
+                            .map { it.copy(alpha = 0.2f) }
+                    ))
+                    .padding(16.dp)
                 ) {
                     Text(
                         text = stringResource(Res.string.overview_hint),
-                        color = MaterialTheme.colors.onBackground,
+                        color = MaterialTheme.colors.onSurface,
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.body2
                     )

@@ -13,11 +13,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.divider
+import cash.atto.wallet.ui.setting
 import cash.atto.wallet.uistate.settings.SettingItemUiState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -26,23 +28,26 @@ fun SettingItem(uiState: SettingItemUiState) {
     Column(
         modifier = Modifier.fillMaxWidth()
             .clickable { uiState.onClick.invoke() }
+            .padding(16.dp)
             .padding(horizontal = 16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = uiState.icon,
-                contentDescription = uiState.title
+                contentDescription = uiState.title,
+                tint = MaterialTheme.colors.setting
             )
 
             Column {
-                Text(uiState.title)
+                Text(
+                    text = uiState.title,
+                    style = MaterialTheme.typography.h6
+                )
             }
         }
-
-        Divider(color = MaterialTheme.colors.divider)
     }
 }
 

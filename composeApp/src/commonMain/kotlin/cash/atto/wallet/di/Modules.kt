@@ -11,6 +11,7 @@ import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
+import cash.atto.wallet.viewmodel.MainScreenViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.ReceiveViewModel
 import cash.atto.wallet.viewmodel.RepresentativeViewModel
@@ -73,6 +74,7 @@ val viewModelModule = module {
     viewModelOf(::BackupSecretViewModel)
     viewModelOf(::CreatePasswordViewModel)
     viewModelOf(::ImportSecretViewModel)
+    viewModelOf(::MainScreenViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::ReceiveViewModel)
     viewModelOf(::RepresentativeViewModel)

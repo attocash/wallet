@@ -1,6 +1,7 @@
 package cash.atto.wallet.components
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,33 +21,43 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_chevron_down
 import attowallet.composeapp.generated.resources.ic_chevron_up
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.divider
+import cash.atto.wallet.ui.primaryGradient
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun ExpandableDrawerItem(
-    label: @Composable () -> Unit,
+    label: String,
     content: @Composable () -> Unit
 ) {
     val drawerOpened = remember {
         mutableStateOf(false)
     }
 
-    Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxWidth()
+        .clip(MaterialTheme.shapes.medium)
+        .background(
+            brush = Brush.horizontalGradient(MaterialTheme.colors.primaryGradient)
+        )
+    ) {
         Row(
             modifier = Modifier.height(48.dp)
                 .padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
+            Text(
+                text = label,
                 modifier = Modifier.weight(1f)
-                    .padding(start = 20.dp)
-            ) { label() }
+                    .padding(start = 20.dp),
+                color = MaterialTheme.colors.primary
+            )
 
             Icon(
                 imageVector = if (drawerOpened.value)
@@ -59,11 +70,6 @@ fun ExpandableDrawerItem(
             )
         }
 
-        Divider(
-            modifier = Modifier.padding(start = 4.dp),
-            color = MaterialTheme.colors.divider
-        )
-
         if (drawerOpened.value)
             content()
     }
@@ -74,7 +80,7 @@ fun ExpandableDrawerItem(
 fun ExpandableDrawerItemPreview() {
     AttoWalletTheme {
         ExpandableDrawerItem(
-            label = { Text("Label") }
+            label = "Label"
         ) {
             Text("Content")
         }

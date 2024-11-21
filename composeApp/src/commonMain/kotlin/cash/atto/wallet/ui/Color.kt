@@ -24,6 +24,8 @@ val green_400 = Color(0xFF0EFD01)
 
 val lime_500 = Color(0xFF8CFD01)
 
+val ochre_600 = Color(0xFFDE8601)
+
 val red_500 = Color(0xFFFD010E)
 val red_900 = Color(0xFFC30000)
 

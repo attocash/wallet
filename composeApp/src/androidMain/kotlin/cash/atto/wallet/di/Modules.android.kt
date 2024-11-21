@@ -9,6 +9,7 @@ import cash.atto.wallet.datasource.RepresentativeDao
 import cash.atto.wallet.datasource.RepresentativeDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import kotlinx.coroutines.Dispatchers
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
