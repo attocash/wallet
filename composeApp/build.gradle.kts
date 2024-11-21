@@ -173,7 +173,7 @@ compose.desktop {
         mainClass = "cash.atto.wallet.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg)
+            targetFormats(TargetFormat.AppImage, TargetFormat.Msi, TargetFormat.Dmg)
             packageName = "AttoWallet"
             packageVersion = "1.0.0"
 
