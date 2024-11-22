@@ -2,6 +2,7 @@ package cash.atto.wallet.components
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,9 +24,13 @@ fun PermanentNavigationDrawer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Row(Modifier.fillMaxSize().then(modifier)) {
+    Row(
+        modifier = Modifier.fillMaxSize()
+            .then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
         Surface(
-            modifier = Modifier.width(280.dp),
+            modifier = Modifier.width(450.dp),
             color = Color.Transparent
         ) {
             drawerContent()

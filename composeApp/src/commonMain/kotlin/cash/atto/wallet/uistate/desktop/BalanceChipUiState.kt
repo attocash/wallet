@@ -6,6 +6,6 @@ data class BalanceChipUiState(
     val attoCoins: BigDecimal?
 ) {
     companion object {
-        val DEFAULT = BalanceChipUiState(BigDecimal.ZERO)
+        val DEFAULT = BalanceChipUiState(null)
     }
 }

@@ -18,11 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_background_desktop
+import attowallet.composeapp.generated.resources.ic_nav_overview
+import attowallet.composeapp.generated.resources.ic_nav_receive
+import attowallet.composeapp.generated.resources.ic_nav_send
 import attowallet.composeapp.generated.resources.main_nav_overview
 import attowallet.composeapp.generated.resources.main_nav_receive
 import attowallet.composeapp.generated.resources.main_nav_send
 import attowallet.composeapp.generated.resources.main_nav_settings
 import cash.atto.wallet.MainScreenNavDestination
+import cash.atto.wallet.components.BalanceChip
 import cash.atto.wallet.components.ExpandableDrawerItem
 import cash.atto.wallet.components.NavigationDrawerItem
 import cash.atto.wallet.components.PermanentNavigationDrawer
@@ -31,11 +35,13 @@ import cash.atto.wallet.components.settings.ProfileExtended
 import cash.atto.wallet.components.settings.ProfileSmall
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -45,6 +51,8 @@ fun MainScreenDesktop(
     onLogoutNavigation: () -> Unit
 ) {
     val viewModel = koinViewModel<MainScreenViewModel>()
+    val uiState = viewModel.state.collectAsState()
+
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val settingsUiState = settingsViewModel.state.collectAsState()
 
@@ -67,6 +75,7 @@ fun MainScreenDesktop(
     }
 
     MainScreenContent(
+        uiState = uiState.value,
         settingsUiState = settingsUiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
@@ -81,6 +90,7 @@ fun MainScreenDesktop(
 
 @Composable
 fun MainScreenContent(
+    uiState: MainScreenUiState,
     settingsUiState: SettingsUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
@@ -106,20 +116,28 @@ fun MainScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    BalanceChip(
+                        modifier = Modifier.fillMaxWidth(),
+                        uiState = uiState.balanceChipUiState
+                    )
+
                     NavigationDrawerItem(
                         label = stringResource(Res.string.main_nav_overview),
+                        icon = vectorResource(Res.drawable.ic_nav_overview),
                         selected = (navState == MainScreenNavDestination.OVERVIEW),
                         onClick = { onNavStateChanged.invoke(MainScreenNavDestination.OVERVIEW) }
                     )
 
                     NavigationDrawerItem(
                         label = stringResource(Res.string.main_nav_send),
+                        icon = vectorResource(Res.drawable.ic_nav_send),
                         selected = (navState == MainScreenNavDestination.SEND),
                         onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) }
                     )
 
                     NavigationDrawerItem(
                         label = stringResource(Res.string.main_nav_receive),
+                        icon = vectorResource(Res.drawable.ic_nav_receive),
                         selected = (navState == MainScreenNavDestination.RECEIVE),
                         onClick = { onNavStateChanged.invoke(MainScreenNavDestination.RECEIVE) }
                     )
@@ -159,6 +177,7 @@ fun MainScreenContent(
 fun MainScreenContentPreview() {
     AttoWalletTheme {
         MainScreenContent(
+            uiState = MainScreenUiState.DEFAULT,
             settingsUiState = SettingsUiState.PREVIEW,
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},

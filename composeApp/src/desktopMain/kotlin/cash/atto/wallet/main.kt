@@ -27,8 +27,8 @@ fun main() {
             title = "Atto Wallet",
         ) {
             window.minimumSize = Dimension(
-                1680,
-                1000
+                1344,
+                800
             )
 
             LifecycleController(
