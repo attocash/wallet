@@ -34,6 +34,7 @@ private val defaultRepresentatives = listOf(
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
     private val accountEntryRepository: AccountEntryRepository,
+    private val network: AttoNetwork,
 ) {
     private val _state = MutableStateFlow<AttoWalletManager?>(null)
     val state = _state.asStateFlow()
@@ -69,8 +70,8 @@ class WalletManagerRepository(
             return null
 
         val signer = appState.privateKey.toSigner()
-        val authenticator = AttoAuthenticator.attoBackend(AttoNetwork.DEV, signer)
-        val client = AttoNodeClient.attoBackend(AttoNetwork.DEV, authenticator)
+        val authenticator = AttoAuthenticator.attoBackend(network, signer)
+        val client = AttoNodeClient.attoBackend(network, authenticator)
         val walletManager = AttoWalletManager(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
