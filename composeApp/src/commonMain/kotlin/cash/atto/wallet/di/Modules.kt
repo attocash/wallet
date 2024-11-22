@@ -1,5 +1,6 @@
 package cash.atto.wallet.di
 
+import cash.atto.commons.AttoNetwork
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
@@ -57,6 +58,7 @@ expect val dataSourceModule: Module
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
+    single { AttoNetwork.LIVE }
     singleOf(::AppStateRepository)
     singleOf(::RepresentativeRepository)
     singleOf(::WalletManagerRepository)
