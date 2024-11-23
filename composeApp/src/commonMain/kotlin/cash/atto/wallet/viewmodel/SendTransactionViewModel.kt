@@ -1,21 +1,12 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
-import cash.atto.commons.toAddress
-import cash.atto.commons.wallet.AttoTransactionRepository
-import cash.atto.commons.wallet.AttoWalletManager
-import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.WalletManagerRepository
-import cash.atto.wallet.uistate.overview.OverviewHeaderUiState
-import cash.atto.wallet.uistate.send.SendConfirmUiState
-import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
-import cash.atto.wallet.uistate.settings.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +16,6 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class SendTransactionViewModel(
-    private val appStateRepository: AppStateRepository,
     private val walletManagerRepository: WalletManagerRepository,
 ) : ViewModel() {
 
@@ -39,12 +29,21 @@ class SendTransactionViewModel(
             walletManagerRepository.state
                 .filterNotNull()
                 .collect { wallet ->
-                    println("SendTransactionViewModel is collecting account information from wallet ${AttoAddress(AttoAlgorithm.V1, wallet.publicKey)}")
+                    println(
+                        "SendTransactionViewModel is collecting account information from wallet ${
+                            AttoAddress(
+                                AttoAlgorithm.V1,
+                                wallet.publicKey
+                            )
+                        }"
+                    )
                     wallet.accountFlow.collect { account ->
                         println("Account $account")
-                        _state.emit(state.value.copy(
-                            account = account
-                        ))
+                        _state.emit(
+                            state.value.copy(
+                                account = account
+                            )
+                        )
                     }
                 }
         }
@@ -54,10 +53,12 @@ class SendTransactionViewModel(
         amount: BigDecimal?,
         address: String?
     ) {
-        _state.emit(state.value.copy(
-            amount = amount,
-            address = address
-        ))
+        _state.emit(
+            state.value.copy(
+                amount = amount,
+                address = address
+            )
+        )
     }
 
     suspend fun send(): Boolean {
@@ -78,19 +79,22 @@ class SendTransactionViewModel(
                             .toString()
                     )
                 )
-        }
-        catch (ex: Exception) {
+        } catch (ex: Exception) {
             println(ex.message)
-            _state.emit(state.value.copy(
-                operationResult = SendTransactionUiState.SendOperationResult.FAILURE
-            ))
+            _state.emit(
+                state.value.copy(
+                    operationResult = SendTransactionUiState.SendOperationResult.FAILURE
+                )
+            )
 
             return false
         }
 
-        _state.emit(state.value.copy(
-            operationResult = SendTransactionUiState.SendOperationResult.SUCCESS
-        ))
+        _state.emit(
+            state.value.copy(
+                operationResult = SendTransactionUiState.SendOperationResult.SUCCESS
+            )
+        )
 
         return true
     }
@@ -116,23 +120,29 @@ class SendTransactionViewModel(
                 .orEmpty()
         )
 
-        _state.emit(state.value.copy(
-            showAmountError = !amountCheckResult,
-            showAddressError = !addressCheckResult
-        ))
+        _state.emit(
+            state.value.copy(
+                showAmountError = !amountCheckResult,
+                showAddressError = !addressCheckResult
+            )
+        )
 
         return amountCheckResult && addressCheckResult
     }
 
     suspend fun showLoader() {
-        _state.emit(state.value.copy(
-            showLoader = true
-        ))
+        _state.emit(
+            state.value.copy(
+                showLoader = true
+            )
+        )
     }
 
     suspend fun hideLoader() {
-        _state.emit(state.value.copy(
-            showLoader = false
-        ))
+        _state.emit(
+            state.value.copy(
+                showLoader = false
+            )
+        )
     }
 }
