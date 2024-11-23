@@ -70,6 +70,7 @@ fun TransactionItem(uiState: TransactionUiState) {
             Box(Modifier.weight(0.43f)) {
                 Text(
                     text = uiState.source,
+                    modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.onSurface.copy(alpha = 0.44f),
                     textAlign = TextAlign.End,
                     overflow = TextOverflow.Ellipsis,

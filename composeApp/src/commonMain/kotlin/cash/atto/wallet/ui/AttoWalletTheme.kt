@@ -47,6 +47,13 @@ val Colors.secondaryGradient: List<Color>
         Color(0xffFC8704)
     )
 
+val Colors.errorGradient: List<Color>
+    get() = listOf(
+        Color(0xffDA0004),
+        Color(0xffFF0004),
+        Color(0xffDA0004)
+    )
+
 val attoShapes = Shapes(
     small = RoundedCornerShape(24.dp),
     medium = RoundedCornerShape(20.dp),

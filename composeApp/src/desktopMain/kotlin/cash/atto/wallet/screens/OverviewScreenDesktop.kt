@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.overview.OverviewHeader
 import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.uistate.overview.OverviewUiState
@@ -43,7 +44,8 @@ fun OverviewDesktop(
     ) {
         TransactionsList(
             uiState = uiState.transactionListUiState,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            titleSize = 24.sp
         )
     }
 }

@@ -70,7 +70,8 @@ fun NavigationDrawerItem(
                 .clip(MaterialTheme.shapes.medium)
                 .then(backgroundModifier)
                 .padding(vertical = 24.dp, horizontal = 32.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
@@ -80,6 +81,7 @@ fun NavigationDrawerItem(
 
             Text(
                 text = label,
+                color = MaterialTheme.colors.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W300,
                 fontFamily = attoFontFamily()

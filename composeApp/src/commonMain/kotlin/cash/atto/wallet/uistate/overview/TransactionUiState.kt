@@ -19,6 +19,7 @@ import attowallet.composeapp.generated.resources.overview_hint_type_to
 import attowallet.composeapp.generated.resources.overview_transaction_from
 import attowallet.composeapp.generated.resources.overview_transaction_to
 import cash.atto.wallet.ui.AttoFormatter
+import cash.atto.wallet.ui.errorGradient
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.secondaryGradient
 import kotlinx.datetime.Instant
@@ -76,7 +77,8 @@ data class TransactionUiState(
         get() {
             val colors = when (type) {
                 TransactionType.SEND -> MaterialTheme.colors.primaryGradient
-                else -> MaterialTheme.colors.secondaryGradient
+                TransactionType.RECEIVE -> MaterialTheme.colors.secondaryGradient
+                else -> MaterialTheme.colors.errorGradient
             }
 
             return Brush.horizontalGradient(
@@ -89,11 +91,12 @@ data class TransactionUiState(
         get() {
             val colors = when (type) {
                 TransactionType.SEND -> MaterialTheme.colors.primaryGradient
-                else -> MaterialTheme.colors.secondaryGradient
+                TransactionType.RECEIVE -> MaterialTheme.colors.secondaryGradient
+                else -> MaterialTheme.colors.errorGradient
             }
 
             return Brush.horizontalGradient(
-                colors.map { it.copy(alpha = 0.7f) }
+                colors.map { it.copy(alpha = 0.45f) }
             )
         }
 }

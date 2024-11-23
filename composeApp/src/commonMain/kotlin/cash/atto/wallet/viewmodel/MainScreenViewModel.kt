@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,7 @@ class MainScreenViewModel(
     val state = _state.asStateFlow()
 
     private var accountCollectorJob: Job? = null
+    private var settingsCollectorJob: Job? = null
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -50,7 +52,21 @@ class MainScreenViewModel(
                     }
                 }
         }
+
+        settingsCollectorJob?.cancel()
+        settingsCollectorJob = scope.launch {
+            settingsViewModel.state.collect {
+                _state.emit(state.value.copy(
+                    settingsUiState = it
+                ))
+            }
+        }
     }
+
+    fun handleBackupNavigation() = settingsViewModel.handleBackupNavigation()
+    fun handleRepresentativeNavigation() = settingsViewModel.handleRepresentativeNavigation()
+    fun hideLogoutDialog() = settingsViewModel.hideLogoutDialog()
+    fun logout() = settingsViewModel.logout()
 
     private suspend fun handleAccount(account: AttoAccount) {
         println("Account $account")

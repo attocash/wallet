@@ -36,7 +36,6 @@ import cash.atto.wallet.components.settings.ProfileSmall
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
-import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
 import org.jetbrains.compose.resources.painterResource
@@ -53,19 +52,16 @@ fun MainScreenDesktop(
     val viewModel = koinViewModel<MainScreenViewModel>()
     val uiState = viewModel.state.collectAsState()
 
-    val settingsViewModel = koinViewModel<SettingsViewModel>()
-    val settingsUiState = settingsViewModel.state.collectAsState()
-
-    LaunchedEffect(settingsUiState.value.navigateToBackup) {
-        if (settingsUiState.value.navigateToBackup) {
-            settingsViewModel.handleBackupNavigation()
+    LaunchedEffect(uiState.value.navigateToBackup) {
+        if (uiState.value.navigateToBackup) {
+            viewModel.handleBackupNavigation()
             onBackupSecretNavigation.invoke()
         }
     }
 
-    LaunchedEffect(settingsUiState.value.navigateToRepresentative) {
-        if (settingsUiState.value.navigateToRepresentative) {
-            settingsViewModel.handleRepresentativeNavigation()
+    LaunchedEffect(uiState.value.navigateToRepresentative) {
+        if (uiState.value.navigateToRepresentative) {
+            viewModel.handleRepresentativeNavigation()
             onRepresentativeNavigation.invoke()
         }
     }
@@ -76,13 +72,12 @@ fun MainScreenDesktop(
 
     MainScreenContent(
         uiState = uiState.value,
-        settingsUiState = settingsUiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
-        onDismissLogout = { settingsViewModel.hideLogoutDialog() },
+        onDismissLogout = { viewModel.hideLogoutDialog() },
         onConfirmLogout = {
-            settingsViewModel.logout()
-            settingsViewModel.hideLogoutDialog()
+            viewModel.logout()
+            viewModel.hideLogoutDialog()
             onLogoutNavigation()
         }
     )
@@ -91,18 +86,21 @@ fun MainScreenDesktop(
 @Composable
 fun MainScreenContent(
     uiState: MainScreenUiState,
-    settingsUiState: SettingsUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
-    Column(Modifier.fillMaxSize()
-        .paint(
-            painter = painterResource(Res.drawable.atto_background_desktop),
-            contentScale = ContentScale.FillBounds
-        )
-        .padding(vertical = 12.dp, horizontal = 16.dp)
+    val settingsUiState = uiState.settingsUiState
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .paint(
+                painter = painterResource(Res.drawable.atto_background_desktop),
+                contentScale = ContentScale.FillBounds
+            )
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         ProfileExtended(
             modifier = Modifier.fillMaxWidth(),
@@ -166,7 +164,7 @@ fun MainScreenContent(
         }
     }
 
-    if (settingsUiState.showLogoutDialog)
+    if (uiState.showLogoutDialog)
         LogoutDialog(
             onDismiss = onDismissLogout,
             onConfirm = onConfirmLogout
@@ -178,7 +176,6 @@ fun MainScreenContentPreview() {
     AttoWalletTheme {
         MainScreenContent(
             uiState = MainScreenUiState.DEFAULT,
-            settingsUiState = SettingsUiState.PREVIEW,
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},
             onDismissLogout = {},
