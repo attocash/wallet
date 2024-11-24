@@ -59,7 +59,7 @@ expect val dataSourceModule: Module
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
-    single { AttoNetwork.LIVE }
+    single { AttoNetwork.DEV }
     singleOf(::AppStateRepository)
     singleOf(::RepresentativeRepository)
     singleOf(::WalletManagerRepository)

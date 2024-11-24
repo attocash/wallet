@@ -18,6 +18,9 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,11 +83,23 @@ fun ReceiveAttoBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReceiveAttoContent(
     address: String,
+    onCopy: () -> Unit
+) {
+    val windowSizeClass = calculateWindowSizeClass()
+
+    if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact)
+        ReceiveAttoContentCompact(address, onCopy)
+    else ReceiveAttoContentExtended(address, onCopy)
+}
+
+@Composable
+fun ReceiveAttoContentCompact(
+    address: String,
     onCopy: () -> Unit,
-    qrCodeSize: Dp = 200.dp
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -108,7 +123,7 @@ fun ReceiveAttoContent(
             style = MaterialTheme.typography.subtitle1
         )
 
-        Box(Modifier.height(qrCodeSize)) {
+        Box(Modifier.height(200.dp)) {
             Text(
                 text = displayAddress,
                 modifier = Modifier
@@ -166,11 +181,90 @@ fun ReceiveAttoContent(
     }
 }
 
+@Composable
+fun ReceiveAttoContentExtended(
+    address: String,
+    onCopy: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val displayAddress = address.substring(0, address.length / 2) +
+                "\n" +
+                address.substring(address.length / 2, address.length)
+
+        Text(
+            text = stringResource(Res.string.overview_receive_address),
+            color = MaterialTheme.colors
+                .onSurface
+                .copy(alpha = 0.55f),
+            style = MaterialTheme.typography.h6
+        )
+
+        Text(
+            text = displayAddress,
+            style = MaterialTheme.typography.h5
+        )
+
+        Box(Modifier.height(300.dp)) {
+            QRCodeImage(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(MaterialTheme.colors.surface)
+                    .padding(24.dp),
+                url = address,
+                contentDescription = "QR"
+            )
+        }
+
+
+        Button(
+            onClick = onCopy,
+            modifier = Modifier.fillMaxWidth(0.7f),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondaryVariant,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            contentPadding = PaddingValues(19.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_copy),
+                    contentDescription = "Copy icon"
+                )
+
+                Text(text = stringResource(Res.string.overview_receive_copy))
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
-fun ReceiveAttoContentPreview() {
+fun ReceiveAttoContentCompactPreview() {
     AttoWalletTheme {
-        ReceiveAttoContent(
+        ReceiveAttoContentCompact(
+            address = "address",
+            onCopy = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ReceiveAttoContentExtendedPreview() {
+    AttoWalletTheme {
+        ReceiveAttoContentExtended(
             address = "address",
             onCopy = {}
         )

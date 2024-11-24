@@ -32,6 +32,7 @@ import cash.atto.wallet.components.common.OutlinedTextCard
 import cash.atto.wallet.components.common.TextCard
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.success
 import cash.atto.wallet.uistate.send.SendResultUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -84,23 +85,23 @@ fun SendResult(
                     modifier = Modifier
                         .height(96.dp)
                         .width(96.dp),
-                    tint = MaterialTheme.colors.secondary
+                    tint = MaterialTheme.colors.success
                 )
 
                 OutlinedTextCard(
                     text = AttoFormatter.format(uiState.amount),
-                    color = MaterialTheme.colors.secondary
+                    color = MaterialTheme.colors.success
                 )
 
                 Text(
                     text = stringResource(Res.string.send_success_to),
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colors.success,
                     style = MaterialTheme.typography.h5
                 )
 
                 OutlinedTextCard(
                     text = uiState.address.orEmpty(),
-                    color = MaterialTheme.colors.secondary
+                    color = MaterialTheme.colors.success
                 )
             }
 
