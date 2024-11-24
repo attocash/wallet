@@ -83,11 +83,11 @@ fun WelcomeScreen(
         Box(Modifier.padding(top = 18.dp)
             .weight(1f)
         ) {
-            Image(
-                bitmap = imageResource(Res.drawable.atto_welcome_cubes),
-                contentDescription = "Atto Wallet",
-                modifier = Modifier.align(Alignment.TopCenter),
-            )
+//            Image(
+//                bitmap = imageResource(Res.drawable.atto_welcome_cubes),
+//                contentDescription = "Atto Wallet",
+//                modifier = Modifier.align(Alignment.TopCenter),
+//            )
 
             Column(
                 modifier = Modifier
