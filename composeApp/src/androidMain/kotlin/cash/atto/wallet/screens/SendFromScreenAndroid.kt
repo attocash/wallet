@@ -91,7 +91,7 @@ fun SendFromScreenAndroid(
         onAddressChanged = { address ->
             coroutineScope.launch {
                 viewModel.updateSendInfo(
-                    amount = uiState.value.sendFromUiState.amount,
+                    amount = uiState.value.sendFromUiState.amountString,
                     address = address
                 )
             }
@@ -106,7 +106,7 @@ fun SendFromAndroid(
     uiState: SendFromUiState,
     onBackNavigation: () -> Unit,
     onSendClicked: () -> Unit,
-    onAmountChanged: (BigDecimal?) -> Unit,
+    onAmountChanged: (String?) -> Unit,
     onAddressChanged: (String?) -> Unit
 ) {
     val context = LocalContext.current
@@ -170,7 +170,7 @@ fun SendFromAndroidContent(
     uiState: SendFromUiState,
     onSendClicked: () -> Unit,
     onScanClicked: () -> Unit,
-    onAmountChanged: (BigDecimal?) -> Unit,
+    onAmountChanged: (String?) -> Unit,
     onAddressChanged: (String?) -> Unit
 ) {
     Column(
@@ -198,10 +198,8 @@ fun SendFromAndroidContent(
         )
 
         TextField(
-            value = uiState.amount?.toString().orEmpty(),
-            onValueChange = {
-                onAmountChanged.invoke(it.toBigDecimalOrNull())
-            },
+            value = uiState.amountString.orEmpty(),
+            onValueChange = onAmountChanged,
             placeholder = {
                 Text(text = stringResource(Res.string.send_from_amount_hint))
             },

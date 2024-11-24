@@ -8,6 +8,7 @@ import java.math.BigDecimal
 
 data class SendTransactionUiState(
     private val account: AttoAccount?,
+    private val amountString: String?,
     private val amount: BigDecimal?,
     private val address: String?,
     private val operationResult: SendOperationResult,
@@ -24,7 +25,7 @@ data class SendTransactionUiState(
             accountBalance = it.balance
                 .toString(AttoUnit.ATTO)
                 .toBigDecimal(),
-            amount = amount,
+            amountString = amountString,
             address = address,
             showAmountError = showAmountError,
             showAddressError = showAddressError,
@@ -51,6 +52,7 @@ data class SendTransactionUiState(
     companion object {
         val DEFAULT = SendTransactionUiState(
             account = null,
+            amountString = null,
             amount = null,
             address = null,
             operationResult = SendOperationResult.UNKNOWN

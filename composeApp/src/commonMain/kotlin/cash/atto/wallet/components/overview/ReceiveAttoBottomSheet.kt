@@ -1,6 +1,5 @@
 package cash.atto.wallet.components.overview
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_copy
@@ -34,14 +32,13 @@ import attowallet.composeapp.generated.resources.ic_share
 import attowallet.composeapp.generated.resources.overview_receive_address
 import attowallet.composeapp.generated.resources.overview_receive_copy
 import attowallet.composeapp.generated.resources.overview_receive_share
-import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.BottomSheet
-import cash.atto.wallet.components.common.BottomSheetStud
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import qrgenerator.QRCodeImage
+import java.nio.charset.Charset
 
 @Composable
 fun ReceiveAttoBottomSheet(
@@ -209,13 +206,20 @@ fun ReceiveAttoContentExtended(
         )
 
         Box(Modifier.height(300.dp)) {
+
+            try {
+                val charset: Charset = Charset.forName("EUC_JP") // EUC_JP is supported
+            }
+            catch (ex:Exception) {
+                return@Box
+            }
             QRCodeImage(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(50.dp))
                     .background(MaterialTheme.colors.surface)
                     .padding(24.dp),
-                url = address,
+                url = String(address.toByteArray(Charsets.UTF_8)),
                 contentDescription = "QR"
             )
         }

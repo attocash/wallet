@@ -50,12 +50,12 @@ class SendTransactionViewModel(
     }
 
     suspend fun updateSendInfo(
-        amount: BigDecimal?,
+        amount: String?,
         address: String?
     ) {
         _state.emit(
             state.value.copy(
-                amount = amount,
+                amountString = amount,
                 address = address
             )
         )
@@ -102,6 +102,7 @@ class SendTransactionViewModel(
     suspend fun clearTransactionData() = _state.emit(
         state.value.copy(
             amount = null,
+            amountString = null,
             address = null,
             showAmountError = false,
             showAddressError = false
@@ -109,9 +110,12 @@ class SendTransactionViewModel(
     )
 
     suspend fun checkTransactionData(): Boolean {
-        val amountCheckResult = state.value
+        val amount = state.value
             .sendFromUiState
-            .amount != null
+            .amountString
+            ?.toBigDecimalOrNull()
+
+        val amountCheckResult = amount != null
 
         val addressCheckResult = AttoAddress.isValid(
             state.value
@@ -122,6 +126,7 @@ class SendTransactionViewModel(
 
         _state.emit(
             state.value.copy(
+                amount = amount,
                 showAmountError = !amountCheckResult,
                 showAddressError = !addressCheckResult
             )

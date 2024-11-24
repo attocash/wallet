@@ -81,7 +81,7 @@
     <string name="send_confirm_sending">SENDING</string>
     <string name="send_confirm_to">TO</string>
     <string name="send_error_address">Enter a valid Atto address</string>
-    <string name="send_error_amount">Specify an amount</string>
+    <string name="send_error_amount">Specify a valid amount of Atto</string>
     <string name="send_failure_title">WE COULDN'T SEND</string>
     <string name="send_failure_to">TO</string>
     <string name="send_from_address_hint">Enter Address</string>
