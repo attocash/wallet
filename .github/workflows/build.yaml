@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ubuntu
+          name: linux
           path: composeApp/build/compose/binaries/main/deb/*-Debian.deb
 
   build-macos:
