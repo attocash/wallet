@@ -77,8 +77,8 @@ jobs:
 
       - name: Rename binary with platform suffix
         run: |
-          file=$(ls composeApp/build/compose/binaries/main/msi/*.msi)
-          mv "$file" "${file%.msi}-Windows.msi"
+          $file = Get-ChildItem -Path composeApp/build/compose/binaries/main/msi/*.msi | Select-Object -First 1
+          Rename-Item -Path $file.FullName -NewName ($file.BaseName + "-Windows" + $file.Extension)
 
       - uses: actions/upload-artifact@v4
         with:
