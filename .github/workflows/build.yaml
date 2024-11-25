@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  build-ubuntu:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +21,15 @@ jobs:
 
       - run: ./gradlew packageDeb
 
+      - name: Rename binary with platform suffix
+        run: |
+          file=$(ls composeApp/build/compose/binaries/main/deb/*.deb)
+          mv "$file" "${file%.deb}-Debian.deb"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ubuntu
-          path: composeApp/build/compose/binaries/main/deb/*.deb
+          path: composeApp/build/compose/binaries/main/deb/*-Debian.deb
 
   build-macos:
     runs-on: macos-latest
@@ -43,10 +48,15 @@ jobs:
 
       - run: ./gradlew packageDmg
 
+      - name: Rename binary with platform suffix
+        run: |
+          file=$(ls composeApp/build/compose/binaries/main/dmg/*.dmg)
+          mv "$file" "${file%.dmg}-MacOS.dmg"
+
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: composeApp/build/compose/binaries/main/dmg/*.dmg
+          path: composeApp/build/compose/binaries/main/dmg/*-MacOS.dmg
 
   build-windows:
     runs-on: windows-latest
@@ -65,7 +75,12 @@ jobs:
 
       - run: ./gradlew packageMsi
 
+      - name: Rename binary with platform suffix
+        run: |
+          file=$(ls composeApp/build/compose/binaries/main/msi/*.msi)
+          mv "$file" "${file%.msi}-Windows.msi"
+
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: composeApp/build\compose\binaries\main\msi\*.msi
+          path: composeApp/build/compose/binaries/main/msi/*-Windows.msi
