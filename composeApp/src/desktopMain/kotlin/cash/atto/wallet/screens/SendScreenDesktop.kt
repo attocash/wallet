@@ -35,10 +35,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_button
@@ -51,6 +53,7 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
@@ -126,8 +129,7 @@ fun SendDesktop(
     onResultClosed: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         color = Color.Transparent
     ) {
         if (navState == SendScreenState.SEND && uiState.sendFromUiState.showLoader)
@@ -181,23 +183,27 @@ fun SendFromDesktop(
 
     Column(
         modifier = Modifier.clip(RoundedCornerShape(50.dp))
-//            .background(color = MaterialTheme.colors.surface)
+            .background(color = MaterialTheme.colors.surface)
             .padding(vertical = 48.dp, horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(Res.string.send_from_title),
-            color = MaterialTheme.colors
-                .onSurface
-                .copy(alpha = 0.55f),
-            style = MaterialTheme.typography.h6
+            color = MaterialTheme.colors.onSurface,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.W400,
+            fontFamily = attoFontFamily()
         )
 
         uiState.accountName?.let {
+            Spacer(Modifier.height(24.dp))
+
             Text(
                 text = it,
-                style = MaterialTheme.typography.h5
+                fontSize = 34.sp,
+                fontWeight = FontWeight.W400,
+                fontFamily = attoFontFamily()
             )
         }
 
@@ -209,16 +215,24 @@ fun SendFromDesktop(
             Text(
                 text = displayAddress,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h5
+                color = MaterialTheme.colors
+                    .onSurface
+                    .copy(alpha = 0.55f),
+                style = MaterialTheme.typography.h6
             )
         }
+
+        Spacer(Modifier.height(1.dp))
 
         Text(
             text = "(${AttoFormatter.format(
                 uiState.accountBalance
             )})",
-            style = MaterialTheme.typography.h5
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h4
         )
+
+        Spacer(Modifier.height(24.dp))
 
         TextField(
             value = uiState.amountString.orEmpty(),
@@ -289,11 +303,11 @@ fun SendFromDesktop(
             )
         }
 
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(24.dp))
 
         AttoButton(
             onClick = onSendClicked,
-            modifier = Modifier.fillMaxWidth(0.7f)
+            modifier = Modifier.fillMaxWidth(0.4f)
         ) {
             Text(text = stringResource(Res.string.send_button))
         }

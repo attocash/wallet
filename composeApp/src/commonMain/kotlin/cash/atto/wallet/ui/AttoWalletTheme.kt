@@ -14,7 +14,7 @@ val attoColors = lightColors(
 //    primaryVariant = brown_600,
     secondary = gold_900,
     secondaryVariant = gold_100,
-    background = Color.White,
+    background = Color.Black,
     surface = Color.White,
     error = red_900,
     onPrimary = gray_800,
@@ -34,7 +34,7 @@ val Colors.setting: Color
     get() = ochre_600
 
 val Colors.success: Color
-    get() = green_400
+    get() = green_700
 
 val Colors.primaryGradient: List<Color>
     get() = listOf(

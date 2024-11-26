@@ -28,6 +28,7 @@ import attowallet.composeapp.generated.resources.send_failure_title
 import attowallet.composeapp.generated.resources.send_failure_to
 import attowallet.composeapp.generated.resources.send_success_to
 import cash.atto.wallet.components.common.AttoOutlinedButton
+import cash.atto.wallet.components.common.AttoOutlinedTextCard
 import cash.atto.wallet.components.common.OutlinedTextCard
 import cash.atto.wallet.components.common.TextCard
 import cash.atto.wallet.ui.AttoFormatter
@@ -88,7 +89,7 @@ fun SendResult(
                     tint = MaterialTheme.colors.success
                 )
 
-                OutlinedTextCard(
+                AttoOutlinedTextCard(
                     text = AttoFormatter.format(uiState.amount),
                     color = MaterialTheme.colors.success
                 )
@@ -99,7 +100,7 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                OutlinedTextCard(
+                AttoOutlinedTextCard(
                     text = uiState.address.orEmpty(),
                     color = MaterialTheme.colors.success
                 )
@@ -121,7 +122,7 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                OutlinedTextCard(
+                AttoOutlinedTextCard(
                     text = AttoFormatter.format(uiState.amount),
                     color = MaterialTheme.colors.error
                 )
@@ -132,7 +133,7 @@ fun SendResult(
                     style = MaterialTheme.typography.h5
                 )
 
-                OutlinedTextCard(
+                AttoOutlinedTextCard(
                     text = uiState.address.orEmpty(),
                     color = MaterialTheme.colors.error
                 )
@@ -147,7 +148,7 @@ fun SendResult(
             onClick = onClose,
             modifier = Modifier.fillMaxWidth(),
             color = if (uiState.result == SendTransactionUiState.SendOperationResult.SUCCESS)
-                MaterialTheme.colors.secondary
+                MaterialTheme.colors.success
             else MaterialTheme.colors.error
         ) {
             Text(text = stringResource(Res.string.send_close))

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -26,10 +25,10 @@ import attowallet.composeapp.generated.resources.send_confirm_cancel
 import attowallet.composeapp.generated.resources.send_confirm_sending
 import attowallet.composeapp.generated.resources.send_confirm_to
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.components.common.AttoOutlinedButton
-import cash.atto.wallet.components.common.TextCard
-import cash.atto.wallet.di.AppScope
+import cash.atto.wallet.components.common.AttoOutlinedTextCard
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
@@ -37,8 +36,6 @@ import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinContext
-import org.koin.compose.getKoin
 import org.koin.compose.viewmodel.koinViewModel
 import java.math.BigDecimal
 
@@ -110,34 +107,34 @@ fun SendConfirmContent(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(Res.string.send_confirm_sending),
-            color = MaterialTheme.colors.primary,
+            color = MaterialTheme.colors.onSurface,
             style = MaterialTheme.typography.h5
         )
 
-        TextCard(
+        AttoOutlinedTextCard(
             text = AttoFormatter.format(uiState.amount),
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colors.background
         )
 
         Text(
             text = stringResource(Res.string.send_confirm_to),
-            color = MaterialTheme.colors.primary,
+            color = MaterialTheme.colors.onSurface,
             style = MaterialTheme.typography.h5
         )
 
-        TextCard(
+        AttoOutlinedTextCard(
             text = uiState.address.orEmpty(),
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colors.background
         )
 
         Spacer(Modifier.weight(1f))
 
-        Button(
+        AttoButton(
             onClick = onConfirm,
             modifier = Modifier.fillMaxWidth()
         ) {
