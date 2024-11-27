@@ -58,7 +58,7 @@
     <string name="representative_close">Close</string>
     <string name="representative_error_address">Enter a valid Atto address</string>
     <string name="representative_subtitle">Currently Represented By</string>
-    <string name="representative_title">REPRESENTATIVE</string>
+    <string name="representative_title">Representative</string>
 
     <!-- safety warning -->
     <string name="safety_warning_confirm">Got It!</string>
