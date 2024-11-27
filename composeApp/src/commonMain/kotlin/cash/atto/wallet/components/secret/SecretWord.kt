@@ -47,13 +47,11 @@ fun SecretWordExpanded(
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "${ordinal})",
-            fontSize = 18.sp
+            text = "${ordinal})"
         )
         Text(
             text = if (hidden) "******" else word,
-            modifier = Modifier.padding(start = 4.dp),
-            fontSize = 18.sp
+            modifier = Modifier.padding(start = 4.dp)
         )
     }
 }

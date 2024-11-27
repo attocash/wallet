@@ -177,6 +177,7 @@ fun BackupSecretPhraseExtended(
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
+                        .fillMaxWidth(0.7f)
                         .align(Alignment.Center)
                         .clip(RoundedCornerShape(50.dp))
                         .background(color = MaterialTheme.colors.surface)

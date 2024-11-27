@@ -39,9 +39,8 @@ fun SecretPhraseGridExpanded(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(6),
-        modifier = Modifier.fillMaxWidth(0.7f),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(
             words
