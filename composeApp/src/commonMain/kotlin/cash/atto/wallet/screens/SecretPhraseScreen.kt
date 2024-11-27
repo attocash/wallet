@@ -5,11 +5,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -20,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -29,13 +25,12 @@ import attowallet.composeapp.generated.resources.secret_copy
 import attowallet.composeapp.generated.resources.secret_title
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoOutlinedButton
-import cash.atto.wallet.components.secret.SecretPhraseGrid
+import cash.atto.wallet.components.secret.SecretPhraseGridCompact
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -88,8 +83,7 @@ fun SecretPhrase(
                     Text(text = stringResource(Res.string.secret_title))
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        SecretPhraseGrid(
-                            columns = 3,
+                        SecretPhraseGridCompact(
                             words = uiState.words,
                             hidden = uiState.hidden
                         )
