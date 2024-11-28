@@ -3,12 +3,10 @@ package cash.atto.wallet.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
@@ -41,7 +39,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.atto_background_desktop
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.password_create_next
 import attowallet.composeapp.generated.resources.secret_import_hint
@@ -49,6 +46,7 @@ import attowallet.composeapp.generated.resources.secret_import_title
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOnboardingContainer
+import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
@@ -219,36 +217,23 @@ fun ImportSecretExpanded(
                         modifier = Modifier.padding(top = 25.dp)
                     )
 
-                    TextField(
+                    AttoTextField(
                         value = uiState.input.orEmpty(),
                         onValueChange = {
                             onInputChanged.invoke(it)
                         },
                         modifier = Modifier.fillMaxWidth()
-                            .padding(top = 12.dp)
-                            .onPreviewKeyEvent {
-                                if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
-                                    onDoneClicked.invoke()
-
-                                    return@onPreviewKeyEvent true
-                                }
-
-                                return@onPreviewKeyEvent false
-                            },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(
-                            onDone = { onDoneClicked.invoke() }
-                        )
+                            .padding(top = 12.dp),
+                        onDone = { onDoneClicked.invoke() },
+                        isError = !uiState.inputValid,
+                        errorLabel = {
+                            Text(
+                                text = uiState.errorMessage.orEmpty(),
+                                color = MaterialTheme.colors.error,
+                                style = MaterialTheme.typography.caption
+                            )
+                        }
                     )
-
-                    if (!uiState.inputValid) {
-                        Text(
-                            text = uiState.errorMessage.orEmpty(),
-                            modifier = Modifier.padding(top = 4.dp),
-                            color = MaterialTheme.colors.error,
-                            style = MaterialTheme.typography.caption
-                        )
-                    }
 
                     AttoButton(
                         onClick = onDoneClicked,
