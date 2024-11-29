@@ -14,15 +14,19 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.backup_confirm_no
 import attowallet.composeapp.generated.resources.backup_confirm_subtitle
 import attowallet.composeapp.generated.resources.backup_confirm_title
 import attowallet.composeapp.generated.resources.backup_confirm_yes
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -38,43 +42,51 @@ fun SecretBackupConfirmScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
                     .padding(bottom = WindowInsets.systemBars
                         .asPaddingValues()
                         .calculateBottomPadding()
                             + 16.dp
                     )
+                    .padding(
+                        start = 16.dp,
+                        top = 20.dp,
+                        end = 16.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
                         text = stringResource(Res.string.backup_confirm_title),
-                        color = MaterialTheme.colors.primary,
-                        style = MaterialTheme.typography.h5
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.W300,
+                        fontFamily = attoFontFamily(),
+                        lineHeight = 40.sp
                     )
 
-                    Text(text = stringResource(Res.string.backup_confirm_subtitle))
+                    Text(
+                        text = stringResource(Res.string.backup_confirm_subtitle),
+                        lineHeight = 22.sp,
+                        style = MaterialTheme.typography.body2
+                    )
                 }
 
-                Column(
+                AttoButton(
+                    onClick = onConfirmClicked,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(
-                        onClick = onConfirmClicked,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = stringResource(Res.string.backup_confirm_yes))
-                    }
+                    Text(text = stringResource(Res.string.backup_confirm_yes))
+                }
 
-                    AttoOutlinedButton(
-                        onClick = onBackNavigation,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = stringResource(Res.string.backup_confirm_no))
-                    }
+                AttoOutlinedButton(
+                    onClick = onBackNavigation,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = stringResource(Res.string.backup_confirm_no))
                 }
             }
         }
