@@ -22,11 +22,24 @@ fun SecretWordCompact(
     word: String,
     hidden: Boolean
 ) {
-    Row(Modifier.padding(vertical = 8.dp)) {
-        Text("${ordinal})")
+    Row(
+        modifier = Modifier.clip(RoundedCornerShape(10.dp))
+            .background(color = MaterialTheme.colors
+                .onSurface
+                .copy(alpha = 0.05f)
+            )
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "${ordinal})",
+            style = MaterialTheme.typography.body2
+        )
+
         Text(
             text = if (hidden) "******" else word,
-            modifier = Modifier.padding(start = 4.dp)
+            modifier = Modifier.padding(start = 4.dp),
+            style = MaterialTheme.typography.body2
         )
     }
 }

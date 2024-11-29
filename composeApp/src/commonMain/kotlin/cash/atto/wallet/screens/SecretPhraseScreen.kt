@@ -1,5 +1,6 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +29,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.secret_backup
@@ -41,6 +44,7 @@ import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.secret.SecretPhraseGridCompact
 import cash.atto.wallet.components.secret.SecretPhraseGridExpanded
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import org.jetbrains.compose.resources.painterResource
@@ -114,29 +118,42 @@ fun SecretPhraseCompact(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
                     .padding(bottom = WindowInsets.systemBars
                         .asPaddingValues()
                         .calculateBottomPadding()
                             + 16.dp
                     )
+                    .padding(
+                        start = 16.dp,
+                        top = 20.dp,
+                        end = 16.dp
+                    )
             ) {
-                Column(Modifier.fillMaxWidth().weight(1f)) {
-                    Text(text = stringResource(Res.string.secret_title))
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(Res.string.secret_title),
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.W300,
+                        fontFamily = attoFontFamily()
+                    )
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        SecretPhraseGridCompact(
-                            words = uiState.words,
-                            hidden = uiState.hidden
-                        )
+                    SecretPhraseGridCompact(
+                        words = uiState.words,
+                        hidden = uiState.hidden
+                    )
 
-                        AttoOutlinedButton(onClick = onCopyClick) {
-                            Text(text = stringResource(Res.string.secret_copy))
-                        }
+                    AttoOutlinedButton(onClick = onCopyClick) {
+                        Text(text = stringResource(Res.string.secret_copy))
                     }
                 }
 
-                Button(
+                AttoButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onBackupConfirmClicked
                 ) {
