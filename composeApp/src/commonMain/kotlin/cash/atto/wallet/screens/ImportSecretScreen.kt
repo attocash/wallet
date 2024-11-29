@@ -128,7 +128,7 @@ fun ImportSecretCompact(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Text(
                         text = stringResource(Res.string.secret_import_title),
@@ -139,6 +139,7 @@ fun ImportSecretCompact(
 
                     Text(
                         text = stringResource(Res.string.secret_import_hint),
+                        lineHeight = 22.sp,
                         style = MaterialTheme.typography.body2
                     )
 

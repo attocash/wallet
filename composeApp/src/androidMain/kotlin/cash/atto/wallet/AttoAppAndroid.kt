@@ -177,7 +177,11 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.SafetyWarning.route) {
+                composable(
+                    route = AttoDestination.SafetyWarning.route,
+                    enterTransition = { fadeIn() },
+                    exitTransition = { fadeOut() }
+                ) {
                     SafetyWarningScreen(
                         onBackNavigation = { navController.navigateUp() },
                         onConfirmClicked = {
