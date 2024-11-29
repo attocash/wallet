@@ -3,6 +3,7 @@ package cash.atto.wallet.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,16 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -30,14 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.nativeKeyCode
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.password_create_next
@@ -48,6 +38,7 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOnboardingContainer
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import kotlinx.coroutines.launch
@@ -121,65 +112,62 @@ fun ImportSecretCompact(
         topBar = { AppBar(onBackNavigation) },
         backgroundColor = MaterialTheme.colors.surface,
         content = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
                     .padding(bottom = WindowInsets.systemBars
                         .asPaddingValues()
                         .calculateBottomPadding()
                             + 16.dp
                     )
+                    .padding(
+                        start = 16.dp,
+                        top = 20.dp,
+                        end = 16.dp
+                    )
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = stringResource(Res.string.secret_import_title),
-                        color = MaterialTheme.colors.primary,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.h5
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.W300,
+                        fontFamily = attoFontFamily()
                     )
 
-                    Text(text = stringResource(Res.string.secret_import_hint))
+                    Text(
+                        text = stringResource(Res.string.secret_import_hint),
+                        style = MaterialTheme.typography.body2
+                    )
 
-                    TextField(
+                    AttoTextField(
                         value = uiState.input.orEmpty(),
                         onValueChange = {
                             onInputChanged.invoke(it)
                         },
-                        modifier = Modifier.onPreviewKeyEvent {
-                            if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
-                                onDoneClicked.invoke()
-
-                                return@onPreviewKeyEvent true
-                            }
-
-                            return@onPreviewKeyEvent false
-                        },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(
-                            onDone = { onDoneClicked.invoke() }
-                        )
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = 8.dp),
+                        onDone = { onDoneClicked.invoke() },
+                        isError = !uiState.inputValid,
+                        errorLabel = {
+                            Text(
+                                text = uiState.errorMessage.orEmpty(),
+                                color = MaterialTheme.colors.error,
+                                style = MaterialTheme.typography.caption
+                            )
+                        }
                     )
-
-                    if (!uiState.inputValid) {
-                        Text(text = uiState.errorMessage.orEmpty())
-                    }
                 }
 
-                FloatingActionButton(
+                Spacer(Modifier.weight(1f))
+
+                AttoButton(
                     onClick = onDoneClicked,
-                    modifier = Modifier.align(Alignment.BottomEnd),
-                    backgroundColor = MaterialTheme.colors.primary
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Check,
-                        contentDescription = "Done"
-                    )
+                    Text(stringResource(Res.string.password_create_next))
                 }
             }
         }

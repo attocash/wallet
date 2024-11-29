@@ -2,6 +2,8 @@ package cash.atto.wallet
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -141,7 +143,11 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.ImportSecret.route) {
+                composable(
+                    route = AttoDestination.ImportSecret.route,
+                    enterTransition = { fadeIn() },
+                    exitTransition = { fadeOut() }
+                ) {
                     ImportSecretScreen(
                         onBackNavigation = { navController.navigateUp() },
                         onImportAccount = {
@@ -268,7 +274,11 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.Welcome.route) {
+                composable(
+                    route = AttoDestination.Welcome.route,
+                    enterTransition = { fadeIn() },
+                    exitTransition = { fadeOut() }
+                ) {
                     WelcomeScreen(
                         onCreateSecretClicked = {
                             navController.navigate(AttoDestination.SafetyWarning.route)
