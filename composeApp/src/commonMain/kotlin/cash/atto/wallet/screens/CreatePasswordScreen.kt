@@ -1,5 +1,6 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,10 +30,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.atto_locks
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.password_confirm_hint
 import attowallet.composeapp.generated.resources.password_create_back
@@ -48,6 +52,7 @@ import cash.atto.wallet.components.common.AttoOnboardingContainer
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import kotlinx.coroutines.launch
@@ -130,37 +135,53 @@ fun CreatePasswordCompact(
 ) {
     val (focusRequester) = FocusRequester.createRefs()
 
-    Scaffold(
-        topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
-        content = {
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(WindowInsets.systemBars
+                    .asPaddingValues()
+                )
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.atto_locks),
+                contentDescription = "Locks",
+                modifier = Modifier.padding(
+                    start = 50.dp,
+                    top = 50.dp,
+                    end = 50.dp,
+                    bottom = 16.dp
+                )
+            )
+
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                                + 16.dp
-                    ),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
                     text = stringResource(Res.string.password_create_title),
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.h5
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.W300,
+                    fontFamily = attoFontFamily(),
                 )
 
                 Text(
                     text = stringResource(Res.string.password_create_text),
-                    textAlign = TextAlign.Center
+                    style = MaterialTheme.typography.body2
                 )
 
                 AttoTextField(
                     value = uiState.password.orEmpty(),
                     onValueChange = { onPasswordChanged.invoke(it) },
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(text = stringResource(Res.string.password_create_hint))
                     },
@@ -171,7 +192,8 @@ fun CreatePasswordCompact(
                 AttoTextField(
                     value = uiState.passwordConfirm.orEmpty(),
                     onValueChange = { onPasswordConfirmChanged.invoke(it) },
-                    modifier = Modifier.focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester(focusRequester),
                     placeholder = {
                         Text(text = stringResource(Res.string.password_confirm_hint))
                     },
@@ -186,31 +208,32 @@ fun CreatePasswordCompact(
                                 else Res.string.password_no_match
                             ),
                             color = MaterialTheme.colors.error,
-                            textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.caption
                         )
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 )
+            }
 
-                Spacer(Modifier.weight(1f))
+            AttoButton(
+                onClick = onConfirmClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(Res.string.password_create_next))
+            }
 
-                AttoButton(
-                    onClick = onConfirmClick,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.password_create_next))
-                }
-
-                AttoOutlinedButton(
-                    onClick = onBackNavigation,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.password_create_back))
-                }
+            AttoOutlinedButton(
+                onClick = onBackNavigation,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(Res.string.password_create_back))
             }
         }
-    )
+
+        Box(Modifier.fillMaxWidth()
+            .align(Alignment.TopCenter)
+        ) { AppBar(onBackNavigation) }
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
