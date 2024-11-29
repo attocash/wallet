@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -25,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.password_enter_hint
@@ -38,6 +38,7 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOnboardingContainer
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -72,21 +73,24 @@ fun EnterPasswordCompact(
         mutableStateOf<String?>(null)
     }
 
-    Surface(
+    Column(
         modifier = Modifier.fillMaxSize()
             .background(color = MaterialTheme.colors.surface)
             .safeDrawingPadding()
             .padding(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize()
+                .weight(1f)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(Res.string.password_enter_title),
-                color = MaterialTheme.colors.primary,
-                style = MaterialTheme.typography.h5
+                fontSize = 30.sp,
+                fontWeight = FontWeight.W300,
+                fontFamily = attoFontFamily(),
             )
 
             AttoTextField(
@@ -109,13 +113,13 @@ fun EnterPasswordCompact(
             )
 
             Spacer(Modifier.weight(1f))
+        }
 
-            Button(
-                onClick = { onSubmitPassword.invoke(input.value) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(Res.string.password_enter_submit))
-            }
+        AttoButton(
+            onClick = { onSubmitPassword.invoke(input.value) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(Res.string.password_enter_submit))
         }
     }
 }

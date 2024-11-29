@@ -129,7 +129,10 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.CreatePassword.route) {
+                composable(
+                    route = AttoDestination.CreatePassword.route,
+                    exitTransition = { fadeOut() }
+                ) {
                     CreatePasswordScreen(
                         onBackNavigation = { navController.navigateUp() },
                         onConfirmClick = {
@@ -156,7 +159,10 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.Overview.route) {
+                composable(
+                    route = AttoDestination.Overview.route,
+                    enterTransition = { fadeIn() }
+                ) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides viewModelStoreOwner
                     ) {
