@@ -180,7 +180,11 @@ fun AttoNavHost(
                 composable(
                     route = AttoDestination.SafetyWarning.route,
                     enterTransition = { fadeIn() },
-                    exitTransition = { fadeOut() }
+                    exitTransition = { fadeOut() },
+                    popEnterTransition = { slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.End,
+                        tween(700)
+                    ) },
                 ) {
                     SafetyWarningScreen(
                         onBackNavigation = { navController.navigateUp() },

@@ -33,13 +33,13 @@ fun SecretWordCompact(
     ) {
         Text(
             text = "${ordinal})",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.overline
         )
 
         Text(
             text = if (hidden) "******" else word,
             modifier = Modifier.padding(start = 4.dp),
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.overline
         )
     }
 }
