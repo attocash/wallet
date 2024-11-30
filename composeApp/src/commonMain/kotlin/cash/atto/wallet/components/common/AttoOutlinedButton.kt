@@ -35,6 +35,7 @@ fun AttoOutlinedButton(
     shape: Shape = MaterialTheme.shapes.small,
     color: Color = MaterialTheme.colors.onSurface,
     contentPadding: PaddingValues = PaddingValues(19.dp),
+    transparent: Boolean = false,
     content: @Composable() (RowScope.() -> Unit)
 ) {
     OutlinedButton(
@@ -46,7 +47,8 @@ fun AttoOutlinedButton(
         shape = shape,
         border = BorderStroke(1.dp, color),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.surface,
+            backgroundColor = if (transparent) Color.Transparent
+                else MaterialTheme.colors.surface,
             contentColor = color
         ),
         contentPadding = contentPadding,
