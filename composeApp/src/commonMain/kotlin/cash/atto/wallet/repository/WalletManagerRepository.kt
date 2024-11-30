@@ -72,6 +72,7 @@ class WalletManagerRepository(
         val signer = appState.privateKey.toSigner()
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
         val client = AttoNodeClient.attoBackend(network, authenticator)
+        accountEntryRepository.clear()
         val walletManager = AttoWalletManager(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,

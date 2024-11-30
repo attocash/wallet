@@ -78,7 +78,6 @@ class OverviewViewModel(
                     }
 
                     accountEntriesCollectorJob?.cancel()
-                    accountEntryRepository.clear()
                     accountEntriesCollectorJob = scope.launch {
                         accountEntryRepository.flow(wallet.publicKey).collect { _ ->
                             _state.emit(
