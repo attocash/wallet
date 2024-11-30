@@ -219,7 +219,11 @@ fun AttoNavHost(
                     )
                 }
 
-                composable(route = AttoDestination.SendConfirm.route) {
+                composable(
+                    route = AttoDestination.SendConfirm.route,
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
+                ) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides viewModelStoreOwner
                     ) {

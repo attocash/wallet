@@ -141,41 +141,47 @@ fun SendFromAndroid(
         }
     )
 
-    Scaffold(
-        topBar = { AppBar(onBackNavigation) },
-        modifier = Modifier.paint(
-            painter = painterResource(resource = Res.drawable.atto_overview_background),
-            contentScale = ContentScale.FillBounds
-        ),
-        backgroundColor = Color.Transparent,
-        content = { padding ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                    )
-            ) {
-                if (uiState.showLoader)
-                    AttoLoader(alpha = 0.7f)
-
-                SendFromAndroidContent(
-                    uiState = uiState,
-                    onSendClicked = onSendClicked,
-                    onScanClicked = {
-                        if (cameraPermissionState.status.isGranted) {
-                            openQRScanner(context, activityResultLauncher)
-                        } else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-                    },
-                    onAmountChanged = onAmountChanged,
-                    onAddressChanged = onAddressChanged
-                )
-            }
+    Box(Modifier.fillMaxSize()) {
+        if (uiState.showLoader) {
+            AttoLoader(
+                alpha = 0.4f,
+                darkMode = true
+            )
         }
-    )
+
+        Scaffold(
+            topBar = { AppBar(onBackNavigation) },
+            modifier = Modifier.paint(
+                painter = painterResource(resource = Res.drawable.atto_overview_background),
+                contentScale = ContentScale.FillBounds
+            ),
+            backgroundColor = Color.Transparent,
+            content = { padding ->
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .padding(
+                            bottom = WindowInsets.systemBars
+                                .asPaddingValues()
+                                .calculateBottomPadding()
+                        )
+                ) {
+                    SendFromAndroidContent(
+                        uiState = uiState,
+                        onSendClicked = onSendClicked,
+                        onScanClicked = {
+                            if (cameraPermissionState.status.isGranted) {
+                                openQRScanner(context, activityResultLauncher)
+                            } else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        },
+                        onAmountChanged = onAmountChanged,
+                        onAddressChanged = onAddressChanged
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -197,9 +203,7 @@ fun SendFromAndroidContent(
         ) {
             Text(
                 text = stringResource(Res.string.send_from_title),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.W300,
-                fontFamily = attoFontFamily(),
+                style = MaterialTheme.typography.h5
             )
 
             uiState.accountName?.let {
@@ -233,7 +237,8 @@ fun SendFromAndroidContent(
             TextField(
                 value = uiState.amountString.orEmpty(),
                 onValueChange = onAmountChanged,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 20.dp),
                 placeholder = {
                     Text(text = stringResource(Res.string.send_from_amount_hint))
@@ -256,7 +261,8 @@ fun SendFromAndroidContent(
                 onValueChange = {
                     onAddressChanged.invoke(it)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 16.dp),
                 placeholder = {
                     Text(text = stringResource(Res.string.send_from_address_hint))

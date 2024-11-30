@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.MaterialTheme
@@ -18,8 +19,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.atto_overview_background
 import attowallet.composeapp.generated.resources.send_confirm
 import attowallet.composeapp.generated.resources.send_confirm_cancel
 import attowallet.composeapp.generated.resources.send_confirm_sending
@@ -34,6 +39,7 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -73,29 +79,42 @@ fun SendConfirm(
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
-    Scaffold(
-        topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
-        content = {
-            Box(Modifier.fillMaxSize()
-                .padding(16.dp)
-                .padding(bottom = WindowInsets.systemBars
-                    .asPaddingValues()
-                    .calculateBottomPadding()
-                        + 16.dp
-                )
-            ) {
-                if (uiState.showLoader)
-                    AttoLoader(alpha = 0.7f)
-
-                SendConfirmContent(
-                    uiState = uiState,
-                    onConfirm = onConfirm,
-                    onCancel = onCancel
-                )
-            }
+    Box(Modifier.fillMaxSize()) {
+        if (uiState.showLoader) {
+            AttoLoader(
+                alpha = 0.4f,
+                darkMode = true
+            )
         }
-    )
+
+        Scaffold(
+            topBar = { AppBar(onBackNavigation) },
+            modifier = Modifier.paint(
+                painter = painterResource(resource = Res.drawable.atto_overview_background),
+                contentScale = ContentScale.FillBounds
+            ),
+            backgroundColor = Color.Transparent,
+            content = {
+                Box(Modifier.fillMaxSize()
+                    .padding(16.dp)
+                    .padding(bottom = WindowInsets.systemBars
+                        .asPaddingValues()
+                        .calculateBottomPadding()
+                    )
+                ) {
+                    Column(Modifier.fillMaxSize()) {
+                        Spacer(Modifier.height(96.dp))
+
+                        SendConfirmContent(
+                            uiState = uiState,
+                            onConfirm = onConfirm,
+                            onCancel = onCancel
+                        )
+                    }
+                }
+            }
+        )
+    }
 }
 
 @Composable
