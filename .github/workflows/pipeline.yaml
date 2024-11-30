@@ -43,6 +43,6 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            release-artifacts/ubuntu/*.deb
+            release-artifacts/linux/*.deb
             release-artifacts/macos/*.dmg
             release-artifacts/windows/*.msi
