@@ -108,19 +108,19 @@ fun AttoNavHost(
                 modifier = modifier,
                 enterTransition = { slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(700)
+                    tween(SLIDE_DURATION)
                 ) },
                 exitTransition = { slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(700)
+                    tween(SLIDE_DURATION)
                 ) },
                 popEnterTransition = { slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
+                    tween(SLIDE_DURATION)
                 ) },
                 popExitTransition = { slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
+                    tween(SLIDE_DURATION)
                 ) }
             ) {
                 composable(route = AttoDestination.BackupSecret.route) {
@@ -131,7 +131,7 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.CreatePassword.route,
-                    exitTransition = { fadeOut() }
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
                 ) {
                     CreatePasswordScreen(
                         onBackNavigation = { navController.navigateUp() },
@@ -148,8 +148,8 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.ImportSecret.route,
-                    enterTransition = { fadeIn() },
-                    exitTransition = { fadeOut() }
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
                 ) {
                     ImportSecretScreen(
                         onBackNavigation = { navController.navigateUp() },
@@ -161,7 +161,8 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.Overview.route,
-                    enterTransition = { fadeIn() }
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
                 ) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides viewModelStoreOwner
@@ -185,8 +186,8 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.SafetyWarning.route,
-                    enterTransition = { fadeIn() },
-                    exitTransition = { fadeOut() },
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) },
                     popEnterTransition = { slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.End,
                         tween(700)
@@ -239,7 +240,11 @@ fun AttoNavHost(
                     }
                 }
 
-                composable(route = AttoDestination.SendFrom.route) {
+                composable(
+                    route = AttoDestination.SendFrom.route,
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
+                ) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides viewModelStoreOwner
                     ) {
@@ -269,7 +274,11 @@ fun AttoNavHost(
                     }
                 }
 
-                composable(route = AttoDestination.Settings.route) {
+                composable(
+                    route = AttoDestination.Settings.route,
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
+                ) {
                     SettingsScreenAndroid(
                         onBackNavigation = { navController.navigateUp() },
                         onBackupSecretNavigation = {
@@ -290,8 +299,8 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.Welcome.route,
-                    enterTransition = { fadeIn() },
-                    exitTransition = { fadeOut() }
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
                 ) {
                     WelcomeScreen(
                         onCreateSecretClicked = {
@@ -306,3 +315,6 @@ fun AttoNavHost(
         }
     }
 }
+
+private const val SLIDE_DURATION = 700
+private const val FADE_DURATION = 700
