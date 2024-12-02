@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -45,10 +46,12 @@ import attowallet.composeapp.generated.resources.representative_subtitle
 import attowallet.composeapp.generated.resources.representative_title
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
+import cash.atto.wallet.components.common.AttoOutlinedTextCard
 import cash.atto.wallet.components.settings.EnterRepresentativeBottomSheet
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.BottomSheetShape
 import cash.atto.wallet.ui.attoFontFamily
+import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.settings.RepresentativeUIState
 import cash.atto.wallet.viewmodel.RepresentativeViewModel
 import kotlinx.coroutines.launch
@@ -132,24 +135,35 @@ fun RepresentativeScreenCompact(
     ) {
         Scaffold(
             topBar = { AppBar(onBackNavigation) },
-            backgroundColor = MaterialTheme.colors.surface,
+            modifier = Modifier.background(
+                brush = Brush.horizontalGradient(
+                    colors = MaterialTheme.colors.primaryGradient
+                )
+            ),
+            backgroundColor = Color.Transparent,
             content = {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(top = 16.dp)
+                        .clip(BottomSheetShape)
+                        .background(color = MaterialTheme.colors.secondaryVariant)
                         .padding(
                             bottom = WindowInsets.systemBars
                                 .asPaddingValues()
                                 .calculateBottomPadding()
                                     + 16.dp
+                        )
+                        .padding(
+                            start = 16.dp,
+                            top = 24.dp,
+                            end = 16.dp
                         ),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = stringResource(Res.string.representative_title),
-                        color = MaterialTheme.colors.primary,
                         style = MaterialTheme.typography.h5
                     )
 
@@ -158,11 +172,14 @@ fun RepresentativeScreenCompact(
                         modifier = Modifier.padding(top = 16.dp)
                     )
 
-                    Text(text = uiState.representative.orEmpty())
+                    AttoOutlinedTextCard(
+                        text = uiState.representative.orEmpty(),
+                        color = MaterialTheme.colors.onSurface
+                    )
 
                     Spacer(Modifier.weight(1f))
 
-                    Button(
+                    AttoButton(
                         onClick = {
                             coroutineScope.launch {
                                 sheetState.show()

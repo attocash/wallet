@@ -19,6 +19,8 @@ import cash.atto.wallet.uistate.settings.SettingsListUiState
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -30,7 +32,12 @@ class SettingsViewModel(
 ) : ViewModel() {
 
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
-    private val walletManagerScope = CoroutineScope(Dispatchers.IO)
+
+    private val appStateCollectorScope = CoroutineScope(Dispatchers.Default)
+    private val walletManagerScope = CoroutineScope(Dispatchers.Default)
+
+    private var appStateCollectorJob: Job? = null
+    private var walletManagerJob: Job? = null
 
     private val _state = MutableStateFlow(SettingsUiState.PREVIEW)
     val state = _state.asStateFlow()
@@ -42,26 +49,34 @@ class SettingsViewModel(
                 settingsListUiState = settingsListInitial()
             )
 
-            appStateRepository.state.collect { appState ->
-                if (appState.publicKey != null) {
-                    _state.emit(state.value.copy(
-                        profileUiState = ProfileUiState(
-                            name = "Main Account",
-                            hash = appState.publicKey
-                                .toAddress(AttoAlgorithm.V1)
-                                .value
-                        )
-                    ))
+            delay(100)
+
+            appStateCollectorJob?.cancel()
+            appStateCollectorJob = appStateCollectorScope.launch {
+                appStateRepository.state.collect { appState ->
+                    if (appState.publicKey != null) {
+                        _state.emit(state.value.copy(
+                            profileUiState = ProfileUiState(
+                                name = "Main Account",
+                                hash = appState.publicKey
+                                    .toAddress(AttoAlgorithm.V1)
+                                    .value
+                            )
+                        ))
+                    }
                 }
             }
-        }
 
-        walletManagerScope.launch {
-            walletManagerRepository.state.collect { wallet ->
-                if (wallet?.account != null)
-                    _state.emit(state.value.copy(
-                        settingsListUiState = settingsListAuthorized()
-                    ))
+            delay(100)
+
+            walletManagerJob?.cancel()
+            walletManagerJob = walletManagerScope.launch {
+                walletManagerRepository.state.collect { wallet ->
+                    if (wallet?.account != null)
+                        _state.emit(state.value.copy(
+                            settingsListUiState = settingsListAuthorized()
+                        ))
+                }
             }
         }
     }

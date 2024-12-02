@@ -53,7 +53,7 @@ fun ReceiveAttoBottomSheet(
         )
 
         Button(
-            onClick = onCopy,
+            onClick = onShare,
             modifier = Modifier.fillMaxWidth(),
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 0.dp,

@@ -188,7 +188,17 @@ fun AttoNavHost(
                     }
                 }
 
-                composable(route = AttoDestination.Representative.route) {
+                composable(
+                    route = AttoDestination.Representative.route,
+                    enterTransition = { slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(SLIDE_DURATION)
+                    ) },
+                    exitTransition = { slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(SLIDE_DURATION)
+                    ) }
+                ) {
                     RepresentativeScreen(
                         onBackNavigation = { navController.navigateUp() }
                     )
