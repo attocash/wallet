@@ -123,7 +123,17 @@ fun AttoNavHost(
                     tween(SLIDE_DURATION)
                 ) }
             ) {
-                composable(route = AttoDestination.BackupSecret.route) {
+                composable(
+                    route = AttoDestination.BackupSecret.route,
+                    enterTransition = { slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(SLIDE_DURATION)
+                    ) },
+                    exitTransition = { slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(SLIDE_DURATION)
+                    ) }
+                ) {
                     BackupSecretPhraseScreen(
                         onBackNavigation = { navController.navigateUp() }
                     )

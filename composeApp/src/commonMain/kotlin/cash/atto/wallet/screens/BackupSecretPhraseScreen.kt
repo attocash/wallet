@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
@@ -45,6 +46,8 @@ import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.secret.SecretPhraseGridCompact
 import cash.atto.wallet.components.secret.SecretPhraseGridExpanded
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.BottomSheetShape
+import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import org.jetbrains.compose.resources.painterResource
@@ -117,29 +120,47 @@ fun BackupSecretPhraseCompact(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        modifier = Modifier.background(
+            brush = Brush.horizontalGradient(
+                colors = MaterialTheme.colors.primaryGradient
+            )
+        ),
+        backgroundColor = Color.Transparent,
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(top = 16.dp)
+                    .clip(BottomSheetShape)
+                    .background(color = MaterialTheme.colors.secondaryVariant)
                     .padding(
                         bottom = WindowInsets.systemBars
                             .asPaddingValues()
                             .calculateBottomPadding()
                                 + 16.dp
+                    )
+                    .padding(
+                        start = 16.dp,
+                        top = 24.dp,
+                        end = 16.dp
                     ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(Res.string.secret_title))
+                Text(
+                    text = stringResource(Res.string.secret_title),
+                    style = MaterialTheme.typography.h5
+                )
 
                 SecretPhraseGridCompact(
                     words = uiState.words,
                     hidden = uiState.hidden
                 )
 
-                AttoOutlinedButton(onClick = onVisibilityToggled) {
+                AttoOutlinedButton(
+                    onClick = onVisibilityToggled,
+                    transparent = true
+                ) {
                     Text(text = stringResource(
                         if (uiState.hidden) Res.string.settings_backup_show
                         else Res.string.settings_backup_hide
@@ -148,7 +169,7 @@ fun BackupSecretPhraseCompact(
 
                 Spacer(Modifier.weight(1f))
 
-                Button(
+                AttoButton(
                     onClick = onCopyClick,
                     modifier = Modifier.fillMaxWidth()
                 ) {
