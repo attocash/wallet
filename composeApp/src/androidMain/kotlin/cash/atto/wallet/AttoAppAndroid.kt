@@ -123,7 +123,17 @@ fun AttoNavHost(
                     tween(SLIDE_DURATION)
                 ) }
             ) {
-                composable(route = AttoDestination.BackupSecret.route) {
+                composable(
+                    route = AttoDestination.BackupSecret.route,
+                    enterTransition = { slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(SLIDE_DURATION)
+                    ) },
+                    exitTransition = { slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(SLIDE_DURATION)
+                    ) }
+                ) {
                     BackupSecretPhraseScreen(
                         onBackNavigation = { navController.navigateUp() }
                     )
@@ -178,7 +188,17 @@ fun AttoNavHost(
                     }
                 }
 
-                composable(route = AttoDestination.Representative.route) {
+                composable(
+                    route = AttoDestination.Representative.route,
+                    enterTransition = { slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(SLIDE_DURATION)
+                    ) },
+                    exitTransition = { slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(SLIDE_DURATION)
+                    ) }
+                ) {
                     RepresentativeScreen(
                         onBackNavigation = { navController.navigateUp() }
                     )
@@ -261,7 +281,11 @@ fun AttoNavHost(
                     }
                 }
 
-                composable(route = AttoDestination.SendResult.route) {
+                composable(
+                    route = AttoDestination.SendResult.route,
+                    enterTransition = { fadeIn(tween(FADE_DURATION)) },
+                    exitTransition = { fadeOut(tween(FADE_DURATION)) }
+                ) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides viewModelStoreOwner
                     ) {

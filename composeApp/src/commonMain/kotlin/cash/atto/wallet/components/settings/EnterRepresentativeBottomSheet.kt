@@ -1,9 +1,11 @@
 package cash.atto.wallet.components.settings
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -18,6 +20,7 @@ import attowallet.composeapp.generated.resources.representative_change
 import attowallet.composeapp.generated.resources.representative_change_title
 import attowallet.composeapp.generated.resources.representative_close
 import attowallet.composeapp.generated.resources.representative_error_address
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -38,7 +41,6 @@ fun EnterRepresentativeBottomSheet(
     BottomSheet {
         Text(
             text = stringResource(Res.string.representative_change_title),
-            color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h5
         )
 
@@ -60,14 +62,38 @@ fun EnterRepresentativeBottomSheet(
 
         Button(
             onClick = { onChange.invoke(input.value) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondaryVariant,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            contentPadding = PaddingValues(19.dp)
         ) {
             Text(text = stringResource(Res.string.representative_change))
         }
 
-        AttoOutlinedButton(
+        Button(
             onClick = onClose,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentColor = MaterialTheme.colors.onSecondary
+            ),
+            contentPadding = PaddingValues(19.dp)
         ) {
             Text(text = stringResource(Res.string.representative_close))
         }
