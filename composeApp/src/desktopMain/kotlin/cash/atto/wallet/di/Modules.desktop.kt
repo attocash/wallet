@@ -4,8 +4,6 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.PasswordDataSource
-import cash.atto.wallet.datasource.RepresentativeDao
-import cash.atto.wallet.datasource.RepresentativeDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
@@ -27,7 +25,6 @@ actual val databaseModule = module {
 
 actual val dataSourceModule = module {
     includes(databaseModule)
-    singleOf(::RepresentativeDataSource).bind(RepresentativeDao::class)
     singleOf(::PasswordDataSource)
     singleOf(::SeedDataSource)
 }

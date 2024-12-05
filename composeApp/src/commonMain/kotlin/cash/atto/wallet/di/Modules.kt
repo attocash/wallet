@@ -4,7 +4,8 @@ import cash.atto.commons.AttoNetwork
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
-import cash.atto.wallet.repository.RepresentativeRepository
+import cash.atto.wallet.repository.PersistentTransactionRepository
+import cash.atto.wallet.repository.PersistentWorkCache
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
@@ -59,11 +60,12 @@ expect val dataSourceModule: Module
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
-    single { AttoNetwork.LIVE }
+    single { AttoNetwork.DEV }
     singleOf(::AppStateRepository)
-    singleOf(::RepresentativeRepository)
     singleOf(::WalletManagerRepository)
     singleOf(::AccountEntryRepository)
+    singleOf(::PersistentTransactionRepository)
+    singleOf(::PersistentWorkCache)
 }
 
 val interactorModule = module {
