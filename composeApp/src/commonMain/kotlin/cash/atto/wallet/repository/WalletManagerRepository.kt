@@ -34,6 +34,8 @@ private val defaultRepresentatives = listOf(
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
     private val accountEntryRepository: AccountEntryRepository,
+    private val transactionRepository: PersistentTransactionRepository,
+    private val workCache: PersistentWorkCache,
     private val network: AttoNetwork,
 ) {
     private val _state = MutableStateFlow<AttoWalletManager?>(null)
@@ -72,17 +74,21 @@ class WalletManagerRepository(
         val signer = appState.privateKey.toSigner()
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
         val client = AttoNodeClient.attoBackend(network, authenticator)
+
         accountEntryRepository.clear()
+        workCache.clear()
+
         val walletManager = AttoWalletManager(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,
                 accountEntryRepository = accountEntryRepository,
+                transactionRepository = transactionRepository
             ),
             signer = signer,
             client = client,
             worker = AttoWorker.attoBackend(authenticator),
-            workCache = AttoWorkCache.inMemory()
+            workCache = workCache
         ) {
             defaultRepresentatives.random()
         }

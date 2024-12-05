@@ -9,7 +9,6 @@ import cash.atto.commons.toPublicKey
 import cash.atto.commons.toSigner
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.repository.AppStateRepository
-import cash.atto.wallet.repository.RepresentativeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.settings.RepresentativeUIState
 import kotlinx.coroutines.CoroutineScope
