@@ -40,6 +40,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val androidInstrumentedTest by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
@@ -112,6 +113,11 @@ kotlin {
 
             implementation(libs.slf4j.simple)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.runner)
+            implementation(libs.androidx.rules)
+            implementation(libs.androidx.ext.junit)
+        }
     }
 }
 
@@ -129,6 +135,8 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {

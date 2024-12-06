@@ -18,6 +18,7 @@ barcodeScanning = "17.2.0"
 camera2 = "1.4.0"
 compose-plugin = "1.6.11"
 decompose = "3.1.0"
+extJunit = "1.2.1"
 junit = "4.13.2"
 kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.1"
@@ -28,6 +29,7 @@ junitJupiter = "5.11.3"
 navigationCompose = "2.8.2"
 koin = "4.0.0"
 qrKit = "1.0.8"
+rules = "1.5.0"
 transportRuntime = "2.2.5"
 material3WindowSize = "0.5.0"
 activityKtx = "1.9.3"
@@ -41,6 +43,9 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera2" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera2" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camera2" }
+androidx-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "extJunit" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "rules" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }

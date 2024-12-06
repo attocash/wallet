@@ -26,14 +26,15 @@ actual class PasswordDataSource(
     private var dataSourceJob: Job? = null
 
     actual suspend fun getPassword(seed: String): String? {
-        val key = stringPreferencesKey("$PASSWORD_KEY${encryptSeed(seed)}")
+        val encryptedSeed = encryptSeed(seed)
+        val key = stringPreferencesKey("$PASSWORD_KEY${encryptedSeed}")
         val passwordFlow = dataStore.data
             .map { preferences ->
                 with (preferences[key] ?: return@map null) {
                     val (ivString, valueString) = this.split(ivToStringSeparator, limit = 2)
 
                     return@map securityUtil.decryptData(
-                        keyAlias = securityKeyAlias,
+                        keyAlias = securityKeyAlias + encryptedSeed,
                         iv = ivString.split(bytesToStringSeparator)
                             .map { it.toByte() }
                             .toByteArray(),
@@ -57,14 +58,23 @@ actual class PasswordDataSource(
     }
 
     actual suspend fun setPassword(seed: String, password: String) {
-        val key = stringPreferencesKey("$PASSWORD_KEY${encryptSeed(seed)}")
-        val (iv, encryptedValue) = securityUtil.encryptData(securityKeyAlias, password)
+        val encryptedSeed = encryptSeed(seed)
+        val key = stringPreferencesKey("$PASSWORD_KEY${encryptedSeed}")
+        val (iv, encryptedValue) = securityUtil.encryptData(
+            securityKeyAlias + encryptedSeed,
+            password
+        )
+
         val ivString = iv.joinToString(bytesToStringSeparator)
         val valueString = encryptedValue.joinToString(bytesToStringSeparator)
 
         dataStore.edit { preferences ->
             preferences[key] = "$ivString$ivToStringSeparator$valueString"
         }
+    }
+
+    suspend fun clear() {
+        dataStore.edit { it.clear() }
     }
 
     private fun encryptSeed(seed: String): String {

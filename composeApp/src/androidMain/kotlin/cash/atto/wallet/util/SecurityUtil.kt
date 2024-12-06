@@ -31,9 +31,13 @@ class SecurityUtil {
     }
 
     fun encryptData(keyAlias: String, text: String): Pair<ByteArray, ByteArray> {
+        val key = if (keyStore.containsAlias(keyAlias))
+            getSecretKey(keyAlias)
+        else generateSecretKey(keyAlias)
+
         cipher.init(
             Cipher.ENCRYPT_MODE,
-            generateSecretKey(keyAlias)
+            key
         )
 
         return Pair(
