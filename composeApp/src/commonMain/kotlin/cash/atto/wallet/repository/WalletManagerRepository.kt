@@ -1,15 +1,27 @@
 package cash.atto.wallet.repository
 
-import cash.atto.commons.*
+import cash.atto.commons.AttoAddress
+import cash.atto.commons.AttoAlgorithm
+import cash.atto.commons.AttoNetwork
+import cash.atto.commons.AttoPublicKey
+import cash.atto.commons.fromHexToByteArray
 import cash.atto.commons.gatekeeper.AttoAuthenticator
 import cash.atto.commons.gatekeeper.attoBackend
-import cash.atto.commons.wallet.*
+import cash.atto.commons.toSigner
+import cash.atto.commons.wallet.AttoNodeClient
+import cash.atto.commons.wallet.AttoWalletManager
+import cash.atto.commons.wallet.AttoWalletViewer
+import cash.atto.commons.wallet.attoBackend
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.state.AppState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 
 private val defaultRepresentatives = listOf(
@@ -33,8 +45,7 @@ private val defaultRepresentatives = listOf(
 
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
-    private val accountEntryRepository: AccountEntryRepository,
-    private val transactionRepository: PersistentTransactionRepository,
+    private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
     private val workCache: PersistentWorkCache,
     private val network: AttoNetwork,
 ) {
@@ -75,15 +86,11 @@ class WalletManagerRepository(
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
         val client = AttoNodeClient.attoBackend(network, authenticator)
 
-        accountEntryRepository.clear()
-        workCache.clear()
-
         val walletManager = AttoWalletManager(
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,
-                accountEntryRepository = accountEntryRepository,
-                transactionRepository = transactionRepository
+                accountEntryRepository = persistentAccountEntryRepository,
             ),
             signer = signer,
             client = client,

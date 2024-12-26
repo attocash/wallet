@@ -1,6 +1,5 @@
 package cash.atto.wallet.datasource
 
-import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -9,17 +8,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
-import androidx.room.Update
-import cash.atto.commons.AttoPublicKey
-import cash.atto.commons.AttoTransaction
-import cash.atto.commons.AttoWork
+import java.math.BigDecimal
 
 @Database(
-    entities = [Transaction::class, Work::class],
+    entities = [AccountEntry::class, Work::class],
     version = 2
 )
 abstract class AppDatabase : RoomDatabase(), DB {
-    abstract fun transactionDao(): TransactionDao
+    abstract fun accountEntryDao(): AccountEntryDao
     abstract fun workDao(): WorkDao
     override fun clearAllTables(): Unit {}
 }
@@ -29,28 +25,28 @@ interface DB {
 }
 
 @Dao
-interface TransactionDao {
+interface AccountEntryDao {
     @Query(
-        "SELECT _transaction from transactions " +
-        "WHERE publicKey = :publicKey " +
-        "ORDER BY id DESC LIMIT 1"
+        "SELECT entry from accountEntries " +
+                "WHERE publicKey = :publicKey " +
+                "ORDER BY height DESC LIMIT 1"
     )
     suspend fun last(publicKey: ByteArray): ByteArray?
 
     @Query(
-        "SELECT _transaction from transactions " +
-        "WHERE publicKey = :publicKey " +
-        "ORDER BY id DESC"
+        "SELECT entry from accountEntries " +
+                "WHERE publicKey = :publicKey " +
+                "ORDER BY height DESC"
     )
-    suspend fun list(publicKey: ByteArray): List<ByteArray>
+    suspend fun list(publicKey: ByteArray): List<String>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun save(transaction: Transaction)
+    suspend fun save(entry: AccountEntry)
 }
 
 @Dao
 interface WorkDao {
-    @Query("SELECT * FROM work ORDER BY _work LIMIT 1")
+    @Query("SELECT * FROM work ORDER BY value LIMIT 1")
     suspend fun get(): Work?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -60,17 +56,18 @@ interface WorkDao {
     suspend fun clear()
 }
 
-@Entity(tableName = "transactions")
-data class Transaction(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
+@Entity(tableName = "accountEntries")
+data class AccountEntry(
+    @PrimaryKey
+    val hash: ByteArray,
     val publicKey: ByteArray,
-    @ColumnInfo(name = "_transaction")
-    val transaction: ByteArray
+    val height: Long,
+    val entry: String
 )
 
 @Entity(tableName = "work")
 data class Work(
-    @ColumnInfo(name = "_work")
-    @PrimaryKey val work: ByteArray
+    @PrimaryKey
+    val publicKey: ByteArray,
+    val value: ByteArray
 )

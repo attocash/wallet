@@ -5,7 +5,7 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
-import cash.atto.wallet.repository.AccountEntryRepository
+import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class OverviewViewModel(
     private val appStateRepository: AppStateRepository,
     private val walletManagerRepository: WalletManagerRepository,
-    private val accountEntryRepository: AccountEntryRepository,
+    private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -64,7 +64,7 @@ class OverviewViewModel(
                     accountCollectorJob = scope.launch {
                         wallet.accountFlow.collect { account ->
                             println("Account $account")
-                            val entries = accountEntryRepository.list(account.publicKey)
+                            val entries = persistentAccountEntryRepository.list(account.publicKey)
 
                             _state.emit(
                                 state.value.copy(
@@ -79,10 +79,10 @@ class OverviewViewModel(
 
                     accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob = scope.launch {
-                        accountEntryRepository.flow(wallet.publicKey).collect { _ ->
+                        persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
                             _state.emit(
                                 state.value.copy(
-                                    entries = accountEntryRepository.list(wallet.publicKey)
+                                    entries = persistentAccountEntryRepository.list(wallet.publicKey)
                                 )
                             )
                         }
