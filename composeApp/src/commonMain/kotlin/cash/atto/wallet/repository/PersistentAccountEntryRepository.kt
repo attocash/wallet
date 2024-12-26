@@ -3,31 +3,29 @@ package cash.atto.wallet.repository
 import cash.atto.commons.AttoAccountEntry
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.wallet.AttoAccountEntryRepository
+import cash.atto.wallet.datasource.AccountEntry
+import cash.atto.wallet.datasource.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class AccountEntryRepository : AttoAccountEntryRepository {
-    private val mutex = Mutex()
-    private val entryMap = mutableMapOf<AttoPublicKey, MutableList<AttoAccountEntry>>()
+class PersistentAccountEntryRepository(
+    appDatabase: AppDatabase
+) : AttoAccountEntryRepository {
+    private val dao = appDatabase.accountEntryDao()
+
     private val flow = MutableSharedFlow<AttoAccountEntry>()
 
     override suspend fun save(entry: AttoAccountEntry) {
-        val publicKey = entry.publicKey
-        mutex.withLock {
-            val entries = entryMap[publicKey] ?: mutableListOf()
-            entries.add(entry)
-            entryMap[publicKey] = entries
-            flow.emit(entry)
-        }
+        val json = Json.encodeToString(entry)
+        dao.save(AccountEntry(entry.hash.value, entry.publicKey.value, entry.height.value.toLong(), json))
+        flow.emit(entry)
     }
 
     override suspend fun list(publicKey: AttoPublicKey): List<AttoAccountEntry> {
-        mutex.withLock {
-            return entryMap[publicKey]?.toList() ?: emptyList()
-        }
+        return dao.list(publicKey.value).map { Json.decodeFromString(it) }
     }
 
     override suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? {
@@ -36,11 +34,5 @@ class AccountEntryRepository : AttoAccountEntryRepository {
 
     fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> {
         return flow.filter { it.publicKey == publicKey }
-    }
-
-    suspend fun clear() {
-        mutex.withLock {
-            entryMap.clear()
-        }
     }
 }

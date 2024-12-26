@@ -12,11 +12,11 @@ class PersistentWorkCache(
     private val dao = appDatabase.workDao()
 
     override suspend fun get(): AttoWork? = dao.get()
-        ?.let { AttoWork(it.work) }
+        ?.let { AttoWork(it.value) }
 
     override suspend fun save(work: AttoWork) {
         clear()
-        dao.set(Work(work.value))
+        dao.set(Work(ByteArray(32), work.value))
     }
 
     suspend fun clear() {
