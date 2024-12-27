@@ -55,14 +55,16 @@ class SettingsViewModel(
             appStateCollectorJob = appStateCollectorScope.launch {
                 appStateRepository.state.collect { appState ->
                     if (appState.publicKey != null) {
-                        _state.emit(state.value.copy(
-                            profileUiState = ProfileUiState(
-                                name = "Main Account",
-                                hash = appState.publicKey
-                                    .toAddress(AttoAlgorithm.V1)
-                                    .value
+                        _state.emit(
+                            state.value.copy(
+                                profileUiState = ProfileUiState(
+                                    name = "Main Account",
+                                    hash = appState.publicKey
+                                        .toAddress(AttoAlgorithm.V1)
+                                        .value
+                                )
                             )
-                        ))
+                        )
                     }
                 }
             }
@@ -73,9 +75,11 @@ class SettingsViewModel(
             walletManagerJob = walletManagerScope.launch {
                 walletManagerRepository.state.collect { wallet ->
                     if (wallet?.account != null)
-                        _state.emit(state.value.copy(
-                            settingsListUiState = settingsListAuthorized()
-                        ))
+                        _state.emit(
+                            state.value.copy(
+                                settingsListUiState = settingsListAuthorized()
+                            )
+                        )
                 }
             }
         }

@@ -8,7 +8,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
-import java.math.BigDecimal
 
 @Database(
     entities = [AccountEntry::class, Work::class],

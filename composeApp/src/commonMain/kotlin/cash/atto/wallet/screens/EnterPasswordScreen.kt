@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -75,7 +75,7 @@ fun EnterPasswordCompact(
 
     Column(
         modifier = Modifier.fillMaxSize()
-            .background(color = MaterialTheme.colors.surface)
+            .background(color = MaterialTheme.colorScheme.surface)
             .safeDrawingPadding()
             .padding(16.dp)
     ) {
@@ -105,9 +105,9 @@ fun EnterPasswordCompact(
                 errorLabel = {
                     Text(
                         text = stringResource(Res.string.password_wrong),
-                        color = MaterialTheme.colors.error,
+                        color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.caption
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             )
@@ -133,11 +133,12 @@ fun EnterPasswordExpanded(
         mutableStateOf<String?>(null)
     }
 
-    Box(Modifier.fillMaxSize()
-        .paint(
-            painter = painterResource(Res.drawable.atto_welcome_background),
-            contentScale = ContentScale.FillBounds
-        )
+    Box(
+        Modifier.fillMaxSize()
+            .paint(
+                painter = painterResource(Res.drawable.atto_welcome_background),
+                contentScale = ContentScale.FillBounds
+            )
     ) {
         AttoOnboardingContainer(
             modifier = Modifier.align(Alignment.Center)
@@ -145,7 +146,7 @@ fun EnterPasswordExpanded(
         ) {
             Text(
                 text = stringResource(Res.string.password_enter_title),
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.headlineLarge
             )
 
             Spacer(Modifier.height(1.dp))
@@ -163,9 +164,9 @@ fun EnterPasswordExpanded(
                 errorLabel = {
                     Text(
                         text = stringResource(Res.string.password_wrong),
-                        color = MaterialTheme.colors.error,
+                        color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.caption
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             )

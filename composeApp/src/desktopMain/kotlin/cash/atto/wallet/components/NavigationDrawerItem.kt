@@ -3,19 +3,13 @@ package cash.atto.wallet.components
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +31,6 @@ import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.setting
 import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NavigationDrawerItem(
     label: String,
@@ -47,10 +40,10 @@ fun NavigationDrawerItem(
     modifier: Modifier = Modifier
 ) {
     val backgroundModifier = if (selected)
-        Modifier.background(color = MaterialTheme.colors.secondaryVariant)
+        Modifier.background(color = MaterialTheme.colorScheme.secondary)
     else Modifier.background(
         brush = Brush.horizontalGradient(
-            MaterialTheme.colors
+            MaterialTheme.colorScheme
                 .primaryGradient
                 .map { it.copy(alpha = 0.4f) }
         )
@@ -63,7 +56,7 @@ fun NavigationDrawerItem(
             .semantics { role = Role.Tab }
             .fillMaxWidth(),
         color = Color.Transparent,
-        contentColor = MaterialTheme.colors.primary
+        contentColor = MaterialTheme.colorScheme.primary
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
@@ -76,12 +69,12 @@ fun NavigationDrawerItem(
             Icon(
                 imageVector = icon,
                 contentDescription = "Navigation Icon",
-                tint = MaterialTheme.colors.setting
+                tint = MaterialTheme.colorScheme.setting
             )
 
             Text(
                 text = label,
-                color = MaterialTheme.colors.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W300,
                 fontFamily = attoFontFamily()

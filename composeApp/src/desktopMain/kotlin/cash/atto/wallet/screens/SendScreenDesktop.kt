@@ -10,15 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +59,6 @@ import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.math.BigDecimal
 
 @Composable
 fun SendScreenDesktop() {
@@ -183,14 +181,14 @@ fun SendFromDesktop(
 
     Column(
         modifier = Modifier.clip(RoundedCornerShape(50.dp))
-            .background(color = MaterialTheme.colors.surface)
+            .background(color = MaterialTheme.colorScheme.surface)
             .padding(vertical = 48.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(Res.string.send_from_title),
-            color = MaterialTheme.colors.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 24.sp,
             fontWeight = FontWeight.W400,
             fontFamily = attoFontFamily()
@@ -209,27 +207,29 @@ fun SendFromDesktop(
 
         uiState.accountSeed?.let { address ->
             val displayAddress = address.substring(0, address.length / 2) +
-                "\n" +
-                address.substring(address.length / 2, address.length)
+                    "\n" +
+                    address.substring(address.length / 2, address.length)
 
             Text(
                 text = displayAddress,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors
+                color = MaterialTheme.colorScheme
                     .onSurface
                     .copy(alpha = 0.55f),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.headlineSmall
             )
         }
 
         Spacer(Modifier.height(1.dp))
 
         Text(
-            text = "(${AttoFormatter.format(
-                uiState.accountBalance
-            )})",
-            color = MaterialTheme.colors.primary,
-            style = MaterialTheme.typography.h4
+            text = "(${
+                AttoFormatter.format(
+                    uiState.accountBalance
+                )
+            })",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineLarge
         )
 
         Spacer(Modifier.height(24.dp))
@@ -241,7 +241,7 @@ fun SendFromDesktop(
                 if (
                     it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
                     it.key.nativeKeyCode == Key.Tab.nativeKeyCode
-                ){
+                ) {
                     focusRequester.requestFocus()
 
                     return@onPreviewKeyEvent true
@@ -264,9 +264,9 @@ fun SendFromDesktop(
         if (uiState.showAmountError) {
             Text(
                 text = stringResource(Res.string.send_error_amount),
-                color = MaterialTheme.colors.error,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.labelMedium
             )
         }
 
@@ -277,7 +277,7 @@ fun SendFromDesktop(
             },
             modifier = Modifier.focusRequester(focusRequester)
                 .onPreviewKeyEvent {
-                    if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode){
+                    if (it.key.nativeKeyCode == Key.Enter.nativeKeyCode) {
                         onSendClicked.invoke()
 
                         return@onPreviewKeyEvent true
@@ -297,9 +297,9 @@ fun SendFromDesktop(
         if (uiState.showAddressError) {
             Text(
                 text = stringResource(Res.string.send_error_address),
-                color = MaterialTheme.colors.error,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.labelMedium
             )
         }
 

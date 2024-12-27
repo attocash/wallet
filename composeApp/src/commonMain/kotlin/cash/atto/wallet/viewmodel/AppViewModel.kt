@@ -8,7 +8,6 @@ import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

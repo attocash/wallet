@@ -12,11 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -30,6 +30,7 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_copy
 import attowallet.composeapp.generated.resources.ic_share
 import attowallet.composeapp.generated.resources.overview_receive_address
+import attowallet.composeapp.generated.resources.overview_receive_close
 import attowallet.composeapp.generated.resources.overview_receive_copy
 import attowallet.composeapp.generated.resources.overview_receive_share
 import cash.atto.wallet.components.common.BottomSheet
@@ -44,7 +45,8 @@ import java.nio.charset.Charset
 fun ReceiveAttoBottomSheet(
     address: String?,
     onCopy: () -> Unit,
-    onShare: () -> Unit
+    onShare: () -> Unit,
+    onClose: () -> Unit,
 ) = address?.let {
     BottomSheet {
         ReceiveAttoContent(
@@ -55,7 +57,7 @@ fun ReceiveAttoBottomSheet(
         Button(
             onClick = onShare,
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 0.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,
@@ -63,8 +65,8 @@ fun ReceiveAttoBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -75,6 +77,27 @@ fun ReceiveAttoBottomSheet(
                 )
 
                 Text(text = stringResource(Res.string.overview_receive_share))
+            }
+        }
+
+        Button(
+            onClick = onClose,
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            contentPadding = PaddingValues(19.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(text = stringResource(Res.string.overview_receive_close))
             }
         }
     }
@@ -109,15 +132,15 @@ fun ReceiveAttoContentCompact(
 
         Text(
             text = stringResource(Res.string.overview_receive_address),
-            color = MaterialTheme.colors
+            color = MaterialTheme.colorScheme
                 .onSurface
                 .copy(alpha = 0.55f),
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleMedium
         )
 
         Text(
             text = displayAddress,
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.titleLarge
         )
 
         Box(Modifier.height(200.dp)) {
@@ -130,19 +153,19 @@ fun ReceiveAttoContentCompact(
                     )
                     .width(800.dp)
                     .padding(top = 40.dp),
-                color = MaterialTheme.colors
+                color = MaterialTheme.colorScheme
                     .onSurface
                     .copy(alpha = 0.15f),
                 textAlign = TextAlign.Center,
                 softWrap = false,
-                style = MaterialTheme.typography.h2
+                style = MaterialTheme.typography.displayMedium
             )
 
             QRCodeImage(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(30.dp))
-                    .background(MaterialTheme.colors.surface)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(16.dp),
                 url = address,
                 contentDescription = "QR"
@@ -153,7 +176,7 @@ fun ReceiveAttoContentCompact(
         Button(
             onClick = onCopy,
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 0.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,
@@ -161,8 +184,8 @@ fun ReceiveAttoContentCompact(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant,
-                contentColor = MaterialTheme.colors.onPrimary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -194,30 +217,29 @@ fun ReceiveAttoContentExtended(
 
         Text(
             text = stringResource(Res.string.overview_receive_address),
-            color = MaterialTheme.colors
+            color = MaterialTheme.colorScheme
                 .onSurface
                 .copy(alpha = 0.55f),
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.headlineSmall
         )
 
         Text(
             text = displayAddress,
-            style = MaterialTheme.typography.h5
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Box(Modifier.height(300.dp)) {
 
             try {
                 val charset: Charset = Charset.forName("EUC_JP") // EUC_JP is supported
-            }
-            catch (ex:Exception) {
+            } catch (ex: Exception) {
                 return@Box
             }
             QRCodeImage(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colors.surface)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(24.dp),
                 url = String(address.toByteArray(Charsets.UTF_8)),
                 contentDescription = "QR"
@@ -228,7 +250,7 @@ fun ReceiveAttoContentExtended(
         Button(
             onClick = onCopy,
             modifier = Modifier.fillMaxWidth(0.7f),
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 0.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,
@@ -236,8 +258,8 @@ fun ReceiveAttoContentExtended(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant,
-                contentColor = MaterialTheme.colors.onPrimary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -282,7 +304,8 @@ fun ReceiveAttoBottomSheetPreview() {
         ReceiveAttoBottomSheet(
             address = "address",
             onCopy = {},
-            onShare = {}
+            onShare = {},
+            onClose = {},
         )
     }
 }

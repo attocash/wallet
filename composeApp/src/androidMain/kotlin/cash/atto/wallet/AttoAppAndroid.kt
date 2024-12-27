@@ -4,21 +4,13 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -106,33 +98,45 @@ fun AttoNavHost(
                     else -> AttoDestination.Welcome.route
                 },
                 modifier = modifier,
-                enterTransition = { slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(SLIDE_DURATION)
-                ) },
-                exitTransition = { slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(SLIDE_DURATION)
-                ) },
-                popEnterTransition = { slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(SLIDE_DURATION)
-                ) },
-                popExitTransition = { slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(SLIDE_DURATION)
-                ) }
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Start,
+                        tween(SLIDE_DURATION)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Start,
+                        tween(SLIDE_DURATION)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.End,
+                        tween(SLIDE_DURATION)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.End,
+                        tween(SLIDE_DURATION)
+                    )
+                }
             ) {
                 composable(
                     route = AttoDestination.BackupSecret.route,
-                    enterTransition = { slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(SLIDE_DURATION)
-                    ) },
-                    exitTransition = { slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(SLIDE_DURATION)
-                    ) }
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Up,
+                            tween(SLIDE_DURATION)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Down,
+                            tween(SLIDE_DURATION)
+                        )
+                    }
                 ) {
                     BackupSecretPhraseScreen(
                         onBackNavigation = { navController.navigateUp() }
@@ -190,14 +194,18 @@ fun AttoNavHost(
 
                 composable(
                     route = AttoDestination.Representative.route,
-                    enterTransition = { slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(SLIDE_DURATION)
-                    ) },
-                    exitTransition = { slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(SLIDE_DURATION)
-                    ) }
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Up,
+                            tween(SLIDE_DURATION)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Down,
+                            tween(SLIDE_DURATION)
+                        )
+                    }
                 ) {
                     RepresentativeScreen(
                         onBackNavigation = { navController.navigateUp() }
@@ -208,10 +216,12 @@ fun AttoNavHost(
                     route = AttoDestination.SafetyWarning.route,
                     enterTransition = { fadeIn(tween(FADE_DURATION)) },
                     exitTransition = { fadeOut(tween(FADE_DURATION)) },
-                    popEnterTransition = { slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(700)
-                    ) },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(700)
+                        )
+                    },
                 ) {
                     SafetyWarningScreen(
                         onBackNavigation = { navController.navigateUp() },

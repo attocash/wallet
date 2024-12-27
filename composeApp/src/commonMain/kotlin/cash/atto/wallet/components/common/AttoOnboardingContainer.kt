@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,11 +24,11 @@ fun AttoOnboardingContainer(
     content: @Composable (ColumnScope) -> Unit
 ) = Column(
     modifier = modifier.clip(MaterialTheme.shapes.medium)
-        .background(color = MaterialTheme.colors.surface)
+        .background(color = MaterialTheme.colorScheme.surface)
         .border(
             width = 1.dp,
-            color = MaterialTheme.colors
-                .secondaryVariant
+            color = MaterialTheme.colorScheme
+                .secondary
                 .copy(alpha = 0.5f),
             shape = MaterialTheme.shapes.medium
         )

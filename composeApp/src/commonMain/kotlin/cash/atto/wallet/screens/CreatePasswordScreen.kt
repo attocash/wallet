@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -32,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
@@ -139,8 +138,9 @@ fun CreatePasswordCompact(
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(WindowInsets.systemBars
-                    .asPaddingValues()
+                .padding(
+                    WindowInsets.systemBars
+                        .asPaddingValues()
                 )
                 .padding(
                     start = 16.dp,
@@ -175,7 +175,7 @@ fun CreatePasswordCompact(
 
                 Text(
                     text = stringResource(Res.string.password_create_text),
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 AttoTextField(
@@ -207,8 +207,8 @@ fun CreatePasswordCompact(
                                     Res.string.password_weak
                                 else Res.string.password_no_match
                             ),
-                            color = MaterialTheme.colors.error,
-                            style = MaterialTheme.typography.caption
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelMedium
                         )
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -230,8 +230,9 @@ fun CreatePasswordCompact(
             }
         }
 
-        Box(Modifier.fillMaxWidth()
-            .align(Alignment.TopCenter)
+        Box(
+            Modifier.fillMaxWidth()
+                .align(Alignment.TopCenter)
         ) { AppBar(onBackNavigation) }
     }
 }
@@ -253,7 +254,7 @@ fun CreatePasswordExpanded(
             painter = painterResource(Res.drawable.atto_welcome_background),
             contentScale = ContentScale.FillBounds
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = {
             Box(Modifier.fillMaxSize()) {
                 AttoOnboardingContainer(
@@ -262,7 +263,7 @@ fun CreatePasswordExpanded(
                 ) {
                     Text(
                         text = stringResource(Res.string.password_create_title),
-                        style = MaterialTheme.typography.h4
+                        style = MaterialTheme.typography.headlineLarge
                     )
 
                     Spacer(Modifier.height(1.dp))
@@ -300,8 +301,8 @@ fun CreatePasswordExpanded(
                                         Res.string.password_weak
                                     else Res.string.password_no_match
                                 ),
-                                color = MaterialTheme.colors.error,
-                                style = MaterialTheme.typography.caption
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.labelMedium
                             )
                         }
                     )

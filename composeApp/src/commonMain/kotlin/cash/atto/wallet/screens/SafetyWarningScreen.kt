@@ -2,7 +2,6 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -11,11 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,15 +42,16 @@ fun SafetyWarningScreen(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                                + 16.dp
                     )
                     .padding(
                         start = 16.dp,
@@ -76,13 +75,13 @@ fun SafetyWarningScreen(
                     Text(
                         text = stringResource(Res.string.safety_warning_description),
                         lineHeight = 22.sp,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
                     Row(
                         modifier = Modifier.padding(top = 8.dp)
                             .clip(MaterialTheme.shapes.medium)
-                            .background(color = MaterialTheme.colors.secondaryVariant)
+                            .background(color = MaterialTheme.colorScheme.secondary)
                             .padding(
                                 start = 20.dp,
                                 top = 20.dp,
@@ -95,7 +94,7 @@ fun SafetyWarningScreen(
                         Icon(
                             imageVector = vectorResource(Res.drawable.ic_lock),
                             contentDescription = "Lock icon",
-                            tint = MaterialTheme.colors.primary
+                            tint = MaterialTheme.colorScheme.primary
                         )
 
                         Text(

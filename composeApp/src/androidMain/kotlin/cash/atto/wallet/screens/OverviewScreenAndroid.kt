@@ -11,19 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
@@ -31,26 +29,20 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_overview_background
-import attowallet.composeapp.generated.resources.overview_receive
-import attowallet.composeapp.generated.resources.overview_send
-import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.AttoReceiveButton
 import cash.atto.wallet.components.common.AttoSendButton
 import cash.atto.wallet.components.overview.OverviewHeader
+import cash.atto.wallet.components.overview.ReceiveAttoBottomSheet
 import cash.atto.wallet.components.overview.TransactionsList
+import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.BottomSheetShape
 import cash.atto.wallet.uistate.overview.OverviewUiState
-import cash.atto.wallet.components.overview.ReceiveAttoBottomSheet
-import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -86,29 +78,37 @@ fun OverviewScreenAndroid(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewAndroid(
     uiState: OverviewUiState,
     onSettingsClicked: () -> Unit,
     onSendClicked: () -> Unit,
     onReceiveCopyClick: () -> Unit,
-    onReceiveShareClick: () -> Unit
+    onReceiveShareClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
+
+    val sheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            skipHiddenState = false
+        )
     )
 
-    ModalBottomSheetLayout(
-        sheetContent = { ReceiveAttoBottomSheet(
-            address = uiState.receiveAddress,
-            onCopy = onReceiveCopyClick,
-            onShare = onReceiveShareClick
-        ) },
-        sheetState = sheetState,
-        sheetShape = BottomSheetShape
+    BottomSheetScaffold(
+        sheetContent = {
+            ReceiveAttoBottomSheet(
+                address = uiState.receiveAddress,
+                onCopy = onReceiveCopyClick,
+                onShare = onReceiveShareClick,
+                onClose = { scope.launch { sheetState.bottomSheetState.hide() } },
+            )
+        },
+        scaffoldState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetSwipeEnabled = false,
+        sheetDragHandle = null,
     ) {
         Column(
             modifier = Modifier
@@ -131,7 +131,7 @@ fun OverviewAndroid(
                 onReceiveClicked = {
                     scope.launch {
                         if (uiState.receiveAddress != null)
-                            sheetState.show()
+                            sheetState.bottomSheetState.expand()
                     }
                 }
             )
@@ -145,21 +145,24 @@ fun OverviewAndroidContent(
     onSendClicked: () -> Unit,
     onReceiveClicked: () -> Unit
 ) {
-    Column(Modifier.padding(
-        top = 40.dp,
-        bottom = 16.dp
-    )) {
+    Column(
+        Modifier.padding(
+            top = 40.dp,
+            bottom = 16.dp
+        )
+    ) {
         Surface(
             modifier = Modifier
                 .weight(1f)
                 .padding(bottom = 16.dp),
-            elevation = 1.dp,
+            tonalElevation = 1.dp,
             shape = RoundedCornerShape(50.dp)
         ) {
-            Box(modifier = Modifier
-                .background(color = MaterialTheme.colors.surface)
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp)
+            Box(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
             ) {
                 TransactionsList(
                     uiState = uiState.transactionListUiState,

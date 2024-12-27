@@ -1,14 +1,10 @@
 package cash.atto.wallet.uistate.overview
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_arrow_down
@@ -30,7 +26,7 @@ data class TransactionUiState(
     val type: TransactionType,
     val amount: String?,
     val source: String,
-    val timestamp : Instant,
+    val timestamp: Instant,
 ) {
 
     var shownAmount = amount?.let { a ->
@@ -76,9 +72,9 @@ data class TransactionUiState(
         @Composable
         get() {
             val colors = when (type) {
-                TransactionType.SEND -> MaterialTheme.colors.primaryGradient
-                TransactionType.RECEIVE -> MaterialTheme.colors.secondaryGradient
-                else -> MaterialTheme.colors.errorGradient
+                TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
+                TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
+                else -> MaterialTheme.colorScheme.errorGradient
             }
 
             return Brush.horizontalGradient(
@@ -90,9 +86,9 @@ data class TransactionUiState(
         @Composable
         get() {
             val colors = when (type) {
-                TransactionType.SEND -> MaterialTheme.colors.primaryGradient
-                TransactionType.RECEIVE -> MaterialTheme.colors.secondaryGradient
-                else -> MaterialTheme.colors.errorGradient
+                TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
+                TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
+                else -> MaterialTheme.colorScheme.errorGradient
             }
 
             return Brush.horizontalGradient(

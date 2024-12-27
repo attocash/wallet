@@ -5,7 +5,8 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun TransferFundsBottomSheet() {}
+fun TransferFundsBottomSheet() {
+}
 
 @Preview
 @Composable

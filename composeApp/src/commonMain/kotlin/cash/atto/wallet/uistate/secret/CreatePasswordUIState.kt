@@ -5,10 +5,11 @@ data class CreatePasswordUIState(
     val passwordConfirm: String?,
     val checkState: PasswordCheckState
 ) {
-    val showError get() = listOf(
-        PasswordCheckState.INVALID,
-        PasswordCheckState.NON_MATCHING
-    ).contains(checkState)
+    val showError
+        get() = listOf(
+            PasswordCheckState.INVALID,
+            PasswordCheckState.NON_MATCHING
+        ).contains(checkState)
 
     enum class PasswordCheckState {
         UNKNOWN,

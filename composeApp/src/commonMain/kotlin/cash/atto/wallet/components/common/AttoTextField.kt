@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.TextField
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +43,7 @@ fun AttoTextField(
                 if (
                     it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
                     it.key.nativeKeyCode == Key.Tab.nativeKeyCode
-                ){
+                ) {
                     onDone.invoke()
 
                     return@onPreviewKeyEvent true

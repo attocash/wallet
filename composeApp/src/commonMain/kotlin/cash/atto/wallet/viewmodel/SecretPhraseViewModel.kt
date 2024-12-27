@@ -1,7 +1,6 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import cash.atto.commons.AttoMnemonic
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import kotlinx.coroutines.CoroutineScope

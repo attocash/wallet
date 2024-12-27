@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,14 +42,14 @@ fun ProfileSmall(
         ) {
             Text(
                 text = uiState.name,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
                 text = uiState.hash,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -65,7 +65,7 @@ fun ProfileExtended(
             imageVector = vectorResource(Res.drawable.ic_atto),
             contentDescription = "Atto",
             modifier = Modifier.size(28.dp, 28.dp),
-            tint = MaterialTheme.colors.primary
+            tint = MaterialTheme.colorScheme.primary
         )
 
         Text(
@@ -84,7 +84,7 @@ fun ProfileExtended(
         ) {
             Text(
                 text = uiState.name,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
@@ -92,7 +92,7 @@ fun ProfileExtended(
                 modifier = Modifier.width(180.dp),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

@@ -16,14 +16,15 @@ class ImportSecretViewModel(
     val state = _state.asStateFlow()
 
     suspend fun updateInput(value: String) {
-        _state.emit(state.value
-            .copy(input = value)
+        _state.emit(
+            state.value
+                .copy(input = value)
         )
 
         checkWallet()
     }
 
-    suspend fun importWallet() : Boolean {
+    suspend fun importWallet(): Boolean {
         if (!checkWallet())
             return false
 
@@ -38,16 +39,17 @@ class ImportSecretViewModel(
         return true
     }
 
-    private suspend fun checkWallet() : Boolean {
+    private suspend fun checkWallet(): Boolean {
         try {
             val mnemonic = AttoMnemonic(state.value.input.orEmpty())
-            _state.emit(state.value
-                .copy(errorMessage = null)
+            _state.emit(
+                state.value
+                    .copy(errorMessage = null)
             )
-        }
-        catch (ex: AttoMnemonicException) {
-            _state.emit(state.value
-                .copy(errorMessage = ex.message)
+        } catch (ex: AttoMnemonicException) {
+            _state.emit(
+                state.value
+                    .copy(errorMessage = ex.message)
             )
 
             return false

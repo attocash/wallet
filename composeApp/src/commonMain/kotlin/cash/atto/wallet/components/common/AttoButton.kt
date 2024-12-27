@@ -9,23 +9,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ButtonElevation
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.primaryGradient
+import io.ktor.websocket.Frame
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Doesn't support interactionSource since this is actually a row
@@ -43,20 +40,20 @@ fun AttoButton(
         modifier = modifier
             .clickable(
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = true),
+                indication = ripple(bounded = true),
                 enabled = enabled,
                 onClick = onClick
             ),
         shape = shape,
     ) {
         ProvideTextStyle(
-            value = MaterialTheme.typography.button
+            value = MaterialTheme.typography.labelLarge
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth()
                     .background(
                         brush = Brush.horizontalGradient(
-                            colors = MaterialTheme.colors.primaryGradient
+                            colors = MaterialTheme.colorScheme.primaryGradient
                         )
                     )
             ) {
@@ -76,7 +73,7 @@ fun AttoButton(
 fun AttoButtonPreview() {
     AttoWalletTheme {
         AttoButton(onClick = {}) {
-            Text("Button")
+            Frame.Text("Button")
         }
     }
 }

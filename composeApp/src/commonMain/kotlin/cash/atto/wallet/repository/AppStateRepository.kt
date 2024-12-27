@@ -1,24 +1,15 @@
 package cash.atto.wallet.repository
 
-import cash.atto.commons.AttoAddress
-import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoMnemonic
-import cash.atto.commons.AttoPrivateKey
-import cash.atto.commons.toPrivateKey
-import cash.atto.commons.toPublicKey
-import cash.atto.commons.toSeed
-import cash.atto.commons.toSigner
-import cash.atto.wallet.state.AppState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SeedDataSource
-import cash.atto.wallet.uistate.settings.RepresentativeUIState
+import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AppStateRepository(
@@ -103,35 +94,45 @@ class AppStateRepository(
     private suspend fun setMnemonic(
         mnemonic: AttoMnemonic?,
     ) {
-        _state.emit(state.value.copy(
-            mnemonic = mnemonic
-        ))
+        _state.emit(
+            state.value.copy(
+                mnemonic = mnemonic
+            )
+        )
     }
 
     private suspend fun setAuthState(authState: AppState.AuthState) {
-        _state.emit(state.value.copy(
-            authState = authState
-        ))
+        _state.emit(
+            state.value.copy(
+                authState = authState
+            )
+        )
     }
 
     private suspend fun setPassword(password: String?) {
-        _state.emit(state.value.copy(
-            password = password
-        ))
+        _state.emit(
+            state.value.copy(
+                password = password
+            )
+        )
     }
 
     private suspend fun startSession() {
-        _state.emit(state.value.copy(
-            authState = AppState.AuthState.SESSION_VALID
-        ))
+        _state.emit(
+            state.value.copy(
+                authState = AppState.AuthState.SESSION_VALID
+            )
+        )
 
         sessionJob?.cancel()
         sessionJob = sessionScope.launch {
             delay(SESSION_DURATION)
 
-            _state.emit(state.value.copy(
-                authState = AppState.AuthState.SESSION_INVALID
-            ))
+            _state.emit(
+                state.value.copy(
+                    authState = AppState.AuthState.SESSION_INVALID
+                )
+            )
         }
     }
 

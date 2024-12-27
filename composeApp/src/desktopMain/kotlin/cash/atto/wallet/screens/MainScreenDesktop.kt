@@ -32,12 +32,10 @@ import cash.atto.wallet.components.NavigationDrawerItem
 import cash.atto.wallet.components.PermanentNavigationDrawer
 import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.components.settings.ProfileExtended
-import cash.atto.wallet.components.settings.ProfileSmall
 import cash.atto.wallet.components.settings.SettingsList
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
-import cash.atto.wallet.viewmodel.SettingsViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource

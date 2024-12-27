@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -110,14 +110,15 @@ fun ImportSecretCompact(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         content = {
             Column(
                 modifier = Modifier.fillMaxSize()
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                                + 16.dp
                     )
                     .padding(
                         start = 16.dp,
@@ -140,7 +141,7 @@ fun ImportSecretCompact(
                     Text(
                         text = stringResource(Res.string.secret_import_hint),
                         lineHeight = 22.sp,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
                     AttoTextField(
@@ -155,8 +156,8 @@ fun ImportSecretCompact(
                         errorLabel = {
                             Text(
                                 text = uiState.errorMessage.orEmpty(),
-                                color = MaterialTheme.colors.error,
-                                style = MaterialTheme.typography.caption
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.labelMedium
                             )
                         }
                     )
@@ -188,7 +189,7 @@ fun ImportSecretExpanded(
             painter = painterResource(Res.drawable.atto_welcome_background),
             contentScale = ContentScale.FillBounds
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = {
             Box(Modifier.fillMaxSize()) {
                 AttoOnboardingContainer(
@@ -198,7 +199,7 @@ fun ImportSecretExpanded(
                 ) {
                     Text(
                         text = stringResource(Res.string.secret_import_title),
-                        style = MaterialTheme.typography.h4
+                        style = MaterialTheme.typography.headlineLarge
                     )
 
                     Text(
@@ -218,8 +219,8 @@ fun ImportSecretExpanded(
                         errorLabel = {
                             Text(
                                 text = uiState.errorMessage.orEmpty(),
-                                color = MaterialTheme.colors.error,
-                                style = MaterialTheme.typography.caption
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.labelMedium
                             )
                         }
                     )

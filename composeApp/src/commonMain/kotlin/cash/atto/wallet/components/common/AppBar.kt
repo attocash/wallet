@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,9 +37,10 @@ fun AppBar(onBackNavigation: () -> Unit) {
     ) {
         Box(Modifier.size(48.dp, 48.dp)
             .clip(CircleShape)
-            .background(color = MaterialTheme.colors
-                .onSurface
-                .copy(alpha = 0.05f)
+            .background(
+                color = MaterialTheme.colorScheme
+                    .onSurface
+                    .copy(alpha = 0.05f)
             )
             .clickable { onBackNavigation.invoke() }
         ) {
