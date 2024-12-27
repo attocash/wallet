@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -37,15 +36,16 @@ fun SecretBackupConfirmScreen(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                                + 16.dp
                     )
                     .padding(
                         start = 16.dp,
@@ -71,7 +71,7 @@ fun SecretBackupConfirmScreen(
                     Text(
                         text = stringResource(Res.string.backup_confirm_subtitle),
                         lineHeight = 22.sp,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 

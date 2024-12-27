@@ -1,9 +1,9 @@
 package cash.atto.wallet.components.settings
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.logout_cancel
@@ -25,7 +25,7 @@ fun LogoutDialog(
             TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(Res.string.logout_confirm),
-                    style = MaterialTheme.typography.overline
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
         },
@@ -33,14 +33,14 @@ fun LogoutDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = stringResource(Res.string.logout_cancel),
-                    style = MaterialTheme.typography.overline
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
         },
         title = {
             Text(
                 text = stringResource(Res.string.logout_title),
-                color = MaterialTheme.colors.primary
+                color = MaterialTheme.colorScheme.primary
             )
         },
         text = {

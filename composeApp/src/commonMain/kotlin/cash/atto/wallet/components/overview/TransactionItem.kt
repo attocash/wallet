@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +54,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                         contentDescription = "operation type icon",
                         modifier = Modifier.align(Alignment.Center)
                             .rotate(-45f),
-                        tint = MaterialTheme.colors.secondary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -62,7 +62,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                     Text(uiState.typeString)
                     Text(
                         text = uiState.shownAmount,
-                        color = MaterialTheme.colors.secondary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -71,7 +71,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                 Text(
                     text = uiState.source,
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.44f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.44f),
                     textAlign = TextAlign.End,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2

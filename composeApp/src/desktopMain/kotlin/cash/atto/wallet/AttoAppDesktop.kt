@@ -1,19 +1,11 @@
 package cash.atto.wallet
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.CreatePasswordScreen
@@ -31,7 +23,6 @@ import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.backStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.popToFirst
-import com.arkivanov.decompose.router.stack.popWhile
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.compose.KoinContext

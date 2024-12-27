@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +28,6 @@ import attowallet.composeapp.generated.resources.ic_nav_settings
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.primaryGradient
-import cash.atto.wallet.ui.setting
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -40,13 +39,17 @@ fun ExpandableDrawerItem(
         mutableStateOf(false)
     }
 
-    Column(Modifier.fillMaxWidth()
-        .clip(MaterialTheme.shapes.medium)
-        .background(brush = Brush.horizontalGradient(
-            MaterialTheme.colors
-                .primaryGradient
-                .map { it.copy(alpha = 0.4f) }
-        ))
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(
+                brush = Brush.horizontalGradient(
+                    MaterialTheme.colorScheme.primaryGradient.map {
+                        it.copy(alpha = 0.4f)
+                    }
+                )
+            )
     ) {
         Row(
             modifier = Modifier.padding(
@@ -61,7 +64,7 @@ fun ExpandableDrawerItem(
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_nav_settings),
                 contentDescription = "Settings Icon",
-                tint = MaterialTheme.colors.setting
+                tint = MaterialTheme.colorScheme.primary
             )
 
             Text(

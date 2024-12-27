@@ -21,10 +21,12 @@ class BackupSecretViewModel(
     init {
         viewModelScope.launch {
             appStateRepository.state.value.mnemonic?.let {
-                _state.emit(SecretPhraseUiState(
-                    words = it.words,
-                    hidden = true
-                ))
+                _state.emit(
+                    SecretPhraseUiState(
+                        words = it.words,
+                        hidden = true
+                    )
+                )
             }
         }
     }

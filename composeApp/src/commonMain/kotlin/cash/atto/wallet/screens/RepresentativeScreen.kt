@@ -15,14 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -59,6 +59,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+
 
 @Composable
 fun RepresentativeScreen(
@@ -100,54 +101,59 @@ fun RepresentativeScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepresentativeScreenCompact(
     uiState: RepresentativeUIState,
     onBackNavigation: () -> Unit,
     onChange: suspend (String) -> Boolean,
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+    val sheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            skipHiddenState = false
+        )
     )
 
     val coroutineScope = rememberCoroutineScope()
 
-    ModalBottomSheetLayout(
+    BottomSheetScaffold(
         sheetContent = {
             EnterRepresentativeBottomSheet(
                 onChange = {
                     coroutineScope.launch {
                         if (onChange.invoke(it))
-                            sheetState.hide()
+                            sheetState.bottomSheetState.hide()
                     }
                 },
                 onClose = {
                     coroutineScope.launch {
-                        sheetState.hide()
+                        sheetState.bottomSheetState.hide()
                     }
                 },
                 showError = uiState.showError
             )
         },
-        sheetState = sheetState,
-        sheetShape = BottomSheetShape
+        scaffoldState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetSwipeEnabled = false,
+        sheetDragHandle = null,
     ) {
         Scaffold(
             topBar = { AppBar(onBackNavigation) },
             modifier = Modifier.background(
                 brush = Brush.horizontalGradient(
-                    colors = MaterialTheme.colors.primaryGradient
+                    colors = MaterialTheme.colorScheme.primaryGradient
                 )
             ),
-            backgroundColor = Color.Transparent,
+            containerColor = Color.Transparent,
             content = {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 16.dp)
                         .clip(BottomSheetShape)
-                        .background(color = MaterialTheme.colors.secondaryVariant)
+                        .background(color = MaterialTheme.colorScheme.secondary)
                         .padding(
                             bottom = WindowInsets.systemBars
                                 .asPaddingValues()
@@ -164,7 +170,7 @@ fun RepresentativeScreenCompact(
                 ) {
                     Text(
                         text = stringResource(Res.string.representative_title),
-                        style = MaterialTheme.typography.h5
+                        style = MaterialTheme.typography.headlineMedium
                     )
 
                     Text(
@@ -174,7 +180,7 @@ fun RepresentativeScreenCompact(
 
                     AttoOutlinedTextCard(
                         text = uiState.representative.orEmpty(),
-                        color = MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(Modifier.weight(1f))
@@ -182,7 +188,7 @@ fun RepresentativeScreenCompact(
                     AttoButton(
                         onClick = {
                             coroutineScope.launch {
-                                sheetState.show()
+                                sheetState.bottomSheetState.expand()
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -195,38 +201,44 @@ fun RepresentativeScreenCompact(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepresentativeScreenExpanded(
     uiState: RepresentativeUIState,
     onBackNavigation: () -> Unit,
     onChange: suspend (String) -> Boolean,
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+
+    val sheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            skipHiddenState = false
+        )
     )
 
     val coroutineScope = rememberCoroutineScope()
 
-    ModalBottomSheetLayout(
+    BottomSheetScaffold(
         sheetContent = {
             EnterRepresentativeBottomSheet(
                 onChange = {
                     coroutineScope.launch {
                         if (onChange.invoke(it))
-                            sheetState.hide()
+                            sheetState.bottomSheetState.hide()
                     }
                 },
                 onClose = {
                     coroutineScope.launch {
-                        sheetState.hide()
+                        sheetState.bottomSheetState.hide()
                     }
                 },
                 showError = uiState.showError
             )
         },
-        sheetState = sheetState,
-        sheetShape = BottomSheetShape
+        scaffoldState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetSwipeEnabled = false,
+        sheetDragHandle = null,
     ) {
         Scaffold(
             topBar = { AppBar(onBackNavigation) },
@@ -234,7 +246,7 @@ fun RepresentativeScreenExpanded(
                 painter = painterResource(Res.drawable.atto_background_desktop),
                 contentScale = ContentScale.FillBounds
             ),
-            backgroundColor = Color.Transparent,
+            containerColor = Color.Transparent,
             content = {
                 Box(Modifier.fillMaxSize()) {
                     Column(
@@ -243,14 +255,14 @@ fun RepresentativeScreenExpanded(
                             .fillMaxHeight(0.8f)
                             .align(Alignment.Center)
                             .clip(RoundedCornerShape(50.dp))
-                            .background(color = MaterialTheme.colors.surface)
+                            .background(color = MaterialTheme.colorScheme.surface)
                             .padding(top = 84.dp, bottom = 72.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = stringResource(Res.string.representative_title),
-                            style = MaterialTheme.typography.h4
+                            style = MaterialTheme.typography.headlineLarge
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -265,14 +277,14 @@ fun RepresentativeScreenExpanded(
                         val displayAddress = uiState.representative
                             ?.let { address ->
                                 address.substring(0, address.length / 2) +
-                                    "\n" +
-                                    address.substring(address.length / 2, address.length)
+                                        "\n" +
+                                        address.substring(address.length / 2, address.length)
                             }
 
                         Text(
                             text = displayAddress.orEmpty(),
                             modifier = Modifier.clip(RoundedCornerShape(50.dp))
-                                .background(MaterialTheme.colors.secondaryVariant)
+                                .background(MaterialTheme.colorScheme.secondary)
                                 .padding(
                                     vertical = 24.dp,
                                     horizontal = 72.dp
@@ -284,7 +296,7 @@ fun RepresentativeScreenExpanded(
                         AttoButton(
                             onClick = {
                                 coroutineScope.launch {
-                                    sheetState.show()
+                                    sheetState.bottomSheetState.expand()
                                 }
                             },
                             modifier = Modifier.width(300.dp)

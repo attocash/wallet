@@ -9,8 +9,7 @@ class PasswordDataSourceWindows : PasswordDataSourceDesktopImpl {
             winCred
                 .getCredential("$APP_NAME${seed.hashCode()}")
                 .ifEmpty { null }
-        }
-        catch (ex: Exception) {
+        } catch (ex: Exception) {
             null
         }
     }

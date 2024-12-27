@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class SendTransactionViewModel(
     private val walletManagerRepository: WalletManagerRepository,

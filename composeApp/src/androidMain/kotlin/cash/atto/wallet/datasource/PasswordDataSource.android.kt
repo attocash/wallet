@@ -18,7 +18,7 @@ actual class PasswordDataSource(
     private val securityUtil = SecurityUtil()
     private val securityKeyAlias = "password-store"
     private val bytesToStringSeparator = "|"
-    private val ivToStringSeparator= ":iv:"
+    private val ivToStringSeparator = ":iv:"
 
     private val dataStore = context.dataStore
 
@@ -30,7 +30,7 @@ actual class PasswordDataSource(
         val key = stringPreferencesKey("$PASSWORD_KEY${encryptedSeed}")
         val passwordFlow = dataStore.data
             .map { preferences ->
-                with (preferences[key] ?: return@map null) {
+                with(preferences[key] ?: return@map null) {
                     val (ivString, valueString) = this.split(ivToStringSeparator, limit = 2)
 
                     return@map securityUtil.decryptData(

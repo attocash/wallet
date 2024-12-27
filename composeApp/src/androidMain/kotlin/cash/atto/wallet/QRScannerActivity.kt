@@ -15,7 +15,10 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -73,10 +76,12 @@ class QRScannerActivity : ComponentActivity() {
                         val imageAnalysis = ImageAnalysis.Builder()
                             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                             .build()
-                            .also { it.setAnalyzer(
-                                cameraExecutor,
-                                analyzer
-                            ) }
+                            .also {
+                                it.setAnalyzer(
+                                    cameraExecutor,
+                                    analyzer
+                                )
+                            }
 
                         try {
                             cameraProvider?.unbindAll()
@@ -86,8 +91,7 @@ class QRScannerActivity : ComponentActivity() {
                                 preview,
                                 imageAnalysis
                             )
-                        }
-                        catch (e: Exception) {
+                        } catch (e: Exception) {
                             Log.e("QrScannerActivity", "Camera binding failed", e)
                         }
                     }, ContextCompat.getMainExecutor(context))

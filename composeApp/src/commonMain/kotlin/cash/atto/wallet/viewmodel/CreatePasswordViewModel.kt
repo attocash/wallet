@@ -16,15 +16,19 @@ class CreatePasswordViewModel(
     val state = _state.asStateFlow()
 
     suspend fun setPassword(password: String?) {
-        _state.emit(state.value.copy(
-            password = password
-        ))
+        _state.emit(
+            state.value.copy(
+                password = password
+            )
+        )
     }
 
     suspend fun setPasswordConfirm(passwordConfirm: String?) {
-        _state.emit(state.value.copy(
-            passwordConfirm = passwordConfirm
-        ))
+        _state.emit(
+            state.value.copy(
+                passwordConfirm = passwordConfirm
+            )
+        )
     }
 
     suspend fun savePassword(): Boolean {
@@ -48,8 +52,8 @@ class CreatePasswordViewModel(
         _state.emit(CreatePasswordUIState.DEFAULT)
     }
 
-    private fun checkPasswordsMatch() : CreatePasswordUIState.PasswordCheckState =
-        with (state.value) {
+    private fun checkPasswordsMatch(): CreatePasswordUIState.PasswordCheckState =
+        with(state.value) {
             if (password != passwordConfirm)
                 CreatePasswordUIState.PasswordCheckState.NON_MATCHING
             else CreatePasswordUIState.PasswordCheckState.VALID

@@ -3,19 +3,14 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
-import cash.atto.commons.AttoPrivateKey
 import cash.atto.commons.toAddress
-import cash.atto.commons.toPublicKey
-import cash.atto.commons.toSigner
 import cash.atto.commons.wallet.AttoWalletManager
-import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.settings.RepresentativeUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class RepresentativeViewModel(
@@ -30,7 +25,7 @@ class RepresentativeViewModel(
     init {
         viewModelScope.launch {
             walletManagerRepository.state
-                .collect { updateRepresentative(it)}
+                .collect { updateRepresentative(it) }
         }
     }
 
@@ -64,11 +59,13 @@ class RepresentativeViewModel(
         if (walletManager?.account == null)
             return
 
-        _state.emit(RepresentativeUIState(
-            walletManager.account!!
-                .representativePublicKey
-                .toAddress(AttoAlgorithm.V1)
-                .value
-        ))
+        _state.emit(
+            RepresentativeUIState(
+                walletManager.account!!
+                    .representativePublicKey
+                    .toAddress(AttoAlgorithm.V1)
+                    .value
+            )
+        )
     }
 }

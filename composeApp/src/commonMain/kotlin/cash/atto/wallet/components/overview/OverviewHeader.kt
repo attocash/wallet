@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +34,10 @@ fun OverviewHeader(
                 .padding(top = 32.dp, end = 16.dp)
                 .size(48.dp, 48.dp)
                 .clip(CircleShape)
-                .background(color = MaterialTheme.colors
-                    .surface
-                    .copy(alpha = 0.5f)
+                .background(
+                    color = MaterialTheme.colorScheme
+                        .surface
+                        .copy(alpha = 0.5f)
                 )
                 .clickable { it.invoke() }
             ) {
@@ -44,7 +45,7 @@ fun OverviewHeader(
                     modifier = Modifier.align(Alignment.Center),
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "settings",
-                    tint = MaterialTheme.colors.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -55,7 +56,7 @@ fun OverviewHeader(
         ) {
             Text(
                 text = AttoFormatter.format(uiState.attoCoins),
-                style = MaterialTheme.typography.h1
+                style = MaterialTheme.typography.displayLarge
             )
         }
     }

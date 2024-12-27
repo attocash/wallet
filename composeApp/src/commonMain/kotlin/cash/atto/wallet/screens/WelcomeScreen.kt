@@ -1,23 +1,17 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -25,13 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
-import attowallet.composeapp.generated.resources.atto_welcome_cubes
 import attowallet.composeapp.generated.resources.atto_welcome_cubes_expanded
 import attowallet.composeapp.generated.resources.ic_atto
 import attowallet.composeapp.generated.resources.welcome_create_wallet
@@ -93,22 +85,23 @@ fun WelcomeScreenCompact(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
             text = stringResource(Res.string.welcome_title),
-            color = MaterialTheme.colors.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h4
+            style = MaterialTheme.typography.headlineLarge
         )
 
         Text(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
             text = stringResource(Res.string.welcome_message),
-            color = MaterialTheme.colors.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.labelMedium
         )
 
-        Box(Modifier.padding(top = 18.dp)
-            .weight(1f)
+        Box(
+            Modifier.padding(top = 18.dp)
+                .weight(1f)
         ) {
 //            Image(
 //                bitmap = imageResource(Res.drawable.atto_welcome_cubes),
@@ -171,16 +164,16 @@ fun WelcomeScreenExpanded(
         ) {
             Text(
                 text = stringResource(Res.string.welcome_title),
-                color = MaterialTheme.colors.onSurface,
-                style = MaterialTheme.typography.h1
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.displayLarge
             )
 
             Spacer(Modifier.height(6.dp))
 
             Text(
                 text = stringResource(Res.string.welcome_message),
-                color = MaterialTheme.colors.onSurface,
-                style = MaterialTheme.typography.h6
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.headlineSmall
             )
 
             Spacer(Modifier.height(15.dp))

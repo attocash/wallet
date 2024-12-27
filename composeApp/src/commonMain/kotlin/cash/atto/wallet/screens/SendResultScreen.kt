@@ -1,6 +1,5 @@
 package cash.atto.wallet.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,14 +31,13 @@ import attowallet.composeapp.generated.resources.send_failure_to
 import attowallet.composeapp.generated.resources.send_success_to
 import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.AttoOutlinedTextCard
-import cash.atto.wallet.components.common.OutlinedTextCard
-import cash.atto.wallet.components.common.TextCard
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.success
 import cash.atto.wallet.uistate.send.SendResultUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -93,23 +91,23 @@ fun SendResult(
                     modifier = Modifier
                         .height(96.dp)
                         .width(96.dp),
-                    tint = MaterialTheme.colors.success
+                    tint = MaterialTheme.colorScheme.success
                 )
 
                 AttoOutlinedTextCard(
                     text = AttoFormatter.format(uiState.amount),
-                    color = MaterialTheme.colors.success
+                    color = MaterialTheme.colorScheme.success
                 )
 
                 Text(
                     text = stringResource(Res.string.send_success_to),
-                    color = MaterialTheme.colors.success,
-                    style = MaterialTheme.typography.h5
+                    color = MaterialTheme.colorScheme.success,
+                    style = MaterialTheme.typography.headlineMedium
                 )
 
                 AttoOutlinedTextCard(
                     text = uiState.address.orEmpty(),
-                    color = MaterialTheme.colors.success
+                    color = MaterialTheme.colorScheme.success
                 )
             }
 
@@ -120,29 +118,29 @@ fun SendResult(
                     modifier = Modifier
                         .height(96.dp)
                         .width(96.dp),
-                    tint = MaterialTheme.colors.error
+                    tint = MaterialTheme.colorScheme.error
                 )
 
                 Text(
                     text = stringResource(Res.string.send_failure_title),
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.h5
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.headlineMedium
                 )
 
                 AttoOutlinedTextCard(
                     text = AttoFormatter.format(uiState.amount),
-                    color = MaterialTheme.colors.error
+                    color = MaterialTheme.colorScheme.error
                 )
 
                 Text(
                     text = stringResource(Res.string.send_failure_to),
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.h5
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.headlineMedium
                 )
 
                 AttoOutlinedTextCard(
                     text = uiState.address.orEmpty(),
-                    color = MaterialTheme.colors.error
+                    color = MaterialTheme.colorScheme.error
                 )
             }
 
@@ -155,11 +153,11 @@ fun SendResult(
             onClick = onClose,
             modifier = Modifier.fillMaxWidth(),
             color = if (uiState.result == SendTransactionUiState.SendOperationResult.SUCCESS)
-                MaterialTheme.colors.success
-            else MaterialTheme.colors.error,
+                MaterialTheme.colorScheme.success
+            else MaterialTheme.colorScheme.error,
             transparent = true
         ) {
-            Text(text = stringResource(Res.string.send_close))
+            Frame.Text(text = stringResource(Res.string.send_close))
         }
     }
 }

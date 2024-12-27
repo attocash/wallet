@@ -4,12 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ButtonElevation
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -25,7 +24,7 @@ fun AttoOutlinedButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = ButtonDefaults.elevation(
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(
         defaultElevation = 0.dp,
         pressedElevation = 0.dp,
         disabledElevation = 0.dp,
@@ -33,7 +32,7 @@ fun AttoOutlinedButton(
         focusedElevation = 0.dp
     ),
     shape: Shape = MaterialTheme.shapes.small,
-    color: Color = MaterialTheme.colors.onSurface,
+    color: Color = MaterialTheme.colorScheme.onSurface,
     contentPadding: PaddingValues = PaddingValues(19.dp),
     transparent: Boolean = false,
     content: @Composable() (RowScope.() -> Unit)
@@ -47,8 +46,8 @@ fun AttoOutlinedButton(
         shape = shape,
         border = BorderStroke(1.dp, color),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (transparent) Color.Transparent
-                else MaterialTheme.colors.surface,
+            containerColor = if (transparent) Color.Transparent
+            else MaterialTheme.colorScheme.surface,
             contentColor = color
         ),
         contentPadding = contentPadding,

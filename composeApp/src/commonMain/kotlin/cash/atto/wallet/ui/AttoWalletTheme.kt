@@ -1,19 +1,20 @@
 package cash.atto.wallet.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Shapes
-import androidx.compose.material.lightColors
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val attoColors = lightColors(
+
+val attoColors = lightColorScheme(
     primary = gold_600,
 //    primaryVariant = brown_600,
-    secondary = gold_900,
-    secondaryVariant = gold_100,
+    secondary = gold_100,
+//    secondaryVariant = gold_100,
     background = Color.Black,
     surface = Color.White,
     error = red_900,
@@ -24,33 +25,33 @@ val attoColors = lightColors(
     onError = Color.White
 )
 
-val Colors.back: Color
+val ColorScheme.back: Color
     get() = gray_700
 
-val Colors.divider: Color
+val ColorScheme.divider: Color
     get() = gray_800
 
-val Colors.setting: Color
+val ColorScheme.setting: Color
     get() = ochre_600
 
-val Colors.success: Color
+val ColorScheme.success: Color
     get() = green_700
 
-val Colors.primaryGradient: List<Color>
+val ColorScheme.primaryGradient: List<Color>
     get() = listOf(
         Color(0xffFFE249),
         Color(0xffFFD11F),
         Color(0xffFF9C05)
     )
 
-val Colors.secondaryGradient: List<Color>
+val ColorScheme.secondaryGradient: List<Color>
     get() = listOf(
         Color(0xffFF9B36),
         Color(0xffEC6C00),
         Color(0xffFC8704)
     )
 
-val Colors.errorGradient: List<Color>
+val ColorScheme.errorGradient: List<Color>
     get() = listOf(
         Color(0xffDA0004),
         Color(0xffFF0004),
@@ -71,7 +72,7 @@ val BottomSheetShape = RoundedCornerShape(
 @Composable
 fun AttoWalletTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colors = attoColors,
+        colorScheme = attoColors,
         typography = attoWalletTypography(),
         shapes = attoShapes
     ) {

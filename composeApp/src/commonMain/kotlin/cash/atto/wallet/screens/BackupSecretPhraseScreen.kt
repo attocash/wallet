@@ -14,10 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -122,17 +122,17 @@ fun BackupSecretPhraseCompact(
         topBar = { AppBar(onBackNavigation) },
         modifier = Modifier.background(
             brush = Brush.horizontalGradient(
-                colors = MaterialTheme.colors.primaryGradient
+                colors = MaterialTheme.colorScheme.primaryGradient
             )
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp)
                     .clip(BottomSheetShape)
-                    .background(color = MaterialTheme.colors.secondaryVariant)
+                    .background(color = MaterialTheme.colorScheme.secondary)
                     .padding(
                         bottom = WindowInsets.systemBars
                             .asPaddingValues()
@@ -149,7 +149,7 @@ fun BackupSecretPhraseCompact(
             ) {
                 Text(
                     text = stringResource(Res.string.secret_title),
-                    style = MaterialTheme.typography.h5
+                    style = MaterialTheme.typography.headlineMedium
                 )
 
                 SecretPhraseGridCompact(
@@ -161,10 +161,12 @@ fun BackupSecretPhraseCompact(
                     onClick = onVisibilityToggled,
                     transparent = true
                 ) {
-                    Text(text = stringResource(
-                        if (uiState.hidden) Res.string.settings_backup_show
-                        else Res.string.settings_backup_hide
-                    ))
+                    Text(
+                        text = stringResource(
+                            if (uiState.hidden) Res.string.settings_backup_show
+                            else Res.string.settings_backup_hide
+                        )
+                    )
                 }
 
                 Spacer(Modifier.weight(1f))
@@ -193,7 +195,7 @@ fun BackupSecretPhraseExtended(
             painter = painterResource(Res.drawable.atto_background_desktop),
             contentScale = ContentScale.FillBounds
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -201,7 +203,7 @@ fun BackupSecretPhraseExtended(
                         .fillMaxWidth(0.7f)
                         .align(Alignment.Center)
                         .clip(RoundedCornerShape(50.dp))
-                        .background(color = MaterialTheme.colors.surface)
+                        .background(color = MaterialTheme.colorScheme.surface)
                         .padding(
                             start = 108.dp,
                             top = 84.dp,
@@ -213,7 +215,7 @@ fun BackupSecretPhraseExtended(
                 ) {
                     Text(
                         text = stringResource(Res.string.secret_title),
-                        style = MaterialTheme.typography.h4
+                        style = MaterialTheme.typography.headlineLarge
                     )
 
                     Spacer(Modifier.height(24.dp))
@@ -229,10 +231,12 @@ fun BackupSecretPhraseExtended(
                         onClick = onVisibilityToggled,
                         modifier = Modifier.width(300.dp)
                     ) {
-                        Text(text = stringResource(
-                            if (uiState.hidden) Res.string.settings_backup_show
-                            else Res.string.settings_backup_hide
-                        ))
+                        Text(
+                            text = stringResource(
+                                if (uiState.hidden) Res.string.settings_backup_show
+                                else Res.string.settings_backup_hide
+                            )
+                        )
                     }
 
                     AttoButton(

@@ -6,7 +6,7 @@ data class RepresentativeState(
 ) {
     companion object {
         val DEFAULT = RepresentativeState(
-            wallet  = null,
+            wallet = null,
             representative = null
         )
     }

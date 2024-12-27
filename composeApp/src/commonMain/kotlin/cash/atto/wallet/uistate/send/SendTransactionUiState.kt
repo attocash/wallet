@@ -16,34 +16,37 @@ data class SendTransactionUiState(
     private val showAddressError: Boolean = false,
     private val showLoader: Boolean = false
 ) {
-    val sendFromUiState get() = account?.let {
-        SendFromUiState(
-            accountName = "Main Account",
-            accountSeed = it.publicKey
-                .toAddress(AttoAlgorithm.V1)
-                .value,
-            accountBalance = it.balance
-                .toString(AttoUnit.ATTO)
-                .toBigDecimal(),
-            amountString = amountString,
+    val sendFromUiState
+        get() = account?.let {
+            SendFromUiState(
+                accountName = "Main Account",
+                accountSeed = it.publicKey
+                    .toAddress(AttoAlgorithm.V1)
+                    .value,
+                accountBalance = it.balance
+                    .toString(AttoUnit.ATTO)
+                    .toBigDecimal(),
+                amountString = amountString,
+                address = address,
+                showAmountError = showAmountError,
+                showAddressError = showAddressError,
+                showLoader = showLoader
+            )
+        } ?: SendFromUiState.DEFAULT
+
+    val sendConfirmUiState
+        get() = SendConfirmUiState(
+            amount = amount,
             address = address,
-            showAmountError = showAmountError,
-            showAddressError = showAddressError,
             showLoader = showLoader
         )
-    } ?: SendFromUiState.DEFAULT
 
-    val sendConfirmUiState get() = SendConfirmUiState(
-        amount = amount,
-        address = address,
-        showLoader = showLoader
-    )
-
-    val sendResultUiState get() = SendResultUiState(
-        result = operationResult,
-        amount = amount,
-        address = address
-    )
+    val sendResultUiState
+        get() = SendResultUiState(
+            result = operationResult,
+            amount = amount,
+            address = address
+        )
 
     enum class SendOperationResult {
         UNKNOWN, SUCCESS, FAILURE

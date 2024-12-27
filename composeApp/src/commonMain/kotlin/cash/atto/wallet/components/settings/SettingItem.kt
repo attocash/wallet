@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,13 +38,13 @@ fun SettingItemBig(uiState: SettingItemUiState) {
             Icon(
                 imageVector = uiState.icon,
                 contentDescription = uiState.title,
-                tint = MaterialTheme.colors.setting
+                tint = MaterialTheme.colorScheme.setting
             )
 
             Column {
                 Text(
                     text = uiState.title,
-                    style = MaterialTheme.typography.h6
+                    style = MaterialTheme.typography.headlineSmall
                 )
             }
         }
@@ -66,7 +66,7 @@ fun SettingItemSmall(uiState: SettingItemUiState) {
             Icon(
                 imageVector = uiState.icon,
                 contentDescription = uiState.title,
-                tint = MaterialTheme.colors.setting
+                tint = MaterialTheme.colorScheme.setting
             )
 
             Column {

@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -93,14 +93,16 @@ fun SendConfirm(
                 painter = painterResource(resource = Res.drawable.atto_overview_background),
                 contentScale = ContentScale.FillBounds
             ),
-            backgroundColor = Color.Transparent,
+            containerColor = Color.Transparent,
             content = {
-                Box(Modifier.fillMaxSize()
-                    .padding(16.dp)
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                    )
+                Box(
+                    Modifier.fillMaxSize()
+                        .padding(16.dp)
+                        .padding(
+                            bottom = WindowInsets.systemBars
+                                .asPaddingValues()
+                                .calculateBottomPadding()
+                        )
                 ) {
                     Column(Modifier.fillMaxSize()) {
                         Spacer(Modifier.height(96.dp))
@@ -131,24 +133,24 @@ fun SendConfirmContent(
     ) {
         Text(
             text = stringResource(Res.string.send_confirm_sending),
-            color = MaterialTheme.colors.onSurface,
-            style = MaterialTheme.typography.h5
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.headlineMedium
         )
 
         AttoOutlinedTextCard(
             text = AttoFormatter.format(uiState.amount),
-            color = MaterialTheme.colors.background
+            color = MaterialTheme.colorScheme.background
         )
 
         Text(
             text = stringResource(Res.string.send_confirm_to),
-            color = MaterialTheme.colors.onSurface,
-            style = MaterialTheme.typography.h5
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.headlineMedium
         )
 
         AttoOutlinedTextCard(
             text = uiState.address.orEmpty(),
-            color = MaterialTheme.colors.background
+            color = MaterialTheme.colorScheme.background
         )
 
         Spacer(Modifier.weight(1f))

@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -113,15 +112,16 @@ fun SecretPhraseCompact(
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        backgroundColor = MaterialTheme.colors.surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                            + 16.dp
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                                + 16.dp
                     )
                     .padding(
                         start = 16.dp,
@@ -177,7 +177,7 @@ fun SecretPhraseExpanded(
             painter = painterResource(Res.drawable.atto_welcome_background),
             contentScale = ContentScale.FillBounds
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = {
             Box(Modifier.fillMaxSize()) {
                 AttoOnboardingContainer(
@@ -187,7 +187,7 @@ fun SecretPhraseExpanded(
                 ) {
                     Text(
                         text = stringResource(Res.string.secret_title),
-                        style = MaterialTheme.typography.h4
+                        style = MaterialTheme.typography.headlineLarge
                     )
 
                     Spacer(Modifier.height(8.dp))

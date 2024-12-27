@@ -2,8 +2,8 @@ package cash.atto.wallet.di
 
 import cash.atto.commons.AttoNetwork
 import cash.atto.wallet.interactor.CheckPasswordInteractor
-import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PersistentWorkCache
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel

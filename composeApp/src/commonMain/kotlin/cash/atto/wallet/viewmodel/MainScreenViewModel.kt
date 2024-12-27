@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -56,9 +55,11 @@ class MainScreenViewModel(
         settingsCollectorJob?.cancel()
         settingsCollectorJob = scope.launch {
             settingsViewModel.state.collect {
-                _state.emit(state.value.copy(
-                    settingsUiState = it
-                ))
+                _state.emit(
+                    state.value.copy(
+                        settingsUiState = it
+                    )
+                )
             }
         }
     }

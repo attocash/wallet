@@ -13,14 +13,14 @@ actual class SeedDataSource(
     private val securityUtil = SecurityUtil()
     private val securityKeyAlias = "data-store"
     private val bytesToStringSeparator = "|"
-    private val ivToStringSeparator= ":iv:"
+    private val ivToStringSeparator = ":iv:"
 
     private val dataStore = context.dataStore
     private val key = stringPreferencesKey(SEED_KEY)
 
     actual val seed = dataStore.data
         .map { preferences ->
-            with (preferences[key] ?: return@map null) {
+            with(preferences[key] ?: return@map null) {
                 val (ivString, valueString) = this.split(ivToStringSeparator, limit = 2)
 
                 return@map securityUtil.decryptData(

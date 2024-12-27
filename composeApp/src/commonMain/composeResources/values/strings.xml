@@ -33,6 +33,7 @@
     <string name="overview_receive_address">YOUR ADDRESS</string>
     <string name="overview_receive_copy">Copy Address</string>
     <string name="overview_receive_share">Share Address</string>
+    <string name="overview_receive_close">Close</string>
     <string name="overview_send">Send</string>
     <string name="overview_transactions_title">Transactions</string>
     <string name="overview_transaction_from">from</string>

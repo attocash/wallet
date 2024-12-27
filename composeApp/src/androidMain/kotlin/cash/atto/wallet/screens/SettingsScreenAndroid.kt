@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -76,10 +76,10 @@ fun SettingsAndroid(
         topBar = { AppBar(onBackNavigation) },
         modifier = Modifier.background(
             brush = Brush.horizontalGradient(
-                colors = MaterialTheme.colors.primaryGradient
+                colors = MaterialTheme.colorScheme.primaryGradient
             )
         ),
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
         content = { padding ->
             Column(
                 Modifier
@@ -93,11 +93,13 @@ fun SettingsAndroid(
                     uiState = uiState.profileUiState
                 )
 
-                Box(modifier = Modifier.fillMaxWidth()
-                    .weight(1f)
-                    .padding(top = 6.dp)
-                    .clip(BottomSheetShape)
-                    .background(color = MaterialTheme.colors.secondaryVariant)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(top = 6.dp)
+                        .clip(BottomSheetShape)
+                        .background(color = MaterialTheme.colorScheme.secondary)
                 ) {
                     SettingsList(
                         modifier = Modifier.fillMaxWidth(),

@@ -11,20 +11,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +50,6 @@ import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.components.common.AttoOutlinedButton
-import cash.atto.wallet.di.AppScope
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
@@ -66,10 +62,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinContext
-import org.koin.compose.getKoin
 import org.koin.compose.viewmodel.koinViewModel
-import java.math.BigDecimal
 
 @Composable
 fun SendFromScreenAndroid(
@@ -155,7 +148,7 @@ fun SendFromAndroid(
                 painter = painterResource(resource = Res.drawable.atto_overview_background),
                 contentScale = ContentScale.FillBounds
             ),
-            backgroundColor = Color.Transparent,
+            containerColor = Color.Transparent,
             content = { padding ->
                 Box(
                     Modifier
@@ -203,14 +196,14 @@ fun SendFromAndroidContent(
         ) {
             Text(
                 text = stringResource(Res.string.send_from_title),
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.headlineMedium
             )
 
             uiState.accountName?.let {
                 Text(
                     text = it,
                     modifier = Modifier.padding(top = 16.dp),
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -218,7 +211,7 @@ fun SendFromAndroidContent(
                 Text(
                     text = it,
                     modifier = Modifier.padding(top = 20.dp),
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.W600,
                     fontFamily = attoFontFamily(),
@@ -227,11 +220,13 @@ fun SendFromAndroidContent(
             }
 
             Text(
-                text = "(${AttoFormatter.format(
-                    uiState.accountBalance
-                )})",
+                text = "(${
+                    AttoFormatter.format(
+                        uiState.accountBalance
+                    )
+                })",
                 modifier = Modifier.padding(top = 36.dp),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.headlineSmall
             )
 
             TextField(
@@ -250,9 +245,9 @@ fun SendFromAndroidContent(
                 Text(
                     text = stringResource(Res.string.send_error_amount),
                     modifier = Modifier.padding(top = 4.dp),
-                    color = MaterialTheme.colors.error,
+                    color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.caption
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
 
@@ -273,9 +268,9 @@ fun SendFromAndroidContent(
                 Text(
                     text = stringResource(Res.string.send_error_address),
                     modifier = Modifier.padding(top = 4.dp),
-                    color = MaterialTheme.colors.error,
+                    color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.caption
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
         }

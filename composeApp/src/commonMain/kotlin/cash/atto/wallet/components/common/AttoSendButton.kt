@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,7 +42,7 @@ fun AttoSendButton(
         modifier = modifier
             .clickable(
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = true),
+                indication = ripple(bounded = true),
                 onClick = onClick
             ),
         shape = RoundedCornerShape(62.dp),
@@ -51,30 +51,31 @@ fun AttoSendButton(
             modifier = Modifier.fillMaxWidth()
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = MaterialTheme.colors.primaryGradient
+                        colors = MaterialTheme.colorScheme.primaryGradient
                     )
                 )
                 .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(52.dp, 52.dp)
-                .clip(CircleShape)
-                .background(color = MaterialTheme.colors.secondaryVariant)
+            Box(
+                Modifier.size(52.dp, 52.dp)
+                    .clip(CircleShape)
+                    .background(color = MaterialTheme.colorScheme.secondary)
             ) {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_arrow_up),
                     contentDescription = "send icon",
                     modifier = Modifier.align(Alignment.Center),
-                    tint = MaterialTheme.colors.secondary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
             Text(
                 text = stringResource(Res.string.overview_send),
                 modifier = Modifier.weight(1f),
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.button
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }

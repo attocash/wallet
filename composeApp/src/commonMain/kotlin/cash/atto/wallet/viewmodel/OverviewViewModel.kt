@@ -5,8 +5,8 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
-import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import kotlinx.coroutines.CoroutineScope

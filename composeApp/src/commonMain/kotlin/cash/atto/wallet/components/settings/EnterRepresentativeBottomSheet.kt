@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,11 +20,9 @@ import attowallet.composeapp.generated.resources.representative_change
 import attowallet.composeapp.generated.resources.representative_change_title
 import attowallet.composeapp.generated.resources.representative_close
 import attowallet.composeapp.generated.resources.representative_error_address
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoOutlinedButton
 import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.ui.AttoWalletTheme
-import kotlinx.coroutines.launch
+import cash.atto.wallet.ui.back
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -41,7 +39,7 @@ fun EnterRepresentativeBottomSheet(
     BottomSheet {
         Text(
             text = stringResource(Res.string.representative_change_title),
-            style = MaterialTheme.typography.h5
+            style = MaterialTheme.typography.headlineMedium
         )
 
         TextField(
@@ -52,9 +50,9 @@ fun EnterRepresentativeBottomSheet(
         if (showError) {
             Text(
                 text = stringResource(Res.string.representative_error_address),
-                color = MaterialTheme.colors.error,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.labelMedium
             )
         }
 
@@ -63,7 +61,7 @@ fun EnterRepresentativeBottomSheet(
         Button(
             onClick = { onChange.invoke(input.value) },
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 0.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,
@@ -71,8 +69,8 @@ fun EnterRepresentativeBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant,
-                contentColor = MaterialTheme.colors.onPrimary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -82,7 +80,7 @@ fun EnterRepresentativeBottomSheet(
         Button(
             onClick = onClose,
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 0.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,
@@ -90,8 +88,8 @@ fun EnterRepresentativeBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.back
             ),
             contentPadding = PaddingValues(19.dp)
         ) {

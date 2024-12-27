@@ -20,7 +20,14 @@ class PersistentAccountEntryRepository(
 
     override suspend fun save(entry: AttoAccountEntry) {
         val json = Json.encodeToString(entry)
-        dao.save(AccountEntry(entry.hash.value, entry.publicKey.value, entry.height.value.toLong(), json))
+        dao.save(
+            AccountEntry(
+                entry.hash.value,
+                entry.publicKey.value,
+                entry.height.value.toLong(),
+                json
+            )
+        )
         flow.emit(entry)
     }
 

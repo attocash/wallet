@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +28,6 @@ import attowallet.composeapp.generated.resources.ic_transactions
 import attowallet.composeapp.generated.resources.overview_hint
 import attowallet.composeapp.generated.resources.overview_transactions_title
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoColors
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -56,13 +54,13 @@ fun TransactionsList(
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_transactions),
                 contentDescription = "Transactions",
-                tint = MaterialTheme.colors.primary
+                tint = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = stringResource(Res.string.overview_transactions_title),
                 modifier = Modifier.padding(start = 8.dp),
-                color = MaterialTheme.colors.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = titleSize,
                 fontWeight = FontWeight.W400,
             )
@@ -72,14 +70,14 @@ fun TransactionsList(
             Box(
                 modifier = Modifier.fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
-                    .background(color = MaterialTheme.colors.primary)
+                    .background(color = MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 12.dp)
             ) {
                 Box(Modifier
                     .fillMaxWidth()
-                    .background(color = MaterialTheme.colors.surface)
+                    .background(color = MaterialTheme.colorScheme.surface)
                     .background(brush = Brush.horizontalGradient(
-                        colors = MaterialTheme.colors
+                        colors = MaterialTheme.colorScheme
                             .primaryGradient
                             .map { it.copy(alpha = 0.2f) }
                     ))
@@ -88,9 +86,9 @@ fun TransactionsList(
                     Text(
                         text = stringResource(Res.string.overview_hint),
                         modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colors.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
