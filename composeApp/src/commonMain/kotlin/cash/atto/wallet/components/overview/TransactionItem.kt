@@ -54,7 +54,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                         contentDescription = "operation type icon",
                         modifier = Modifier.align(Alignment.Center)
                             .rotate(-45f),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
 
@@ -62,7 +62,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                     Text(uiState.typeString)
                     Text(
                         text = uiState.shownAmount,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
             }
