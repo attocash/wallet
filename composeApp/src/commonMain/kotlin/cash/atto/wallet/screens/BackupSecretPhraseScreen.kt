@@ -126,23 +126,18 @@ fun BackupSecretPhraseCompact(
             )
         ),
         containerColor = Color.Transparent,
-        content = {
+        content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp)
+                    .padding(top = innerPadding.calculateTopPadding() + 16.dp)
                     .clip(BottomSheetShape)
                     .background(color = MaterialTheme.colorScheme.secondary)
                     .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                                + 16.dp
-                    )
-                    .padding(
                         start = 16.dp,
                         top = 24.dp,
-                        end = 16.dp
+                        end = 16.dp,
+                        bottom = innerPadding.calculateBottomPadding() + 16.dp
                     ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
