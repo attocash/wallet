@@ -35,7 +35,7 @@ class OverviewViewModel(
             _state.value = OverviewUiState.empty()
 
             appStateRepository.state.collect {
-                val receiveAddress = it.publicKey
+                val receiveAddress = it.getPublicKey()
                     ?.toAddress(AttoAlgorithm.V1)
                     ?.value
 

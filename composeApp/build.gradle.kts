@@ -29,6 +29,10 @@ kotlin {
     }
 
     jvm("desktop")
+//
+//    js {
+//        binaries.executable()
+//    }
 
     applyDefaultHierarchyTemplate()
 
@@ -38,6 +42,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+//        val jsMain by getting
         val androidInstrumentedTest by getting
 
         androidMain.dependencies {

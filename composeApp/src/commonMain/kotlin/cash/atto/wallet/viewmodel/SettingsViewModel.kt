@@ -54,17 +54,13 @@ class SettingsViewModel(
             appStateCollectorJob?.cancel()
             appStateCollectorJob = appStateCollectorScope.launch {
                 appStateRepository.state.collect { appState ->
-                    if (appState.publicKey != null) {
-                        _state.emit(
-                            state.value.copy(
-                                profileUiState = ProfileUiState(
-                                    name = "Main Account",
-                                    hash = appState.publicKey
-                                        .toAddress(AttoAlgorithm.V1)
-                                        .value
-                                )
+                    appState.getPublicKey()?.let {
+                        _state.emit(state.value.copy(
+                            profileUiState = ProfileUiState(
+                                name = "Main Account",
+                                hash = it.toAddress(AttoAlgorithm.V1).value
                             )
-                        )
+                        ))
                     }
                 }
             }

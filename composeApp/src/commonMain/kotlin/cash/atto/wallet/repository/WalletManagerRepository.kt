@@ -79,10 +79,8 @@ class WalletManagerRepository(
     private suspend fun createWalletManager(
         appState: AppState
     ): AttoWalletManager? {
-        if (appState.privateKey == null)
-            return null
-
-        val signer = appState.privateKey.toSigner()
+        val privateKey = appState.getPrivateKey() ?: return null
+        val signer = privateKey.toSigner()
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
         val client = AttoNodeClient.attoBackend(network, authenticator)
 
