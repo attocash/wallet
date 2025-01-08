@@ -11,9 +11,9 @@ data class AppState(
     val password: String?,
     val index: UInt = 0U
 ) {
-    val seed = mnemonic?.toSeed()
-    val privateKey = seed?.toPrivateKey(index)
-    val publicKey = privateKey?.toPublicKey()
+    suspend fun getSeed() = mnemonic?.toSeed()
+    suspend fun getPrivateKey() = getSeed()?.toPrivateKey(index)
+    suspend fun getPublicKey() = getPrivateKey()?.toPublicKey()
 
     enum class AuthState {
         UNKNOWN,

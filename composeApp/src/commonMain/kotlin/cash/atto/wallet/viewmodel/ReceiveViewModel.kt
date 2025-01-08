@@ -23,7 +23,7 @@ class ReceiveViewModel(
         viewModelScope.launch {
             appStateRepository.state.collect { appState ->
                 _address.emit(
-                    appState.publicKey
+                    appState.getPublicKey()
                         ?.toAddress(AttoAlgorithm.V1)
                         ?.value
                 )
