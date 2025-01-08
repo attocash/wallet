@@ -65,8 +65,8 @@ fun ReceiveAttoBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
