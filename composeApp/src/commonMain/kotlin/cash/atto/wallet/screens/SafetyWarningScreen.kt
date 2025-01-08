@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,20 +44,16 @@ fun SafetyWarningScreen(
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         containerColor = MaterialTheme.colorScheme.surface,
-        content = {
+        content = { innerPadding ->
             Column(
                 modifier = Modifier
+                    .padding(innerPadding)
                     .fillMaxSize()
-                    .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                                + 16.dp
-                    )
                     .padding(
                         start = 16.dp,
                         top = 20.dp,
-                        end = 16.dp
+                        end = 16.dp,
+                        bottom = 16.dp
                     )
             ) {
                 Column(

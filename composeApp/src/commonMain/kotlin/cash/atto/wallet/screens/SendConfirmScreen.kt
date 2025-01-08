@@ -94,15 +94,11 @@ fun SendConfirm(
                 contentScale = ContentScale.FillBounds
             ),
             containerColor = Color.Transparent,
-            content = {
+            content = { innerPadding ->
                 Box(
                     Modifier.fillMaxSize()
+                        .padding(innerPadding)
                         .padding(16.dp)
-                        .padding(
-                            bottom = WindowInsets.systemBars
-                                .asPaddingValues()
-                                .calculateBottomPadding()
-                        )
                 ) {
                     Column(Modifier.fillMaxSize()) {
                         Spacer(Modifier.height(96.dp))

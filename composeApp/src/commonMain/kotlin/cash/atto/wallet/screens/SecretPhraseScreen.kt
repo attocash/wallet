@@ -113,20 +113,16 @@ fun SecretPhraseCompact(
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         containerColor = MaterialTheme.colorScheme.surface,
-        content = {
+        content = { innerPadding ->
             Column(
                 modifier = Modifier
+                    .padding(innerPadding)
                     .fillMaxSize()
-                    .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                                + 16.dp
-                    )
                     .padding(
                         start = 16.dp,
                         top = 20.dp,
-                        end = 16.dp
+                        end = 16.dp,
+                        bottom = 16.dp
                     )
             ) {
                 Column(

@@ -111,19 +111,16 @@ fun ImportSecretCompact(
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
         containerColor = MaterialTheme.colorScheme.surface,
-        content = {
+        content = { innerPadding ->
             Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(
-                        bottom = WindowInsets.systemBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                                + 16.dp
-                    )
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
                     .padding(
                         start = 16.dp,
                         top = 20.dp,
-                        end = 16.dp
+                        end = 16.dp,
+                        bottom = 16.dp
                     )
             ) {
                 Column(

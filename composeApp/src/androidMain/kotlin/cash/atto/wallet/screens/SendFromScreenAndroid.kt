@@ -149,16 +149,12 @@ fun SendFromAndroid(
                 contentScale = ContentScale.FillBounds
             ),
             containerColor = Color.Transparent,
-            content = { padding ->
+            content = { innerPadding ->
                 Box(
                     Modifier
                         .fillMaxSize()
+                        .padding(innerPadding)
                         .padding(16.dp)
-                        .padding(
-                            bottom = WindowInsets.systemBars
-                                .asPaddingValues()
-                                .calculateBottomPadding()
-                        )
                 ) {
                     SendFromAndroidContent(
                         uiState = uiState,
