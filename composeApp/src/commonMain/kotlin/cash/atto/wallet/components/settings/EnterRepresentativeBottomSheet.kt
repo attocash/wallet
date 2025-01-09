@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,8 +29,11 @@ import cash.atto.wallet.ui.back
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnterRepresentativeBottomSheet(
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(),
     onChange: (String) -> Unit,
     onClose: () -> Unit,
     showError: Boolean
@@ -36,7 +42,10 @@ fun EnterRepresentativeBottomSheet(
         mutableStateOf("")
     }
 
-    BottomSheet {
+    BottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    ) {
         Text(
             text = stringResource(Res.string.representative_change_title),
             style = MaterialTheme.typography.headlineMedium
@@ -88,8 +97,8 @@ fun EnterRepresentativeBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.back
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -98,11 +107,13 @@ fun EnterRepresentativeBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun EnterRepresentativeBottomSheetPreview() {
     AttoWalletTheme {
         EnterRepresentativeBottomSheet(
+            onDismissRequest = {},
             onChange = {},
             onClose = {},
             showError = true

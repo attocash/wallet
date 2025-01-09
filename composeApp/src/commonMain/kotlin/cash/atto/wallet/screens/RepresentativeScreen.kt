@@ -5,30 +5,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -108,37 +106,34 @@ fun RepresentativeScreenCompact(
     onBackNavigation: () -> Unit,
     onChange: suspend (String) -> Boolean,
 ) {
-    val sheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
-        )
-    )
-
     val coroutineScope = rememberCoroutineScope()
 
-    BottomSheetScaffold(
-        sheetContent = {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Box(Modifier.fillMaxSize()) {
+        if (showBottomSheet) {
             EnterRepresentativeBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
                 onChange = {
                     coroutineScope.launch {
                         if (onChange.invoke(it))
-                            sheetState.bottomSheetState.hide()
+                            showBottomSheet = false
                     }
                 },
                 onClose = {
                     coroutineScope.launch {
-                        sheetState.bottomSheetState.hide()
+                        showBottomSheet = false
                     }
                 },
                 showError = uiState.showError
             )
-        },
-        scaffoldState = sheetState,
-        sheetShape = BottomSheetShape,
-        sheetSwipeEnabled = false,
-        sheetDragHandle = null,
-    ) {
+        }
+
         Scaffold(
             topBar = { AppBar(onBackNavigation) },
             modifier = Modifier.background(
@@ -183,7 +178,7 @@ fun RepresentativeScreenCompact(
                     AttoButton(
                         onClick = {
                             coroutineScope.launch {
-                                sheetState.bottomSheetState.expand()
+                                showBottomSheet = true
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -204,37 +199,34 @@ fun RepresentativeScreenExpanded(
     onChange: suspend (String) -> Boolean,
 ) {
 
-    val sheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
-        )
-    )
-
     val coroutineScope = rememberCoroutineScope()
 
-    BottomSheetScaffold(
-        sheetContent = {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Box(Modifier.fillMaxSize()) {
+        if (showBottomSheet) {
             EnterRepresentativeBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
                 onChange = {
                     coroutineScope.launch {
                         if (onChange.invoke(it))
-                            sheetState.bottomSheetState.hide()
+                            showBottomSheet = false
                     }
                 },
                 onClose = {
                     coroutineScope.launch {
-                        sheetState.bottomSheetState.hide()
+                        showBottomSheet = false
                     }
                 },
                 showError = uiState.showError
             )
-        },
-        scaffoldState = sheetState,
-        sheetShape = BottomSheetShape,
-        sheetSwipeEnabled = false,
-        sheetDragHandle = null,
-    ) {
+        }
+
         Scaffold(
             topBar = { AppBar(onBackNavigation) },
             modifier = Modifier.paint(
@@ -291,7 +283,7 @@ fun RepresentativeScreenExpanded(
                         AttoButton(
                             onClick = {
                                 coroutineScope.launch {
-                                    sheetState.bottomSheetState.expand()
+                                    showBottomSheet = true
                                 }
                             },
                             modifier = Modifier.width(300.dp)
