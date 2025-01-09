@@ -14,15 +14,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -38,6 +46,7 @@ import cash.atto.wallet.components.overview.ReceiveAttoBottomSheet
 import cash.atto.wallet.components.overview.TransactionsList
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.BottomSheetShape
+import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import kotlinx.coroutines.launch
@@ -89,27 +98,23 @@ fun OverviewAndroid(
 ) {
     val scope = rememberCoroutineScope()
 
-    val sheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
-        )
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
     )
 
-    BottomSheetScaffold(
-        sheetContent = {
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (showBottomSheet) {
             ReceiveAttoBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
                 address = uiState.receiveAddress,
                 onCopy = onReceiveCopyClick,
-                onShare = onReceiveShareClick,
-                onClose = { scope.launch { sheetState.bottomSheetState.hide() } },
+                onShare = onReceiveShareClick
             )
-        },
-        scaffoldState = sheetState,
-        sheetShape = BottomSheetShape,
-        sheetSwipeEnabled = false,
-        sheetDragHandle = null,
-    ) {
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +136,7 @@ fun OverviewAndroid(
                 onReceiveClicked = {
                     scope.launch {
                         if (uiState.receiveAddress != null)
-                            sheetState.bottomSheetState.expand()
+                            showBottomSheet = true
                     }
                 }
             )
