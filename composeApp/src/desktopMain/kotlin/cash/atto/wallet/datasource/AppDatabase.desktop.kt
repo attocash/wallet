@@ -8,10 +8,11 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import cash.atto.wallet.Config
 
 @Database(
     entities = [AccountEntryDesktop::class, WorkDesktop::class],
-    version = 2
+    version = Config.DATABASE_VERSION
 )
 abstract class AppDatabaseDesktop : RoomDatabase(), AppDatabase, DB {
     abstract override fun accountEntryDao(): AccountEntryDaoDesktop
