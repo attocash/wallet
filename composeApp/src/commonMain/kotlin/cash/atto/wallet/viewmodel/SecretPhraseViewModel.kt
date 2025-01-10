@@ -17,7 +17,7 @@ class SecretPhraseViewModel(
     val state = _state.asStateFlow()
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             _state.value = SecretPhraseUiState(
                 words = appStateRepository.generateNewSecret(),
                 hidden = false

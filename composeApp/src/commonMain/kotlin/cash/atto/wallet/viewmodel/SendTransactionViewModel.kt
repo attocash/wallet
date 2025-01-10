@@ -7,6 +7,7 @@ import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.send.SendTransactionUiState
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -112,7 +113,7 @@ class SendTransactionViewModel(
         val amount = state.value
             .sendFromUiState
             .amountString
-            ?.toBigDecimalOrNull()
+            ?.toBigDecimal()
 
         val amountCheckResult = amount != null
 

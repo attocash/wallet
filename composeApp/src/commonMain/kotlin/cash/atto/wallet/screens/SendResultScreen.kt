@@ -37,13 +37,13 @@ import cash.atto.wallet.ui.success
 import cash.atto.wallet.uistate.send.SendResultUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-import java.math.BigDecimal
 
 @Composable
 fun SendResultScreen(

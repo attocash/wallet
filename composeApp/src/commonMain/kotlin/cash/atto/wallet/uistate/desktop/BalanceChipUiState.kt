@@ -1,6 +1,6 @@
 package cash.atto.wallet.uistate.desktop
 
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 data class BalanceChipUiState(
     val attoCoins: BigDecimal?

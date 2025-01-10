@@ -29,10 +29,11 @@ kotlin {
     }
 
     jvm("desktop")
-//
-//    js {
-//        binaries.executable()
-//    }
+
+    js {
+        browser()
+        binaries.executable()
+    }
 
     applyDefaultHierarchyTemplate()
 
@@ -42,7 +43,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-//        val jsMain by getting
+        val jsMain by getting
         val androidInstrumentedTest by getting
 
         androidMain.dependencies {
@@ -71,6 +72,10 @@ kotlin {
             implementation(libs.androidx.camera.view)
 
             implementation(libs.barcode.scanning)
+            implementation(libs.qr.kit)
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
 
         commonMain.dependencies {
@@ -97,14 +102,7 @@ kotlin {
 
             implementation(libs.decompose)
             implementation(libs.decompose.extensions.compose)
-
-            implementation(libs.qr.kit)
-
-            implementation(libs.room.runtime)
-            implementation(libs.sqlite.bundled)
-        }
-        commonTest.dependencies {
-            implementation(libs.junit.jupiter)
+            implementation(libs.bignum)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -115,6 +113,10 @@ kotlin {
             implementation(libs.jna.platform)
 
             implementation(libs.slf4j.simple)
+            implementation(libs.qr.kit)
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.runner)
@@ -169,9 +171,16 @@ room {
 }
 
 dependencies {
-    add("kspCommonMainMetadata", libs.room.compiler)
     implementation(libs.transport.runtime)
     testImplementation(libs.junit.jupiter)
+
+    listOf(
+        "kspAndroid",
+        "kspDesktop",
+        "kspCommonMainMetadata"
+    ).forEach {
+        add(it, libs.room.compiler)
+    }
 }
 
 tasks.withType<JavaCompile> {

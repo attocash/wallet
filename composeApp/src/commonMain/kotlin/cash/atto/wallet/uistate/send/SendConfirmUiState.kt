@@ -1,6 +1,6 @@
 package cash.atto.wallet.uistate.send
 
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 data class SendConfirmUiState(
     val amount: BigDecimal?,

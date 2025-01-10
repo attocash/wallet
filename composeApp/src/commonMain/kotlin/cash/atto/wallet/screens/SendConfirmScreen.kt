@@ -38,12 +38,12 @@ import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-import java.math.BigDecimal
 
 @Composable
 fun SendConfirmScreen(

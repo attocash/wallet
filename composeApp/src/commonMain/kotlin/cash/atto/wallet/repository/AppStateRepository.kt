@@ -19,7 +19,7 @@ class AppStateRepository(
     private val _state = MutableStateFlow(AppState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val sessionScope = CoroutineScope(Dispatchers.IO)
+    private val sessionScope = CoroutineScope(Dispatchers.Default)
     private var sessionJob: Job? = null
 
     init {
