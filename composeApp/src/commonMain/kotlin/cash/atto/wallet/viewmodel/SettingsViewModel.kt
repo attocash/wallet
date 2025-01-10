@@ -31,7 +31,7 @@ class SettingsViewModel(
     private val walletManagerRepository: WalletManagerRepository
 ) : ViewModel() {
 
-    private val viewModelScope = CoroutineScope(Dispatchers.IO)
+    private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     private val appStateCollectorScope = CoroutineScope(Dispatchers.Default)
     private val walletManagerScope = CoroutineScope(Dispatchers.Default)

@@ -4,7 +4,8 @@ import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 
 data class SendTransactionUiState(
     private val account: AttoAccount?,

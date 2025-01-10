@@ -4,6 +4,7 @@ import cash.atto.commons.AttoWork
 import cash.atto.commons.wallet.AttoWorkCache
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.Work
+import cash.atto.wallet.datasource.createWork
 
 class PersistentWorkCache(
     appDatabase: AppDatabase
@@ -16,7 +17,7 @@ class PersistentWorkCache(
 
     override suspend fun save(work: AttoWork) {
         clear()
-        dao.set(Work(ByteArray(32), work.value))
+        dao.set(createWork(ByteArray(32), work.value))
     }
 
     suspend fun clear() {

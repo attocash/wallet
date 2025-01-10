@@ -14,7 +14,7 @@ class ReceiveViewModel(
     private val appStateRepository: AppStateRepository
 ) : ViewModel() {
 
-    private val viewModelScope = CoroutineScope(Dispatchers.IO)
+    private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     private val _address = MutableStateFlow<String?>(null)
     val address = _address.asStateFlow()

@@ -37,12 +37,11 @@ import attowallet.composeapp.generated.resources.overview_receive_close
 import attowallet.composeapp.generated.resources.overview_receive_copy
 import attowallet.composeapp.generated.resources.overview_receive_share
 import cash.atto.wallet.components.common.BottomSheet
+import cash.atto.wallet.components.common.QRCodeImage
 import cash.atto.wallet.ui.AttoWalletTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import qrgenerator.QRCodeImage
-import java.nio.charset.Charset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -215,24 +214,14 @@ fun ReceiveAttoContentExtended(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Box(Modifier.height(300.dp)) {
-
-            try {
-                val charset: Charset = Charset.forName("EUC_JP") // EUC_JP is supported
-            } catch (ex: Exception) {
-                return@Box
-            }
-            QRCodeImage(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(24.dp),
-                url = String(address.toByteArray(Charsets.UTF_8)),
-                contentDescription = "QR"
-            )
-        }
-
+        QRCodeImage(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(24.dp),
+            url = address,
+            contentDescription = "QR"
+        )
 
         Button(
             onClick = onCopy,

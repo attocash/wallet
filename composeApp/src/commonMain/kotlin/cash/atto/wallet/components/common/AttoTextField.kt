@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
@@ -41,8 +40,8 @@ fun AttoTextField(
             onValueChange = onValueChange,
             modifier = modifier.onPreviewKeyEvent {
                 if (
-                    it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
-                    it.key.nativeKeyCode == Key.Tab.nativeKeyCode
+                    it.key.keyCode == Key.Enter.keyCode ||
+                    it.key.keyCode == Key.Tab.keyCode
                 ) {
                     onDone.invoke()
 

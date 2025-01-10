@@ -8,6 +8,7 @@ import cash.atto.commons.AttoUnit
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

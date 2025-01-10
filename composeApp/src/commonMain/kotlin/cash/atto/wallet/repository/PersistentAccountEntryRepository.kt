@@ -5,6 +5,7 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.wallet.datasource.AccountEntry
 import cash.atto.wallet.datasource.AppDatabase
+import cash.atto.wallet.datasource.createAccountEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
@@ -21,7 +22,7 @@ class PersistentAccountEntryRepository(
     override suspend fun save(entry: AttoAccountEntry) {
         val json = Json.encodeToString(entry)
         dao.save(
-            AccountEntry(
+            createAccountEntry(
                 entry.hash.value,
                 entry.publicKey.value,
                 entry.height.value.toLong(),

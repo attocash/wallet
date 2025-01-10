@@ -15,12 +15,14 @@ androidx-material3 = "1.3.1"
 androidx-test-junit = "1.2.1"
 androidx-datastore = "1.1.1"
 barcodeScanning = "17.3.0"
+bignum = "0.3.10"
 camera2 = "1.4.1"
 compose-plugin = "1.7.3"
 decompose = "3.1.0"
 extJunit = "1.2.1"
 junit = "4.13.2"
 kotlin = "2.1.0"
+kotlinNativeBigdecimal = "1.0"
 kotlinx-coroutines = "1.10.1"
 ktor = "3.0.3"
 atto-commons = "1a5ef28-SNAPSHOT"
@@ -47,9 +49,11 @@ androidx-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "ex
 androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "rules" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 decompose-extensions-compose-jetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decompose" }
+kotlin-native-bigdecimal = { module = "com.crossoid:kotlin-native-bigdecimal", version.ref = "kotlinNativeBigdecimal" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
