@@ -59,7 +59,6 @@ expect val dataSourceModule: Module
 val repositoryModule = module {
     includes(httpClientModule)
     includes(dataSourceModule)
-    // TODO make this  be determined by build type
     single { AttoNetwork.DEV }
 //    single { AttoNetwork.LIVE }
     singleOf(::AppStateRepository)
