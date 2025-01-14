@@ -1,5 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.nio.charset.StandardCharsets
 
 plugins {
@@ -30,8 +32,21 @@ kotlin {
 
     jvm("desktop")
 
-    js {
-        browser()
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "attoWallet"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "attoWallet.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(project.rootDir.path)
+                        add(project.projectDir.path)
+                    }
+                }
+            }
+        }
         binaries.executable()
     }
 
@@ -43,7 +58,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-        val jsMain by getting
+        val wasmJsMain by getting
         val androidInstrumentedTest by getting
 
         androidMain.dependencies {
