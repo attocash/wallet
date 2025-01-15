@@ -87,7 +87,6 @@ kotlin {
             implementation(libs.androidx.camera.view)
 
             implementation(libs.barcode.scanning)
-            implementation(libs.qr.kit)
 
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
@@ -118,6 +117,7 @@ kotlin {
             implementation(libs.decompose)
             implementation(libs.decompose.extensions.compose)
             implementation(libs.bignum)
+            implementation(libs.qrose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -128,7 +128,6 @@ kotlin {
             implementation(libs.jna.platform)
 
             implementation(libs.slf4j.simple)
-            implementation(libs.qr.kit)
 
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
