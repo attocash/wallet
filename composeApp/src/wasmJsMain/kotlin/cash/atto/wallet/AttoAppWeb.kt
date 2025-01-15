@@ -1,6 +1,5 @@
 package cash.atto.wallet
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +11,7 @@ import cash.atto.wallet.screens.BackupSecretPhraseScreen
 import cash.atto.wallet.screens.CreatePasswordScreen
 import cash.atto.wallet.screens.EnterPassword
 import cash.atto.wallet.screens.ImportSecretScreen
+import cash.atto.wallet.screens.MainScreenWeb
 import cash.atto.wallet.screens.RepresentativeScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
@@ -117,17 +117,17 @@ fun AttoNavHost(
                         }
                     )
 
-//                    is AttoDestination.DesktopMain -> MainScreenDesktop(
-//                        onBackupSecretNavigation = {
-//                            component.navigation.push(AttoDestination.BackupSecret)
-//                        },
-//                        onRepresentativeNavigation = {
-//                            component.navigation.push(AttoDestination.Representative)
-//                        },
-//                        onLogoutNavigation = {
-//                            component.navigation.popToFirst()
-//                        }
-//                    )
+                    is AttoDestination.DesktopMain -> MainScreenWeb(
+                        onBackupSecretNavigation = {
+                            component.navigation.push(AttoDestination.BackupSecret)
+                        },
+                        onRepresentativeNavigation = {
+                            component.navigation.push(AttoDestination.Representative)
+                        },
+                        onLogoutNavigation = {
+                            component.navigation.popToFirst()
+                        }
+                    )
 
                     is AttoDestination.ImportSecret -> ImportSecretScreen(
                         onBackNavigation = { component.navigation.pop() },

@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MainScreenDesktop(
+fun MainScreenWeb(
     onBackupSecretNavigation: () -> Unit,
     onRepresentativeNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
@@ -154,9 +154,9 @@ fun MainScreenContent(
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
                 when (navState) {
-                    MainScreenNavDestination.OVERVIEW -> OverviewScreenDesktop()
-                    MainScreenNavDestination.SEND -> SendScreenDesktop()
-                    MainScreenNavDestination.RECEIVE -> ReceiveScreenDesktop()
+                    MainScreenNavDestination.OVERVIEW -> OverviewScreenWeb()
+                    MainScreenNavDestination.SEND -> SendScreenWeb()
+                    MainScreenNavDestination.RECEIVE -> ReceiveScreenWeb()
                 }
             }
         }
