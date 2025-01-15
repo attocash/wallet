@@ -1,7 +1,11 @@
 package cash.atto.wallet.components.common
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
 @Composable
 actual fun QRCodeImage(
@@ -9,9 +13,11 @@ actual fun QRCodeImage(
     url: String,
     contentDescription: String
 ) {
-    qrgenerator.QRCodeImage(
-        modifier = modifier,
-        url = url,
-        contentDescription = contentDescription
-    )
+    if (url.isNotEmpty()) {
+        Image(
+            modifier = modifier.padding(8.dp),
+            painter = rememberQrCodePainter(url),
+            contentDescription = contentDescription
+        )
+    }
 }
