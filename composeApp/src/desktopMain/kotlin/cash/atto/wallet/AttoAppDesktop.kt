@@ -30,7 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AttoAppDesktop(
-    component: NavigationComponent
+    component: DWNavigationComponent
 ) {
     AttoWalletTheme {
         KoinContext {
@@ -51,7 +51,7 @@ fun AttoAppDesktop(
 @Composable
 fun AttoNavHost(
     uiState: AppUiState,
-    component: NavigationComponent,
+    component: DWNavigationComponent,
     modifier: Modifier = Modifier,
     submitPassword: suspend (String?) -> Boolean
 ) {

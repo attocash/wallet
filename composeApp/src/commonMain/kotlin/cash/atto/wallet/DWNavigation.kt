@@ -11,7 +11,8 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import org.jetbrains.compose.resources.StringResource
 
-class NavigationComponent(
+// Navigation component used for desktop and web targets
+class DWNavigationComponent(
     componentContext: ComponentContext
 ) : ComponentContext by componentContext {
 

@@ -14,7 +14,7 @@ import java.awt.Dimension
 fun main() {
     val lifecycle = LifecycleRegistry()
     val navComponent = runOnUiThread {
-        NavigationComponent(DefaultComponentContext(lifecycle))
+        DWNavigationComponent(DefaultComponentContext(lifecycle))
     }
 
     application {
