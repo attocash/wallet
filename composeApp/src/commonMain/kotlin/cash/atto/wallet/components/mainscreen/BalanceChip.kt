@@ -1,4 +1,4 @@
-package cash.atto.wallet.components
+package cash.atto.wallet.components.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

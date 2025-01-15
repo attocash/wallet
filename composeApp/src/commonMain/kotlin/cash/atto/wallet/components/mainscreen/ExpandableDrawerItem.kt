@@ -1,6 +1,5 @@
-package cash.atto.wallet.components
+package cash.atto.wallet.components.mainscreen
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +28,7 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.primaryGradient
 import org.jetbrains.compose.resources.vectorResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ExpandableDrawerItem(
