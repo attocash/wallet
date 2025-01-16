@@ -7,23 +7,19 @@ class AppDatabaseWeb : AppDatabase {
 
 class AccountEntryDaoWeb : AccountEntryDao {
 
-    private val _accountEntries = HashMap<ByteArray, List<AccountEntryWeb>>()
+    private val _accountEntries = ArrayList<AccountEntryWeb>()
 
-    override suspend fun last(publicKey: ByteArray) = _accountEntries[publicKey]
-        ?.lastOrNull()
-        ?.toString()
+    override suspend fun last(publicKey: ByteArray) = _accountEntries
+        .lastOrNull { it.publicKey.contentEquals(publicKey) }
+        ?.entry
         ?.encodeToByteArray()
 
-    override suspend fun list(publicKey: ByteArray): List<String> = _accountEntries[publicKey]
-        ?.map { it.toString() }
-        ?: emptyList()
+    override suspend fun list(publicKey: ByteArray): List<String> = _accountEntries
+        .filter { it.publicKey.contentEquals(publicKey) }
+        .map { it.entry }
 
-    suspend fun save(entry: AccountEntryWeb) {
-        val currentValue = _accountEntries[entry.publicKey]
-            ?.toMutableList()
-            ?: emptyList()
-
-        _accountEntries[entry.publicKey] = currentValue + entry
+    private fun save(entry: AccountEntryWeb) {
+        _accountEntries.add(entry)
     }
 
     override suspend fun save(entry: AccountEntry) = save(entry as AccountEntryWeb)
