@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -40,14 +43,19 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReceiveAttoBottomSheet(
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(),
     address: String?,
     onCopy: () -> Unit,
     onShare: () -> Unit,
-    onClose: () -> Unit,
 ) = address?.let {
-    BottomSheet {
+    BottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    ) {
         ReceiveAttoContent(
             address = address,
             onCopy = onCopy
@@ -64,8 +72,8 @@ fun ReceiveAttoBottomSheet(
                 focusedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
@@ -76,27 +84,6 @@ fun ReceiveAttoBottomSheet(
                 )
 
                 Text(text = stringResource(Res.string.overview_receive_share))
-            }
-        }
-
-        Button(
-            onClick = onClose,
-            modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp
-            ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            contentPadding = PaddingValues(19.dp)
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = stringResource(Res.string.overview_receive_close))
             }
         }
     }
@@ -286,15 +273,16 @@ fun ReceiveAttoContentExtendedPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ReceiveAttoBottomSheetPreview() {
     AttoWalletTheme {
         ReceiveAttoBottomSheet(
+            onDismissRequest = {},
             address = "address",
             onCopy = {},
-            onShare = {},
-            onClose = {},
+            onShare = {}
         )
     }
 }
