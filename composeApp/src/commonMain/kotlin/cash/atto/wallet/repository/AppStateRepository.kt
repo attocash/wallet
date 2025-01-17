@@ -1,8 +1,12 @@
 package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoMnemonic
+import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SeedDataSource
+import cash.atto.wallet.datasource.TempSeedDataSource
+import cash.atto.wallet.getPlatform
+import cash.atto.wallet.interactor.SeedArgon2Interactor
 import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,11 +14,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 class AppStateRepository(
     private val seedDataSource: SeedDataSource,
-    private val passwordDataSource: PasswordDataSource
+    private val tempSeedDataSource: TempSeedDataSource,
+    private val passwordDataSource: PasswordDataSource,
+    private val seedArgon2Interactor: SeedArgon2Interactor
 ) {
     private val _state = MutableStateFlow(AppState.DEFAULT)
     val state = _state.asStateFlow()
@@ -25,6 +32,16 @@ class AppStateRepository(
     init {
         CoroutineScope(Dispatchers.Default).launch {
             seedDataSource.seed.collect { seed ->
+                if (getPlatform().type == PlatformType.WEB) {
+                    setAuthState(
+                        seed?.let {
+                            AppState.AuthState.NO_PASSWORD
+                        } ?: AppState.AuthState.NO_SEED
+                    )
+
+                    return@collect
+                }
+
                 val mnemonic = seed?.let { AttoMnemonic(it) }
                 setMnemonic(mnemonic)
 
@@ -47,9 +64,12 @@ class AppStateRepository(
 
     suspend fun generateNewSecret(): List<String> {
         val mnemonic = AttoMnemonic.generate()
-        seedDataSource.setSeed(
-            mnemonic.words.joinToString(" ")
-        )
+        val seed = mnemonic.words.joinToString(" ")
+
+        // If in web, don't store the seed yet
+        if (getPlatform().type == PlatformType.WEB)
+            tempSeedDataSource.seed = seed
+        else seedDataSource.setSeed(seed)
 
         setAuthState(AppState.AuthState.NEW_ACCOUNT)
 
@@ -58,7 +78,11 @@ class AppStateRepository(
 
     suspend fun importSecret(secret: List<String>) {
         val seed = secret.joinToString(" ")
-        seedDataSource.setSeed(seed)
+
+        // If in web, don't store the seed yet
+        if (getPlatform().type == PlatformType.WEB)
+            tempSeedDataSource.seed = seed
+        else seedDataSource.setSeed(seed)
 
         val password = passwordDataSource.getPassword(seed)
         if (password == null)
@@ -66,7 +90,7 @@ class AppStateRepository(
     }
 
     suspend fun submitPassword(password: String): Boolean {
-        if (password == state.value.password) {
+        if (checkPassword(password)) {
             startSession()
             return true
         }
@@ -74,18 +98,29 @@ class AppStateRepository(
         return false
     }
 
-    suspend fun savePassword(password: String) = state.value
-        .mnemonic
-        ?.words
-        ?.let {
-            passwordDataSource.setPassword(
-                seed = it.joinToString(" "),
-                password = password
-            )
-
-            setPassword(password)
-            startSession()
+    suspend fun savePassword(password: String) {
+        // If the platform is web, we store the seed
+        if (getPlatform().type == PlatformType.WEB) {
+            tempSeedDataSource.seed?.let {
+                seedDataSource.setSeed(
+                    seedArgon2Interactor.encryptSeed(it, password)
+                )
+            }
         }
+
+        state.value
+            .mnemonic
+            ?.words
+            ?.let {
+                passwordDataSource.setPassword(
+                    seed = it.joinToString(" "),
+                    password = password
+                )
+
+                setPassword(password)
+                startSession()
+            }
+    }
 
     suspend fun deleteKeys() {
         seedDataSource.clearSeed()
@@ -133,6 +168,21 @@ class AppStateRepository(
                     authState = AppState.AuthState.SESSION_INVALID
                 )
             )
+        }
+    }
+
+    private suspend fun checkPassword(password: String): Boolean {
+        return when (getPlatform().type) {
+            PlatformType.WEB -> tempSeedDataSource.seed == seedArgon2Interactor
+                .decryptSeed(
+                    encryptedSeed = seedDataSource
+                        .seed
+                        .last()
+                        .orEmpty(),
+                    password = password
+                )
+
+            else -> password == state.value.password
         }
     }
 

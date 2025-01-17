@@ -5,7 +5,9 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.AppDatabaseDesktop
 import cash.atto.wallet.datasource.PasswordDataSource
+import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
+import cash.atto.wallet.interactor.SeedArgon2Interactor
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -28,5 +30,7 @@ actual val databaseModule = module {
 actual val dataSourceModule = module {
     includes(databaseModule)
     singleOf(::PasswordDataSource)
+    singleOf(::SaltDataSource)
     singleOf(::SeedDataSource)
+    singleOf(::SeedArgon2Interactor)
 }

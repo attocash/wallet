@@ -1,6 +1,8 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import cash.atto.wallet.PlatformType
+import cash.atto.wallet.getPlatform
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.state.AppState
@@ -27,7 +29,12 @@ class AppViewModel(
                     AppUiState(
                         shownScreen = when (it.authState) {
                             AppState.AuthState.NEW_ACCOUNT -> AppUiState.ShownScreen.WELCOME
-                            AppState.AuthState.NO_PASSWORD -> AppUiState.ShownScreen.PASSWORD_CREATE
+
+                            AppState.AuthState.NO_PASSWORD ->
+                                if (getPlatform().type == PlatformType.WEB)
+                                    AppUiState.ShownScreen.PASSWORD_ENTER
+                                else AppUiState.ShownScreen.PASSWORD_CREATE
+
                             AppState.AuthState.NO_SEED -> AppUiState.ShownScreen.WELCOME
                             AppState.AuthState.SESSION_INVALID -> AppUiState.ShownScreen.PASSWORD_ENTER
                             AppState.AuthState.SESSION_VALID -> AppUiState.ShownScreen.OVERVIEW
