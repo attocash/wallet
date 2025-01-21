@@ -23,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 
@@ -69,13 +70,15 @@ class SettingsViewModel(
 
             walletManagerJob?.cancel()
             walletManagerJob = walletManagerScope.launch {
-                walletManagerRepository.state.collect { wallet ->
-                    if (wallet?.account != null)
-                        _state.emit(
-                            state.value.copy(
-                                settingsListUiState = settingsListAuthorized()
+                walletManagerRepository.state
+                    .filterNotNull()
+                    .collect { wallet ->
+                        if (wallet.account != null)
+                            _state.emit(
+                                state.value.copy(
+                                    settingsListUiState = settingsListAuthorized()
+                                )
                             )
-                        )
                 }
             }
         }

@@ -33,15 +33,14 @@ class AppStateRepository(
         CoroutineScope(Dispatchers.Default).launch {
             seedDataSource.seed.collect { seed ->
                 if (getPlatform().type == PlatformType.WEB) {
-                    seed?.let {
+                    if (seed != null) {
                         setAuthState(AppState.AuthState.NO_PASSWORD)
-                        setEncryptedSeed(it)
-                    } ?: setAuthState(AppState.AuthState.NO_SEED)
-                    setAuthState(
-                        seed?.let {
-                            AppState.AuthState.NO_PASSWORD
-                        } ?: AppState.AuthState.NO_SEED
-                    )
+                        setEncryptedSeed(seed)
+                    } else {
+                        setAuthState(AppState.AuthState.NO_SEED)
+                        setEncryptedSeed(null)
+                        setMnemonic(null)
+                    }
 
                     return@collect
                 }
@@ -94,9 +93,33 @@ class AppStateRepository(
     }
 
     suspend fun submitPassword(password: String): Boolean {
-        if (checkPassword(password)) {
-            startSession()
-            return true
+        when (getPlatform().type) {
+            PlatformType.WEB -> {
+                val decrypted = seedAESInteractor
+                    .decryptSeed(
+                        encryptedSeed = state.value.encryptedSeed.orEmpty(),
+                        password = password
+                    )
+
+                try {
+                    val mnemonic = AttoMnemonic(decrypted)
+                    setMnemonic(mnemonic)
+                    startSession()
+
+                    return true
+                }
+                catch (ex: Exception) {
+                    return false
+                }
+            }
+            else -> {
+                if (password == state.value.password) {
+                    startSession()
+                    return true
+                }
+
+                return false
+            }
         }
 
         return false
@@ -131,7 +154,7 @@ class AppStateRepository(
     }
 
     private suspend fun setEncryptedSeed(
-        encryptedSeed: String
+        encryptedSeed: String?
     ) {
         _state.emit(
             state.value.copy(
@@ -182,29 +205,6 @@ class AppStateRepository(
                     authState = AppState.AuthState.SESSION_INVALID
                 )
             )
-        }
-    }
-
-    private suspend fun checkPassword(password: String): Boolean {
-        return when (getPlatform().type) {
-            PlatformType.WEB -> {
-                val decrypted = seedAESInteractor
-                    .decryptSeed(
-                        encryptedSeed = state.value.encryptedSeed.orEmpty(),
-                        password = password
-                    )
-
-                return try {
-                    AttoMnemonic(decrypted)
-
-                    true
-                }
-                catch (ex: Exception) {
-                    false
-                }
-            }
-
-            else -> password == state.value.password
         }
     }
 
