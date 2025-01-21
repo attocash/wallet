@@ -6,6 +6,7 @@ import cash.atto.commons.toPublicKey
 import cash.atto.commons.toSeed
 
 data class AppState(
+    val encryptedSeed: String?,
     val mnemonic: AttoMnemonic?,
     val authState: AuthState,
     val password: String?,
@@ -26,6 +27,7 @@ data class AppState(
 
     companion object {
         val DEFAULT = AppState(
+            encryptedSeed = null,
             mnemonic = null,
             authState = AuthState.UNKNOWN,
             password = null

@@ -6,7 +6,7 @@ import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.datasource.TempSeedDataSource
 import cash.atto.wallet.getPlatform
-import cash.atto.wallet.interactor.SeedArgon2Interactor
+import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,7 @@ class AppStateRepository(
     private val seedDataSource: SeedDataSource,
     private val tempSeedDataSource: TempSeedDataSource,
     private val passwordDataSource: PasswordDataSource,
-    private val seedArgon2Interactor: SeedArgon2Interactor
+    private val seedAESInteractor: SeedAESInteractor
 ) {
     private val _state = MutableStateFlow(AppState.DEFAULT)
     val state = _state.asStateFlow()
@@ -33,6 +33,10 @@ class AppStateRepository(
         CoroutineScope(Dispatchers.Default).launch {
             seedDataSource.seed.collect { seed ->
                 if (getPlatform().type == PlatformType.WEB) {
+                    seed?.let {
+                        setAuthState(AppState.AuthState.NO_PASSWORD)
+                        setEncryptedSeed(it)
+                    } ?: setAuthState(AppState.AuthState.NO_SEED)
                     setAuthState(
                         seed?.let {
                             AppState.AuthState.NO_PASSWORD
@@ -103,7 +107,7 @@ class AppStateRepository(
         if (getPlatform().type == PlatformType.WEB) {
             tempSeedDataSource.seed?.let {
                 seedDataSource.setSeed(
-                    seedArgon2Interactor.encryptSeed(it, password)
+                    seedAESInteractor.encryptSeed(it, password)
                 )
             }
         }
@@ -124,6 +128,16 @@ class AppStateRepository(
 
     suspend fun deleteKeys() {
         seedDataSource.clearSeed()
+    }
+
+    private suspend fun setEncryptedSeed(
+        encryptedSeed: String
+    ) {
+        _state.emit(
+            state.value.copy(
+                encryptedSeed = encryptedSeed
+            )
+        )
     }
 
     private suspend fun setMnemonic(
@@ -173,14 +187,22 @@ class AppStateRepository(
 
     private suspend fun checkPassword(password: String): Boolean {
         return when (getPlatform().type) {
-            PlatformType.WEB -> tempSeedDataSource.seed == seedArgon2Interactor
-                .decryptSeed(
-                    encryptedSeed = seedDataSource
-                        .seed
-                        .last()
-                        .orEmpty(),
-                    password = password
-                )
+            PlatformType.WEB -> {
+                val decrypted = seedAESInteractor
+                    .decryptSeed(
+                        encryptedSeed = state.value.encryptedSeed.orEmpty(),
+                        password = password
+                    )
+
+                return try {
+                    AttoMnemonic(decrypted)
+
+                    true
+                }
+                catch (ex: Exception) {
+                    false
+                }
+            }
 
             else -> password == state.value.password
         }
