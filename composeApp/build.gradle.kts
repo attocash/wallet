@@ -140,7 +140,6 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
-            implementation(npm("argon2-browser", "1.18.0"))
         }
     }
 

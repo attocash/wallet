@@ -7,7 +7,7 @@ import cash.atto.wallet.datasource.AppDatabaseDesktop
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
-import cash.atto.wallet.interactor.SeedArgon2Interactor
+import cash.atto.wallet.interactor.SeedAESInteractor
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -32,5 +32,5 @@ actual val dataSourceModule = module {
     singleOf(::PasswordDataSource)
     singleOf(::SaltDataSource)
     singleOf(::SeedDataSource)
-    singleOf(::SeedArgon2Interactor)
+    singleOf(::SeedAESInteractor)
 }
