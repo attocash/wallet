@@ -157,7 +157,7 @@ fun SendResult(
             else MaterialTheme.colorScheme.error,
             transparent = true
         ) {
-            Frame.Text(text = stringResource(Res.string.send_close))
+            Text(text = stringResource(Res.string.send_close))
         }
     }
 }
