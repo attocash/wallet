@@ -70,8 +70,7 @@ fun AttoAppDesktop(
                         withStyle(
                             SpanStyle(
                             textDecoration = TextDecoration.Underline
-                        )
-                        ) {
+                        )) {
                             val text = stringResource(Res.string.copyright_title)
                             val link = stringResource(Res.string.copyright_link)
                             append(text)
