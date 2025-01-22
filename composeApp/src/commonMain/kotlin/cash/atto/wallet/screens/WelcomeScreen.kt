@@ -146,21 +146,11 @@ fun WelcomeScreenExpanded(
                 contentScale = ContentScale.FillBounds
             )
     ) {
-        Image(
-            bitmap = imageResource(Res.drawable.atto_welcome_cubes_expanded),
-            contentDescription = "Atto Wallet",
-            modifier = Modifier.align(Alignment.BottomEnd)
-                .padding(start = 450.dp)
-        )
-
         Column(
-            modifier = Modifier.width(700.dp)
-                .align(Alignment.CenterStart)
-                .padding(
-                    start = 160.dp,
-                    top = 40.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier.align(Alignment.Center)
+                .padding(top = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(Res.string.welcome_title),
@@ -179,14 +169,14 @@ fun WelcomeScreenExpanded(
             Spacer(Modifier.height(15.dp))
 
             AttoButton(
-                modifier = Modifier.width(260.dp),
+                modifier = Modifier.width(400.dp),
                 onClick = onCreateSecretClicked
             ) {
                 Text(stringResource(Res.string.welcome_create_wallet))
             }
 
             AttoOutlinedButton(
-                modifier = Modifier.width(260.dp),
+                modifier = Modifier.width(400.dp),
                 onClick = onImportSecretClicked
             ) {
                 Text(stringResource(Res.string.welcome_import_wallet))
