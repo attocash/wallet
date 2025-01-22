@@ -31,7 +31,7 @@ import cash.atto.wallet.screens.SendConfirmScreen
 import cash.atto.wallet.screens.SendFromScreenAndroid
 import cash.atto.wallet.screens.SendResultScreen
 import cash.atto.wallet.screens.SettingsScreenAndroid
-import cash.atto.wallet.screens.WelcomeScreen
+import cash.atto.wallet.screens.WelcomeScreenAndroid
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
@@ -340,7 +340,7 @@ fun AttoNavHost(
                     enterTransition = { fadeIn(tween(FADE_DURATION)) },
                     exitTransition = { fadeOut(tween(FADE_DURATION)) }
                 ) {
-                    WelcomeScreen(
+                    WelcomeScreenAndroid(
                         onCreateSecretClicked = {
                             navController.navigate(AttoDestination.SafetyWarning.route)
                         },
