@@ -5,6 +5,10 @@
     <string name="backup_confirm_title">Are you sure that you have backed up your secret phrase?</string>
     <string name="backup_confirm_yes">Yes</string>
 
+    <!-- copyright -->
+    <string name="copyright_link">https://atto.cash/</string>
+    <string name="copyright_title">Copyright © 2025 Atto B.V.</string>
+
     <!-- logout -->
     <string name="logout_cancel">CANCEL</string>
     <string name="logout_confirm">DELETE INFO AND LOGOUT</string>
