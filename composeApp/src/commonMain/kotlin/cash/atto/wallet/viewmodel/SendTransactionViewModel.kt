@@ -110,10 +110,15 @@ class SendTransactionViewModel(
     )
 
     suspend fun checkTransactionData(): Boolean {
-        val amount = state.value
-            .sendFromUiState
-            .amountString
-            ?.toBigDecimal()
+        val amount = try {
+            state.value
+                .sendFromUiState
+                .amountString
+                ?.toBigDecimal()
+        }
+        catch(ex: NumberFormatException) {
+            null
+        }
 
         val amountCheckResult = amount != null
 
