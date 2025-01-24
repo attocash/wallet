@@ -80,7 +80,7 @@ jobs:
       url: ${{ steps.deploy.outputs.details_url }}
     runs-on: ubuntu-latest
     needs:
-      - build
+      - preview
     steps:
       - uses: actions/checkout@v4
 
