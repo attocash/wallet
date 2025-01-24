@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "atto-wallet",
+    "public": "artifacts/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
