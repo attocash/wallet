@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +31,7 @@ import attowallet.composeapp.generated.resources.main_nav_settings
 import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.mainscreen.BalanceChip
 import cash.atto.wallet.components.mainscreen.ExpandableDrawerItem
+import cash.atto.wallet.components.mainscreen.HideableNavigationDrawer
 import cash.atto.wallet.components.mainscreen.NavigationDrawerItem
 import cash.atto.wallet.components.mainscreen.PermanentNavigationDrawer
 import cash.atto.wallet.components.settings.LogoutDialog
@@ -68,7 +72,7 @@ fun MainScreenWeb(
         mutableStateOf(MainScreenNavDestination.OVERVIEW)
     }
 
-    MainScreenContent(
+    MainScreenWebContent(
         uiState = uiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
@@ -81,8 +85,121 @@ fun MainScreenWeb(
     )
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun MainScreenContent(
+fun MainScreenWebContent(
+    uiState: MainScreenUiState,
+    navState: MainScreenNavDestination,
+    onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    onDismissLogout: () -> Unit,
+    onConfirmLogout: () -> Unit
+) {
+    val windowSizeClass = calculateWindowSizeClass()
+
+    if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
+        MainScreenWebContentExpanded(
+            uiState = uiState,
+            navState = navState,
+            onNavStateChanged = onNavStateChanged,
+            onDismissLogout = onDismissLogout,
+            onConfirmLogout = onConfirmLogout
+        )
+    } else {
+        MainScreenWebContentCompact(
+            uiState = uiState,
+            navState = navState,
+            onNavStateChanged = onNavStateChanged,
+            onDismissLogout = onDismissLogout,
+            onConfirmLogout = onConfirmLogout
+        )
+    }
+}
+
+@Composable
+fun MainScreenWebContentCompact(
+    uiState: MainScreenUiState,
+    navState: MainScreenNavDestination,
+    onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    onDismissLogout: () -> Unit,
+    onConfirmLogout: () -> Unit
+) {
+    val settingsUiState = uiState.settingsUiState
+
+    HideableNavigationDrawer(
+        modifier = Modifier.fillMaxSize()
+            .paint(
+                painter = painterResource(Res.drawable.atto_background_desktop),
+                contentScale = ContentScale.FillBounds
+            ),
+        header = {
+            ProfileExtended(
+                modifier = Modifier.fillMaxWidth(),
+                uiState = settingsUiState.profileUiState
+            )
+        },
+        drawerContent = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                BalanceChip(
+                    modifier = Modifier.fillMaxWidth(),
+                    uiState = uiState.balanceChipUiState
+                )
+
+                NavigationDrawerItem(
+                    label = stringResource(Res.string.main_nav_overview),
+                    icon = vectorResource(Res.drawable.ic_nav_overview),
+                    selected = (navState == MainScreenNavDestination.OVERVIEW),
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.OVERVIEW) }
+                )
+
+                NavigationDrawerItem(
+                    label = stringResource(Res.string.main_nav_send),
+                    icon = vectorResource(Res.drawable.ic_nav_send),
+                    selected = (navState == MainScreenNavDestination.SEND),
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) }
+                )
+
+                NavigationDrawerItem(
+                    label = stringResource(Res.string.main_nav_receive),
+                    icon = vectorResource(Res.drawable.ic_nav_receive),
+                    selected = (navState == MainScreenNavDestination.RECEIVE),
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.RECEIVE) }
+                )
+
+                ExpandableDrawerItem(
+                    label = stringResource(Res.string.main_nav_settings)
+                ) {
+                    SettingsList(settingsUiState.settingsListUiState)
+                }
+            }
+        }
+    ) {
+        val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+        }
+
+        CompositionLocalProvider(
+            LocalViewModelStoreOwner provides viewModelStoreOwner
+        ) {
+            when (navState) {
+                MainScreenNavDestination.OVERVIEW -> OverviewScreenWeb()
+                MainScreenNavDestination.SEND -> SendScreenWeb()
+                MainScreenNavDestination.RECEIVE -> ReceiveScreenWeb()
+            }
+        }
+    }
+
+    if (uiState.showLogoutDialog)
+        LogoutDialog(
+            onDismiss = onDismissLogout,
+            onConfirm = onConfirmLogout
+        )
+}
+
+@Composable
+fun MainScreenWebContentExpanded(
     uiState: MainScreenUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
@@ -170,9 +287,22 @@ fun MainScreenContent(
 }
 
 @Composable
-fun MainScreenContentPreview() {
+fun MainScreenWebContentCompactPreview() {
     AttoWalletTheme {
-        MainScreenContent(
+        MainScreenWebContentCompact(
+            uiState = MainScreenUiState.DEFAULT,
+            navState = MainScreenNavDestination.OVERVIEW,
+            onNavStateChanged = {},
+            onDismissLogout = {},
+            onConfirmLogout = {}
+        )
+    }
+}
+
+@Composable
+fun MainScreenWebContentExpandedPreview() {
+    AttoWalletTheme {
+        MainScreenWebContentExpanded(
             uiState = MainScreenUiState.DEFAULT,
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},

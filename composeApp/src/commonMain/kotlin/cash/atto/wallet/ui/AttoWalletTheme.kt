@@ -15,6 +15,7 @@ val attoColors = lightColorScheme(
 //    primaryVariant = brown_600,
     secondary = gold_100,
     secondaryContainer = gold_900,
+    tertiary = yellow_100,
     background = Color.Black,
     surface = Color.White,
     error = red_900,
