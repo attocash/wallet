@@ -51,6 +51,7 @@ jobs:
       group: "live"
       cancel-in-progress: false
     environment:
+      name: preview
       url: ${{ steps.deploy.outputs.details_url }}
     runs-on: ubuntu-latest
     needs:
