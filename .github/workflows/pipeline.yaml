@@ -46,6 +46,30 @@ jobs:
             artifacts/linux/*.deb
             artifacts/macos/*.dmg
             artifacts/windows/*.msi
+  preview:
+    concurrency:
+      group: "live"
+      cancel-in-progress: false
+    environment:
+      url: ${{ steps.deploy.outputs.details_url }}
+    runs-on: ubuntu-latest
+    needs:
+      - release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ATTO_APPLICATION_LIVE }}
+          channelId: preview
+
   deploy:
     concurrency:
       group: "live"
@@ -56,7 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - preview
-      - build
     steps:
       - uses: actions/checkout@v4
 
