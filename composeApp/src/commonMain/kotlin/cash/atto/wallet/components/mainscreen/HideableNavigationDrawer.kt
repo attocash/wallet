@@ -6,6 +6,7 @@ import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,8 +85,8 @@ fun HideableNavigationDrawer(
         if (drawerExpanded.value) {
             Box(Modifier.fillMaxSize()) {
                 Box(Modifier.fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.2f)
-                ))
+                    .background(Color.Black.copy(alpha = 0.2f))
+                )
             }
         }
 
@@ -100,34 +101,43 @@ fun HideableNavigationDrawer(
                 targetOffset = { size -> IntOffset(-size.width, 0) }
             )
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.75f)
-                    .fillMaxHeight()
-                    .align(Alignment.CenterStart)
-                    .background(
-                        color = MaterialTheme.colorScheme.tertiary
+            Row(Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(0.75f)
+                        .fillMaxHeight()
+                        .background(
+                            color = MaterialTheme.colorScheme.tertiary
 
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Box(Modifier.size(48.dp, 48.dp)
-                    .clip(CircleShape)
-                    .background(
-                        color = MaterialTheme.colorScheme
-                            .onSurface
-                            .copy(alpha = 0.05f)
-                    )
-                    .clickable { drawerExpanded.value = false }
+                        )
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        modifier = Modifier.align(Alignment.Center),
-                        imageVector = vectorResource(Res.drawable.ic_atto_chevron_left),
-                        contentDescription = "backIcon"
-                    )
+                    Box(Modifier.size(48.dp, 48.dp)
+                        .clip(CircleShape)
+                        .background(
+                            color = MaterialTheme.colorScheme
+                                .onSurface
+                                .copy(alpha = 0.05f)
+                        )
+                        .clickable { drawerExpanded.value = false }
+                    ) {
+                        Icon(
+                            modifier = Modifier.align(Alignment.Center),
+                            imageVector = vectorResource(Res.drawable.ic_atto_chevron_left),
+                            contentDescription = "backIcon"
+                        )
+                    }
+
+                    drawerContent()
                 }
 
-                drawerContent()
+                Box(Modifier.weight(1f)
+                    .fillMaxHeight()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { drawerExpanded.value = false }
+                )
             }
         }
     }
