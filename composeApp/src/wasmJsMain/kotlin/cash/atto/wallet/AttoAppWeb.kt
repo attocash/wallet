@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +47,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun AttoAppWeb(
     component: DWNavigationComponent
@@ -53,6 +57,7 @@ fun AttoAppWeb(
             val viewModel = koinViewModel<AppViewModel>()
             val uiState = viewModel.state.collectAsState()
             val uriHandler = LocalUriHandler.current
+            val windowSizeClass = calculateWindowSizeClass()
 
             Box(Modifier.fillMaxSize()) {
                 AttoNavHost(
@@ -63,29 +68,31 @@ fun AttoAppWeb(
                     }
                 )
 
-                Text(
-                    modifier = Modifier.align(Alignment.BottomStart)
-                        .padding(16.dp),
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(
-                            textDecoration = TextDecoration.Underline
-                        )) {
-                            val text = stringResource(Res.string.copyright_title)
-                            val link = stringResource(Res.string.copyright_link)
-                            append(text)
-                            addLink(
-                                clickable = LinkAnnotation.Clickable(
-                                    tag = "URL",
-                                    linkInteractionListener = {
-                                        uriHandler.openUri(link)
-                                    }
-                                ),
-                                start = 0,
-                                end = text.length
-                            )
+                if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
+                    Text(
+                        modifier = Modifier.align(Alignment.BottomStart)
+                            .padding(16.dp),
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                textDecoration = TextDecoration.Underline
+                            )) {
+                                val text = stringResource(Res.string.copyright_title)
+                                val link = stringResource(Res.string.copyright_link)
+                                append(text)
+                                addLink(
+                                    clickable = LinkAnnotation.Clickable(
+                                        tag = "URL",
+                                        linkInteractionListener = {
+                                            uriHandler.openUri(link)
+                                        }
+                                    ),
+                                    start = 0,
+                                    end = text.length
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
