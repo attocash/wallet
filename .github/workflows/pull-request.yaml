@@ -1,10 +1,31 @@
-# Managed by management-terraform
-
 name: Pull Request
 
 on:
   pull_request:
 
 jobs:
-  test:
+  build:
     uses: ./.github/workflows/build.yaml
+
+  deploy-web:
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - id: deploy-web
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ATTO_APPLICATION_LIVE }}
+          channelId: preview
