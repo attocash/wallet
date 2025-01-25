@@ -20,11 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_welcome_background
 import attowallet.composeapp.generated.resources.atto_welcome_cubes_expanded
+import attowallet.composeapp.generated.resources.copyright_link
+import attowallet.composeapp.generated.resources.copyright_title
 import attowallet.composeapp.generated.resources.ic_atto
 import attowallet.composeapp.generated.resources.welcome_create_wallet
 import attowallet.composeapp.generated.resources.welcome_import_wallet
@@ -65,6 +73,8 @@ fun WelcomeScreenCompact(
     onCreateSecretClicked: () -> Unit,
     onImportSecretClicked: () -> Unit
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = Modifier.fillMaxSize()
             .paint(
@@ -131,6 +141,32 @@ fun WelcomeScreenCompact(
                 }
             }
         }
+
+        Text(
+            modifier = Modifier.padding(16.dp)
+                .padding(bottom = 16.dp),
+            text = buildAnnotatedString {
+                withStyle(
+                    SpanStyle(
+                        textDecoration = TextDecoration.Underline
+                    )
+                ) {
+                    val text = stringResource(Res.string.copyright_title)
+                    val link = stringResource(Res.string.copyright_link)
+                    append(text)
+                    addLink(
+                        clickable = LinkAnnotation.Clickable(
+                            tag = "URL",
+                            linkInteractionListener = {
+                                uriHandler.openUri(link)
+                            }
+                        ),
+                        start = 0,
+                        end = text.length
+                    )
+                }
+            }
+        )
     }
 }
 
