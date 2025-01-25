@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
@@ -17,7 +18,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ReceiveScreenDesktop() {
     val viewModel = koinViewModel<ReceiveViewModel>()
-    val address = viewModel.address
+    val address = viewModel.address.collectAsState()
 
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
