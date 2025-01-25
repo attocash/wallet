@@ -113,12 +113,6 @@ fun WelcomeScreenCompact(
             Modifier.padding(top = 18.dp)
                 .weight(1f)
         ) {
-//            Image(
-//                bitmap = imageResource(Res.drawable.atto_welcome_cubes),
-//                contentDescription = "Atto Wallet",
-//                modifier = Modifier.align(Alignment.TopCenter),
-//            )
-
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -175,6 +169,8 @@ fun WelcomeScreenExpanded(
     onCreateSecretClicked: () -> Unit,
     onImportSecretClicked: () -> Unit
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Box(
         modifier = Modifier.fillMaxSize()
             .paint(
@@ -218,6 +214,31 @@ fun WelcomeScreenExpanded(
                 Text(stringResource(Res.string.welcome_import_wallet))
             }
         }
+
+        Text(
+            modifier = Modifier.align(Alignment.BottomStart)
+                .padding(16.dp),
+            text = buildAnnotatedString {
+                withStyle(
+                    SpanStyle(
+                        textDecoration = TextDecoration.Underline
+                    )) {
+                    val text = stringResource(Res.string.copyright_title)
+                    val link = stringResource(Res.string.copyright_link)
+                    append(text)
+                    addLink(
+                        clickable = LinkAnnotation.Clickable(
+                            tag = "URL",
+                            linkInteractionListener = {
+                                uriHandler.openUri(link)
+                            }
+                        ),
+                        start = 0,
+                        end = text.length
+                    )
+                }
+            }
+        )
     }
 }
 
