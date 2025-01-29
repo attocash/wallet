@@ -37,7 +37,7 @@ material3WindowSize = "0.5.0"
 activityKtx = "1.9.3"
 slf4j = "2.0.16"
 roomCommon = "2.7.0-alpha01"
-ksp = "2.1.0-1.0.29"
+ksp = "2.1.10-1.0.29"
 sqlite = "2.5.0-SNAPSHOT"
 
 [libraries]
