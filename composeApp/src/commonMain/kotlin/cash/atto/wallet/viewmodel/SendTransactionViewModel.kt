@@ -75,8 +75,8 @@ class SendTransactionViewModel(
                         unit = AttoUnit.ATTO,
                         string = state.value
                             .sendConfirmUiState
-                            .amount
-                            .toString()
+                            .amount!!
+                            .toPlainString()
                     )
                 )
         } catch (ex: Exception) {
