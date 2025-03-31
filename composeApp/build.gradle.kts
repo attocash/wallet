@@ -222,7 +222,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg)
             packageName = "AttoWallet"
-            packageVersion = "1.0.8"
+            packageVersion = "1.0.9"
             modules("jdk.charsets")
 
             linux {
