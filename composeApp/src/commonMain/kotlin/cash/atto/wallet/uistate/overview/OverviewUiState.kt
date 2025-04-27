@@ -22,7 +22,7 @@ data class OverviewUiState(
             transactions = entries
                 .filterNotNull()
                 .sortedByDescending { it.height }
-                .map {
+                .mapNotNull {
                     when (it.blockType) {
                         AttoBlockType.SEND -> TransactionUiState(
                             type = TransactionType.SEND,
@@ -31,19 +31,11 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp
+                            timestamp = it.timestamp,
+                            height = it.height
                         )
 
-                        AttoBlockType.RECEIVE -> TransactionUiState(
-                            type = TransactionType.RECEIVE,
-                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
-                            source = AttoAddress(
-                                it.subjectAlgorithm,
-                                it.subjectPublicKey
-                            ).toString(),
-                            timestamp = it.timestamp
-                        )
-
+                        AttoBlockType.RECEIVE,
                         AttoBlockType.OPEN -> TransactionUiState(
                             type = TransactionType.RECEIVE,
                             amount = "+ " + it.amount().toString(AttoUnit.ATTO),
@@ -51,7 +43,8 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp
+                            timestamp = it.timestamp,
+                            height = it.height
                         )
 
                         AttoBlockType.CHANGE -> TransactionUiState(
@@ -61,7 +54,8 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp
+                            timestamp = it.timestamp,
+                            height = it.height
                         )
 
                         else -> null
