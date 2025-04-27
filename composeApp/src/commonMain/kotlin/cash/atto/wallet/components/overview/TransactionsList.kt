@@ -27,6 +27,7 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_transactions
 import attowallet.composeapp.generated.resources.overview_hint
 import attowallet.composeapp.generated.resources.overview_transactions_title
+import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.overview.TransactionListUiState
@@ -121,12 +122,14 @@ fun TransactionsListPreview() {
                         amount = "A little Atto",
                         source = "someone",
                         timestamp = Clock.System.now(),
+                        height = AttoHeight(1UL),
                     ),
                     TransactionUiState(
                         type = TransactionType.RECEIVE,
                         amount = "A lot of Atto",
                         source = "someone",
                         timestamp = Clock.System.now(),
+                        height = AttoHeight(0UL),
                     ),
                 ),
                 showHint = true

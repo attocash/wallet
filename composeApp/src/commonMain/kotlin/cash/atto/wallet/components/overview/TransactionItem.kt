@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -58,16 +59,32 @@ fun TransactionItem(uiState: TransactionUiState) {
                     )
                 }
 
-                Column {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     Text(uiState.typeString)
                     Text(
                         text = uiState.shownAmount,
                         color = MaterialTheme.colorScheme.secondaryContainer
                     )
+                    Text(
+                        text = uiState.formattedTimestamp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.44f),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
 
-            Box(Modifier.weight(0.43f)) {
+            Column(
+                modifier = Modifier.weight(0.43f),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = "#" + uiState.height.value.formatWithCommas(),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.bodySmall
+                )
                 Text(
                     text = uiState.source,
                     modifier = Modifier.fillMaxWidth(),
@@ -81,6 +98,20 @@ fun TransactionItem(uiState: TransactionUiState) {
     }
 }
 
+private fun ULong.formatWithCommas(): String {
+    val str = this.toString()
+    val sb = StringBuilder()
+    var count = 0
+    for (i in str.length - 1 downTo 0) {
+        sb.append(str[i])
+        count++
+        if (count % 3 == 0 && i != 0) {
+            sb.append(',')
+        }
+    }
+    return sb.reverse().toString()
+}
+
 @Preview
 @Composable
 fun TransactionItemPreview() {
@@ -90,7 +121,8 @@ fun TransactionItemPreview() {
                 type = TransactionType.SEND,
                 amount = "A little Atto",
                 source = "someone",
-                timestamp = Clock.System.now()
+                timestamp = Clock.System.now(),
+                height = AttoHeight(0UL)
             )
         )
     }
