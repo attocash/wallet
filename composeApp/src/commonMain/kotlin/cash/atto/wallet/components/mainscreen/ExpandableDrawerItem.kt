@@ -52,12 +52,10 @@ fun ExpandableDrawerItem(
             )
     ) {
         Row(
-            modifier = Modifier.padding(
-                start = 32.dp,
-                top = 24.dp,
-                end = 16.dp,
-                bottom = 24.dp
-            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { drawerOpened.value = !drawerOpened.value }
+                .padding(start = 32.dp, top = 24.dp, end = 16.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -79,10 +77,7 @@ fun ExpandableDrawerItem(
                 imageVector = if (drawerOpened.value)
                     vectorResource(Res.drawable.ic_chevron_up)
                 else vectorResource(Res.drawable.ic_chevron_down),
-                contentDescription = "Drawer toggle",
-                modifier = Modifier
-                    .clickable { drawerOpened.value = !drawerOpened.value }
-                    .padding(8.dp)
+                contentDescription = "Drawer toggle"
             )
         }
 
