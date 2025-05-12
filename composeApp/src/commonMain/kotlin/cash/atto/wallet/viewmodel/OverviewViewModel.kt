@@ -16,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class OverviewViewModel(
@@ -65,7 +66,8 @@ class OverviewViewModel(
                     accountCollectorJob = scope.launch {
                         wallet.accountFlow.collect { account ->
                             println("Account $account")
-                            val entries = persistentAccountEntryRepository.list(account.publicKey)
+                            val entries =
+                                persistentAccountEntryRepository.stream(account.publicKey).toList()
 
                             _state.emit(
                                 state.value.copy(
@@ -83,7 +85,8 @@ class OverviewViewModel(
                         persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
                             _state.emit(
                                 state.value.copy(
-                                    entries = persistentAccountEntryRepository.list(wallet.publicKey)
+                                    entries = persistentAccountEntryRepository.stream(wallet.publicKey)
+                                        .toList()
                                 )
                             )
                         }

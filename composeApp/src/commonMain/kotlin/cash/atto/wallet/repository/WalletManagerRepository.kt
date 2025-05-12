@@ -7,16 +7,11 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.fromHexToByteArray
 import cash.atto.commons.gatekeeper.AttoAuthenticator
 import cash.atto.commons.gatekeeper.attoBackend
+import cash.atto.commons.node.AttoNodeOperations
 import cash.atto.commons.toSigner
-import cash.atto.commons.wallet.AttoAccountEntryRepository
-import cash.atto.commons.wallet.AttoNodeClient
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.commons.wallet.AttoWalletViewer
-import cash.atto.commons.wallet.AttoWorkCache
-import cash.atto.commons.wallet.attoBackend
-import cash.atto.commons.wallet.inMemory
 import cash.atto.commons.worker.AttoWorker
-import cash.atto.commons.worker.attoBackend
 import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -85,7 +80,7 @@ class WalletManagerRepository(
         val privateKey = appState.getPrivateKey() ?: return null
         val signer = privateKey.toSigner()
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
-        val client = AttoNodeClient.attoBackend(network, authenticator)
+        val client = AttoNodeOperations.attoBackend(network, authenticator)
 
         val walletManager = AttoWalletManager(
             viewer = AttoWalletViewer(
@@ -95,7 +90,7 @@ class WalletManagerRepository(
             ),
             signer = signer,
             client = client,
-            worker = AttoWorker.attoBackend(authenticator),
+            worker = AttoWorker.attoBackend(network, authenticator),
             workCache = workCache
         ) {
             defaultRepresentatives.random()
