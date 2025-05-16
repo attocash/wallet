@@ -16,14 +16,13 @@ import attowallet.composeapp.generated.resources.overview_transaction_from
 import attowallet.composeapp.generated.resources.overview_transaction_to
 import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoFormatter
+import cash.atto.wallet.ui.AttoDateFormatter
 import cash.atto.wallet.ui.errorGradient
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.secondaryGradient
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 data class TransactionUiState(
     val type: TransactionType,
@@ -100,18 +99,11 @@ data class TransactionUiState(
             )
         }
 
+    val shownHeight: String
+        get() = AttoFormatter.format(height.value)
+
     val formattedTimestamp: String
-        get() {
-            val dateTime = timestamp.toLocalDateTime(TimeZone.currentSystemDefault())
-
-            val day = if (dateTime.dayOfMonth < 10) "0${dateTime.dayOfMonth}" else "${dateTime.dayOfMonth}"
-            val month = dateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }
-            val year = dateTime.year
-            val hour = if (dateTime.hour < 10) "0${dateTime.hour}" else "${dateTime.hour}"
-            val minute = if (dateTime.minute < 10) "0${dateTime.minute}" else "${dateTime.minute}"
-
-            return "$day $month $year, $hour:$minute"
-        }
+        get() = AttoDateFormatter.format(timestamp)
 }
 
 enum class TransactionType {

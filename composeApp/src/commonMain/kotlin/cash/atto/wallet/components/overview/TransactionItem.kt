@@ -81,7 +81,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = "#" + uiState.height.value.formatWithCommas(),
+                    text = "#" + uiState.shownHeight,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -96,20 +96,6 @@ fun TransactionItem(uiState: TransactionUiState) {
             }
         }
     }
-}
-
-private fun ULong.formatWithCommas(): String {
-    val str = this.toString()
-    val sb = StringBuilder()
-    var count = 0
-    for (i in str.length - 1 downTo 0) {
-        sb.append(str[i])
-        count++
-        if (count % 3 == 0 && i != 0) {
-            sb.append(',')
-        }
-    }
-    return sb.reverse().toString()
 }
 
 @Preview
