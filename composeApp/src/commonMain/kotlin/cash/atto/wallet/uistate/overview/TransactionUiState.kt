@@ -32,7 +32,15 @@ data class TransactionUiState(
     val height: AttoHeight,
 ) {
 
-    val shownAmount: String = AttoFormatter.format(amount)
+    var shownAmount = amount?.let { a ->
+        //check if first element is a sign
+        if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
+            val sign = a.split(' ').getOrNull(0)
+            val number = a.split(' ').getOrNull(1)
+
+            "$sign ${AttoFormatter.format(number)}"
+        } else AttoFormatter.format(amount)
+    } ?: AttoFormatter.format(amount)
 
     val icon: ImageVector
         @Composable
@@ -91,9 +99,11 @@ data class TransactionUiState(
             )
         }
 
-    val shownHeight: String = AttoFormatter.format(height.value)
+    val shownHeight: String
+        get() = AttoFormatter.format(height.value)
 
-    val formattedTimestamp: String = AttoDateFormatter.format(timestamp)
+    val formattedTimestamp: String
+        get() = AttoDateFormatter.format(timestamp)
 }
 
 enum class TransactionType {
