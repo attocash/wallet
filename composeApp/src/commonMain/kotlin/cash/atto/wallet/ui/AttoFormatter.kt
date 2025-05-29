@@ -1,6 +1,5 @@
 package cash.atto.wallet.ui
 
-
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 object AttoFormatter {

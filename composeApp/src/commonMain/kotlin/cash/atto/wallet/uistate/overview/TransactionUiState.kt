@@ -32,7 +32,14 @@ data class TransactionUiState(
     val height: AttoHeight,
 ) {
 
-    val shownAmount: String = AttoFormatter.format(amount)
+    var shownAmount = amount?.let { a ->
+        if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
+            val sign = a.split(' ').getOrNull(0)
+            val number = a.split(' ').getOrNull(1)
+
+            "$sign ${AttoFormatter.format(number)}"
+        } else AttoFormatter.format(amount)
+    } ?: AttoFormatter.format(amount)
 
     val icon: ImageVector
         @Composable
