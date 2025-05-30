@@ -60,6 +60,14 @@ kotlin {
         val desktopMain by getting
         val wasmJsMain by getting
         val androidInstrumentedTest by getting
+        val commonMain by getting
+        val androidMain by getting
+
+        val jvmMain by creating {
+            dependsOn(commonMain)
+        }
+        androidMain.dependsOn(jvmMain)
+        desktopMain.dependsOn(jvmMain)
 
         androidMain.dependencies {
             implementation(compose.preview)
