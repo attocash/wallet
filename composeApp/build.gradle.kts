@@ -34,7 +34,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "attoWallet"
+        outputModuleName.set("attoWallet")
         browser {
             commonWebpackConfig {
                 outputFileName = "attoWallet.js"
@@ -75,7 +75,6 @@ kotlin {
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.core.splashscreen)
 
@@ -109,15 +108,12 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.atto.commons.wallet)
 
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.client.content.negotiation)
 
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.ktor.client.core)
 
             implementation(libs.koin.composeVM)
 
@@ -132,7 +128,6 @@ kotlin {
             implementation(compose.desktop.currentOs)
 
             implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.ktor.client.okhttp)
             implementation(libs.jna)
             implementation(libs.jna.platform)
 
@@ -217,7 +212,7 @@ tasks.withType<JavaCompile> {
     options.encoding = StandardCharsets.UTF_8.toString()
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
     if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
     }
@@ -248,4 +243,8 @@ compose.desktop {
             }
         }
     }
+}
+
+afterEvaluate {
+    tasks.findByName("kspKotlinDesktop")?.dependsOn("kspCommonMainKotlinMetadata")
 }

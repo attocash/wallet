@@ -1,7 +1,7 @@
 package cash.atto.wallet
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import cash.atto.wallet.di.viewModelModule
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -14,7 +14,7 @@ fun main() {
 
     startKoin { modules(viewModelModule) }
 
-    CanvasBasedWindow(canvasElementId = "AttoWallet") {
+    ComposeViewport(viewportContainerId = "AttoWallet") {
         AttoAppWeb(navComponent)
     }
 }

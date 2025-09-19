@@ -1,44 +1,36 @@
 [versions]
 accompanistPermissions = "0.37.3"
-agp = "8.10.0"
+agp = "8.13.0"
 android-compileSdk = "35"
 android-minSdk = "26"
 android-targetSdk = "35"
-androidx-activityCompose = "1.10.1"
-androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.2.1"
-androidx-core-ktx = "1.16.0"
+androidx-activityCompose = "1.11.0"
 androidx-core-splashscreen = "1.0.1"
-androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.4"
-androidx-material3 = "1.3.1"
-androidx-test-junit = "1.2.1"
-androidx-datastore = "1.1.6"
+androidx-lifecycle = "2.9.4"
+androidx-datastore = "1.1.7"
 barcodeScanning = "17.3.0"
 bignum = "0.3.10"
-camera2 = "1.4.2"
-compose-plugin = "1.8.1"
-decompose = "3.1.0"
-extJunit = "1.2.1"
-junit = "4.13.2"
-kotlin = "2.1.21"
-kotlinNativeBigdecimal = "1.0"
+camera2 = "1.5.0"
+compose-plugin = "1.9.0"
+decompose = "3.3.0"
+extJunit = "1.3.0"
+kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
-ktor = "3.1.3"
-atto-commons = "4.0.3"
+kotlinx-serialization = "1.9.0"
+atto-commons = "5.3.0"
 jna = "5.17.0"
-junitJupiter = "5.13.3"
-navigationCompose = "2.9.0"
-koin = "4.0.4"
+junitJupiter = "5.13.4"
+navigationCompose = "2.9.4"
+koin = "4.1.1"
 qrose = "1.0.1"
-rules = "1.6.2"
+rules = "1.7.0"
 transportRuntime = "4.0.0"
 material3WindowSize = "0.5.0"
-activityKtx = "1.10.1"
+activityKtx = "1.11.0"
 slf4j = "2.0.17"
-roomCommon = "2.7.1"
-ksp = "2.1.20-1.0.31"
-sqlite = "2.5.1"
+roomCommon = "2.8.0"
+ksp = "2.2.0-2.0.2"
+sqlite = "2.6.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -52,29 +44,13 @@ barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref =
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-decompose-extensions-compose-jetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decompose" }
-kotlin-native-bigdecimal = { module = "com.crossoid:kotlin-native-bigdecimal", version.ref = "kotlinNativeBigdecimal" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material3 = { group = "com.google.android.material3", name = "material3", version.ref = "androidx-material3" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 atto-commons-wallet = { module = "cash.atto:commons-wallet", version.ref = "atto-commons" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
@@ -82,9 +58,6 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 # Koin dependencies
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 material3-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "material3WindowSize" }
 qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }

@@ -5,12 +5,12 @@ import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.interactor.utils.CryptoKey
 import cash.atto.wallet.interactor.utils.TextDecoder
 import cash.atto.wallet.interactor.utils.getSubtleCryptoInstance
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 
-internal fun transformKeyAlgorithm(salt: Uint8Array): JsAny = js("""
+internal fun transformKeyAlgorithm(salt: Uint8Array): JsAny = js(
+    """
     ({ 
         "name": "pbkdf2",
         "hash": "sha-256",
@@ -18,29 +18,37 @@ internal fun transformKeyAlgorithm(salt: Uint8Array): JsAny = js("""
         "iterations": 100000,
         "length": 256
     })
-""")
+"""
+)
 
-internal fun deriveBitsAlgorithm(salt: Uint8Array): JsAny = js("""
+internal fun deriveBitsAlgorithm(salt: Uint8Array): JsAny = js(
+    """
     ({ 
         "name": "pbkdf2",
         "hash": "sha-256",
         "salt": salt,
         "iterations": 10000
     })
-""")
+"""
+)
 
-internal fun generateCryptoKeyAlgorithm(): JsAny = js("""
+internal fun generateCryptoKeyAlgorithm(): JsAny = js(
+    """
     ("AES-GCM")
-""")
+"""
+)
 
-internal fun encryptionAlgorithm(salt: Uint8Array): JsAny = js("""
+internal fun encryptionAlgorithm(salt: Uint8Array): JsAny = js(
+    """
     ({ 
         "name": "AES-GCM",
         "iv": salt
     })
-""")
+"""
+)
 
-internal fun arrayBufferToBase64(buffer: Uint8Array): String = js("""
+internal fun arrayBufferToBase64(buffer: Uint8Array): String = js(
+    """
     {
       var binary = '';
       var bytes = new Uint8Array(buffer);
@@ -50,9 +58,11 @@ internal fun arrayBufferToBase64(buffer: Uint8Array): String = js("""
       }
       return window.btoa(binary);
     }
-""")
+"""
+)
 
-internal fun base64ToArrayBuffer(base64: String): Uint8Array = js("""
+internal fun base64ToArrayBuffer(base64: String): Uint8Array = js(
+    """
     {
       var binary_string = window.atob(base64);
       var len = binary_string.length;
@@ -62,7 +72,8 @@ internal fun base64ToArrayBuffer(base64: String): Uint8Array = js("""
       }
       return bytes.buffer;
     }
-""")
+"""
+)
 
 actual class SeedAESInteractor(
     private val saltDataSource: SaltDataSource
@@ -74,9 +85,9 @@ actual class SeedAESInteractor(
         val crypto = getSubtleCryptoInstance()
 
         val encrypted = crypto.encrypt(
-            algorithm = encryptionAlgorithm(salt.toByteArray().toUint8Array()),
+            algorithm = encryptionAlgorithm(salt.encodeToByteArray().toUint8Array()),
             key = key,
-            data = seed.toByteArray().toUint8Array()
+            data = seed.encodeToByteArray().toUint8Array()
         ).await<Uint8Array>()
 
         return arrayBufferToBase64(encrypted)
@@ -92,14 +103,13 @@ actual class SeedAESInteractor(
             val crypto = getSubtleCryptoInstance()
 
             val decrypted = crypto.decrypt(
-                algorithm = encryptionAlgorithm(salt.toByteArray().toUint8Array()),
+                algorithm = encryptionAlgorithm(salt.encodeToByteArray().toUint8Array()),
                 key = key,
                 data = base64ToArrayBuffer(encryptedSeed)
             ).await<Uint8Array>()
 
             return TextDecoder().decode(decrypted)
-        }
-        catch (ex: Throwable) {
+        } catch (ex: Throwable) {
             return ""
         }
     }
@@ -110,14 +120,14 @@ actual class SeedAESInteractor(
 
         val paddedKey = crypto.importKey(
             format = "raw",
-            keyData = password.toByteArray().toUint8Array(),
-            algorithm = transformKeyAlgorithm(salt.toByteArray().toUint8Array()),
+            keyData = password.encodeToByteArray().toUint8Array(),
+            algorithm = transformKeyAlgorithm(salt.encodeToByteArray().toUint8Array()),
             extractable = false,
             keyUsages = mapKeyUsages(arrayOf("deriveBits")),
         ).await<CryptoKey>()
 
         val derivedBits = crypto.deriveBits(
-            algorithm = deriveBitsAlgorithm(salt.toByteArray().toUint8Array()),
+            algorithm = deriveBitsAlgorithm(salt.encodeToByteArray().toUint8Array()),
             baseKey = paddedKey,
             128
         ).await<ArrayBuffer>()

@@ -44,8 +44,25 @@
     </script>
 
     <script type="application/javascript" src="attoWallet.js"></script>
+
+    <style>
+        /* reset */
+        html, body { height: 100%; margin: 0; padding: 0; }
+        /* prevent page scrollbars */
+        body { overflow: hidden; }
+        /* Compose host: fill viewport without causing scrollbars */
+        #AttoWallet {
+          position: fixed;         /* pin to viewport */
+          inset: 0;                /* top/right/bottom/left = 0 */
+          display: block;
+          border: 0;               /* remove any default border */
+          outline: none;           /* remove focus outline */
+        }
+        /* just in case some UA draws focus ring */
+        #AttoWallet:focus { outline: none; }
+    </style>
 </head>
 <body>
-<canvas id="AttoWallet"></canvas>
+<div id="AttoWallet"></div>
 </body>
 </html>

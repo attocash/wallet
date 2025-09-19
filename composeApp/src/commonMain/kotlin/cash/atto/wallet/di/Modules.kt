@@ -18,40 +18,12 @@ import cash.atto.wallet.viewmodel.RepresentativeViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.logging.SIMPLE
-import io.ktor.http.ContentType
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 object AppScope
-
-val httpClientModule = module {
-    single {
-        HttpClient {
-            install(ContentNegotiation) {
-                json(
-                    json = Json { ignoreUnknownKeys = true },
-                    contentType = ContentType.Any
-                )
-            }
-            install(Logging) {
-                level = LogLevel.ALL // Logs everything (headers, bodies, etc.)
-                logger = Logger.SIMPLE
-            }
-            install(HttpTimeout)
-        }
-    }
-}
 
 expect val databaseModule: Module
 
@@ -62,7 +34,6 @@ val commonDataSourceModule = module {
 }
 
 val repositoryModule = module {
-    includes(httpClientModule)
     includes(commonDataSourceModule)
     includes(dataSourceModule)
 //    single { AttoNetwork.DEV }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.primaryGradient
-import io.ktor.websocket.Frame
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Doesn't support interactionSource since this is actually a row
@@ -73,7 +73,7 @@ fun AttoButton(
 fun AttoButtonPreview() {
     AttoWalletTheme {
         AttoButton(onClick = {}) {
-            Frame.Text("Button")
+            Text("Button")
         }
     }
 }
