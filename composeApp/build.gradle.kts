@@ -52,10 +52,6 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
-    sourceSets.commonMain {
-        kotlin.srcDir("build/generated/ksp/metadata")
-    }
-
     sourceSets {
         val desktopMain by getting
         val wasmJsMain by getting
@@ -212,18 +208,12 @@ tasks.withType<JavaCompile> {
     options.encoding = StandardCharsets.UTF_8.toString()
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn("kspCommonMainKotlinMetadata")
-    }
-}
-
 compose.desktop {
     application {
         mainClass = "cash.atto.wallet.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg)
+            targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg, TargetFormat.Rpm)
             packageName = "AttoWallet"
             packageVersion = "1.0.10"
             modules("jdk.charsets")
@@ -246,5 +236,16 @@ compose.desktop {
 }
 
 afterEvaluate {
-    tasks.findByName("kspKotlinDesktop")?.dependsOn("kspCommonMainKotlinMetadata")
+    val kspAndroidTasks = tasks.matching { it.name.startsWith("ksp") && it.name.endsWith("KotlinAndroid") }
+
+    val composeResourceGenerators = tasks.matching { t ->
+        t.name == "generateComposeResClass" ||
+                (t.name.startsWith("generate") &&
+                        (t.name.contains("ResourceAccessors", ignoreCase = true) ||
+                                t.name.contains("ResourceCollectors", ignoreCase = true)))
+    }
+
+    kspAndroidTasks.configureEach {
+        dependsOn(composeResourceGenerators)
+    }
 }
