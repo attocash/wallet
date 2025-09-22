@@ -138,7 +138,7 @@ kotlin {
             implementation(libs.androidx.ext.junit)
         }
         wasmJsMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
+            implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
         }
     }
 
