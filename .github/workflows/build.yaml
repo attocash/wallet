@@ -15,7 +15,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew allTests
 
@@ -42,7 +42,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew allTests
 
@@ -69,7 +69,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew allTests
 
@@ -96,7 +96,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew allTests
 
