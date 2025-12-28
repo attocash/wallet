@@ -33,7 +33,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SettingsScreenAndroid(
     onBackNavigation: () -> Unit,
     onBackupSecretNavigation: () -> Unit,
-    onRepresentativeNavigation: () -> Unit,
     onLogoutNavigation: () -> Unit
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
@@ -43,13 +42,6 @@ fun SettingsScreenAndroid(
         if (uiState.value.navigateToBackup) {
             viewModel.handleBackupNavigation()
             onBackupSecretNavigation.invoke()
-        }
-    }
-
-    LaunchedEffect(uiState.value.navigateToRepresentative) {
-        if (uiState.value.navigateToRepresentative) {
-            viewModel.handleRepresentativeNavigation()
-            onRepresentativeNavigation.invoke()
         }
     }
 

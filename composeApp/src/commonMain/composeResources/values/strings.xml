@@ -22,6 +22,7 @@
     <string name="main_nav_overview">Overview</string>
     <string name="main_nav_receive">Receive</string>
     <string name="main_nav_send">Send</string>
+    <string name="main_nav_staking">Staking</string>
     <string name="main_nav_settings">Settings</string>
 
     <!-- overview -->
@@ -57,13 +58,35 @@
     <string name="password_weak">Password must contain at least 6 characters, uppercase and lowercase letters, numbers and special symbols.</string>
     <string name="password_wrong">Incorrect password.</string>
 
-    <!-- representative -->
-    <string name="representative_change">Change</string>
-    <string name="representative_change_title">Change representative</string>
-    <string name="representative_close">Close</string>
-    <string name="representative_error_address">Enter a valid Atto address</string>
-    <string name="representative_subtitle">Currently Represented By</string>
-    <string name="representative_title">Representative</string>
+    <!-- staking -->
+    <string name="staking_title">Staking &amp; Voters</string>
+    <string name="staking_info_title">What is Staking?</string>
+    <string name="staking_info_description">⚠ Staking is not enabled yet. Staking will allow you to earn rewards by delegating your voting weight to a voter node. Voters help secure the network by validating transactions.</string>
+    <string name="staking_apy_title">Current APY</string>
+    <string name="staking_apy_info">APY (Annual Percentage Yield) is the rate of return you can earn. Each voter decides how much of the global APY they share with you and the Global APY are adjusted daily based on price</string>
+    <string name="staking_your_apy">Your APY</string>
+    <string name="staking_global_apy">Global APY</string>
+    <string name="staking_current_voter">Current Voter</string>r
+    <string name="staking_select_voter">Select a Voter</string>
+    <string name="staking_voters_list">Available Voters</string>
+    <string name="staking_voter_share">Share: %1$d%%</string>
+    <string name="staking_voter_apy">APY: %1$.2f%%</string>
+    <string name="staking_change">Change</string>
+    <string name="staking_change_title">Change voter</string>
+    <string name="staking_close">Close</string>
+    <string name="staking_error_address">Enter a valid Atto address</string>
+    <string name="staking_unknown_voter">Unknown Voter</string>
+
+    <!-- voter detail -->
+    <string name="voter_detail_title">Voter Details</string>
+    <string name="voter_detail_description">Description</string>
+    <string name="voter_detail_entity">Entity</string>
+    <string name="voter_detail_share">Share Percentage</string>
+    <string name="voter_detail_apy">APY</string>
+    <string name="voter_detail_weight">Network Weight</string>
+    <string name="voter_detail_last_voted">Last Voted</string>
+    <string name="voter_detail_address">Address</string>
+    <string name="voter_detail_confirm">Confirm Selection</string>
 
     <!-- safety warning -->
     <string name="safety_warning_confirm">Got It!</string>
@@ -103,7 +126,7 @@
     <string name="settings_load">Load from Paper Wallet</string>
     <string name="settings_logout">Logout</string>
     <string name="settings_notifications">Notifications</string>
-    <string name="settings_representative">Change Representative</string>
+    <string name="settings_representative">Staking &amp; Voters</string>
     <string name="settings_security">Security</string>
 
     <!-- welcome -->

@@ -6,6 +6,7 @@ import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PersistentWorkCache
+import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
@@ -14,7 +15,7 @@ import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import cash.atto.wallet.viewmodel.MainScreenViewModel
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.ReceiveViewModel
-import cash.atto.wallet.viewmodel.RepresentativeViewModel
+import cash.atto.wallet.viewmodel.VoterViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
@@ -41,6 +42,7 @@ val repositoryModule = module {
     singleOf(::AppStateRepository)
     singleOf(::PersistentAccountEntryRepository)
     singleOf(::PersistentWorkCache)
+    singleOf(::VotersRepository)
     singleOf(::WalletManagerRepository)
 }
 
@@ -58,7 +60,7 @@ val viewModelModule = module {
     viewModelOf(::MainScreenViewModel)
     viewModelOf(::OverviewViewModel)
     viewModelOf(::ReceiveViewModel)
-    viewModelOf(::RepresentativeViewModel)
+    viewModelOf(::VoterViewModel)
     viewModelOf(::SecretPhraseViewModel)
     viewModelOf(::SendTransactionViewModel)
     viewModelOf(::SettingsViewModel)

@@ -14,4 +14,11 @@ actual object AttoDateFormatter {
         val zonedDateTime = value.toJavaInstant().atZone(ZoneId.systemDefault())
         return formatter.format(zonedDateTime)
     }
+
+    @OptIn(ExperimentalTime::class)
+    actual fun formatDate(value: Instant): String {
+        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
+        val zonedDateTime = value.toJavaInstant().atZone(ZoneId.systemDefault())
+        return formatter.format(zonedDateTime)
+    }
 }

@@ -12,7 +12,8 @@ import cash.atto.wallet.screens.CreatePasswordScreen
 import cash.atto.wallet.screens.EnterPassword
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.MainScreenDesktop
-import cash.atto.wallet.screens.RepresentativeScreen
+import cash.atto.wallet.screens.VoterDetailScreen
+import cash.atto.wallet.screens.VoterScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
 import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -121,12 +122,18 @@ fun AttoNavHost(
                         onBackupSecretNavigation = {
                             component.navigation.push(AttoDestination.BackupSecret)
                         },
-                        onRepresentativeNavigation = {
-                            component.navigation.push(AttoDestination.Representative)
-                        },
                         onLogoutNavigation = {
                             component.navigation.popToFirst()
+                        },
+                        onVoterDetailNavigation = { voterAddress ->
+                            component.navigation.push(AttoDestination.VoterDetail(voterAddress))
                         }
+                    )
+
+                    is AttoDestination.VoterDetail -> VoterDetailScreen(
+                        voterAddress = (screen.instance as AttoDestination.VoterDetail).voterAddress,
+                        onBackNavigation = { component.navigation.pop() },
+                        onConfirm = { component.navigation.pop() }
                     )
 
                     is AttoDestination.ImportSecret -> ImportSecretScreen(
@@ -136,7 +143,7 @@ fun AttoNavHost(
                         }
                     )
 
-                    is AttoDestination.Representative -> RepresentativeScreen(
+                    is AttoDestination.Voter -> VoterScreen(
                         onBackNavigation = { component.navigation.pop() }
                     )
 

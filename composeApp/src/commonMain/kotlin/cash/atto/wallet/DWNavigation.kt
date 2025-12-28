@@ -4,6 +4,7 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.main_nav_overview
 import attowallet.composeapp.generated.resources.main_nav_receive
 import attowallet.composeapp.generated.resources.main_nav_send
+import attowallet.composeapp.generated.resources.main_nav_staking
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -38,5 +39,6 @@ enum class MainScreenNavDestination(
 ) {
     OVERVIEW(Res.string.main_nav_overview),
     SEND(Res.string.main_nav_send),
-    RECEIVE(Res.string.main_nav_receive);
+    RECEIVE(Res.string.main_nav_receive),
+    STAKING(Res.string.main_nav_staking);
 }

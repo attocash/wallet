@@ -42,8 +42,13 @@ sealed class AttoDestination {
     }
 
     @Serializable
-    object Representative : AttoDestination() {
-        override val route = "representative"
+    object Voter : AttoDestination() {
+        override val route = "voter"
+    }
+
+    @Serializable
+    data class VoterDetail(val voterAddress: String) : AttoDestination() {
+        override val route = "voterDetail"
     }
 
     @Serializable

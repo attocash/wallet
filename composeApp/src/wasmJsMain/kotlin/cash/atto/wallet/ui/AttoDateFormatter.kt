@@ -17,10 +17,25 @@ private external fun currentLocale(): String
     }).format(new Date(iso))
 """
 )
-private external fun formatDate(isoString: String, locale: String): String
+private external fun formatDateTime(isoString: String, locale: String): String
+
+@JsFun(
+    """
+    (iso, locale) => new Intl.DateTimeFormat(locale, {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    }).format(new Date(iso))
+"""
+)
+private external fun formatDateOnly(isoString: String, locale: String): String
 
 actual object AttoDateFormatter {
     @OptIn(ExperimentalTime::class)
     actual fun format(value: Instant): String =
-        formatDate(value.toString(), currentLocale())
+        formatDateTime(value.toString(), currentLocale())
+
+    @OptIn(ExperimentalTime::class)
+    actual fun formatDate(value: Instant): String =
+        formatDateOnly(value.toString(), currentLocale())
 }

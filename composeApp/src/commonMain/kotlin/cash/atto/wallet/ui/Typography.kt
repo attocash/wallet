@@ -77,7 +77,7 @@ fun attoWalletTypography() = Typography(
         fontFamily = attoFontFamily(),
         fontWeight = FontWeight.W400,
         fontSize = 14.sp,
-        letterSpacing = 4.sp
+        letterSpacing = 2.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = attoFontFamily(),

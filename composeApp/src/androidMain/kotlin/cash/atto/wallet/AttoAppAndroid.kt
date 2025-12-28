@@ -23,7 +23,8 @@ import cash.atto.wallet.screens.CreatePasswordScreen
 import cash.atto.wallet.screens.EnterPassword
 import cash.atto.wallet.screens.ImportSecretScreen
 import cash.atto.wallet.screens.OverviewScreenAndroid
-import cash.atto.wallet.screens.RepresentativeScreen
+import cash.atto.wallet.screens.VoterDetailScreen
+import cash.atto.wallet.screens.VoterScreen
 import cash.atto.wallet.screens.SafetyWarningScreen
 import cash.atto.wallet.screens.SecretBackupConfirmScreen
 import cash.atto.wallet.screens.SecretPhraseScreen
@@ -193,7 +194,7 @@ fun AttoNavHost(
                 }
 
                 composable(
-                    route = AttoDestination.Representative.route,
+                    route = AttoDestination.Voter.route,
                     enterTransition = {
                         slideIntoContainer(
                             AnimatedContentTransitionScope.SlideDirection.Up,
@@ -207,8 +208,34 @@ fun AttoNavHost(
                         )
                     }
                 ) {
-                    RepresentativeScreen(
-                        onBackNavigation = { navController.navigateUp() }
+                    VoterScreen(
+                        onBackNavigation = { navController.navigateUp() },
+                        onVoterClick = { voterAddress ->
+                            navController.navigate("${AttoDestination.VoterDetail("").route}/$voterAddress")
+                        }
+                    )
+                }
+
+                composable(
+                    route = "${AttoDestination.VoterDetail("").route}/{voterAddress}",
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Start,
+                            tween(SLIDE_DURATION)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(SLIDE_DURATION)
+                        )
+                    }
+                ) { backStackEntry ->
+                    val voterAddress = backStackEntry.arguments?.getString("voterAddress") ?: ""
+                    VoterDetailScreen(
+                        voterAddress = voterAddress,
+                        onBackNavigation = { navController.navigateUp() },
+                        onConfirm = { navController.navigateUp() }
                     )
                 }
 
@@ -321,9 +348,6 @@ fun AttoNavHost(
                         onBackNavigation = { navController.navigateUp() },
                         onBackupSecretNavigation = {
                             navController.navigate(AttoDestination.BackupSecret.route)
-                        },
-                        onRepresentativeNavigation = {
-                            navController.navigate(AttoDestination.Representative.route)
                         },
                         onLogoutNavigation = {
                             navController.navigate(AttoDestination.Welcome.route) {

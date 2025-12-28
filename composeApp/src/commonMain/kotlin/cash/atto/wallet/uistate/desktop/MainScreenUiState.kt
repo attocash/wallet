@@ -7,7 +7,6 @@ data class MainScreenUiState(
     val settingsUiState: SettingsUiState
 ) {
     val navigateToBackup get() = settingsUiState.navigateToBackup
-    val navigateToRepresentative get() = settingsUiState.navigateToRepresentative
     val showLogoutDialog get() = settingsUiState.showLogoutDialog
 
     companion object {

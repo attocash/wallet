@@ -2,13 +2,11 @@ package cash.atto.wallet.viewmodel
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.lifecycle.ViewModel
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.settings_backup
 import attowallet.composeapp.generated.resources.settings_logout
-import attowallet.composeapp.generated.resources.settings_representative
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
 import cash.atto.wallet.repository.AppStateRepository
@@ -88,10 +86,6 @@ class SettingsViewModel(
         _state.emit(state.value.copy(navigateToBackup = false))
     }
 
-    fun handleRepresentativeNavigation() = viewModelScope.launch {
-        _state.emit(state.value.copy(navigateToRepresentative = false))
-    }
-
     fun hideLogoutDialog() = viewModelScope.launch {
         _state.emit(state.value.copy(showLogoutDialog = false))
     }
@@ -102,10 +96,6 @@ class SettingsViewModel(
 
     private fun navigateToBackup() = viewModelScope.launch {
         _state.emit(state.value.copy(navigateToBackup = true))
-    }
-
-    private fun navigateToRepresentative() = viewModelScope.launch {
-        _state.emit(state.value.copy(navigateToRepresentative = true))
     }
 
     private fun showLogoutDialog() = viewModelScope.launch {
@@ -128,10 +118,6 @@ class SettingsViewModel(
             icon = Icons.Filled.Refresh,
             title = getString(Res.string.settings_backup)
         ) { navigateToBackup() },
-        SettingItemUiState(
-            icon = Icons.Filled.Home,
-            title = getString(Res.string.settings_representative)
-        ) { navigateToRepresentative() },
         SettingItemUiState(
             icon = Icons.AutoMirrored.Filled.ExitToApp,
             title = getString(Res.string.settings_logout)

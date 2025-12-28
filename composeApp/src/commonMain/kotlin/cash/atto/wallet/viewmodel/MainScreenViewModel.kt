@@ -66,7 +66,6 @@ class MainScreenViewModel(
     }
 
     fun handleBackupNavigation() = settingsViewModel.handleBackupNavigation()
-    fun handleRepresentativeNavigation() = settingsViewModel.handleRepresentativeNavigation()
     fun hideLogoutDialog() = settingsViewModel.hideLogoutDialog()
     fun logout() = settingsViewModel.logout()
 

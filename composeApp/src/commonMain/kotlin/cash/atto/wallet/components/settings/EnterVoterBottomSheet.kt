@@ -19,19 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.representative_change
-import attowallet.composeapp.generated.resources.representative_change_title
-import attowallet.composeapp.generated.resources.representative_close
-import attowallet.composeapp.generated.resources.representative_error_address
+import attowallet.composeapp.generated.resources.staking_change
+import attowallet.composeapp.generated.resources.staking_change_title
+import attowallet.composeapp.generated.resources.staking_close
+import attowallet.composeapp.generated.resources.staking_error_address
 import cash.atto.wallet.components.common.BottomSheet
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.back
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EnterRepresentativeBottomSheet(
+fun EnterVoterBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
     onChange: (String) -> Unit,
@@ -47,7 +46,7 @@ fun EnterRepresentativeBottomSheet(
         sheetState = sheetState
     ) {
         Text(
-            text = stringResource(Res.string.representative_change_title),
+            text = stringResource(Res.string.staking_change_title),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -58,7 +57,7 @@ fun EnterRepresentativeBottomSheet(
 
         if (showError) {
             Text(
-                text = stringResource(Res.string.representative_error_address),
+                text = stringResource(Res.string.staking_error_address),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelMedium
@@ -83,7 +82,7 @@ fun EnterRepresentativeBottomSheet(
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
-            Text(text = stringResource(Res.string.representative_change))
+            Text(text = stringResource(Res.string.staking_change))
         }
 
         Button(
@@ -102,7 +101,7 @@ fun EnterRepresentativeBottomSheet(
             ),
             contentPadding = PaddingValues(19.dp)
         ) {
-            Text(text = stringResource(Res.string.representative_close))
+            Text(text = stringResource(Res.string.staking_close))
         }
     }
 }
@@ -112,7 +111,7 @@ fun EnterRepresentativeBottomSheet(
 @Composable
 fun EnterRepresentativeBottomSheetPreview() {
     AttoWalletTheme {
-        EnterRepresentativeBottomSheet(
+        EnterVoterBottomSheet(
             onDismissRequest = {},
             onChange = {},
             onClose = {},

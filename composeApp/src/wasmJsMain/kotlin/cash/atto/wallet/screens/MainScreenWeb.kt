@@ -13,7 +13,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
@@ -24,9 +24,11 @@ import attowallet.composeapp.generated.resources.atto_background_desktop
 import attowallet.composeapp.generated.resources.ic_nav_overview
 import attowallet.composeapp.generated.resources.ic_nav_receive
 import attowallet.composeapp.generated.resources.ic_nav_send
+import attowallet.composeapp.generated.resources.ic_nav_staking
 import attowallet.composeapp.generated.resources.main_nav_overview
 import attowallet.composeapp.generated.resources.main_nav_receive
 import attowallet.composeapp.generated.resources.main_nav_send
+import attowallet.composeapp.generated.resources.main_nav_staking
 import attowallet.composeapp.generated.resources.main_nav_settings
 import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.mainscreen.BalanceChip
@@ -48,8 +50,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MainScreenWeb(
     onBackupSecretNavigation: () -> Unit,
-    onRepresentativeNavigation: () -> Unit,
-    onLogoutNavigation: () -> Unit
+    onLogoutNavigation: () -> Unit,
+    onVoterDetailNavigation: (String) -> Unit
 ) {
     val viewModel = koinViewModel<MainScreenViewModel>()
     val uiState = viewModel.state.collectAsState()
@@ -61,14 +63,7 @@ fun MainScreenWeb(
         }
     }
 
-    LaunchedEffect(uiState.value.navigateToRepresentative) {
-        if (uiState.value.navigateToRepresentative) {
-            viewModel.handleRepresentativeNavigation()
-            onRepresentativeNavigation.invoke()
-        }
-    }
-
-    val navState = remember {
+    val navState = rememberSaveable {
         mutableStateOf(MainScreenNavDestination.OVERVIEW)
     }
 
@@ -76,6 +71,7 @@ fun MainScreenWeb(
         uiState = uiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
+        onVoterDetailNavigation = onVoterDetailNavigation,
         onDismissLogout = { viewModel.hideLogoutDialog() },
         onConfirmLogout = {
             viewModel.logout()
@@ -91,6 +87,7 @@ fun MainScreenWebContent(
     uiState: MainScreenUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    onVoterDetailNavigation: (String) -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -101,6 +98,7 @@ fun MainScreenWebContent(
             uiState = uiState,
             navState = navState,
             onNavStateChanged = onNavStateChanged,
+            onVoterDetailNavigation = onVoterDetailNavigation,
             onDismissLogout = onDismissLogout,
             onConfirmLogout = onConfirmLogout
         )
@@ -109,6 +107,7 @@ fun MainScreenWebContent(
             uiState = uiState,
             navState = navState,
             onNavStateChanged = onNavStateChanged,
+            onVoterDetailNavigation = onVoterDetailNavigation,
             onDismissLogout = onDismissLogout,
             onConfirmLogout = onConfirmLogout
         )
@@ -120,6 +119,7 @@ fun MainScreenWebContentCompact(
     uiState: MainScreenUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    onVoterDetailNavigation: (String) -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -168,6 +168,13 @@ fun MainScreenWebContentCompact(
                     onClick = { onNavStateChanged.invoke(MainScreenNavDestination.RECEIVE) }
                 )
 
+                NavigationDrawerItem(
+                    label = stringResource(Res.string.main_nav_staking),
+                    icon = vectorResource(Res.drawable.ic_nav_staking),
+                    selected = (navState == MainScreenNavDestination.STAKING),
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) }
+                )
+
                 ExpandableDrawerItem(
                     label = stringResource(Res.string.main_nav_settings)
                 ) {
@@ -187,6 +194,10 @@ fun MainScreenWebContentCompact(
                 MainScreenNavDestination.OVERVIEW -> OverviewScreenWeb()
                 MainScreenNavDestination.SEND -> SendScreenWeb()
                 MainScreenNavDestination.RECEIVE -> ReceiveScreenWeb()
+                MainScreenNavDestination.STAKING -> VoterScreen(
+                    onBackNavigation = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                    onVoterClick = onVoterDetailNavigation
+                )
             }
         }
     }
@@ -203,6 +214,7 @@ fun MainScreenWebContentExpanded(
     uiState: MainScreenUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    onVoterDetailNavigation: (String) -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -255,6 +267,13 @@ fun MainScreenWebContentExpanded(
                         onClick = { onNavStateChanged.invoke(MainScreenNavDestination.RECEIVE) }
                     )
 
+                    NavigationDrawerItem(
+                        label = stringResource(Res.string.main_nav_staking),
+                        icon = vectorResource(Res.drawable.ic_nav_staking),
+                        selected = (navState == MainScreenNavDestination.STAKING),
+                        onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) }
+                    )
+
                     ExpandableDrawerItem(
                         label = stringResource(Res.string.main_nav_settings)
                     ) {
@@ -274,6 +293,10 @@ fun MainScreenWebContentExpanded(
                     MainScreenNavDestination.OVERVIEW -> OverviewScreenWeb()
                     MainScreenNavDestination.SEND -> SendScreenWeb()
                     MainScreenNavDestination.RECEIVE -> ReceiveScreenWeb()
+                    MainScreenNavDestination.STAKING -> VoterScreen(
+                        onBackNavigation = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                        onVoterClick = onVoterDetailNavigation
+                    )
                 }
             }
         }
@@ -293,6 +316,7 @@ fun MainScreenWebContentCompactPreview() {
             uiState = MainScreenUiState.DEFAULT,
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},
+            onVoterDetailNavigation = {},
             onDismissLogout = {},
             onConfirmLogout = {}
         )
@@ -306,6 +330,7 @@ fun MainScreenWebContentExpandedPreview() {
             uiState = MainScreenUiState.DEFAULT,
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},
+            onVoterDetailNavigation = {},
             onDismissLogout = {},
             onConfirmLogout = {}
         )

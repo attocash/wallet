@@ -65,6 +65,36 @@ kotlin {
         androidMain.dependsOn(jvmMain)
         desktopMain.dependsOn(jvmMain)
 
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.atto.commons.wallet)
+
+
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.koin.composeVM)
+
+            implementation(libs.material3.window.size)
+
+            implementation(libs.decompose)
+            implementation(libs.decompose.extensions.compose)
+            implementation(libs.bignum)
+            implementation(libs.qrose)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+        }
+
         androidMain.dependencies {
             implementation(compose.preview)
 
@@ -95,31 +125,6 @@ kotlin {
             implementation(libs.sqlite.bundled)
         }
 
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.atto.commons.wallet)
-
-
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-
-            implementation(libs.koin.composeVM)
-
-            implementation(libs.material3.window.size)
-
-            implementation(libs.decompose)
-            implementation(libs.decompose.extensions.compose)
-            implementation(libs.bignum)
-            implementation(libs.qrose)
-        }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 
