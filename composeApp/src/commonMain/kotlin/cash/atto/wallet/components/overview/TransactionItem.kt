@@ -24,8 +24,10 @@ import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
-import kotlinx.datetime.Clock
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun TransactionItem(uiState: TransactionUiState) {
@@ -98,6 +100,7 @@ fun TransactionItem(uiState: TransactionUiState) {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Preview
 @Composable
 fun TransactionItemPreview() {

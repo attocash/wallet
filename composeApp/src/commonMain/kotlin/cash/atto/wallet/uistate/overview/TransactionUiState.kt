@@ -15,16 +15,17 @@ import attowallet.composeapp.generated.resources.overview_hint_type_to
 import attowallet.composeapp.generated.resources.overview_transaction_from
 import attowallet.composeapp.generated.resources.overview_transaction_to
 import cash.atto.commons.AttoHeight
-import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoDateFormatter
+import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.errorGradient
 import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.ui.secondaryGradient
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class TransactionUiState(
+data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val type: TransactionType,
     val amount: String?,
     val source: String,
@@ -101,6 +102,7 @@ data class TransactionUiState(
     val shownHeight: String
         get() = AttoFormatter.format(height.value)
 
+    @OptIn(ExperimentalTime::class)
     val formattedTimestamp: String
         get() = AttoDateFormatter.format(timestamp)
 }

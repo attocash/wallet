@@ -33,10 +33,11 @@ import cash.atto.wallet.ui.primaryGradient
 import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
-import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun TransactionsList(
@@ -110,6 +111,7 @@ fun TransactionsList(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Preview
 @Composable
 fun TransactionsListPreview() {

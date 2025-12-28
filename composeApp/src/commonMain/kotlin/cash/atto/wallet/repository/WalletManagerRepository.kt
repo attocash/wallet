@@ -1,25 +1,16 @@
 package cash.atto.wallet.repository
 
-import cash.atto.commons.AttoAddress
-import cash.atto.commons.AttoAlgorithm
-import cash.atto.commons.AttoNetwork
-import cash.atto.commons.AttoPublicKey
-import cash.atto.commons.fromHexToByteArray
+import cash.atto.commons.*
 import cash.atto.commons.gatekeeper.AttoAuthenticator
 import cash.atto.commons.gatekeeper.attoBackend
-import cash.atto.commons.node.AttoNodeOperations
-import cash.atto.commons.toSigner
+import cash.atto.commons.node.AttoNodeClient
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.commons.wallet.AttoWalletViewer
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.wallet.state.AppState
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 
 private val defaultRepresentatives = listOf(
@@ -112,9 +103,10 @@ class WalletManagerRepository(
         val privateKey = appState.getPrivateKey() ?: return null
         val signer = privateKey.toSigner()
         val authenticator = AttoAuthenticator.attoBackend(network, signer)
-        val client = AttoNodeOperations.attoBackend(network, authenticator)
+        val client = AttoNodeClient.attoBackend(network, authenticator)
 
         val walletManager = AttoWalletManager(
+            network,
             viewer = AttoWalletViewer(
                 publicKey = signer.publicKey,
                 client = client,

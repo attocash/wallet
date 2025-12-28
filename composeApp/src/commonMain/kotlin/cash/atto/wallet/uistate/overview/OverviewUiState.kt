@@ -6,6 +6,8 @@ import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoBlockType
 import cash.atto.commons.AttoUnit
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 data class OverviewUiState(
     private val balance: BigDecimal?,
@@ -17,6 +19,7 @@ data class OverviewUiState(
             attoCoins = balance
         )
 
+    @OptIn(ExperimentalTime::class)
     val transactionListUiState
         get() = TransactionListUiState(
             transactions = entries
@@ -31,7 +34,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp,
+                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
 
@@ -43,7 +46,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp,
+                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
 
@@ -54,7 +57,7 @@ data class OverviewUiState(
                                 it.subjectAlgorithm,
                                 it.subjectPublicKey
                             ).toString(),
-                            timestamp = it.timestamp,
+                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
 

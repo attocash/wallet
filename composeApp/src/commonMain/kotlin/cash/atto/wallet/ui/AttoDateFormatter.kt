@@ -1,7 +1,10 @@
 package cash.atto.wallet.ui
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
 
 expect object AttoDateFormatter {
+    @OptIn(ExperimentalTime::class)
     fun format(value: Instant): String
 }

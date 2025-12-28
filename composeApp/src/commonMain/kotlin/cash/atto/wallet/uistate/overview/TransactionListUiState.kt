@@ -7,8 +7,9 @@ import attowallet.composeapp.generated.resources.overview_hint_amount_to
 import attowallet.composeapp.generated.resources.overview_hint_destination
 import attowallet.composeapp.generated.resources.overview_hint_source
 import cash.atto.commons.AttoHeight
-import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 data class TransactionListUiState(
     val transactions: List<TransactionUiState?>,
@@ -20,6 +21,7 @@ data class TransactionListUiState(
             showHint = false
         )
 
+        @OptIn(ExperimentalTime::class)
         @Composable
         fun Empty() = listOf(
             TransactionUiState(
