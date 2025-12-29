@@ -79,6 +79,7 @@ class MainScreenViewModel(
                         .toString(AttoUnit.ATTO)
                         .toBigDecimal()
                 ),
+                isWalletInitialized = true
             )
         )
     }

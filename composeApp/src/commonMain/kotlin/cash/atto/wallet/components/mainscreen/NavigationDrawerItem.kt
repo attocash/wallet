@@ -37,7 +37,8 @@ fun NavigationDrawerItem(
     icon: ImageVector,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val backgroundModifier = if (selected)
         Modifier.background(color = MaterialTheme.colorScheme.secondary)
@@ -49,9 +50,11 @@ fun NavigationDrawerItem(
         )
     )
 
+    val contentAlpha = if (enabled) 1f else 0.38f
+
     Surface(
         selected = selected,
-        onClick = onClick,
+        onClick = { if (enabled) onClick() },
         modifier = modifier
             .semantics { role = Role.Tab }
             .fillMaxWidth(),
@@ -69,12 +72,12 @@ fun NavigationDrawerItem(
             Icon(
                 imageVector = icon,
                 contentDescription = "Navigation Icon",
-                tint = MaterialTheme.colorScheme.setting
+                tint = MaterialTheme.colorScheme.setting.copy(alpha = contentAlpha)
             )
 
             Text(
                 text = label,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W300,
                 fontFamily = attoFontFamily()

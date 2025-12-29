@@ -4,7 +4,8 @@ import cash.atto.wallet.uistate.settings.SettingsUiState
 
 data class MainScreenUiState(
     val balanceChipUiState: BalanceChipUiState,
-    val settingsUiState: SettingsUiState
+    val settingsUiState: SettingsUiState,
+    val isWalletInitialized: Boolean = false
 ) {
     val navigateToBackup get() = settingsUiState.navigateToBackup
     val showLogoutDialog get() = settingsUiState.showLogoutDialog
@@ -12,7 +13,8 @@ data class MainScreenUiState(
     companion object {
         val DEFAULT = MainScreenUiState(
             balanceChipUiState = BalanceChipUiState.DEFAULT,
-            settingsUiState = SettingsUiState.PREVIEW
+            settingsUiState = SettingsUiState.PREVIEW,
+            isWalletInitialized = false
         )
     }
 }

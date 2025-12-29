@@ -158,7 +158,8 @@ fun MainScreenWebContentCompact(
                     label = stringResource(Res.string.main_nav_send),
                     icon = vectorResource(Res.drawable.ic_nav_send),
                     selected = (navState == MainScreenNavDestination.SEND),
-                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) }
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) },
+                    enabled = uiState.isWalletInitialized
                 )
 
                 NavigationDrawerItem(
@@ -172,7 +173,8 @@ fun MainScreenWebContentCompact(
                     label = stringResource(Res.string.main_nav_staking),
                     icon = vectorResource(Res.drawable.ic_nav_staking),
                     selected = (navState == MainScreenNavDestination.STAKING),
-                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) }
+                    onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) },
+                    enabled = uiState.isWalletInitialized
                 )
 
                 ExpandableDrawerItem(
@@ -257,7 +259,8 @@ fun MainScreenWebContentExpanded(
                         label = stringResource(Res.string.main_nav_send),
                         icon = vectorResource(Res.drawable.ic_nav_send),
                         selected = (navState == MainScreenNavDestination.SEND),
-                        onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) }
+                        onClick = { onNavStateChanged.invoke(MainScreenNavDestination.SEND) },
+                        enabled = uiState.isWalletInitialized
                     )
 
                     NavigationDrawerItem(
@@ -271,7 +274,8 @@ fun MainScreenWebContentExpanded(
                         label = stringResource(Res.string.main_nav_staking),
                         icon = vectorResource(Res.drawable.ic_nav_staking),
                         selected = (navState == MainScreenNavDestination.STAKING),
-                        onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) }
+                        onClick = { onNavStateChanged.invoke(MainScreenNavDestination.STAKING) },
+                        enabled = uiState.isWalletInitialized
                     )
 
                     ExpandableDrawerItem(
