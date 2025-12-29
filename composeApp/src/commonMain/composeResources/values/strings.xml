@@ -59,7 +59,7 @@
     <string name="password_wrong">Incorrect password.</string>
 
     <!-- staking -->
-    <string name="staking_title">Staking &amp; Voters</string>
+    <string name="staking_title">Staking &amp; Voters Preview</string>
     <string name="staking_info_title">What is Staking?</string>
     <string name="staking_info_description">Staking will allow you to earn rewards by delegating your voting weight to a voter node. Voters help secure the network by validating transactions.</string>
     <string name="staking_apy_title">Current APY</string>
