@@ -81,7 +81,7 @@ class VoterViewModel(
 
         val votersSorted = voters.sortedWith(
             compareByDescending<Voter> { it.sharePercentage }
-                .thenByDescending { it.voteWeight }
+                .thenBy { it.voteWeight }
         )
 
         val currentVoter = voters.find { it.address == representativeAddress }
