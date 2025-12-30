@@ -26,7 +26,6 @@ import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.model.Voter
-import cash.atto.wallet.ui.AttoDateFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.BottomSheetShape
 import cash.atto.wallet.ui.primaryGradient
@@ -196,7 +195,8 @@ fun VoterDetailContent(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    val lastVotedText = AttoDateFormatter.formatDate(voter.lastVotedAt)
+
+    val lastVotedAtFormatted = voter.lastVotedAtFormatted
     val supplyPercentage = voter.voteWeightPercentage.toPlainString()
 
     Column(
@@ -270,7 +270,7 @@ fun VoterDetailContent(
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_last_voted),
-                    value = lastVotedText
+                    value = lastVotedAtFormatted
                 )
             }
         }

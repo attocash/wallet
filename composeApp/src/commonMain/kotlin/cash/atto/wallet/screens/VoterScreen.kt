@@ -432,16 +432,16 @@ fun CurrentVoterCard(
     onChangeClick: () -> Unit
 ) {
     val weightAbove1Percent = (currentVoterWeightPercentage ?: 0.0) > 1.0
-    
+
     // Warning conditions
     val now = Clock.System.now()
-    val hasNotVotedIn24H = currentVoterLastVotedAt?.let { 
-        (now - it) > 24.hours 
+    val hasNotVotedIn24H = currentVoterLastVotedAt?.let {
+        (now - it) > 24.hours
     } ?: false
     val apyIsZero = userApy == null || userApy == 0.0
-    
+
     val hasWarning = hasNotVotedIn24H || weightAbove1Percent || apyIsZero
-    
+
     // Warning color
     val warningColor = Color(0xFFFF9800)
 
@@ -483,7 +483,7 @@ fun CurrentVoterCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             // Weight and Last Voted row (similar to VoterCard)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -513,7 +513,7 @@ fun CurrentVoterCard(
                     )
                 }
             }
-            
+
             Spacer(Modifier.height(8.dp))
             AttoButton(
                 onClick = onChangeClick,
@@ -532,12 +532,12 @@ fun VoterCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val lastVotedText = AttoDateFormatter.formatDate(voter.lastVotedAt)
+    val lastVotedAtFormatted = voter.lastVotedAtFormatted
     val supplyPercentage = voter.voteWeightPercentage.toPlainString()
 
     // Warning conditions
     val now = Clock.System.now()
-    val timeSinceLastVote = now - voter.lastVotedAt
+    val timeSinceLastVote = now - (voter.lastVotedAt ?: Instant.fromEpochMilliseconds(0))
     val hasNotVotedIn24H = timeSinceLastVote > 24.hours
     val weightAbove1Percent = voter.voteWeightPercentage.doubleValue(false) > 1.0
     val apyIsZero = calculatedApy == 0.0
@@ -603,7 +603,7 @@ fun VoterCard(
                         color = if (weightAbove1Percent) warningColor else green_700
                     )
                     Text(
-                        text = "Last voted: $lastVotedText",
+                        text = "Last voted: $lastVotedAtFormatted",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (hasNotVotedIn24H) warningColor else green_700
                     )

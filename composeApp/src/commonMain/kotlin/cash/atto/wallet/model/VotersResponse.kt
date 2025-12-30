@@ -1,5 +1,6 @@
 package cash.atto.wallet.model
 
+import cash.atto.wallet.ui.AttoDateFormatter
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.DecimalMode
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
@@ -43,6 +44,15 @@ data class Voter(
             val percentage = (weight * hundred).divide(maxSupply, decimalMode = mode)
 
             return@let percentage
+        }
+
+    val lastVotedAtFormatted
+        get() = lastVotedAt.let {
+            if (it.toEpochMilliseconds() == 0L) {
+                "Unknown"
+            } else {
+                AttoDateFormatter.formatDate(it)
+            }
         }
 }
 
