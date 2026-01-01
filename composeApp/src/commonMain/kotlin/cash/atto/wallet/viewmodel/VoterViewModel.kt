@@ -6,6 +6,7 @@ import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
 import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.model.Voter
+import cash.atto.wallet.model.calculateEntityWeightPercentage
 import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.settings.VoterUIState
@@ -85,7 +86,8 @@ class VoterViewModel(
         )
 
         val currentVoter = voters.find { it.address == representativeAddress }
-        val currentVoterWeightPercentage = currentVoter?.voteWeightPercentage?.doubleValue(false)
+        val currentVoterWeightPercentage = currentVoter?.voteWeightPercentage
+        val currentVoterEntityWeightPercentage = currentVoter?.calculateEntityWeightPercentage(voters)
         val currentVoterLastVotedAt = currentVoter?.lastVotedAt
 
         _state.emit(
@@ -94,6 +96,7 @@ class VoterViewModel(
                 currentVoterLabel = voterLabel,
                 currentVoterApy = userApy,
                 currentVoterWeightPercentage = currentVoterWeightPercentage,
+                currentVoterEntityWeightPercentage = currentVoterEntityWeightPercentage,
                 currentVoterLastVotedAt = currentVoterLastVotedAt,
                 globalApy = votersResponse?.apy,
                 voters = votersSorted,

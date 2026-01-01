@@ -1,6 +1,5 @@
 package cash.atto.wallet.model
 
-import cash.atto.wallet.ui.AttoDateFormatter
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.DecimalMode
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
@@ -46,14 +45,6 @@ data class Voter(
             return@let percentage
         }
 
-    val lastVotedAtFormatted
-        get() = lastVotedAt.let {
-            if (it.toEpochMilliseconds() == 0L) {
-                "Unknown"
-            } else {
-                AttoDateFormatter.formatDate(it)
-            }
-        }
 }
 
 @Serializable
@@ -66,3 +57,24 @@ data class VoterEntity(
     val addedAt: String,
     val description: String
 )
+
+fun Voter.calculateEntityWeightPercentage(allVoters: List<Voter>): BigDecimal {
+    val entityVoters = allVoters.filter { it.entity == this.entity }
+
+    val totalWeight = entityVoters.fold(BigDecimal.ZERO) { acc, voter ->
+        acc + BigDecimal.parseString(voter.voteWeight)
+    }
+
+    val maxSupply = BigDecimal.parseString(
+        cash.atto.commons.AttoAmount.MAX.raw.toString()
+    )
+    val hundred = BigDecimal.parseString("100.00")
+
+    val mode = DecimalMode(
+        decimalPrecision = 2,
+        scale = 2,
+        roundingMode = RoundingMode.ROUND_HALF_CEILING
+    )
+
+    return (totalWeight * hundred).divide(maxSupply, decimalMode = mode)
+}

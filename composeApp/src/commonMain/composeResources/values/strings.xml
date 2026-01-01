@@ -83,7 +83,8 @@
     <string name="voter_detail_entity">Entity</string>
     <string name="voter_detail_share">Share Percentage</string>
     <string name="voter_detail_apy">APY</string>
-    <string name="voter_detail_weight">Network Weight</string>
+    <string name="voter_detail_entity_weight">Entity Weight</string>
+    <string name="voter_detail_voter_weight">Weight</string>
     <string name="voter_detail_last_voted">Last Voted</string>
     <string name="voter_detail_address">Address</string>
     <string name="voter_detail_confirm">Confirm Selection</string>

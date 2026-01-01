@@ -29,9 +29,11 @@ import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.settings.EnterVoterBottomSheet
 import cash.atto.wallet.model.Voter
+import cash.atto.wallet.model.calculateEntityWeightPercentage
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.settings.VoterUIState
 import cash.atto.wallet.viewmodel.VoterViewModel
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -185,7 +187,7 @@ fun VoterScreenCompact(
                                     ?: stringResource(Res.string.staking_unknown_voter),
                                 voterAddress = uiState.currentVoter.orEmpty(),
                                 userApy = uiState.currentVoterApy,
-                                currentVoterWeightPercentage = uiState.currentVoterWeightPercentage,
+                                currentVoterEntityWeightPercentage = uiState.currentVoterEntityWeightPercentage,
                                 currentVoterLastVotedAt = uiState.currentVoterLastVotedAt,
                                 onChangeClick = {
                                     coroutineScope.launch {
@@ -211,6 +213,7 @@ fun VoterScreenCompact(
                                 val voterApy = globalApy * voter.sharePercentage / 100.0
                                 VoterCard(
                                     voter = voter,
+                                    allVoters = uiState.voters,
                                     calculatedApy = voterApy,
                                     isSelected = voter.address == uiState.currentVoter,
                                     onClick = { onVoterClick(voter.address) }
@@ -294,6 +297,7 @@ fun VoterScreenExpanded(
                         // Show voter detail overlay
                         VoterDetailContent(
                             voter = selectedVoter,
+                            allVoters = uiState.voters,
                             calculatedApy = selectedVoterApy,
                             onConfirm = {
                                 coroutineScope.launch {
@@ -354,7 +358,7 @@ fun VoterScreenExpanded(
                                         ?: stringResource(Res.string.staking_unknown_voter),
                                     voterAddress = uiState.currentVoter.orEmpty(),
                                     userApy = uiState.currentVoterApy,
-                                    currentVoterWeightPercentage = uiState.currentVoterWeightPercentage,
+                                    currentVoterEntityWeightPercentage = uiState.currentVoterEntityWeightPercentage,
                                     currentVoterLastVotedAt = uiState.currentVoterLastVotedAt,
                                     onChangeClick = {
                                         coroutineScope.launch {
@@ -380,6 +384,7 @@ fun VoterScreenExpanded(
                                     val voterApy = globalApy * voter.sharePercentage / 100.0
                                     VoterCard(
                                         voter = voter,
+                                        allVoters = uiState.voters,
                                         calculatedApy = voterApy,
                                         isSelected = voter.address == uiState.currentVoter,
                                         onClick = { selectedVoterAddress = voter.address }
@@ -426,19 +431,19 @@ fun StakingInfoCard(
 fun CurrentVoterCard(
     voterLabel: String,
     voterAddress: String,
-    userApy: Double?,
-    currentVoterWeightPercentage: Double?,
+    userApy: BigDecimal?,
+    currentVoterEntityWeightPercentage: BigDecimal?,
     currentVoterLastVotedAt: Instant?,
     onChangeClick: () -> Unit
 ) {
-    val weightAbove1Percent = (currentVoterWeightPercentage ?: 0.0) > 1.0
+    val weightAbove1Percent = (currentVoterEntityWeightPercentage ?: BigDecimal.ZERO) > BigDecimal.ONE
 
     // Warning conditions
     val now = Clock.System.now()
     val hasNotVotedIn24H = currentVoterLastVotedAt?.let {
         (now - it) > 24.hours
     } ?: false
-    val apyIsZero = userApy == null || userApy == 0.0
+    val apyIsZero = userApy == null || userApy.compareTo(BigDecimal.ZERO) == 0
 
     val hasWarning = hasNotVotedIn24H || weightAbove1Percent || apyIsZero
 
@@ -489,23 +494,23 @@ fun CurrentVoterCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (userApy != null) {
-                    val formattedApy = (kotlin.math.round(userApy * 100) / 100).toString()
+                    val formattedApy = userApy.roundToDigitPositionAfterDecimalPoint(2, com.ionspin.kotlin.bignum.decimal.RoundingMode.ROUND_HALF_AWAY_FROM_ZERO).toPlainString()
                     Text(
                         text = "APY: $formattedApy%",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (weightAbove1Percent) warningColor else green_700
                     )
                 }
-                if (currentVoterWeightPercentage != null) {
-                    val formattedWeight = (kotlin.math.round(currentVoterWeightPercentage * 100) / 100).toString()
+                if (currentVoterEntityWeightPercentage != null) {
+                    val formattedWeight = currentVoterEntityWeightPercentage.roundToDigitPositionAfterDecimalPoint(2, com.ionspin.kotlin.bignum.decimal.RoundingMode.ROUND_HALF_AWAY_FROM_ZERO).toPlainString()
                     Text(
-                        text = "Weight: $formattedWeight%",
+                        text = "Entity Weight: $formattedWeight%",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (weightAbove1Percent) warningColor else green_700
                     )
                 }
                 if (currentVoterLastVotedAt != null) {
-                    val lastVotedText = AttoDateFormatter.formatDate(currentVoterLastVotedAt)
+                    val lastVotedText = AttoDateFormatter.formatRelativeDate(currentVoterLastVotedAt)
                     Text(
                         text = "Last voted: $lastVotedText",
                         style = MaterialTheme.typography.bodySmall,
@@ -528,18 +533,20 @@ fun CurrentVoterCard(
 @Composable
 fun VoterCard(
     voter: Voter,
+    allVoters: List<Voter>,
     calculatedApy: Double,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val lastVotedAtFormatted = voter.lastVotedAtFormatted
-    val supplyPercentage = voter.voteWeightPercentage.toPlainString()
+    val lastVotedAtFormatted = AttoDateFormatter.formatRelativeDate(voter.lastVotedAt)
+    val entityWeightPercentage = voter.calculateEntityWeightPercentage(allVoters)
+    val entityWeightString = entityWeightPercentage.toPlainString()
 
     // Warning conditions
     val now = Clock.System.now()
-    val timeSinceLastVote = now - (voter.lastVotedAt ?: Instant.fromEpochMilliseconds(0))
+    val timeSinceLastVote = now - voter.lastVotedAt
     val hasNotVotedIn24H = timeSinceLastVote > 24.hours
-    val weightAbove1Percent = voter.voteWeightPercentage.doubleValue(false) > 1.0
+    val weightAbove1Percent = entityWeightPercentage.doubleValue(false) > 1.0
     val apyIsZero = calculatedApy == 0.0
 
     val hasWarning = hasNotVotedIn24H || weightAbove1Percent || apyIsZero
@@ -598,7 +605,7 @@ fun VoterCard(
                         color = if (weightAbove1Percent) warningColor else green_700
                     )
                     Text(
-                        text = "Weight: $supplyPercentage%",
+                        text = "Entity Weight: $entityWeightString%",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (weightAbove1Percent) warningColor else green_700
                     )

@@ -26,9 +26,8 @@ import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.model.Voter
-import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.BottomSheetShape
-import cash.atto.wallet.ui.primaryGradient
+import cash.atto.wallet.model.calculateEntityWeightPercentage
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.viewmodel.VoterViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -53,6 +52,7 @@ fun VoterDetailScreen(
 
     VoterDetailScreenContent(
         voter = voter,
+        allVoters = uiState.value.voters,
         calculatedApy = calculatedApy,
         isLoading = uiState.value.isLoading,
         onBackNavigation = onBackNavigation,
@@ -71,6 +71,7 @@ fun VoterDetailScreen(
 @Composable
 fun VoterDetailScreenContent(
     voter: Voter?,
+    allVoters: List<Voter>,
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
@@ -81,6 +82,7 @@ fun VoterDetailScreenContent(
     if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
         VoterDetailScreenCompact(
             voter = voter,
+            allVoters = allVoters,
             calculatedApy = calculatedApy,
             isLoading = isLoading,
             onBackNavigation = onBackNavigation,
@@ -89,6 +91,7 @@ fun VoterDetailScreenContent(
     } else {
         VoterDetailScreenExpanded(
             voter = voter,
+            allVoters = allVoters,
             calculatedApy = calculatedApy,
             isLoading = isLoading,
             onBackNavigation = onBackNavigation,
@@ -100,6 +103,7 @@ fun VoterDetailScreenContent(
 @Composable
 fun VoterDetailScreenCompact(
     voter: Voter?,
+    allVoters: List<Voter>,
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
@@ -134,6 +138,7 @@ fun VoterDetailScreenCompact(
                     } else {
                         VoterDetailContent(
                             voter = voter,
+                            allVoters = allVoters,
                             calculatedApy = calculatedApy,
                             onConfirm = onConfirm,
                             modifier = Modifier
@@ -150,6 +155,7 @@ fun VoterDetailScreenCompact(
 @Composable
 fun VoterDetailScreenExpanded(
     voter: Voter?,
+    allVoters: List<Voter>,
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
@@ -171,6 +177,7 @@ fun VoterDetailScreenExpanded(
                 } else {
                     VoterDetailContent(
                         voter = voter,
+                        allVoters = allVoters,
                         calculatedApy = calculatedApy,
                         onConfirm = onConfirm,
                         modifier = Modifier
@@ -190,14 +197,16 @@ fun VoterDetailScreenExpanded(
 @Composable
 fun VoterDetailContent(
     voter: Voter,
+    allVoters: List<Voter>,
     calculatedApy: Double,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
-    val lastVotedAtFormatted = voter.lastVotedAtFormatted
-    val supplyPercentage = voter.voteWeightPercentage.toPlainString()
+    val lastVotedAtFormatted = AttoDateFormatter.formatRelativeDate(voter.lastVotedAt)
+    val nodeWeightPercentage = voter.voteWeightPercentage.toPlainString()
+    val entityWeightPercentage = voter.calculateEntityWeightPercentage(allVoters).toPlainString()
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -264,8 +273,13 @@ fun VoterDetailContent(
                 )
 
                 DetailRow(
-                    label = stringResource(Res.string.voter_detail_weight),
-                    value = "$supplyPercentage%"
+                    label = stringResource(Res.string.voter_detail_entity_weight),
+                    value = "$entityWeightPercentage%"
+                )
+
+                DetailRow(
+                    label = stringResource(Res.string.voter_detail_voter_weight),
+                    value = "$nodeWeightPercentage%"
                 )
 
                 DetailRow(
@@ -339,18 +353,20 @@ private fun DetailRow(
 @Preview
 @Composable
 fun VoterDetailScreenCompactPreview() {
+    val testVoter = Voter(
+        address = "atto://address123",
+        label = "Test Voter",
+        entity = "Test Entity",
+        sharePercentage = 80,
+        addedAt = "2024-01-01",
+        description = "This is a test voter description",
+        voteWeight = "1000000000000000000000000000",
+        lastVotedAt = Clock.System.now()
+    )
     AttoWalletTheme {
         VoterDetailScreenCompact(
-            voter = Voter(
-                address = "atto://address123",
-                label = "Test Voter",
-                entity = "Test Entity",
-                sharePercentage = 80,
-                addedAt = "2024-01-01",
-                description = "This is a test voter description",
-                voteWeight = "1000000000000000000000000000",
-                lastVotedAt = Clock.System.now()
-            ),
+            voter = testVoter,
+            allVoters = listOf(testVoter),
             calculatedApy = 5.5,
             isLoading = false,
             onBackNavigation = {},
@@ -362,18 +378,20 @@ fun VoterDetailScreenCompactPreview() {
 @Preview
 @Composable
 fun VoterDetailScreenExpandedPreview() {
+    val testVoter = Voter(
+        address = "atto://address123",
+        label = "Test Voter",
+        entity = "Test Entity",
+        sharePercentage = 80,
+        addedAt = "2024-01-01",
+        description = "This is a test voter description",
+        voteWeight = "1000000000000000000000000000",
+        lastVotedAt = Clock.System.now()
+    )
     AttoWalletTheme {
         VoterDetailScreenExpanded(
-            voter = Voter(
-                address = "atto://address123",
-                label = "Test Voter",
-                entity = "Test Entity",
-                sharePercentage = 80,
-                addedAt = "2024-01-01",
-                description = "This is a test voter description",
-                voteWeight = "1000000000000000000000000000",
-                lastVotedAt = Clock.System.now()
-            ),
+            voter = testVoter,
+            allVoters = listOf(testVoter),
             calculatedApy = 5.5,
             isLoading = false,
             onBackNavigation = {},
