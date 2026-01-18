@@ -602,7 +602,7 @@ fun VoterCard(
                     Text(
                         text = "APY: $formattedApy%",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (weightAbove1Percent) warningColor else green_700
+                        color = if (apyIsZero) warningColor else green_700
                     )
                     Text(
                         text = "Entity Weight: $entityWeightString%",
