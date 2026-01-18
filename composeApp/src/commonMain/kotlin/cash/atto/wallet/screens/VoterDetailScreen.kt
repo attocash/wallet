@@ -35,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun VoterDetailScreen(
@@ -206,7 +207,16 @@ fun VoterDetailContent(
 
     val lastVotedAtFormatted = AttoDateFormatter.formatRelativeDate(voter.lastVotedAt)
     val nodeWeightPercentage = voter.voteWeightPercentage.toPlainString()
-    val entityWeightPercentage = voter.calculateEntityWeightPercentage(allVoters).toPlainString()
+    val entityWeightPercentageValue = voter.calculateEntityWeightPercentage(allVoters)
+    val entityWeightPercentage = entityWeightPercentageValue.toPlainString()
+
+    val now = Clock.System.now()
+    val timeSinceLastVote = now - voter.lastVotedAt
+    val hasNotVotedIn24H = timeSinceLastVote > 24.hours
+    val weightAbove1Percent = entityWeightPercentageValue.doubleValue(false) > 1.0
+    val apyIsZero = calculatedApy == 0.0
+
+    val warningColor = Color(0xFFFF9800)
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -269,12 +279,13 @@ fun VoterDetailContent(
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_apy),
                     value = "$formattedApy%",
-                    valueColor = MaterialTheme.colorScheme.primary
+                    valueColor = if (apyIsZero) warningColor else green_700
                 )
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_entity_weight),
-                    value = "$entityWeightPercentage%"
+                    value = "$entityWeightPercentage%",
+                    valueColor = if (weightAbove1Percent) warningColor else green_700
                 )
 
                 DetailRow(
@@ -284,7 +295,8 @@ fun VoterDetailContent(
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_last_voted),
-                    value = lastVotedAtFormatted
+                    value = lastVotedAtFormatted,
+                    valueColor = if (hasNotVotedIn24H) warningColor else green_700
                 )
             }
         }
