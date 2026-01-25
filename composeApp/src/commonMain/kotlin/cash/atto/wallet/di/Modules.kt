@@ -6,6 +6,7 @@ import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PersistentWorkCache
+import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
@@ -42,6 +43,7 @@ val repositoryModule = module {
     singleOf(::AppStateRepository)
     singleOf(::PersistentAccountEntryRepository)
     singleOf(::PersistentWorkCache)
+    singleOf(::HomeRepository)
     singleOf(::VotersRepository)
     singleOf(::WalletManagerRepository)
 }

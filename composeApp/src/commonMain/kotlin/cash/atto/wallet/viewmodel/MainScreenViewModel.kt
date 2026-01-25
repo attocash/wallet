@@ -5,9 +5,11 @@ import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
+import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +21,8 @@ import kotlinx.coroutines.launch
 
 class MainScreenViewModel(
     private val walletManagerRepository: WalletManagerRepository,
-    private val settingsViewModel: SettingsViewModel
+    private val settingsViewModel: SettingsViewModel,
+    private val homeRepository: HomeRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainScreenUiState.DEFAULT)
@@ -27,6 +30,8 @@ class MainScreenViewModel(
 
     private var accountCollectorJob: Job? = null
     private var settingsCollectorJob: Job? = null
+    private var homeCollectorJob: Job? = null
+    private var currentBalance: BigDecimal? = null
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -63,6 +68,13 @@ class MainScreenViewModel(
                 )
             }
         }
+
+        homeCollectorJob?.cancel()
+        homeCollectorJob = scope.launch {
+            homeRepository.homeResponse.collect {
+                updateBalanceWithUsd()
+            }
+        }
     }
 
     fun handleBackupNavigation() = settingsViewModel.handleBackupNavigation()
@@ -72,14 +84,30 @@ class MainScreenViewModel(
     private suspend fun handleAccount(account: AttoAccount) {
         println("Account $account")
 
+        currentBalance = account.balance
+            .toString(AttoUnit.ATTO)
+            .toBigDecimal()
+
+        updateBalanceWithUsd()
+
+        _state.emit(
+            state.value.copy(
+                isWalletInitialized = true
+            )
+        )
+    }
+
+    private suspend fun updateBalanceWithUsd() {
+        val balance = currentBalance ?: return
+        val priceUsd = homeRepository.getPriceUsd()
+        val usdValue = priceUsd?.let { (balance * it).scale(2) }
+
         _state.emit(
             state.value.copy(
                 balanceChipUiState = BalanceChipUiState(
-                    account.balance
-                        .toString(AttoUnit.ATTO)
-                        .toBigDecimal()
-                ),
-                isWalletInitialized = true
+                    attoCoins = balance,
+                    usdValue = usdValue
+                )
             )
         )
     }

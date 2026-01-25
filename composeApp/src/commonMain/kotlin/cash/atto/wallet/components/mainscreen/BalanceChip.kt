@@ -2,6 +2,7 @@ package cash.atto.wallet.components.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,13 +29,25 @@ fun BalanceChip(
             .background(color = MaterialTheme.colorScheme.surface)
             .padding(32.dp)
     ) {
-        Text(
-            text = AttoFormatter.format(uiState.attoCoins),
-            modifier = Modifier.align(Alignment.CenterStart),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.W300,
-            fontFamily = attoFontFamily()
-        )
+        Column(
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Text(
+                text = AttoFormatter.format(uiState.attoCoins),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.W300,
+                fontFamily = attoFontFamily()
+            )
+            uiState.usdValue?.let { usd ->
+                Text(
+                    text = "≈ $${usd.toPlainString()} USD",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.W300,
+                    fontFamily = attoFontFamily(),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+        }
     }
 }
 

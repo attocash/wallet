@@ -10,9 +10,14 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.minutes
 
 class VotersRepository(
     private val network: AttoNetwork
@@ -28,6 +33,17 @@ class VotersRepository(
 
     private val _votersResponse = MutableStateFlow<VotersResponse?>(null)
     val votersResponse = _votersResponse.asStateFlow()
+
+    private val scope = CoroutineScope(Dispatchers.Default)
+
+    init {
+        scope.launch {
+            while (true) {
+                fetchVoters()
+                delay(1.minutes)
+            }
+        }
+    }
 
     suspend fun fetchVoters(): VotersResponse? {
         val baseUrl = network.gatekeerperUrl()
