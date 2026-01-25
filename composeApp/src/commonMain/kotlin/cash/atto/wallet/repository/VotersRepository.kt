@@ -29,19 +29,10 @@ class VotersRepository(
     private val _votersResponse = MutableStateFlow<VotersResponse?>(null)
     val votersResponse = _votersResponse.asStateFlow()
 
-    private fun getBaseUrl(): String {
-        return when (network) {
-            AttoNetwork.LOCAL -> "https://gatekeeper.dev.application.atto.cash"
-            AttoNetwork.DEV -> "https://gatekeeper.dev.application.atto.cash"
-            AttoNetwork.BETA -> "https://gatekeeper.beta.application.atto.cash"
-            AttoNetwork.LIVE -> "https://gatekeeper.live.application.atto.cash"
-            else -> throw IllegalArgumentException("Unsupported network: $network")
-        }
-    }
-
     suspend fun fetchVoters(): VotersResponse? {
+        val baseUrl = network.gatekeerperUrl()
         return try {
-            val response = client.get("${getBaseUrl()}/projections/voters")
+            val response = client.get("${baseUrl}/projections/voters")
             val votersResponse = response.body<VotersResponse>()
             _votersResponse.emit(votersResponse)
             votersResponse
