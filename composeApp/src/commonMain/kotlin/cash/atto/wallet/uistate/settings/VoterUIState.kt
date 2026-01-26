@@ -1,7 +1,7 @@
 package cash.atto.wallet.uistate.settings
 
 import cash.atto.wallet.model.Voter
-import cash.atto.wallet.model.VoterEntity
+import cash.atto.wallet.model.Entity
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlin.time.Instant
 
@@ -14,7 +14,7 @@ data class VoterUIState(
     val currentVoterLastVotedAt: Instant? = null,
     val globalApy: String? = null,
     val voters: List<Voter> = emptyList(),
-    val entities: List<VoterEntity> = emptyList(),
+    val entities: List<Entity> = emptyList(),
     val isLoading: Boolean = false,
     val showError: Boolean = false
 ) {

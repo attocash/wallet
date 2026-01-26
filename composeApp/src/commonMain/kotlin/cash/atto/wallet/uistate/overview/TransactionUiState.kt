@@ -29,6 +29,7 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val type: TransactionType,
     val amount: String?,
     val source: String,
+    val sourceLabel: String? = null,
     val timestamp: Instant,
     val height: AttoHeight,
 ) {
@@ -53,9 +54,21 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val typeString
         @Composable
         get() = when (type) {
-            TransactionType.SEND -> stringResource(Res.string.overview_hint_type_to)
-            TransactionType.RECEIVE -> stringResource(Res.string.overview_hint_type_from)
-            TransactionType.CHANGE -> stringResource(Res.string.overview_hint_type_change)
+            TransactionType.SEND -> {
+                val label = sourceLabel ?: ""
+                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_to)} $label"
+                else stringResource(Res.string.overview_hint_type_to)
+            }
+            TransactionType.RECEIVE -> {
+                val label = sourceLabel ?: ""
+                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_from)} $label"
+                else stringResource(Res.string.overview_hint_type_from)
+            }
+            TransactionType.CHANGE -> {
+                val label = sourceLabel ?: ""
+                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_change)} $label"
+                else stringResource(Res.string.overview_hint_type_change)
+            }
         }
 
     val shownSource

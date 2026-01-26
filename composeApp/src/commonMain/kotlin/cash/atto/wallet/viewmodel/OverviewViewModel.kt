@@ -5,7 +5,10 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
+import cash.atto.wallet.model.getAddressLabel
+import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
@@ -23,6 +26,7 @@ class OverviewViewModel(
     private val appStateRepository: AppStateRepository,
     private val walletManagerRepository: WalletManagerRepository,
     private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -74,7 +78,13 @@ class OverviewViewModel(
                                     balance = account.balance
                                         .toString(AttoUnit.ATTO)
                                         .toBigDecimal(),
-                                    entries = entries
+                                    entries = entries,
+                                    addressLabelResolver = { address ->
+                                        homeRepository.homeResponse.value?.getAddressLabel(address)
+                                    },
+                                    voterLabelResolver = { address ->
+                                        homeRepository.homeResponse.value?.getVoterLabel(address)
+                                    }
                                 )
                             )
                         }
@@ -86,7 +96,13 @@ class OverviewViewModel(
                             _state.emit(
                                 state.value.copy(
                                     entries = persistentAccountEntryRepository.stream(wallet.publicKey)
-                                        .toList()
+                                        .toList(),
+                                    addressLabelResolver = { address ->
+                                        homeRepository.homeResponse.value?.getAddressLabel(address)
+                                    },
+                                    voterLabelResolver = { address ->
+                                        homeRepository.homeResponse.value?.getVoterLabel(address)
+                                    }
                                 )
                             )
                         }

@@ -5,18 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HomeResponse(
     val metrics: List<Metric>,
-    val voters: List<Voter>
+    val addresses: List<Address> = emptyList(),
+    val voters: List<Voter> = emptyList()
 ) {
     val metricMap = metrics.associateBy { it.name }
+    val addressMap = addresses.associateBy { it.address }
     val voterMap = voters.associateBy { it.address }
 }
-
-@Serializable
-data class Metric(
-    val value: String,
-    val name: String,
-    val date: String
-)
 
 fun HomeResponse.getMetricValue(name: String): String? {
     return metricMap[name]?.value
@@ -32,4 +27,12 @@ fun HomeResponse.getStakingApy(): String? {
 
 fun HomeResponse.getVoter(address: String): Voter? {
     return voterMap[address]
+}
+
+fun HomeResponse.getAddressLabel(address: String): String? {
+    return addressMap[address]?.label
+}
+
+fun HomeResponse.getVoterLabel(address: String): String? {
+    return voterMap[address]?.label
 }

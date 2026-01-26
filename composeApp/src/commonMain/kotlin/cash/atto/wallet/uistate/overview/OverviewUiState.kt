@@ -12,7 +12,9 @@ import kotlin.time.Instant
 data class OverviewUiState(
     private val balance: BigDecimal?,
     val entries: List<AttoAccountEntry?>,
-    val receiveAddress: String?
+    val receiveAddress: String?,
+    val addressLabelResolver: (String) -> String? = { null },
+    val voterLabelResolver: (String) -> String? = { null }
 ) {
     val headerUiState
         get() = OverviewHeaderUiState(
@@ -26,14 +28,17 @@ data class OverviewUiState(
                 .filterNotNull()
                 .sortedByDescending { it.height }
                 .mapNotNull {
+                    val subjectAddress = AttoAddress(
+                        it.subjectAlgorithm,
+                        it.subjectPublicKey
+                    ).toString()
+                    
                     when (it.blockType) {
                         AttoBlockType.SEND -> TransactionUiState(
                             type = TransactionType.SEND,
                             amount = "- " + it.amount().toString(AttoUnit.ATTO),
-                            source = AttoAddress(
-                                it.subjectAlgorithm,
-                                it.subjectPublicKey
-                            ).toString(),
+                            source = subjectAddress,
+                            sourceLabel = addressLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
@@ -42,10 +47,8 @@ data class OverviewUiState(
                         AttoBlockType.OPEN -> TransactionUiState(
                             type = TransactionType.RECEIVE,
                             amount = "+ " + it.amount().toString(AttoUnit.ATTO),
-                            source = AttoAddress(
-                                it.subjectAlgorithm,
-                                it.subjectPublicKey
-                            ).toString(),
+                            source = subjectAddress,
+                            sourceLabel = addressLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
@@ -53,10 +56,8 @@ data class OverviewUiState(
                         AttoBlockType.CHANGE -> TransactionUiState(
                             type = TransactionType.CHANGE,
                             amount = null,
-                            source = AttoAddress(
-                                it.subjectAlgorithm,
-                                it.subjectPublicKey
-                            ).toString(),
+                            source = subjectAddress,
+                            sourceLabel = voterLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
                             height = it.height
                         )
