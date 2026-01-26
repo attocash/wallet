@@ -38,9 +38,21 @@ fun BalanceChip(
                 fontWeight = FontWeight.W300,
                 fontFamily = attoFontFamily()
             )
-            uiState.usdValue?.let { usd ->
+            val usdText = uiState.usdValue?.let { "≈ $${it.toPlainString()} USD" } ?: ""
+            val apyText = uiState.apy?.let { " · ${it.toPlainString()}% APY" } ?: ""
+            val apyColor = if (uiState.apy != null && uiState.apy > com.ionspin.kotlin.bignum.decimal.BigDecimal.ZERO) {
+                androidx.compose.ui.graphics.Color(0xFF4CAF50)
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            }
+            if (usdText.isNotEmpty() || apyText.isNotEmpty()) {
                 Text(
-                    text = "≈ $${usd.toPlainString()} USD",
+                    text = androidx.compose.ui.text.buildAnnotatedString {
+                        append(usdText)
+                        pushStyle(androidx.compose.ui.text.SpanStyle(color = apyColor))
+                        append(apyText)
+                        pop()
+                    },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W300,
                     fontFamily = attoFontFamily(),

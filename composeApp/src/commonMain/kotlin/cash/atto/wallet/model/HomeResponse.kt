@@ -6,7 +6,10 @@ import kotlinx.serialization.Serializable
 data class HomeResponse(
     val metrics: List<Metric>,
     val voters: List<Voter>
-)
+) {
+    val metricMap = metrics.associateBy { it.name }
+    val voterMap = voters.associateBy { it.address }
+}
 
 @Serializable
 data class Metric(
@@ -16,9 +19,17 @@ data class Metric(
 )
 
 fun HomeResponse.getMetricValue(name: String): String? {
-    return metrics.find { it.name == name }?.value
+    return metricMap[name]?.value
 }
 
 fun HomeResponse.getPriceUsd(): String? {
     return getMetricValue("price.usd")
+}
+
+fun HomeResponse.getStakingApy(): String? {
+    return getMetricValue("distribution.staking.annual-percentage-yield.effective")
+}
+
+fun HomeResponse.getVoter(address: String): Voter? {
+    return voterMap[address]
 }

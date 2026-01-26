@@ -5,11 +5,14 @@ import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
+import cash.atto.wallet.model.getStakingApy
+import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +35,7 @@ class MainScreenViewModel(
     private var settingsCollectorJob: Job? = null
     private var homeCollectorJob: Job? = null
     private var currentBalance: BigDecimal? = null
+    private var currentRepresentativeAddress: String? = null
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -88,6 +92,11 @@ class MainScreenViewModel(
             .toString(AttoUnit.ATTO)
             .toBigDecimal()
 
+        currentRepresentativeAddress = AttoAddress(
+            account.representativeAlgorithm,
+            account.representativePublicKey
+        ).toString()
+
         updateBalanceWithUsd()
 
         _state.emit(
@@ -100,15 +109,41 @@ class MainScreenViewModel(
     private suspend fun updateBalanceWithUsd() {
         val balance = currentBalance ?: return
         val priceUsd = homeRepository.getPriceUsd()
-        val usdValue = priceUsd?.let { (balance * it).scale(2) }
+        val usdValue = priceUsd?.let {
+            (balance * it).roundToDigitPositionAfterDecimalPoint(
+                digitPosition = 2,
+                roundingMode = RoundingMode.ROUND_HALF_AWAY_FROM_ZERO
+            )
+        }
+        val apy = calculateApy()
 
         _state.emit(
             state.value.copy(
                 balanceChipUiState = BalanceChipUiState(
                     attoCoins = balance,
-                    usdValue = usdValue
+                    usdValue = usdValue,
+                    apy = apy
                 )
             )
+        )
+    }
+
+    private fun calculateApy(): BigDecimal {
+        val homeResponse = homeRepository.homeResponse.value ?: return BigDecimal.ZERO
+        val representativeAddress = currentRepresentativeAddress ?: return BigDecimal.ZERO
+
+        val voter = homeResponse.getVoter(representativeAddress)
+            ?: return BigDecimal.ZERO
+
+        val globalApy = homeResponse.getStakingApy()?.let { BigDecimal.parseString(it) }
+            ?: return BigDecimal.ZERO
+
+        val sharePercentage = BigDecimal.fromInt(voter.sharePercentage)
+        val hundred = BigDecimal.fromInt(100)
+
+        return (globalApy * sharePercentage).divide(hundred).roundToDigitPositionAfterDecimalPoint(
+            digitPosition = 2,
+            roundingMode = RoundingMode.ROUND_HALF_AWAY_FROM_ZERO
         )
     }
 }

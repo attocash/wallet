@@ -4,9 +4,10 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 data class BalanceChipUiState(
     val attoCoins: BigDecimal?,
-    val usdValue: BigDecimal? = null
+    val usdValue: BigDecimal? = null,
+    val apy: BigDecimal? = null
 ) {
     companion object {
-        val DEFAULT = BalanceChipUiState(null, null)
+        val DEFAULT = BalanceChipUiState(null, null, null)
     }
 }
