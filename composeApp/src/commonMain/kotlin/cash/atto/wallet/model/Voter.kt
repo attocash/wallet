@@ -28,7 +28,7 @@ data class Voter(
             val hundred = BigDecimal.parseString("100.00")
 
             val mode = DecimalMode(
-                decimalPrecision = 2,
+                decimalPrecision = 5,
                 scale = 2,
                 roundingMode = RoundingMode.ROUND_HALF_CEILING
             )
@@ -53,7 +53,7 @@ fun Voter.calculateEntityWeightPercentage(allVoters: List<Voter>): BigDecimal {
     val hundred = BigDecimal.parseString("100.00")
 
     val mode = DecimalMode(
-        decimalPrecision = 2,
+        decimalPrecision = 5,
         scale = 2,
         roundingMode = RoundingMode.ROUND_HALF_CEILING
     )

@@ -74,7 +74,7 @@ class VotersRepository(
         val hundred = BigDecimal.fromInt(100)
 
         val mode = DecimalMode(
-            decimalPrecision = 2,
+            decimalPrecision = 5,
             scale = 2,
             roundingMode = RoundingMode.ROUND_HALF_CEILING
         )
