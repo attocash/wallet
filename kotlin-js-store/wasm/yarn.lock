@@ -7,6 +7,11 @@
   resolved "https://registry.yarnpkg.com/@js-joda/core/-/core-3.2.0.tgz#3e61e21b7b2b8a6be746df1335cf91d70db2a273"
   integrity sha512-PMqgJ0sw5B7FKb2d5bWYIoxjri+QlW/Pys7+Rw82jSH0QN3rB05jZ/VrrsUdh1w4+i2kw9JOejXGq/KhDOX7Kg==
 
+"@sqlite.org/sqlite-wasm@^3.50.1-build1":
+  version "3.50.1-build1"
+  resolved "https://registry.yarnpkg.com/@sqlite.org/sqlite-wasm/-/sqlite-wasm-3.50.1-build1.tgz#67dd9944b0e37ddb0ef2c8b195baa74ece838e44"
+  integrity sha512-yH4M/SHN98NibniIwTVk6rwTJjy7n39l7zwWY3u+qsfZBGTi4lC1uEl2NDvIlkzsFtfCBvHBJJFJ1iuU3UzzEQ==
+
 "@stablelib/binary@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/binary/-/binary-1.0.1.tgz#c5900b94368baf00f811da5bdb1610963dfddf7f"
@@ -86,6 +91,11 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
+
+"sqlite-web-worker@file:../../composeApp/sqlite-web-worker":
+  version "0.0.0"
+  dependencies:
+    "@sqlite.org/sqlite-wasm" "^3.50.1-build1"
 
 ws@8.18.3:
   version "8.18.3"

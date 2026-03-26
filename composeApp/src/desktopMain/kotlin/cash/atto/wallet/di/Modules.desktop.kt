@@ -1,6 +1,6 @@
 package cash.atto.wallet.di
 
-import androidx.room.Room
+import androidx.room3.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.AppDatabaseDesktop

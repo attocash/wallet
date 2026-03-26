@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kspCompose)
-    alias(libs.plugins.room)
+    alias(libs.plugins.room3)
 }
 
 repositories {
@@ -93,6 +93,8 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+
+            implementation(libs.room3.runtime)
         }
 
         androidMain.dependencies {
@@ -112,8 +114,6 @@ kotlin {
 
             implementation(libs.slf4j.simple)
 
-            implementation(libs.room.runtime.android)
-
             //QR scanning
             implementation(libs.androidx.camera.camera2) // Update to the latest version
             implementation(libs.androidx.camera.lifecycle)
@@ -121,7 +121,6 @@ kotlin {
 
             implementation(libs.barcode.scanning)
 
-            implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
         }
 
@@ -134,9 +133,9 @@ kotlin {
 
             implementation(libs.slf4j.simple)
 
-            implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
         }
+
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.runner)
             implementation(libs.androidx.rules)
@@ -144,6 +143,13 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+            implementation(libs.sqlite.web)
+            implementation(
+                npm(
+                    "sqlite-web-worker",
+                    layout.projectDirectory.dir("sqlite-web-worker").asFile
+                )
+            )
         }
     }
 
@@ -192,7 +198,7 @@ android {
     }
 }
 
-room {
+room3 {
     schemaDirectory("$projectDir/schemas")
 }
 
@@ -203,9 +209,9 @@ dependencies {
     listOf(
         "kspAndroid",
         "kspDesktop",
-        "kspCommonMainMetadata"
+        "kspWasmJs",
     ).forEach {
-        add(it, libs.room.compiler)
+        add(it, libs.room3.compiler)
     }
 }
 

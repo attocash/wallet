@@ -1,48 +1,81 @@
 package cash.atto.wallet.datasource
 
-class AppDatabaseWeb : AppDatabase {
-    override fun accountEntryDao() = AccountEntryDaoWeb()
-    override fun workDao() = WorkDaoWeb()
+import androidx.room3.Dao
+import androidx.room3.Database
+import androidx.room3.Entity
+import androidx.room3.ExperimentalRoomApi
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.PrimaryKey
+import androidx.room3.Query
+import androidx.room3.RoomDatabase
+import androidx.room3.RoomDatabaseConstructor
+import androidx.room3.RoomWarnings
+import cash.atto.wallet.Config
+
+@OptIn(ExperimentalRoomApi::class)
+@Database(
+    entities = [AccountEntryWasmJs::class, WorkWasmJs::class],
+    version = Config.DATABASE_VERSION
+)
+@Suppress(RoomWarnings.NO_DATABASE_CONSTRUCTOR)
+abstract class AppDatabaseWasmJs : RoomDatabase(), AppDatabase {
+    abstract override fun accountEntryDao(): AccountEntryDaoWasmJs
+    abstract override fun workDao(): WorkDaoWasmJs
 }
 
-class AccountEntryDaoWeb : AccountEntryDao {
-
-    private val _accountEntries = ArrayList<AccountEntryWeb>()
-
-    override suspend fun last(publicKey: ByteArray) = _accountEntries
-        .lastOrNull { it.publicKey.contentEquals(publicKey) }
-        ?.entry
-        ?.encodeToByteArray()
-
-    override suspend fun list(publicKey: ByteArray): List<String> = _accountEntries
-        .filter { it.publicKey.contentEquals(publicKey) }
-        .map { it.entry }
-
-    private fun save(entry: AccountEntryWeb) {
-        _accountEntries.add(entry)
-    }
-
-    override suspend fun save(entry: AccountEntry) = save(entry as AccountEntryWeb)
+internal object AppDatabaseWasmJsConstructor : RoomDatabaseConstructor<AppDatabaseWasmJs> {
+    override fun initialize(): AppDatabaseWasmJs = AppDatabaseWasmJs_Impl()
 }
 
-class WorkDaoWeb : WorkDao {
+@Dao
+interface AccountEntryDaoWasmJs : AccountEntryDao {
+    @Query(
+        "SELECT entry from accountEntries " +
+                "WHERE publicKey = :publicKey " +
+                "ORDER BY height DESC LIMIT 1"
+    )
+    override suspend fun last(publicKey: ByteArray): ByteArray?
 
-    private var _work: WorkWeb? = null
+    @Query(
+        "SELECT entry from accountEntries " +
+                "WHERE publicKey = :publicKey " +
+                "ORDER BY height DESC"
+    )
+    override suspend fun list(publicKey: ByteArray): List<String>
 
-    override suspend fun get() = _work
-    suspend fun set(work: WorkWeb) { _work = work }
-    override suspend fun set(work: Work) = set(work as WorkWeb)
-    override suspend fun clear() { _work = null }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun save(entry: AccountEntryWasmJs)
+
+    override suspend fun save(entry: AccountEntry) = save(entry as AccountEntryWasmJs)
 }
 
-data class AccountEntryWeb(
+@Dao
+interface WorkDaoWasmJs : WorkDao {
+    @Query("SELECT * FROM work ORDER BY value LIMIT 1")
+    override suspend fun get(): WorkWasmJs?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun set(work: WorkWasmJs)
+
+    override suspend fun set(work: Work) = set(work as WorkWasmJs)
+
+    @Query("DELETE FROM work")
+    override suspend fun clear()
+}
+
+@Entity(tableName = "accountEntries")
+data class AccountEntryWasmJs(
+    @PrimaryKey
     override val hash: ByteArray,
     override val publicKey: ByteArray,
     override val height: Long,
     override val entry: String
 ) : AccountEntry
 
-data class WorkWeb(
+@Entity(tableName = "work")
+data class WorkWasmJs(
+    @PrimaryKey
     override val publicKey: ByteArray,
     override val value: ByteArray
 ) : Work
@@ -52,18 +85,17 @@ actual fun createAccountEntry(
     publicKey: ByteArray,
     height: Long,
     entry: String
-): AccountEntry = AccountEntryWeb(
+): AccountEntry = AccountEntryWasmJs(
     hash = hash,
     publicKey = publicKey,
     height = height,
     entry = entry
 )
 
-
 actual fun createWork(
     publicKey: ByteArray,
     value: ByteArray
-): Work = WorkWeb(
+): Work = WorkWasmJs(
     publicKey = publicKey,
     value = value
 )
