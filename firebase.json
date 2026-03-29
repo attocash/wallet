@@ -31,7 +31,7 @@
           },
           {
             "key": "Permissions-Policy",
-            "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), publickey-credentials-get=(), clipboard-read=(), clipboard-write=()"
+            "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), publickey-credentials-get=(), clipboard-read=(self), clipboard-write=(self)"
           },
           {
             "key": "Cross-Origin-Opener-Policy",
@@ -47,7 +47,20 @@
           },
           {
             "key": "Strict-Transport-Security",
-            "value": "max-age=31536000; includeSubDomains"
+            "value": "max-age=31536000; includeSubDomains; preload"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          },
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "same-origin"
           }
         ]
       },
@@ -67,6 +80,19 @@
       {
         "source": "**/*.js",
         "headers": [
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "same-origin"
+          }
+        ]
+      },
+      {
+        "source": "**/*.otf",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          },
           {
             "key": "Cross-Origin-Resource-Policy",
             "value": "same-origin"
