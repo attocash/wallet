@@ -16,25 +16,30 @@ import org.koin.dsl.module
 import org.w3c.dom.Worker
 
 /**
- * Wraps [WebWorkerSQLiteDriver] and reports [hasConnectionPool] as `true` so that Room uses
- * its single-connection [PassthroughConnectionPool] instead of opening separate reader/writer
- * connections that fight over the same OPFS file lock.
+ * Wraps [WebWorkerSQLiteDriver] to redirect the in-memory path (":memory:") to a named OPFS
+ * file for persistent storage. Used with [Room.inMemoryDatabaseBuilder] so that Room selects
+ * its single-connection pool (which properly serializes reader/writer access via a semaphore),
+ * while the actual data is persisted to OPFS.
+ *
+ * This avoids two Room3 alpha issues on web:
+ * - [PassthroughConnectionPool] (used when hasConnectionPool=true) lacks mutual exclusion,
+ *   causing "cannot start a transaction within a transaction" when the invalidation tracker
+ *   and DAO operations interleave.
+ * - Multiple OPFS connections (used with databaseBuilder + named DB) cause
+ *   "createSyncAccessHandle" lock contention.
  */
-private class SingleConnectionWebDriver(worker: Worker) : SQLiteDriver {
+private class PersistentSingleConnectionDriver(worker: Worker) : SQLiteDriver {
     private val delegate = WebWorkerSQLiteDriver(worker)
 
-    override val hasConnectionPool: Boolean get() = true
-
     override suspend fun openAsync(fileName: String): SQLiteConnection =
-        delegate.openAsync(fileName)
+        delegate.openAsync("atto-wallet.db")
 }
 
 private val database by lazy {
-    Room.databaseBuilder<AppDatabaseWasmJs>(
-        name = "atto-wallet.db",
+    Room.inMemoryDatabaseBuilder<AppDatabaseWasmJs>(
         factory = AppDatabaseWasmJsConstructor::initialize
     )
-        .setDriver(SingleConnectionWebDriver(createWorker()))
+        .setDriver(PersistentSingleConnectionDriver(createWorker()))
         .build()
 }
 
