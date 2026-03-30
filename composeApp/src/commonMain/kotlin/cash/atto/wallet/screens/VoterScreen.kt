@@ -1,10 +1,14 @@
 package cash.atto.wallet.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -142,12 +146,19 @@ fun VoterScreenCompact(
                         CircularProgressIndicator()
                     }
                 } else {
-                    LazyColumn(
+                    val listState = rememberLazyListState()
+
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = innerPadding.calculateTopPadding() + 16.dp)
                             .clip(BottomSheetShape)
                             .background(color = MaterialTheme.colorScheme.secondary)
+                    ) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(
                                 start = 16.dp,
                                 top = 24.dp,
@@ -220,6 +231,9 @@ fun VoterScreenCompact(
                                 )
                             }
                         }
+                    }
+
+                    SimpleScrollbar(listState = listState)
                     }
                 }
             }
@@ -314,13 +328,20 @@ fun VoterScreenExpanded(
                                 .padding(48.dp)
                         )
                     } else {
-                        LazyColumn(
+                        val expandedListState = rememberLazyListState()
+
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth(0.7f)
                                 .fillMaxHeight(0.9f)
                                 .align(Alignment.Center)
                                 .clip(RoundedCornerShape(50.dp))
                                 .background(color = MaterialTheme.colorScheme.surface)
+                        ) {
+                        LazyColumn(
+                            state = expandedListState,
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .padding(
                                     horizontal = 48.dp,
                                     vertical = 48.dp
@@ -391,6 +412,9 @@ fun VoterScreenExpanded(
                                     )
                                 }
                             }
+                        }
+
+                        SimpleScrollbar(listState = expandedListState)
                         }
                     }
                 }
@@ -623,6 +647,49 @@ fun VoterCard(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun BoxScope.SimpleScrollbar(
+    listState: LazyListState,
+    modifier: Modifier = Modifier
+) {
+    val firstVisibleItem = listState.firstVisibleItemIndex
+    val totalItems = listState.layoutInfo.totalItemsCount
+    val visibleItems = listState.layoutInfo.visibleItemsInfo.size
+
+    if (totalItems > visibleItems) {
+        val scrollFraction = firstVisibleItem.toFloat() / (totalItems - visibleItems).coerceAtLeast(1)
+        val thumbHeight = (visibleItems.toFloat() / totalItems).coerceIn(0.1f, 1f)
+
+        val targetAlpha = if (listState.isScrollInProgress) 1f else 0.5f
+        val alpha by animateFloatAsState(
+            targetValue = targetAlpha,
+            animationSpec = tween(durationMillis = 300)
+        )
+
+        Box(
+            modifier = modifier
+                .fillMaxHeight()
+                .width(6.dp)
+                .padding(vertical = 4.dp)
+                .align(Alignment.CenterEnd)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(thumbHeight)
+                    .offset(
+                        y = (scrollFraction * (1f - thumbHeight) *
+                                listState.layoutInfo.viewportEndOffset).dp / 2
+                    )
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = alpha * 0.4f)
+                    )
+            )
         }
     }
 }
