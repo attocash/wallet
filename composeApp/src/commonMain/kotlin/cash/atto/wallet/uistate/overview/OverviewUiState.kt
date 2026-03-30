@@ -40,7 +40,8 @@ data class OverviewUiState(
                             source = subjectAddress,
                             sourceLabel = addressLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height
+                            height = it.height,
+                            hash = it.hash.toString()
                         )
 
                         AttoBlockType.RECEIVE,
@@ -50,7 +51,8 @@ data class OverviewUiState(
                             source = subjectAddress,
                             sourceLabel = addressLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height
+                            height = it.height,
+                            hash = it.hash.toString()
                         )
 
                         AttoBlockType.CHANGE -> TransactionUiState(
@@ -59,7 +61,8 @@ data class OverviewUiState(
                             source = subjectAddress,
                             sourceLabel = voterLabelResolver(subjectAddress),
                             timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height
+                            height = it.height,
+                            hash = it.hash.toString()
                         )
 
                         else -> null

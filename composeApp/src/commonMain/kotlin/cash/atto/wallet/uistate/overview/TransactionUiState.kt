@@ -32,6 +32,7 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val sourceLabel: String? = null,
     val timestamp: Instant,
     val height: AttoHeight,
+    val hash: String? = null,
 ) {
 
     var shownAmount = amount?.let { a ->
