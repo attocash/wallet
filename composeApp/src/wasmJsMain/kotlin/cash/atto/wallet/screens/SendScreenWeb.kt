@@ -3,12 +3,18 @@ package cash.atto.wallet.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,9 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -50,6 +58,7 @@ import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
+import cash.atto.wallet.components.common.QrScannerView
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
@@ -178,6 +187,19 @@ fun SendFromWeb(
     onSendClicked: () -> Unit
 ) {
     val (focusRequester) = FocusRequester.createRefs()
+    var showQrScanner by remember { mutableStateOf(false) }
+
+    if (showQrScanner) {
+        Dialog(onDismissRequest = { showQrScanner = false }) {
+            QrScannerView(
+                modifier = Modifier.size(400.dp),
+                onQrCodeScanned = { result ->
+                    onAddressChanged(result)
+                    showQrScanner = false
+                }
+            )
+        }
+    }
 
     Column(
         modifier = Modifier.clip(RoundedCornerShape(50.dp))
@@ -271,29 +293,44 @@ fun SendFromWeb(
             )
         }
 
-        TextField(
-            value = uiState.address.orEmpty(),
-            onValueChange = {
-                onAddressChanged.invoke(it)
-            },
-            modifier = Modifier.focusRequester(focusRequester)
-                .onPreviewKeyEvent {
-                    if (it.key.keyCode == Key.Enter.keyCode) {
-                        onSendClicked.invoke()
-
-                        return@onPreviewKeyEvent true
-                    }
-
-                    return@onPreviewKeyEvent false
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = uiState.address.orEmpty(),
+                onValueChange = {
+                    onAddressChanged.invoke(it)
                 },
-            placeholder = {
-                Text(text = stringResource(Res.string.send_from_address_hint))
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { onSendClicked.invoke() }
+                modifier = Modifier.weight(1f)
+                    .focusRequester(focusRequester)
+                    .onPreviewKeyEvent {
+                        if (it.key.keyCode == Key.Enter.keyCode) {
+                            onSendClicked.invoke()
+
+                            return@onPreviewKeyEvent true
+                        }
+
+                        return@onPreviewKeyEvent false
+                    },
+                placeholder = {
+                    Text(text = stringResource(Res.string.send_from_address_hint))
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSendClicked.invoke() }
+                )
             )
-        )
+
+            Spacer(Modifier.width(8.dp))
+
+            IconButton(onClick = { showQrScanner = true }) {
+                Icon(
+                    imageVector = Icons.Default.QrCodeScanner,
+                    contentDescription = "Scan QR Code",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
         if (uiState.showAddressError) {
             Text(
