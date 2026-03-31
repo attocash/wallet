@@ -202,13 +202,19 @@ fun SendFromWeb(
 ) {
     val (focusRequester) = FocusRequester.createRefs()
     var showQrScanner by remember { mutableStateOf(false) }
+    var scannerError by remember { mutableStateOf<String?>(null) }
 
     if (showQrScanner) {
         Dialog(onDismissRequest = { showQrScanner = false }) {
             QrScannerView(
                 modifier = Modifier.size(400.dp),
                 onQrCodeScanned = { result ->
+                    scannerError = null
                     onAddressChanged(result)
+                    showQrScanner = false
+                },
+                onScanError = { message ->
+                    scannerError = message
                     showQrScanner = false
                 }
             )
@@ -286,7 +292,7 @@ fun SendFromWeb(
                 )
 
                 Text(
-                    text = uiState.accountBalanceUsd?.let { AttoFormatter.formatUsd(it) } ?: "≈ ${'$'}0.00",
+                    text = uiState.accountBalanceUsd?.let { AttoFormatter.formatUsd(it) } ?: "USD price unavailable",
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -392,7 +398,10 @@ fun SendFromWeb(
 
             OutlinedTextField(
                 value = uiState.address.orEmpty(),
-                onValueChange = { onAddressChanged.invoke(it) },
+                onValueChange = {
+                    scannerError = null
+                    onAddressChanged.invoke(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
@@ -416,7 +425,10 @@ fun SendFromWeb(
                     }
                 } else null,
                 trailingIcon = {
-                    IconButton(onClick = { showQrScanner = true }) {
+                    IconButton(onClick = {
+                        scannerError = null
+                        showQrScanner = true
+                    }) {
                         Icon(
                             imageVector = Icons.Default.QrCodeScanner,
                             contentDescription = "Scan QR Code",
@@ -435,6 +447,15 @@ fun SendFromWeb(
                 ),
                 singleLine = true
             )
+
+            scannerError?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+            }
         }
 
         Spacer(Modifier.height(28.dp))
@@ -457,4 +478,3 @@ fun SendFromWeb(
         }
     }
 }
-

@@ -22,6 +22,13 @@ data class SendTransactionUiState(
     val priceUsd: BigDecimal? = null,
     val isUsdMode: Boolean = false
 ) {
+    private fun parseDecimal(value: String?): BigDecimal? =
+        try {
+            value?.toBigDecimal()
+        } catch (_: Exception) {
+            null
+        }
+
     private fun amountUsd(attoAmount: BigDecimal?): BigDecimal? {
         if (attoAmount == null || priceUsd == null) return null
         return attoAmount.multiply(priceUsd)
@@ -33,32 +40,28 @@ data class SendTransactionUiState(
     }
 
     private fun equivalentDisplay(): String {
-        val input = try { amountString?.toBigDecimal() } catch (_: Exception) { null }
+        val input = parseDecimal(amountString)
         return if (isUsdMode) {
-            usdToAtto(input)?.let { "≈ ${it.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING).toStringExpanded()} ATTO" }
-                ?: "≈ 0 ATTO"
+            usdToAtto(input)?.let {
+                "≈ ${it.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING).toStringExpanded()} ATTO"
+            } ?: "USD price unavailable"
         } else {
             amountUsd(input)?.let { AttoFormatter.formatUsd(it) }
-                ?: "≈ $0 USD"
+                ?: "USD price unavailable"
         }
     }
     val sendFromUiState
         get() = account?.let {
+            val accountBalance = it.balance.toString(AttoUnit.ATTO)
             SendFromUiState(
                 accountName = "Main Account",
                 accountSeed = it.publicKey
                     .toAddress(AttoAlgorithm.V1)
                     .value,
-                accountBalance = it.balance
-                    .toString(AttoUnit.ATTO)
-                    .toBigDecimal(),
-                accountBalanceUsd = amountUsd(
-                    it.balance.toString(AttoUnit.ATTO).toBigDecimal()
-                ),
+                accountBalance = accountBalance,
+                accountBalanceUsd = amountUsd(parseDecimal(accountBalance)),
                 amountString = amountString,
-                amountUsd = amountUsd(
-                    try { amountString?.toBigDecimal() } catch (_: Exception) { null }
-                ),
+                amountUsd = amountUsd(parseDecimal(amountString)),
                 address = address,
                 showAmountError = showAmountError,
                 showAddressError = showAddressError,

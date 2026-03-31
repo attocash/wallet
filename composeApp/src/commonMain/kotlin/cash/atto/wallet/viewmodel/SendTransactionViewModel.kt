@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class SendTransactionViewModel(
@@ -30,6 +32,19 @@ class SendTransactionViewModel(
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     init {
+        viewModelScope.launch {
+            homeRepository.homeResponse
+                .map { homeRepository.getPriceUsd() }
+                .distinctUntilChanged()
+                .collect { priceUsd ->
+                    _state.emit(
+                        state.value.copy(
+                            priceUsd = priceUsd
+                        )
+                    )
+                }
+        }
+
         viewModelScope.launch {
             walletManagerRepository.state
                 .filterNotNull()
@@ -139,14 +154,19 @@ class SendTransactionViewModel(
 
         val priceUsd = homeRepository.getPriceUsd()
 
-        // Convert USD to ATTO if in USD mode
-        val amount = if (state.value.isUsdMode && rawAmount != null && priceUsd != null && priceUsd != BigDecimal.ZERO) {
-            rawAmount.divide(priceUsd, DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING))
+        val hasUsdPrice = priceUsd != null && priceUsd != BigDecimal.ZERO
+
+        // USD mode is only valid when a live price is available for conversion.
+        val amount = if (state.value.isUsdMode && rawAmount != null && hasUsdPrice) {
+            rawAmount.divide(
+                priceUsd,
+                DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING)
+            )
         } else {
             rawAmount
         }
 
-        val amountCheckResult = amount != null
+        val amountCheckResult = amount != null && (!state.value.isUsdMode || hasUsdPrice)
 
         val addressCheckResult = AttoAddress.isValid(
             state.value

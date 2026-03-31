@@ -270,7 +270,7 @@ fun SendFromDesktop(
                 )
 
                 Text(
-                    text = uiState.accountBalanceUsd?.let { AttoFormatter.formatUsd(it) } ?: "≈ ${'$'}0.00",
+                    text = uiState.accountBalanceUsd?.let { AttoFormatter.formatUsd(it) } ?: "USD price unavailable",
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                     style = MaterialTheme.typography.bodyMedium
                 )

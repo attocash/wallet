@@ -11,7 +11,7 @@ class WasmQrScanner : QrScanner {
     private var scanIntervalId: Int? = null
     private var isScanning = false
 
-    override fun startScanning(onResult: (String) -> Unit) {
+    fun startScanning(onResult: (String) -> Unit, onError: (String) -> Unit) {
         if (isScanning) return
         isScanning = true
 
@@ -42,10 +42,16 @@ class WasmQrScanner : QrScanner {
                 )
             },
             onError = { error ->
-                println("QR Scanner error: ${error.toString()}")
+                val message = error.toString()
+                println("QR Scanner error: $message")
                 stopScanning()
+                onError(message)
             }
         )
+    }
+
+    override fun startScanning(onResult: (String) -> Unit) {
+        startScanning(onResult) { }
     }
 
     override fun stopScanning() {

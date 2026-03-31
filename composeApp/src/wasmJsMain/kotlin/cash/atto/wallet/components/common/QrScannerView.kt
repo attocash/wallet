@@ -21,7 +21,8 @@ import org.w3c.dom.Node
 @Composable
 fun QrScannerView(
     modifier: Modifier = Modifier,
-    onQrCodeScanned: (String) -> Unit
+    onQrCodeScanned: (String) -> Unit,
+    onScanError: (String) -> Unit
 ) {
     var scannedValue by remember { mutableStateOf<String?>(null) }
     val scanner = remember { WasmQrScanner() }
@@ -38,11 +39,17 @@ fun QrScannerView(
         container.id = "qr-scanner-container"
         document.body?.appendChild(container)
 
-        scanner.startScanning { result ->
-            scannedValue = result
-            onQrCodeScanned(result)
-            container.remove()
-        }
+        scanner.startScanning(
+            onResult = { result ->
+                scannedValue = result
+                onQrCodeScanned(result)
+                container.remove()
+            },
+            onError = { message ->
+                onScanError(message)
+                container.remove()
+            }
+        )
 
         val videoEl = scanner.videoElement
         if (videoEl != null) {

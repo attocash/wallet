@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_overview_background
 import attowallet.composeapp.generated.resources.send_confirm
+import attowallet.composeapp.generated.resources.send_confirm_amount
 import attowallet.composeapp.generated.resources.send_confirm_cancel
 import attowallet.composeapp.generated.resources.send_confirm_sending
 import attowallet.composeapp.generated.resources.send_confirm_to
@@ -211,15 +212,19 @@ fun SendConfirmContentRedesigned(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
             )
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Amount",
+                    text = stringResource(Res.string.send_confirm_amount),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -228,15 +233,19 @@ fun SendConfirmContentRedesigned(
 
                 Text(
                     text = "${AttoFormatter.format(uiState.amount)} ATTO",
-                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 uiState.amountUsd?.let {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = AttoFormatter.formatUsd(it),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                     )

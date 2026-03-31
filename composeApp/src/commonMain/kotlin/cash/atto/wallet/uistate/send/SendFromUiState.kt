@@ -5,7 +5,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 data class SendFromUiState(
     val accountName: String?,
     val accountSeed: String?,
-    val accountBalance: BigDecimal,
+    val accountBalance: String?,
     val accountBalanceUsd: BigDecimal?,
     val amountString: String?,
     val amountUsd: BigDecimal?,
@@ -20,7 +20,7 @@ data class SendFromUiState(
         val DEFAULT = SendFromUiState(
             accountName = null,
             accountSeed = null,
-            accountBalance = BigDecimal.ZERO,
+            accountBalance = null,
             accountBalanceUsd = null,
             amountString = null,
             amountUsd = null,
