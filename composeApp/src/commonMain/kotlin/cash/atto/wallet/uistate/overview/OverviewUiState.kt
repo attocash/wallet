@@ -11,6 +11,7 @@ import kotlin.time.Instant
 
 data class OverviewUiState(
     private val balance: BigDecimal?,
+    val priceUsd: BigDecimal? = null,
     val entries: List<AttoAccountEntry?>,
     val receiveAddress: String?,
     val addressLabelResolver: (String) -> String? = { null },
@@ -74,12 +75,14 @@ data class OverviewUiState(
     companion object {
         val DEFAULT = OverviewUiState(
             balance = null,
+            priceUsd = null,
             entries = List<AttoAccountEntry?>(2) { null },
             receiveAddress = null
         )
 
         suspend fun empty() = OverviewUiState(
             balance = null,
+            priceUsd = null,
             entries = emptyList(),
             receiveAddress = null
         )

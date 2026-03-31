@@ -78,6 +78,7 @@ class OverviewViewModel(
                                     balance = account.balance
                                         .toString(AttoUnit.ATTO)
                                         .toBigDecimal(),
+                                    priceUsd = homeRepository.getPriceUsd(),
                                     entries = entries,
                                     addressLabelResolver = { address ->
                                         homeRepository.homeResponse.value?.getAddressLabel(address)
@@ -95,6 +96,7 @@ class OverviewViewModel(
                         persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
                             _state.emit(
                                 state.value.copy(
+                                    priceUsd = homeRepository.getPriceUsd(),
                                     entries = persistentAccountEntryRepository.stream(wallet.publicKey)
                                         .toList(),
                                     addressLabelResolver = { address ->

@@ -19,6 +19,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ReceiveScreenDesktop() {
     val viewModel = koinViewModel<ReceiveViewModel>()
     val address = viewModel.address.collectAsState()
+    val priceUsd = viewModel.priceUsd.collectAsState()
 
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
@@ -29,9 +30,10 @@ fun ReceiveScreenDesktop() {
     ) {
         ReceiveAttoContent(
             address = address.value.orEmpty(),
-            onCopy = {
+            priceUsd = priceUsd.value,
+            onCopy = { paymentRequest ->
                 clipboardManager.setText(
-                    AnnotatedString(address.value.orEmpty())
+                    AnnotatedString(paymentRequest)
                 )
             }
         )

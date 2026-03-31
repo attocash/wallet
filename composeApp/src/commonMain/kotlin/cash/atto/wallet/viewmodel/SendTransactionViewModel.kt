@@ -7,6 +7,7 @@ import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
+import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.DecimalMode
@@ -78,6 +79,30 @@ class SendTransactionViewModel(
                 amountString = amount,
                 address = address,
                 priceUsd = homeRepository.getPriceUsd()
+            )
+        )
+    }
+
+    suspend fun applyPaymentRequest(paymentRequest: String?) {
+        val parsed = AttoPaymentRequests.parse(paymentRequest) ?: return
+        val amountAtto = parsed.amountRaw?.let { rawAmount ->
+            try {
+                AttoAmount.from(
+                    unit = AttoUnit.RAW,
+                    string = rawAmount
+                ).toString(AttoUnit.ATTO)
+            } catch (_: Exception) {
+                null
+            }
+        }
+        _state.emit(
+            state.value.copy(
+                amountString = amountAtto ?: state.value.sendFromUiState.amountString,
+                address = parsed.address,
+                priceUsd = homeRepository.getPriceUsd(),
+                isUsdMode = false,
+                showAmountError = false,
+                showAddressError = false
             )
         )
     }

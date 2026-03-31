@@ -69,15 +69,13 @@ fun OverviewScreenAndroid(
         uiState = uiState.value,
         onSettingsClicked = onSettingsClicked,
         onSendClicked = onSendClicked,
-        onReceiveCopyClick = {
-            uiState.value.receiveAddress?.let {
-                clipboardManager.setText(AnnotatedString(it))
-            }
+        onReceiveCopyClick = { paymentRequest ->
+            clipboardManager.setText(AnnotatedString(paymentRequest))
         },
-        onReceiveShareClick = {
+        onReceiveShareClick = { paymentRequest ->
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, uiState.value.receiveAddress)
+                putExtra(Intent.EXTRA_TEXT, paymentRequest)
                 type = "text/plain"
             }
 
@@ -93,8 +91,8 @@ fun OverviewAndroid(
     uiState: OverviewUiState,
     onSettingsClicked: () -> Unit,
     onSendClicked: () -> Unit,
-    onReceiveCopyClick: () -> Unit,
-    onReceiveShareClick: () -> Unit,
+    onReceiveCopyClick: (String) -> Unit,
+    onReceiveShareClick: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -103,13 +101,13 @@ fun OverviewAndroid(
     )
 
     var showBottomSheet by remember { mutableStateOf(false) }
-
     Box(modifier = Modifier.fillMaxSize()) {
         if (showBottomSheet) {
             ReceiveAttoBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState,
                 address = uiState.receiveAddress,
+                priceUsd = uiState.priceUsd,
                 onCopy = onReceiveCopyClick,
                 onShare = onReceiveShareClick
             )

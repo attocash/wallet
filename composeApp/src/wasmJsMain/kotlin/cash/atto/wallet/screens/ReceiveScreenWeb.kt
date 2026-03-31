@@ -19,6 +19,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ReceiveScreenWeb() {
     val viewModel = koinViewModel<ReceiveViewModel>()
     val address = viewModel.address.collectAsState()
+    val priceUsd = viewModel.priceUsd.collectAsState()
 
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
@@ -29,9 +30,10 @@ fun ReceiveScreenWeb() {
     ) {
         ReceiveAttoContent(
             address = address.value.orEmpty(),
-            onCopy = {
+            priceUsd = priceUsd.value,
+            onCopy = { paymentRequest ->
                 clipboardManager.setText(
-                    AnnotatedString(address.value.orEmpty())
+                    AnnotatedString(paymentRequest)
                 )
             }
         )

@@ -77,6 +77,11 @@ fun SendFromScreenAndroid(
     SendFromAndroid(
         uiState = uiState.value.sendFromUiState,
         onBackNavigation = onBackNavigation,
+        onPaymentRequestScanned = { paymentRequest ->
+            coroutineScope.launch {
+                viewModel.applyPaymentRequest(paymentRequest)
+            }
+        },
         onSendClicked = {
             coroutineScope.launch {
                 if (viewModel.checkTransactionData())
@@ -108,6 +113,7 @@ fun SendFromScreenAndroid(
 fun SendFromAndroid(
     uiState: SendFromUiState,
     onBackNavigation: () -> Unit,
+    onPaymentRequestScanned: (String?) -> Unit,
     onSendClicked: () -> Unit,
     onAmountChanged: (String?) -> Unit,
     onAddressChanged: (String?) -> Unit
@@ -118,8 +124,7 @@ fun SendFromAndroid(
     ) {
         if (it.resultCode == Activity.RESULT_OK) {
             val qr = it.data?.getStringExtra(QRScannerActivity.QR_TAG)
-
-            onAddressChanged.invoke(qr)
+            onPaymentRequestScanned(qr)
         }
     }
 
@@ -316,6 +321,7 @@ fun SendFromAndroidPreview() {
         SendFromAndroid(
             uiState = SendFromUiState.DEFAULT,
             onBackNavigation = {},
+            onPaymentRequestScanned = {},
             onSendClicked = {},
             onAmountChanged = {},
             onAddressChanged = {}

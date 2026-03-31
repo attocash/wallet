@@ -60,6 +60,7 @@ import attowallet.composeapp.generated.resources.send_error_amount
 import attowallet.composeapp.generated.resources.send_from_address_hint
 import attowallet.composeapp.generated.resources.send_from_amount_hint
 import attowallet.composeapp.generated.resources.send_from_title
+import cash.atto.wallet.components.common.AttoAmountInputField
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.ui.AttoFormatter
@@ -280,85 +281,26 @@ fun SendFromDesktop(
         Spacer(Modifier.height(28.dp))
 
         // Amount field
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (uiState.isUsdMode) "Amount (USD)" else "Amount (ATTO)",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-
-                Surface(
-                    onClick = onToggleInputMode,
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+        AttoAmountInputField(
+            value = uiState.amountString.orEmpty(),
+            onValueChange = { onAmountChanged(it) },
+            isUsdMode = uiState.isUsdMode,
+            onToggleInputMode = onToggleInputMode,
+            equivalentDisplay = uiState.equivalentDisplay,
+            placeholder = stringResource(Res.string.send_from_amount_hint),
+            isError = uiState.showAmountError,
+            errorText = stringResource(Res.string.send_error_amount),
+            inputModifier = Modifier.onPreviewKeyEvent {
+                if (
+                    it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
+                    it.key.nativeKeyCode == Key.Tab.nativeKeyCode
                 ) {
-                    Text(
-                        text = if (uiState.isUsdMode) "Switch to ATTO" else "Switch to USD",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    focusRequester.requestFocus()
+                    return@onPreviewKeyEvent true
                 }
+                return@onPreviewKeyEvent false
             }
-
-            OutlinedTextField(
-                value = uiState.amountString.orEmpty(),
-                onValueChange = onAmountChanged,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onPreviewKeyEvent {
-                        if (
-                            it.key.nativeKeyCode == Key.Enter.nativeKeyCode ||
-                            it.key.nativeKeyCode == Key.Tab.nativeKeyCode
-                        ) {
-                            focusRequester.requestFocus()
-                            return@onPreviewKeyEvent true
-                        }
-                        return@onPreviewKeyEvent false
-                    },
-                placeholder = {
-                    Text(text = stringResource(Res.string.send_from_amount_hint))
-                },
-                isError = uiState.showAmountError,
-                supportingText = if (uiState.showAmountError) {
-                    {
-                        Text(
-                            text = stringResource(Res.string.send_error_amount),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                } else {
-                    {
-                        Text(
-                            text = uiState.equivalentDisplay,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusRequester.requestFocus() }
-                ),
-                singleLine = true
-            )
-        }
+        )
 
         Spacer(Modifier.height(12.dp))
 
