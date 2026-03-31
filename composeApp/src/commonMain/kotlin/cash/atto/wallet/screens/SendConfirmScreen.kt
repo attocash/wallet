@@ -4,13 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_overview_background
@@ -33,7 +38,6 @@ import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.components.common.AttoOutlinedButton
-import cash.atto.wallet.components.common.AttoOutlinedTextCard
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.send.SendConfirmUiState
@@ -133,10 +137,22 @@ fun SendConfirmContent(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        AttoOutlinedTextCard(
-            text = AttoFormatter.format(uiState.amount),
-            color = MaterialTheme.colorScheme.background
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "${AttoFormatter.format(uiState.amount)} ATTO",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            uiState.amountUsd?.let {
+                Text(
+                    text = AttoFormatter.formatUsd(it),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
 
         Text(
             text = stringResource(Res.string.send_confirm_to),
@@ -144,9 +160,13 @@ fun SendConfirmContent(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        AttoOutlinedTextCard(
+        Text(
             text = uiState.address.orEmpty(),
-            color = MaterialTheme.colorScheme.background
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(Modifier.weight(1f))
@@ -168,11 +188,135 @@ fun SendConfirmContent(
 }
 
 @Composable
+fun SendConfirmContentRedesigned(
+    uiState: SendConfirmUiState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    isLoading: Boolean = false
+) {
+    Column(
+        modifier = Modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.send_confirm_sending),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Amount",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "${AttoFormatter.format(uiState.amount)} ATTO",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                uiState.amountUsd?.let {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = AttoFormatter.formatUsd(it),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(Res.string.send_confirm_to),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = uiState.address.orEmpty(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        AttoButton(
+            onClick = onConfirm,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text(text = stringResource(Res.string.send_confirm))
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        AttoOutlinedButton(
+            onClick = onCancel,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            Text(text = stringResource(Res.string.send_confirm_cancel))
+        }
+    }
+}
+
+enum class SendScreenState {
+    SEND, CONFIRM, RESULT;
+}
+
+@Composable
 fun SendConfirmContentPreview() {
     AttoWalletTheme {
         SendConfirmContent(
             uiState = SendConfirmUiState(
                 amount = BigDecimal.TEN,
+                amountUsd = null,
                 address = "atto://address",
                 showLoader = false
             ),
@@ -189,6 +333,7 @@ fun SendConfirmPreview() {
         SendConfirm(
             uiState = SendConfirmUiState(
                 amount = BigDecimal.TEN,
+                amountUsd = null,
                 address = "atto://address",
                 showLoader = false
             ),

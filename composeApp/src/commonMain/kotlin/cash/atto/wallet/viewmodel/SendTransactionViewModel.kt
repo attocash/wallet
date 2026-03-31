@@ -5,8 +5,12 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
+import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.send.SendTransactionUiState
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.DecimalMode
+import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +21,7 @@ import kotlinx.coroutines.launch
 
 class SendTransactionViewModel(
     private val walletManagerRepository: WalletManagerRepository,
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SendTransactionUiState.DEFAULT)
@@ -56,7 +61,8 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amountString = amount,
-                address = address
+                address = address,
+                priceUsd = homeRepository.getPriceUsd()
             )
         )
     }
@@ -99,18 +105,29 @@ class SendTransactionViewModel(
         return true
     }
 
+    suspend fun toggleInputMode() {
+        _state.emit(
+            state.value.copy(
+                isUsdMode = !state.value.isUsdMode,
+                amountString = null
+            )
+        )
+    }
+
     suspend fun clearTransactionData() = _state.emit(
         state.value.copy(
             amount = null,
             amountString = null,
             address = null,
+            operationResult = SendTransactionUiState.SendOperationResult.UNKNOWN,
             showAmountError = false,
-            showAddressError = false
+            showAddressError = false,
+            isUsdMode = false
         )
     )
 
     suspend fun checkTransactionData(): Boolean {
-        val amount = try {
+        val rawAmount = try {
             state.value
                 .sendFromUiState
                 .amountString
@@ -118,6 +135,15 @@ class SendTransactionViewModel(
         }
         catch(ex: NumberFormatException) {
             null
+        }
+
+        val priceUsd = homeRepository.getPriceUsd()
+
+        // Convert USD to ATTO if in USD mode
+        val amount = if (state.value.isUsdMode && rawAmount != null && priceUsd != null && priceUsd != BigDecimal.ZERO) {
+            rawAmount.divide(priceUsd, DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING))
+        } else {
+            rawAmount
         }
 
         val amountCheckResult = amount != null
@@ -132,6 +158,7 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amount = amount,
+                priceUsd = priceUsd,
                 showAmountError = !amountCheckResult,
                 showAddressError = !addressCheckResult
             )

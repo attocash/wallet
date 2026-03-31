@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,11 +25,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.atto_overview_background
 import attowallet.composeapp.generated.resources.send_close
+import attowallet.composeapp.generated.resources.send_confirm_to
 import attowallet.composeapp.generated.resources.send_failure_title
 import attowallet.composeapp.generated.resources.send_failure_to
 import attowallet.composeapp.generated.resources.send_success_to
@@ -93,10 +102,22 @@ fun SendResult(
                     tint = MaterialTheme.colorScheme.success
                 )
 
-                AttoOutlinedTextCard(
-                    text = AttoFormatter.format(uiState.amount),
-                    color = MaterialTheme.colorScheme.success
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${AttoFormatter.format(uiState.amount)} ATTO",
+                        color = MaterialTheme.colorScheme.success,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    uiState.amountUsd?.let {
+                        Text(
+                            text = AttoFormatter.formatUsd(it),
+                            color = MaterialTheme.colorScheme.success.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 Text(
                     text = stringResource(Res.string.send_success_to),
@@ -126,10 +147,22 @@ fun SendResult(
                     style = MaterialTheme.typography.headlineMedium
                 )
 
-                AttoOutlinedTextCard(
-                    text = AttoFormatter.format(uiState.amount),
-                    color = MaterialTheme.colorScheme.error
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${AttoFormatter.format(uiState.amount)} ATTO",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    uiState.amountUsd?.let {
+                        Text(
+                            text = AttoFormatter.formatUsd(it),
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 Text(
                     text = stringResource(Res.string.send_failure_to),
@@ -161,6 +194,103 @@ fun SendResult(
     }
 }
 
+@Composable
+fun SendResultRedesigned(
+    uiState: SendResultUiState,
+    onClose: () -> Unit
+) {
+    val isSuccess = uiState.result == SendTransactionUiState.SendOperationResult.SUCCESS
+    val accentColor = if (isSuccess)
+        MaterialTheme.colorScheme.success
+    else
+        MaterialTheme.colorScheme.error
+
+    Column(
+        modifier = Modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.height(16.dp))
+
+        Icon(
+            imageVector = if (isSuccess) Icons.Outlined.Done else Icons.Outlined.Close,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = accentColor
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = if (isSuccess) "Transaction Sent!" else stringResource(Res.string.send_failure_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = accentColor
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = accentColor.copy(alpha = 0.08f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "${AttoFormatter.format(uiState.amount)} ATTO",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = accentColor
+                )
+
+                uiState.amountUsd?.let {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = AttoFormatter.formatUsd(it),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = if (isSuccess) stringResource(Res.string.send_success_to)
+            else stringResource(Res.string.send_confirm_to),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+
+        Spacer(Modifier.height(4.dp))
+
+        Text(
+            text = uiState.address.orEmpty(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        AttoOutlinedButton(
+            onClick = onClose,
+            modifier = Modifier.fillMaxWidth(),
+            color = accentColor,
+            transparent = true
+        ) {
+            Text(text = stringResource(Res.string.send_close))
+        }
+    }
+}
+
 @Preview
 @Composable
 fun SendResultPreview() {
@@ -169,6 +299,7 @@ fun SendResultPreview() {
             uiState = SendResultUiState(
                 result = SendTransactionUiState.SendOperationResult.SUCCESS,
                 amount = BigDecimal.TEN,
+                amountUsd = null,
                 address = "atto://address"
             ),
             onClose = {}
