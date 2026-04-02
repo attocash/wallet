@@ -11,6 +11,7 @@ import cash.atto.wallet.state.AppState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.time.Duration.Companion.seconds
 
 
 private val defaultRepresentatives = listOf(
@@ -70,11 +71,19 @@ class WalletManagerRepository(
     private val workCache: PersistentWorkCache,
     private val network: AttoNetwork,
 ) {
+    private val receiveInterval = 10.seconds
+
     private val _state = MutableStateFlow<AttoWalletManager?>(null)
     val state = _state.asStateFlow()
+    private val _pendingReceivablesState = MutableStateFlow(PendingReceivablesState.EMPTY)
+    val pendingReceivablesState = _pendingReceivablesState.asStateFlow()
 
     private val appStateCollectorScope = CoroutineScope(Dispatchers.Default)
     private var appStateCollectorJob: Job? = null
+    private val receivableCollectorScope = CoroutineScope(Dispatchers.Default)
+    private var receivableCollectorJob: Job? = null
+    private val receiverScope = CoroutineScope(Dispatchers.Default)
+    private var receiverJob: Job? = null
 
     init {
         appStateCollectorJob = appStateCollectorScope.launch {
@@ -84,7 +93,17 @@ class WalletManagerRepository(
                 } catch (_: CancellationException) {
                 }
 
-                _state.emit(createWalletManager(it))
+                receivableCollectorJob?.cancel()
+                receiverJob?.cancel()
+                _pendingReceivablesState.emit(PendingReceivablesState.EMPTY)
+
+                val walletManager = createWalletManager(it)
+                _state.emit(walletManager)
+
+                if (walletManager != null) {
+                    startReceivableCollector(walletManager)
+                    startBackgroundReceiver(walletManager)
+                }
             }
         }
     }
@@ -120,8 +139,61 @@ class WalletManagerRepository(
             defaultRepresentatives.random()
         }
 
-        walletManager.start()
+        walletManager.start(autoReceive = false)
 
         return walletManager
+    }
+
+    private fun startReceivableCollector(walletManager: AttoWalletManager) {
+        receivableCollectorJob?.cancel()
+        receivableCollectorJob = receivableCollectorScope.launch {
+            walletManager.receivableFlow.collect { receivable ->
+                enqueueReceivable(receivable)
+            }
+        }
+    }
+
+    private fun startBackgroundReceiver(walletManager: AttoWalletManager) {
+        receiverJob?.cancel()
+        receiverJob = receiverScope.launch {
+            while (isActive) {
+                val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
+
+                if (nextReceivable == null) {
+                    delay(1_000)
+                    continue
+                }
+
+                try {
+                    walletManager.receive(nextReceivable)
+                    dequeueReceivable(nextReceivable.hash.toString())
+                    delay(receiveInterval)
+                } catch (ex: Exception) {
+                    println("Failed to receive ${nextReceivable.hash}: ${ex.message}")
+                    delay(10_000)
+                }
+            }
+        }
+    }
+
+    private suspend fun enqueueReceivable(receivable: AttoReceivable) {
+        val hash = receivable.hash.toString()
+        if (_pendingReceivablesState.value.receivables.any { it.hash.toString() == hash }) {
+            return
+        }
+
+        _pendingReceivablesState.emit(
+            PendingReceivablesState(
+                _pendingReceivablesState.value.receivables + receivable
+            )
+        )
+    }
+
+    private suspend fun dequeueReceivable(hash: String) {
+        _pendingReceivablesState.emit(
+            PendingReceivablesState(
+                _pendingReceivablesState.value.receivables.filterNot { it.hash.toString() == hash }
+            )
+        )
     }
 }

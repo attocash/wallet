@@ -9,6 +9,7 @@ import cash.atto.wallet.model.getStakingApy
 import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.WalletManagerRepository
+import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -34,8 +35,10 @@ class MainScreenViewModel(
     private var accountCollectorJob: Job? = null
     private var settingsCollectorJob: Job? = null
     private var homeCollectorJob: Job? = null
+    private var receivablesCollectorJob: Job? = null
     private var currentBalance: BigDecimal? = null
     private var currentRepresentativeAddress: String? = null
+    private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -76,6 +79,14 @@ class MainScreenViewModel(
         homeCollectorJob?.cancel()
         homeCollectorJob = scope.launch {
             homeRepository.homeResponse.collect {
+                updateBalanceWithUsd()
+            }
+        }
+
+        receivablesCollectorJob?.cancel()
+        receivablesCollectorJob = scope.launch {
+            walletManagerRepository.pendingReceivablesState.collect {
+                pendingReceivablesState = it
                 updateBalanceWithUsd()
             }
         }
@@ -123,7 +134,9 @@ class MainScreenViewModel(
                 balanceChipUiState = BalanceChipUiState(
                     attoCoins = balance,
                     usdValue = usdValue,
-                    apy = apy
+                    apy = apy,
+                    pendingReceivableCount = pendingReceivablesState.count,
+                    pendingReceivableAmount = pendingReceivablesState.totalAmount
                 )
             )
         )

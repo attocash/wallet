@@ -14,6 +14,8 @@ data class OverviewUiState(
     val priceUsd: BigDecimal? = null,
     val entries: List<AttoAccountEntry?>,
     val receiveAddress: String?,
+    val pendingReceivableCount: Int = 0,
+    val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO,
     val addressLabelResolver: (String) -> String? = { null },
     val voterLabelResolver: (String) -> String? = { null }
 ) {

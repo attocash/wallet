@@ -11,6 +11,7 @@ import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
+import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,8 @@ class OverviewViewModel(
 
     private var accountCollectorJob: Job? = null
     private var accountEntriesCollectorJob: Job? = null
+    private var receivablesCollectorJob: Job? = null
+    private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -111,13 +114,28 @@ class OverviewViewModel(
                     }
                 }
         }
+
+        receivablesCollectorJob?.cancel()
+        receivablesCollectorJob = scope.launch {
+            walletManagerRepository.pendingReceivablesState.collect {
+                pendingReceivablesState = it
+                _state.emit(
+                    state.value.copy(
+                        pendingReceivableCount = it.count,
+                        pendingReceivableAmount = it.totalAmount
+                    )
+                )
+            }
+        }
     }
 
     private suspend fun clearAccountData() {
         _state.emit(
             state.value.copy(
                 balance = null,
-                entries = emptyList()
+                entries = emptyList(),
+                pendingReceivableCount = pendingReceivablesState.count,
+                pendingReceivableAmount = pendingReceivablesState.totalAmount
             )
         )
     }

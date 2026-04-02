@@ -59,6 +59,19 @@ fun BalanceChip(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
+
+            if (uiState.pendingReceivableCount > 0) {
+                Text(
+                    text = "${uiState.pendingReceivableCount} pending receive" +
+                        if (uiState.pendingReceivableCount == 1) "" else "s" +
+                        " · ${AttoFormatter.format(uiState.pendingReceivableAmount)} ATTO",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W400,
+                    fontFamily = attoFontFamily(),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
