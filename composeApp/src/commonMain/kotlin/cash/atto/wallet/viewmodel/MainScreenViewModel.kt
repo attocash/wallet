@@ -83,6 +83,7 @@ class MainScreenViewModel(
 
     fun handleBackupNavigation() = settingsViewModel.handleBackupNavigation()
     fun hideLogoutDialog() = settingsViewModel.hideLogoutDialog()
+    fun lock() = settingsViewModel.lock()
     fun logout() = settingsViewModel.logout()
 
     private suspend fun handleAccount(account: AttoAccount) {

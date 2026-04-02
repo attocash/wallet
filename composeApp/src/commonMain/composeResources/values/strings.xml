@@ -60,6 +60,9 @@
     <string name="password_weak">Password must contain at least 6 characters, uppercase and lowercase letters, numbers and special symbols.</string>
     <string name="password_wrong">Incorrect password.</string>
 
+    <!-- profile -->
+    <string name="profile_lock">Lock</string>
+
     <!-- staking -->
     <string name="staking_title">Staking &amp; Voters</string>
     <string name="staking_info_title">What is Staking?</string>

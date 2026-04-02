@@ -90,6 +90,10 @@ class SettingsViewModel(
         _state.emit(state.value.copy(showLogoutDialog = false))
     }
 
+    fun lock() = viewModelScope.launch {
+        appStateRepository.lock()
+    }
+
     fun logout() = viewModelScope.launch {
         appStateRepository.deleteKeys()
     }

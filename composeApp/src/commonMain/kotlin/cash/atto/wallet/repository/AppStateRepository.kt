@@ -153,6 +153,17 @@ class AppStateRepository(
         seedDataSource.clearSeed()
     }
 
+    suspend fun lock() {
+        sessionJob?.cancel()
+        sessionJob = null
+
+        if (getPlatform().type == PlatformType.WEB) {
+            setMnemonic(null)
+        }
+
+        setAuthState(AppState.AuthState.SESSION_INVALID)
+    }
+
     private suspend fun setEncryptedSeed(
         encryptedSeed: String?
     ) {

@@ -72,6 +72,7 @@ fun MainScreenWeb(
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
         onVoterDetailNavigation = onVoterDetailNavigation,
+        onLock = { viewModel.lock() },
         onDismissLogout = { viewModel.hideLogoutDialog() },
         onConfirmLogout = {
             viewModel.logout()
@@ -88,6 +89,7 @@ fun MainScreenWebContent(
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     onVoterDetailNavigation: (String) -> Unit,
+    onLock: () -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -99,6 +101,7 @@ fun MainScreenWebContent(
             navState = navState,
             onNavStateChanged = onNavStateChanged,
             onVoterDetailNavigation = onVoterDetailNavigation,
+            onLock = onLock,
             onDismissLogout = onDismissLogout,
             onConfirmLogout = onConfirmLogout
         )
@@ -108,6 +111,7 @@ fun MainScreenWebContent(
             navState = navState,
             onNavStateChanged = onNavStateChanged,
             onVoterDetailNavigation = onVoterDetailNavigation,
+            onLock = onLock,
             onDismissLogout = onDismissLogout,
             onConfirmLogout = onConfirmLogout
         )
@@ -120,6 +124,7 @@ fun MainScreenWebContentCompact(
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     onVoterDetailNavigation: (String) -> Unit,
+    onLock: () -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -134,7 +139,8 @@ fun MainScreenWebContentCompact(
         header = {
             ProfileExtended(
                 modifier = Modifier.fillMaxWidth(),
-                uiState = settingsUiState.profileUiState
+                uiState = settingsUiState.profileUiState,
+                onLockClick = onLock
             )
         },
         drawerContent = {
@@ -217,6 +223,7 @@ fun MainScreenWebContentExpanded(
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     onVoterDetailNavigation: (String) -> Unit,
+    onLock: () -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit
 ) {
@@ -233,7 +240,8 @@ fun MainScreenWebContentExpanded(
     ) {
         ProfileExtended(
             modifier = Modifier.fillMaxWidth(),
-            uiState = settingsUiState.profileUiState
+            uiState = settingsUiState.profileUiState,
+            onLockClick = onLock
         )
 
         PermanentNavigationDrawer(
@@ -321,6 +329,7 @@ fun MainScreenWebContentCompactPreview() {
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},
             onVoterDetailNavigation = {},
+            onLock = {},
             onDismissLogout = {},
             onConfirmLogout = {}
         )
@@ -335,6 +344,7 @@ fun MainScreenWebContentExpandedPreview() {
             navState = MainScreenNavDestination.OVERVIEW,
             onNavStateChanged = {},
             onVoterDetailNavigation = {},
+            onLock = {},
             onDismissLogout = {},
             onConfirmLogout = {}
         )

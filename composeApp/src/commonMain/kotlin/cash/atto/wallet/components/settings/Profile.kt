@@ -1,5 +1,7 @@
 package cash.atto.wallet.components.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,12 +9,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -20,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_atto
 import attowallet.composeapp.generated.resources.main_title
+import attowallet.composeapp.generated.resources.profile_lock
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.settings.ProfileUiState
@@ -58,6 +65,7 @@ fun ProfileSmall(
 @Composable
 fun ProfileExtended(
     uiState: ProfileUiState,
+    onLockClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -94,6 +102,29 @@ fun ProfileExtended(
                 maxLines = 1,
                 style = MaterialTheme.typography.bodyMedium
             )
+        }
+
+        onLockClick?.let {
+            Row(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f))
+                    .clickable(onClick = it)
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = stringResource(Res.string.profile_lock),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = stringResource(Res.string.profile_lock),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
     }
 }
