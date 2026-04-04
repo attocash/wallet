@@ -407,7 +407,7 @@ fun ReceiveAttoContentCompactPreview() {
             displayAddress = "address\naddress",
             amountInput = "12.34",
             isUsdMode = false,
-            equivalentDisplay = "≈ $3.09 USD",
+            equivalentDisplay = "~ $3.09 USD",
             onAmountInputChanged = {},
             onToggleInputMode = {},
             onCopy = {},
@@ -425,7 +425,7 @@ fun ReceiveAttoContentExtendedPreview() {
             displayAddress = "address\naddress",
             amountInput = "12.34",
             isUsdMode = false,
-            equivalentDisplay = "≈ $3.09 USD",
+            equivalentDisplay = "~ $3.09 USD",
             onAmountInputChanged = {},
             onToggleInputMode = {},
             onCopy = {},
@@ -503,7 +503,7 @@ private fun receiveEquivalentDisplay(
 
     return if (isUsdMode) {
         receiveAmountAtto(amountInput, true, priceUsd)?.let { attoAmount ->
-            "≈ ${
+            "~ ${
                 BigDecimal.parseString(attoAmount)
                     .roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING)
                     .toStringExpanded()

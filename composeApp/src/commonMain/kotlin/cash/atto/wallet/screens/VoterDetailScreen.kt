@@ -330,11 +330,10 @@ fun VoterDetailContent(
 
         // Confirm Button
         AttoButton(
+            text = stringResource(Res.string.voter_detail_confirm),
             onClick = onConfirm,
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = stringResource(Res.string.voter_detail_confirm))
-        }
+        )
     }
 }
 

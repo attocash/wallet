@@ -64,7 +64,6 @@ fun SecretBackupConfirmScreen(
                         text = stringResource(Res.string.backup_confirm_title),
                         fontSize = 30.sp,
                         fontWeight = FontWeight.W300,
-                        fontFamily = attoFontFamily(),
                         lineHeight = 40.sp
                     )
 
@@ -76,11 +75,10 @@ fun SecretBackupConfirmScreen(
                 }
 
                 AttoButton(
+                    text = stringResource(Res.string.backup_confirm_yes),
                     onClick = onConfirmClicked,
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.backup_confirm_yes))
-                }
+                )
 
                 AttoOutlinedButton(
                     onClick = onBackNavigation,

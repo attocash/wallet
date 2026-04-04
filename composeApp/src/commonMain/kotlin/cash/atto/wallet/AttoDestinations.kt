@@ -12,18 +12,8 @@ sealed class AttoDestination {
     }
 
     @Serializable
-    object ConfirmPin : AttoDestination() {
-        override val route = "confirmPin"
-    }
-
-    @Serializable
     object CreatePassword : AttoDestination() {
         override val route = "createPassword"
-    }
-
-    @Serializable
-    object CreatePin : AttoDestination() {
-        override val route = "createPin"
     }
 
     @Serializable
@@ -32,8 +22,8 @@ sealed class AttoDestination {
     }
 
     @Serializable
-    object ImportSecret : AttoDestination() {
-        override val route = "importSecret"
+    object ImportPhrase : AttoDestination() {
+        override val route = "import-phrase"
     }
 
     @Serializable
@@ -62,8 +52,8 @@ sealed class AttoDestination {
     }
 
     @Serializable
-    object SecretPhrase : AttoDestination() {
-        override val route = "secretPhrase"
+    object RecoveryPhrase : AttoDestination() {
+        override val route = "recovery-phrase"
     }
 
     @Serializable

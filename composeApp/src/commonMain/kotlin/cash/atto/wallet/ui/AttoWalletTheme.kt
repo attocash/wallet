@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 
 val attoColors = lightColorScheme(
     primary = gold_600,
-//    primaryVariant = brown_600,
     secondary = gold_100,
     secondaryContainer = gold_900,
     tertiary = yellow_100,
@@ -75,7 +74,7 @@ fun AttoWalletTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = attoColors,
         typography = attoWalletTypography(),
-        shapes = attoShapes
+        shapes = attoShapes,
     ) {
         content()
     }

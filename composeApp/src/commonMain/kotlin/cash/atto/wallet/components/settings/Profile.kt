@@ -81,7 +81,6 @@ fun ProfileExtended(
             modifier = Modifier.padding(start = 4.dp),
             fontSize = 26.sp,
             fontWeight = FontWeight.W300,
-            fontFamily = attoFontFamily(),
         )
 
         Spacer(Modifier.weight(1f))

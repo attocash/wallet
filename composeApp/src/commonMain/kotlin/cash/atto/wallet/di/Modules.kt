@@ -20,6 +20,7 @@ import cash.atto.wallet.viewmodel.VoterViewModel
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import cash.atto.wallet.viewmodel.SettingsViewModel
+import cash.atto.wallet.viewmodel.WelcomeViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -66,4 +67,5 @@ val viewModelModule = module {
     viewModelOf(::SecretPhraseViewModel)
     viewModelOf(::SendTransactionViewModel)
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::WelcomeViewModel)
 }

@@ -151,70 +151,26 @@ fun TransactionDetailDialog(
 
                 Spacer(Modifier.height(4.dp))
 
-                Text(
-                    text = "Type",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = uiState.typeString,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                TransactionDetailField(label = "Type", value = uiState.typeString)
 
-                uiState.shownAmount.takeIf { it.isNotBlank() }?.let {
-                    Text(
-                        text = "Amount",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                uiState.shownAmount.takeIf(String::isNotBlank)?.let {
+                    TransactionDetailField(label = "Amount", value = it)
                 }
 
-                Text(
-                    text = "Height",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = "#${uiState.shownHeight}",
-                    style = MaterialTheme.typography.bodyLarge
+                TransactionDetailField(label = "Height", value = "#${uiState.shownHeight}")
+
+                TransactionDetailField(label = "Date", value = uiState.formattedTimestamp)
+
+                TransactionDetailField(
+                    label = if (uiState.type == TransactionType.CHANGE) "Voter" else "Address",
+                    value = uiState.source,
+                    maxLines = 3
                 )
 
-                Text(
-                    text = "Date",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = uiState.formattedTimestamp,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                Text(
-                    text = if (uiState.type == TransactionType.CHANGE) "Voter" else "Address",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = uiState.source,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = "Transaction Hash",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = uiState.hash.orEmpty(),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+                TransactionDetailField(
+                    label = "Transaction Hash",
+                    value = uiState.hash.orEmpty(),
+                    maxLines = 3
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -248,6 +204,28 @@ fun TransactionDetailDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TransactionDetailField(
+    label: String,
+    value: String,
+    maxLines: Int = 1
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        Text(
+            text = value,
+            style = if (maxLines > 1) MaterialTheme.typography.bodySmall
+                    else MaterialTheme.typography.bodyLarge,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

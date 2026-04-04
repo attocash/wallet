@@ -66,7 +66,6 @@ fun SafetyWarningScreen(
                         text = stringResource(Res.string.safety_warning_title),
                         fontSize = 30.sp,
                         fontWeight = FontWeight.W300,
-                        fontFamily = attoFontFamily()
                     )
 
                     Text(
@@ -98,18 +97,16 @@ fun SafetyWarningScreen(
                             text = stringResource(Res.string.safety_warning_hint),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.W600,
-                            fontFamily = attoFontFamily(),
                             lineHeight = 22.sp
                         )
                     }
                 }
 
                 AttoButton(
+                    text = stringResource(Res.string.safety_warning_confirm),
                     onClick = onConfirmClicked,
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(Res.string.safety_warning_confirm))
-                }
+                )
             }
         }
     )

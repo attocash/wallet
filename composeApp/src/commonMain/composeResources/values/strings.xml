@@ -7,7 +7,7 @@
 
     <!-- copyright -->
     <string name="copyright_link">https://atto.cash/</string>
-    <string name="copyright_title">Copyright © 2025 Atto B.V.</string>
+    <string name="copyright_title">Copyright © 2026 Atto B.V.</string>
 
     <!-- logout -->
     <string name="logout_cancel">CANCEL</string>
@@ -24,6 +24,7 @@
     <string name="main_nav_send">Send</string>
     <string name="main_nav_staking">Staking</string>
     <string name="main_nav_settings">Settings</string>
+    <string name="main_nav_transactions">Transactions</string>
 
     <!-- overview -->
     <string name="overview_hint">Welcome to Atto. Once you receive some, transactions will show up like this:</string>
@@ -45,19 +46,34 @@
     <string name="overview_transactions_title">Transactions</string>
     <string name="overview_transaction_from">from</string>
     <string name="overview_transaction_to">to</string>
+    <string name="overview_recent_activity">Recent Activity</string>
+    <string name="overview_balance_title">Total Balance</string>
+    <string name="overview_portfolio_title">Portfolio</string>
+    <string name="overview_pending_title">Pending Receivables</string>
+    <string name="overview_live_title">Live Network</string>
+    <string name="overview_live_hint">Synced to your latest wallet activity</string>
 
     <!-- password -->
-    <string name="password_create_back">Go Back</string>
-    <string name="password_confirm_hint">Confirm the password</string>
-    <string name="password_create_hint">Create a password</string>
-    <string name="password_create_next">Next</string>
-    <string name="password_create_text">This password will be required to open Atto.</string>
-    <string name="password_create_title">Create a password</string>
+    <string name="password_confirm_hint">Confirm your password</string>
+    <string name="password_create_hint">Enter your password</string>
+    <string name="password_create_next">Create Password</string>
+    <string name="password_create_text">This password unlocks your Atto wallet on this device</string>
+    <string name="password_create_title">Create Password</string>
+    <string name="password_field_label">Password</string>
+    <string name="password_confirm_label">Confirm Password</string>
+    <string name="password_match">Passwords match</string>
+    <string name="password_requirements_title">Password Requirements</string>
+    <string name="password_requirement_length">At least 8 characters</string>
+    <string name="password_requirement_upper">One uppercase letter</string>
+    <string name="password_requirement_lower">One lowercase letter</string>
+    <string name="password_requirement_number">One number</string>
+    <string name="password_requirement_special">One special character</string>
     <string name="password_enter_hint">Enter password</string>
     <string name="password_enter_submit">Submit</string>
     <string name="password_enter_title">Enter password</string>
+    <string name="password_enter_subtitle">Unlock your wallet to access balances, transactions, and settings on this device.</string>
     <string name="password_no_match">Passwords don't match.</string>
-    <string name="password_weak">Password must contain at least 6 characters, uppercase and lowercase letters, numbers and special symbols.</string>
+    <string name="password_weak">Password must contain at least 8 characters, uppercase and lowercase letters, numbers and special symbols.</string>
     <string name="password_wrong">Incorrect password.</string>
 
     <!-- profile -->
@@ -102,10 +118,42 @@
 
     <!-- secret -->
     <string name="secret_backup">I've Backed It Up</string>
+    <string name="secret_check_all_items">Check All Items (%1$d/3)</string>
+    <string name="secret_checklist_one_description">Digital storage (screenshots, cloud) is vulnerable to hacking</string>
+    <string name="secret_checklist_one_title">I've written down all 24 words in order on paper</string>
+    <string name="secret_checklist_three_description">Not even support staff or family members</string>
+    <string name="secret_checklist_three_title">I will never share this phrase with anyone</string>
+    <string name="secret_checklist_two_description">Atto cannot help you recover your funds without it</string>
+    <string name="secret_checklist_two_title">I understand this phrase cannot be recovered if lost</string>
+    <string name="secret_confirm_backup_hint">Please confirm you understand the importance of this backup.</string>
+    <string name="secret_confirm_backup_title">Confirm Your Understanding</string>
+    <string name="secret_continue_create_password">Continue to Create Password</string>
     <string name="secret_copy">Copy</string>
-    <string name="secret_import_hint">Please enter your 24-word secret phrase below. Each word should be separated by a space.</string>
-    <string name="secret_import_title">Import secret phrase</string>
+    <string name="secret_copied">Copied</string>
+    <string name="secret_copy_phrase">Copy Phrase</string>
+    <string name="secret_help_body_one">Your recovery phrase is a set of 24 words that acts as the master key to your wallet. It is the only way to recover your funds if you lose access to your device.</string>
+    <string name="secret_help_body_two">This phrase gives complete access to your wallet and funds. Anyone who has these 24 words can access and transfer all your cryptocurrency. Store it securely in a physical location, never digitally.</string>
+    <string name="secret_help_warning">Atto has no access to your recovery phrase and cannot help you recover it. You are solely responsible for keeping it safe.</string>
+    <string name="secret_help_title">What is a Recovery Phrase?</string>
+    <string name="secret_import_hint">Enter all 24 words from your recovery phrase</string>
+    <string name="secret_import_title">Import Wallet</string>
+    <string name="secret_import_paste_title">Have your phrase copied?</string>
+    <string name="secret_import_paste_hint">Click paste to fill all fields automatically</string>
+    <string name="secret_import_paste">Paste</string>
+    <string name="secret_import_paste_success">Recovery phrase pasted successfully</string>
+    <string name="secret_import_progress">Progress</string>
+    <string name="secret_import_word_placeholder">Enter word</string>
+    <string name="secret_import_invalid_title">Invalid word detected</string>
+    <string name="secret_import_invalid_title_plural">Invalid words detected</string>
+    <string name="secret_import_invalid_hint">Please check the highlighted words and make sure they match your recovery phrase</string>
+    <string name="secret_import_submit">Import Wallet</string>
+    <string name="secret_view_hint">Write these words down on paper in exact order. Never store digitally.</string>
+    <string name="secret_view_title">Your 24-Word Recovery Phrase</string>
+    <string name="secret_view_tab">View Phrase</string>
+    <string name="secret_recovery_title">Recovery Phrase</string>
     <string name="secret_title">Secret Phrase</string>
+    <string name="secret_confirm_tab">Confirm Backup</string>
+    <string name="secret_written_down">I've Written It Down</string>
 
     <!-- send -->
     <string name="send_button">Send</string>
@@ -124,6 +172,13 @@
     <string name="send_from_title">SEND FROM</string>
     <string name="send_scan_qr">Scan QR Code</string>
     <string name="send_success_to">SENT TO</string>
+    <string name="send_balance_title">Available Balance</string>
+    <string name="send_address_title">Recipient Address</string>
+    <string name="send_amount_title">Amount</string>
+    <string name="send_recent_title">Recent Sent</string>
+    <string name="send_fee_title">Estimated Fee</string>
+    <string name="send_fee_value">0 ATTO</string>
+    <string name="send_continue">Continue</string>
 
     <!-- settings -->
     <string name="settings_backup">Backup Secret Phrase</string>
@@ -135,10 +190,41 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_representative">Staking &amp; Voters</string>
     <string name="settings_security">Security</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Manage wallet recovery, device security, and application information.</string>
+    <string name="settings_app_info">Application Info</string>
+    <string name="settings_version">Version 1.0.0</string>
+    <string name="settings_network">Network Live</string>
+    <string name="settings_build_hint">Build synced with the active wallet session.</string>
+
+    <!-- transactions -->
+    <string name="transactions_title">Transactions</string>
+    <string name="transactions_subtitle">Full account history, including sent, received, and representative changes.</string>
+
+    <!-- receive -->
+    <string name="receive_title">Receive Atto</string>
+    <string name="receive_subtitle">Share your wallet address or payment QR code to receive funds.</string>
+    <string name="receive_qr_title">Wallet QR</string>
+    <string name="receive_copy_payment_request">Copy Payment Request</string>
+    <string name="receive_copy_address">Copy Wallet Address</string>
+    <string name="receive_hint_title">Receiving Tips</string>
+    <string name="receive_hint_body">Use the QR code for in-person transfers, or copy the address when sharing it digitally.</string>
 
     <!-- welcome -->
-    <string name="welcome_create_wallet">New Wallet</string>
-    <string name="welcome_import_wallet">Import Wallet</string>
-    <string name="welcome_message">To begin, you may create a new wallet or import an existing one.</string>
-    <string name="welcome_title">Welcome to Atto</string>
+    <string name="welcome_create_wallet">Create new wallet</string>
+    <string name="welcome_create_wallet_description">Generate a new recovery phrase and set up a secure wallet</string>
+    <string name="welcome_import_wallet">Import existing wallet</string>
+    <string name="welcome_import_wallet_description">Use your 24-word recovery phrase to restore access</string>
+    <string name="welcome_message">Manage your Atto with a wallet designed for speed, simplicity, and a digital currency built to move without fees.</string>
+    <string name="welcome_title">Atto Wallet</string>
+    <string name="welcome_stats_market_cap">Market Cap</string>
+    <string name="welcome_stats_market_cap_description">Total value locked</string>
+    <string name="welcome_stats_market_cap_value">$8.4M</string>
+    <string name="welcome_stats_confirmation">Avg Confirmation</string>
+    <string name="welcome_stats_confirmation_description">Near-instant transfers</string>
+    <string name="welcome_stats_confirmation_unit">ms</string>
+    <string name="welcome_stats_confirmation_value">143</string>
+    <string name="welcome_stats_price">Price (USD)</string>
+    <string name="welcome_stats_price_description">Current market price</string>
+    <string name="welcome_stats_price_value">$0.082</string>
 </resources>

@@ -230,17 +230,17 @@ compose.desktop {
             modules("jdk.charsets")
 
             linux {
-                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.png"))
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.png"))
                 shortcut = true
             }
 
             windows {
-                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.ico"))
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.ico"))
                 shortcut = true
             }
 
             macOS {
-                iconFile.set(project.file("src/commonMain/composeResources/drawable/logo.png"))
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.png"))
             }
         }
     }

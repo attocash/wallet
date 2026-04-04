@@ -32,17 +32,7 @@ external interface SubtleCrypto {
     ): Promise<ArrayBuffer>
 }
 
-fun getSubtleCryptoInstance(): SubtleCrypto {
-    js(
-        """
-            var isNodeJs = typeof process !== 'undefined' && process.versions != null && process.versions.node != null
-            if (isNodeJs) {
-                return (eval('require')('node:crypto').webcrypto).subtle;
-            } else {
-                return (window ? (window.crypto ? window.crypto : window.msCrypto) : self.crypto).subtle;
-            }
-            """,
-    )
-}
+fun getSubtleCryptoInstance(): SubtleCrypto =
+    js("(globalThis.crypto || (typeof window !== 'undefined' ? (window.crypto || window.msCrypto) : self.crypto)).subtle")
 
 external interface CryptoKey : JsAny
