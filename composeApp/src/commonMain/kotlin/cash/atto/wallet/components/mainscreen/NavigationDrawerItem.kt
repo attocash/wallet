@@ -80,7 +80,6 @@ fun NavigationDrawerItem(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W300,
-                fontFamily = attoFontFamily()
             )
         }
     }

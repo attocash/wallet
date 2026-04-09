@@ -12,12 +12,14 @@ import kotlin.time.Instant
 data class OverviewUiState(
     private val balance: BigDecimal?,
     val priceUsd: BigDecimal? = null,
+    val apy: BigDecimal? = null,
     val entries: List<AttoAccountEntry?>,
     val receiveAddress: String?,
     val pendingReceivableCount: Int = 0,
     val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO,
     val addressLabelResolver: (String) -> String? = { null },
-    val voterLabelResolver: (String) -> String? = { null }
+    val voterLabelResolver: (String) -> String? = { null },
+    val voterName: String? = null
 ) {
     val headerUiState
         get() = OverviewHeaderUiState(
@@ -47,9 +49,17 @@ data class OverviewUiState(
                             hash = it.hash.toString()
                         )
 
-                        AttoBlockType.RECEIVE,
-                        AttoBlockType.OPEN -> TransactionUiState(
+                        AttoBlockType.RECEIVE -> TransactionUiState(
                             type = TransactionType.RECEIVE,
+                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
+                            source = subjectAddress,
+                            sourceLabel = addressLabelResolver(subjectAddress),
+                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
+                            height = it.height,
+                            hash = it.hash.toString()
+                        )
+                        AttoBlockType.OPEN -> TransactionUiState(
+                            type = TransactionType.OPEN,
                             amount = "+ " + it.amount().toString(AttoUnit.ATTO),
                             source = subjectAddress,
                             sourceLabel = addressLabelResolver(subjectAddress),

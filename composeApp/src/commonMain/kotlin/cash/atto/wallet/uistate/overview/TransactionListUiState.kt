@@ -17,7 +17,7 @@ data class TransactionListUiState(
 ) {
     companion object {
         val DEFAULT = TransactionListUiState(
-            transactions = List<TransactionUiState?>(2) { null },
+            transactions = List(2) { null },
             showHint = false
         )
 

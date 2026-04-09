@@ -6,20 +6,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.ic_arrow_down
-import attowallet.composeapp.generated.resources.ic_arrow_up
-import attowallet.composeapp.generated.resources.overview_hint_type_change
-import attowallet.composeapp.generated.resources.overview_hint_type_from
-import attowallet.composeapp.generated.resources.overview_hint_type_to
-import attowallet.composeapp.generated.resources.overview_transaction_from
-import attowallet.composeapp.generated.resources.overview_transaction_to
+import attowallet.composeapp.generated.resources.*
 import cash.atto.commons.AttoHeight
-import cash.atto.wallet.ui.AttoDateFormatter
-import cash.atto.wallet.ui.AttoFormatter
-import cash.atto.wallet.ui.errorGradient
-import cash.atto.wallet.ui.primaryGradient
-import cash.atto.wallet.ui.secondaryGradient
+import cash.atto.wallet.ui.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import kotlin.time.ExperimentalTime
@@ -42,11 +31,12 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
 
             "$sign ${AttoFormatter.format(number)}"
         } else AttoFormatter.format(amount)
-    } ?: AttoFormatter.format(amount)
+    } ?: " "
 
     val icon: ImageVector
         @Composable
         get() = when (type) {
+            TransactionType.OPEN -> vectorResource(Res.drawable.ic_arrow_down)
             TransactionType.SEND -> vectorResource(Res.drawable.ic_arrow_up)
             TransactionType.RECEIVE -> vectorResource(Res.drawable.ic_arrow_down)
             TransactionType.CHANGE -> Icons.Outlined.Refresh
@@ -55,16 +45,24 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val typeString
         @Composable
         get() = when (type) {
+            TransactionType.OPEN -> {
+                val label = sourceLabel ?: ""
+                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_from)} $label"
+                else stringResource(Res.string.overview_hint_type_from)
+            }
+
             TransactionType.SEND -> {
                 val label = sourceLabel ?: ""
                 if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_to)} $label"
                 else stringResource(Res.string.overview_hint_type_to)
             }
+
             TransactionType.RECEIVE -> {
                 val label = sourceLabel ?: ""
                 if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_from)} $label"
                 else stringResource(Res.string.overview_hint_type_from)
             }
+
             TransactionType.CHANGE -> {
                 val label = sourceLabel ?: ""
                 if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_change)} $label"
@@ -75,6 +73,9 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
     val shownSource
         @Composable
         get() = when (type) {
+            TransactionType.OPEN ->
+                "${stringResource(Res.string.overview_transaction_from)} $source"
+
             TransactionType.SEND ->
                 "${stringResource(Res.string.overview_transaction_to)} $source"
 
@@ -122,5 +123,5 @@ data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
 }
 
 enum class TransactionType {
-    SEND, RECEIVE, CHANGE;
+    OPEN, SEND, RECEIVE, CHANGE;
 }

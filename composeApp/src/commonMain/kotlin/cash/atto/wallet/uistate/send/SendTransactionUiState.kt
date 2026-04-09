@@ -2,6 +2,7 @@ package cash.atto.wallet.uistate.send
 
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAlgorithm
+import cash.atto.commons.AttoSendBlock
 import cash.atto.commons.AttoUnit
 import cash.atto.commons.toAddress
 import cash.atto.wallet.ui.AttoFormatter
@@ -20,7 +21,9 @@ data class SendTransactionUiState(
     private val showAddressError: Boolean = false,
     private val showLoader: Boolean = false,
     val priceUsd: BigDecimal? = null,
-    val isUsdMode: Boolean = false
+    val isUsdMode: Boolean = false,
+    val elapsedMs: Long? = null,
+    val sendBlock: AttoSendBlock? = null
 ) {
     private fun parseDecimal(value: String?): BigDecimal? =
         try {
@@ -43,7 +46,7 @@ data class SendTransactionUiState(
         val input = parseDecimal(amountString)
         return if (isUsdMode) {
             usdToAtto(input)?.let {
-                "≈ ${it.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING).toStringExpanded()} ATTO"
+                "~ ${it.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING).toStringExpanded()} ATTO"
             } ?: "USD price unavailable"
         } else {
             amountUsd(input)?.let { AttoFormatter.formatUsd(it) }
@@ -67,7 +70,8 @@ data class SendTransactionUiState(
                 showAddressError = showAddressError,
                 showLoader = showLoader,
                 isUsdMode = isUsdMode,
-                equivalentDisplay = equivalentDisplay()
+                equivalentDisplay = equivalentDisplay(),
+                priceUsd = priceUsd
             )
         } ?: SendFromUiState.DEFAULT
 
@@ -76,7 +80,8 @@ data class SendTransactionUiState(
             amount = amount,
             amountUsd = amountUsd(amount),
             address = address,
-            showLoader = showLoader
+            showLoader = showLoader,
+            accountHeight = account?.height?.value
         )
 
     val sendResultUiState
@@ -84,7 +89,9 @@ data class SendTransactionUiState(
             result = operationResult,
             amount = amount,
             amountUsd = amountUsd(amount),
-            address = address
+            address = address,
+            elapsedMs = elapsedMs,
+            sendBlock = sendBlock
         )
 
     enum class SendOperationResult {
@@ -98,6 +105,7 @@ data class SendTransactionUiState(
             amount = null,
             address = null,
             operationResult = SendOperationResult.UNKNOWN,
+            elapsedMs = null,
             isUsdMode = false
         )
     }

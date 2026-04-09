@@ -8,7 +8,7 @@ class CheckPasswordInteractor {
             password == null ->
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
 
-            password.length < 6 ->
+            password.length < 8 ->
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
 
             !password.any { it.isUpperCase() } ->

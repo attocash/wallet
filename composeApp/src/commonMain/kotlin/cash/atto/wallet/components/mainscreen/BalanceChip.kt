@@ -36,9 +36,8 @@ fun BalanceChip(
                 text = AttoFormatter.format(uiState.attoCoins),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.W300,
-                fontFamily = attoFontFamily()
             )
-            val usdText = uiState.usdValue?.let { "≈ $${it.toPlainString()} USD" } ?: ""
+            val usdText = uiState.usdValue?.let { "~ $${it.toPlainString()} USD" } ?: ""
             val apyText = uiState.apy?.let { " · ${it.toPlainString()}% APY" } ?: ""
             val apyColor = if (uiState.apy != null && uiState.apy > com.ionspin.kotlin.bignum.decimal.BigDecimal.ZERO) {
                 androidx.compose.ui.graphics.Color(0xFF4CAF50)
@@ -55,7 +54,6 @@ fun BalanceChip(
                     },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W300,
-                    fontFamily = attoFontFamily(),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
@@ -67,7 +65,6 @@ fun BalanceChip(
                         " · ${AttoFormatter.format(uiState.pendingReceivableAmount)} ATTO",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.W400,
-                    fontFamily = attoFontFamily(),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 8.dp)
                 )

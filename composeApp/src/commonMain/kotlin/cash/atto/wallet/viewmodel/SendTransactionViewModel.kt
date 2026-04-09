@@ -109,7 +109,11 @@ class SendTransactionViewModel(
 
     suspend fun send(): Boolean {
         try {
-            walletManagerRepository.state
+            val amount = state.value.sendConfirmUiState.amount
+                ?.let(::toAttoAmount)
+                ?: throw IllegalStateException("Invalid amount")
+
+            val block = walletManagerRepository.state
                 .value!!
                 .send(
                     receiverAddress = AttoAddress.parse(
@@ -117,14 +121,17 @@ class SendTransactionViewModel(
                             .sendConfirmUiState
                             .address!!
                     ),
-                    amount = AttoAmount.from(
-                        unit = AttoUnit.ATTO,
-                        string = state.value
-                            .sendConfirmUiState
-                            .amount!!
-                            .toPlainString()
-                    )
+                    amount = amount
                 )
+
+            _state.emit(
+                state.value.copy(
+                    operationResult = SendTransactionUiState.SendOperationResult.SUCCESS,
+                    sendBlock = block
+                )
+            )
+
+            return true
         } catch (ex: Exception) {
             println(ex.message)
             _state.emit(
@@ -135,14 +142,6 @@ class SendTransactionViewModel(
 
             return false
         }
-
-        _state.emit(
-            state.value.copy(
-                operationResult = SendTransactionUiState.SendOperationResult.SUCCESS
-            )
-        )
-
-        return true
     }
 
     suspend fun toggleInputMode() {
@@ -186,7 +185,7 @@ class SendTransactionViewModel(
             rawAmount.divide(
                 priceUsd,
                 DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING)
-            )
+            ).roundToDigitPositionAfterDecimalPoint(18, RoundingMode.ROUND_HALF_CEILING)
         } else {
             rawAmount
         }
@@ -212,6 +211,13 @@ class SendTransactionViewModel(
         return amountCheckResult && addressCheckResult
     }
 
+    suspend fun setElapsedMs(ms: Long) {
+        _state.emit(
+            state.value.copy(
+                elapsedMs = ms
+            )
+        )
+    }
     suspend fun showLoader() {
         _state.emit(
             state.value.copy(
@@ -219,7 +225,6 @@ class SendTransactionViewModel(
             )
         )
     }
-
     suspend fun hideLoader() {
         _state.emit(
             state.value.copy(
@@ -227,4 +232,10 @@ class SendTransactionViewModel(
             )
         )
     }
+
+    private fun toAttoAmount(amount: BigDecimal): AttoAmount =
+        AttoAmount.from(
+            unit = AttoUnit.ATTO,
+            string = amount.toStringExpanded()
+        )
 }

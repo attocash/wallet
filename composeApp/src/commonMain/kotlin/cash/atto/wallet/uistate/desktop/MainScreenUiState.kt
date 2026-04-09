@@ -7,7 +7,6 @@ data class MainScreenUiState(
     val settingsUiState: SettingsUiState,
     val isWalletInitialized: Boolean = false
 ) {
-    val navigateToBackup get() = settingsUiState.navigateToBackup
     val showLogoutDialog get() = settingsUiState.showLogoutDialog
 
     companion object {

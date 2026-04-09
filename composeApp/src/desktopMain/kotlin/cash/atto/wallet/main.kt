@@ -36,7 +36,7 @@ fun main() {
                 windowInfo = LocalWindowInfo.current,
             )
 
-            AttoAppDesktop(navComponent)
+            AttoApp(navComponent)
         }
     }
 }

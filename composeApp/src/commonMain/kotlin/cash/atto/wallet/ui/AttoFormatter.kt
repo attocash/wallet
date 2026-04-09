@@ -17,7 +17,7 @@ object AttoFormatter {
     fun formatUsd(value: BigDecimal?): String {
         if (value == null) return ""
         val rounded = value.roundToDigitPositionAfterDecimalPoint(2, RoundingMode.ROUND_HALF_CEILING)
-        return "≈ $${ rounded.toStringExpanded() } USD"
+        return "~ $${ rounded.toStringExpanded() } USD"
     }
 
     fun format(value: ULong): String =

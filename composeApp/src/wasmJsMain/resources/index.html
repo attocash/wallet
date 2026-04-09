@@ -25,6 +25,14 @@
 
     <link rel="canonical" href="https://wallet.atto.cash">
     <title>Atto Wallet – Lightning-Fast & Secure Crypto Web Wallet</title>
+
+    <!-- Warm up wallet backend origins used by the web app. This reduces connect latency,
+         but it does not remove CORS preflight requests for non-simple API calls. -->
+    <link rel="dns-prefetch" href="//gatekeeper.live.application.atto.cash">
+    <link rel="dns-prefetch" href="//wallet-gatekeeper.live.application.atto.cash">
+    <link rel="preconnect" href="https://gatekeeper.live.application.atto.cash" crossorigin>
+    <link rel="preconnect" href="https://wallet-gatekeeper.live.application.atto.cash" crossorigin>
+
     <!-- Favicons (modern minimal set) -->
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     <link rel="icon" href="logo.ico" sizes="any">

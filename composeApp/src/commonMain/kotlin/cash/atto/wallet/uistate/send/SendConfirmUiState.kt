@@ -6,5 +6,6 @@ data class SendConfirmUiState(
     val amount: BigDecimal?,
     val amountUsd: BigDecimal?,
     val address: String?,
-    val showLoader: Boolean
+    val showLoader: Boolean,
+    val accountHeight: ULong? = null
 )

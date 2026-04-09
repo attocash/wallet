@@ -21,6 +21,14 @@ fun HomeResponse.getPriceUsd(): String? {
     return getMetricValue("price.usd")
 }
 
+fun HomeResponse.getCirculatingSupply(): String? {
+    return getMetricValue("supply.circulating")
+}
+
+fun HomeResponse.getAverageConfirmationMs(): String? {
+    return getMetricValue("network.confirmation-time.ms.average")
+}
+
 fun HomeResponse.getStakingApy(): String? {
     return getMetricValue("distribution.staking.annual-percentage-yield.effective")
 }

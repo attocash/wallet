@@ -14,7 +14,8 @@ data class SendFromUiState(
     val showAddressError: Boolean,
     val showLoader: Boolean,
     val isUsdMode: Boolean = false,
-    val equivalentDisplay: String = ""
+    val equivalentDisplay: String = "",
+    val priceUsd: BigDecimal? = null
 ) {
     companion object {
         val DEFAULT = SendFromUiState(

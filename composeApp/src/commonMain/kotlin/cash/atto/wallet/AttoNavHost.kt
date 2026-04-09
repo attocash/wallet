@@ -1,51 +1,45 @@
 package cash.atto.wallet
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cash.atto.wallet.components.common.AttoLoader
-import cash.atto.wallet.screens.BackupSecretPhraseScreen
-import cash.atto.wallet.screens.CreatePasswordScreen
-import cash.atto.wallet.screens.EnterPassword
-import cash.atto.wallet.screens.ImportSecretScreen
-import cash.atto.wallet.screens.MainScreenWeb
-import cash.atto.wallet.screens.VoterDetailScreen
-import cash.atto.wallet.screens.VoterScreen
-import cash.atto.wallet.screens.SecretPhraseScreen
-import cash.atto.wallet.screens.WelcomeScreen
+import cash.atto.wallet.screens.*
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.router.stack.active
-import com.arkivanov.decompose.router.stack.backStack
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.popToFirst
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.*
 import kotlinx.coroutines.launch
-import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
-fun AttoAppWeb(
-    component: DWNavigationComponent
+fun AttoApp(
+    component: DWNavigationComponent,
+    debugScreen: String? = null,
+    debugPassword: String? = null,
+    initialNavOverride: MainScreenNavDestination? = null,
+    qrScannerContent: (@Composable (
+        onResult: (String) -> Unit,
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit
+    ) -> Unit)? = null
 ) {
     AttoWalletTheme {
-        KoinContext {
-            val viewModel = koinViewModel<AppViewModel>()
-            val uiState = viewModel.state.collectAsState()
+        val viewModel = koinViewModel<AppViewModel>()
+        val uiState = viewModel.state.collectAsState()
 
-            AttoNavHost(
-                uiState = uiState.value,
-                component = component,
-                submitPassword = {
-                    viewModel.enterPassword(it)
-                }
-            )
-        }
+        AttoNavHost(
+            uiState = uiState.value,
+            component = component,
+            debugScreen = debugScreen,
+            debugPassword = debugPassword,
+            initialNavOverride = initialNavOverride,
+            qrScannerContent = qrScannerContent,
+            submitPassword = {
+                viewModel.enterPassword(it)
+            }
+        )
     }
 }
 
@@ -54,8 +48,34 @@ fun AttoNavHost(
     uiState: AppUiState,
     component: DWNavigationComponent,
     modifier: Modifier = Modifier,
+    debugScreen: String? = null,
+    debugPassword: String? = null,
+    initialNavOverride: MainScreenNavDestination? = null,
+    qrScannerContent: (@Composable (
+        onResult: (String) -> Unit,
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit
+    ) -> Unit)? = null,
     submitPassword: suspend (String?) -> Boolean
 ) {
+    if (debugScreen == "login") {
+        val passwordValid = remember {
+            mutableStateOf(true)
+        }
+
+        val coroutineScope = rememberCoroutineScope()
+
+        LoginScreen(
+            onSubmitPassword = {
+                coroutineScope.launch {
+                    passwordValid.value = (submitPassword.invoke(it))
+                }
+            },
+            passwordValid = passwordValid.value
+        )
+        return
+    }
+
     when (uiState.shownScreen) {
         AppUiState.ShownScreen.LOADER -> AttoLoader(modifier)
 
@@ -63,10 +83,23 @@ fun AttoNavHost(
             val passwordValid = remember {
                 mutableStateOf(true)
             }
+            val attemptedDebugPassword = remember {
+                mutableStateOf<String?>(null)
+            }
 
             val coroutineScope = rememberCoroutineScope()
 
-            EnterPassword(
+            LaunchedEffect(debugPassword) {
+                if (
+                    !debugPassword.isNullOrBlank()
+                    && attemptedDebugPassword.value != debugPassword
+                ) {
+                    attemptedDebugPassword.value = debugPassword
+                    passwordValid.value = submitPassword.invoke(debugPassword)
+                }
+            }
+
+            LoginScreen(
                 onSubmitPassword = {
                     coroutineScope.launch {
                         passwordValid.value = (submitPassword.invoke(it))
@@ -98,10 +131,6 @@ fun AttoNavHost(
                 stack = component.childStack,
             ) { screen ->
                 when (screen.instance) {
-                    is AttoDestination.BackupSecret -> BackupSecretPhraseScreen(
-                        onBackNavigation = { component.navigation.pop() }
-                    )
-
                     is AttoDestination.CreatePassword -> CreatePasswordScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onConfirmClick = {
@@ -118,25 +147,17 @@ fun AttoNavHost(
                         }
                     )
 
-                    is AttoDestination.DesktopMain -> MainScreenWeb(
-                        onBackupSecretNavigation = {
-                            component.navigation.push(AttoDestination.BackupSecret)
-                        },
+                    is AttoDestination.DesktopMain -> MainScreen(
                         onLogoutNavigation = {
                             component.navigation.popToFirst()
                         },
-                        onVoterDetailNavigation = { voterAddress ->
-                            component.navigation.push(AttoDestination.VoterDetail(voterAddress))
-                        }
+                        initialNavOverride = initialNavOverride,
+                        qrScannerContent = qrScannerContent
                     )
 
-                    is AttoDestination.VoterDetail -> VoterDetailScreen(
-                        voterAddress = (screen.instance as AttoDestination.VoterDetail).voterAddress,
-                        onBackNavigation = { component.navigation.pop() },
-                        onConfirm = { component.navigation.pop() }
-                    )
 
-                    is AttoDestination.ImportSecret -> ImportSecretScreen(
+
+                    is AttoDestination.ImportPhrase -> ImportPhraseScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onImportAccount = {
                             component.navigation.push(AttoDestination.CreatePassword)
@@ -147,7 +168,7 @@ fun AttoNavHost(
                         onBackNavigation = { component.navigation.pop() }
                     )
 
-                    is AttoDestination.SecretPhrase -> SecretPhraseScreen(
+                    is AttoDestination.RecoveryPhrase -> RecoveryPhraseScreen(
                         onBackNavigation = { component.navigation.pop() },
                         onBackupConfirmClicked = {
                             component.navigation.push(AttoDestination.CreatePassword)
@@ -156,10 +177,10 @@ fun AttoNavHost(
 
                     is AttoDestination.Welcome -> WelcomeScreen(
                         onCreateSecretClicked = {
-                            component.navigation.push(AttoDestination.SecretPhrase)
+                            component.navigation.push(AttoDestination.RecoveryPhrase)
                         },
                         onImportSecretClicked = {
-                            component.navigation.push(AttoDestination.ImportSecret)
+                            component.navigation.push(AttoDestination.ImportPhrase)
                         }
                     )
 

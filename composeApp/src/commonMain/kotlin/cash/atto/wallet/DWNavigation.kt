@@ -11,10 +11,13 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import org.jetbrains.compose.resources.StringResource
+import attowallet.composeapp.generated.resources.main_nav_transactions
+import attowallet.composeapp.generated.resources.main_nav_settings
 
 // Navigation component used for desktop and web targets
 class DWNavigationComponent(
-    componentContext: ComponentContext
+    componentContext: ComponentContext,
+    initialDestination: AttoDestination = AttoDestination.Welcome
 ) : ComponentContext by componentContext {
 
     val navigation = StackNavigation<AttoDestination>()
@@ -23,7 +26,7 @@ class DWNavigationComponent(
         childStack(
             source = navigation,
             serializer = AttoDestination.serializer(), // Or null to disable navigation state saving
-            initialConfiguration = AttoDestination.Welcome,
+            initialConfiguration = initialDestination,
             handleBackButton = true, // Pop the back stack on back button press
             childFactory = ::createChild,
         )
@@ -40,5 +43,7 @@ enum class MainScreenNavDestination(
     OVERVIEW(Res.string.main_nav_overview),
     SEND(Res.string.main_nav_send),
     RECEIVE(Res.string.main_nav_receive),
+    TRANSACTIONS(Res.string.main_nav_transactions),
+    SETTINGS(Res.string.main_nav_settings),
     STAKING(Res.string.main_nav_staking);
 }

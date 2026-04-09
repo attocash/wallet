@@ -545,11 +545,10 @@ fun CurrentVoterCard(
 
             Spacer(Modifier.height(8.dp))
             AttoButton(
+                text = stringResource(Res.string.staking_change),
                 onClick = onChangeClick,
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(Res.string.staking_change))
-            }
+            )
         }
     }
 }

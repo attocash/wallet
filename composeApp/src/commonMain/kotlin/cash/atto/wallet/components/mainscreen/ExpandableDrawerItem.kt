@@ -70,7 +70,6 @@ fun ExpandableDrawerItem(
                 modifier = Modifier.weight(1f),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W300,
-                fontFamily = attoFontFamily()
             )
 
             Icon(
