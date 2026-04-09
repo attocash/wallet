@@ -44,8 +44,8 @@ jobs:
           prerelease: false
           files: |
             artifacts/linux/*.deb
-            artifacts/macos/*.dmg
-            artifacts/windows/*.msi
+#            artifacts/macos/*.dmg
+#            artifacts/windows/*.msi
   preview:
     concurrency:
       group: "live"

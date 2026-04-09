@@ -30,60 +30,60 @@ jobs:
         with:
           name: linux
           path: composeApp/build/compose/binaries/main/deb/*-Debian.deb
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - uses: gradle/actions/setup-gradle@v6
-
-      - run: ./gradlew allTests
-
-      - run: ./gradlew packageDmg
-
-      - name: Rename binary with platform suffix
-        run: |
-          file=$(ls composeApp/build/compose/binaries/main/dmg/*.dmg)
-          mv "$file" "${file%.dmg}-MacOS.dmg"
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: macos
-          path: composeApp/build/compose/binaries/main/dmg/*-MacOS.dmg
-
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - uses: gradle/actions/setup-gradle@v6
-
-      - run: ./gradlew allTests
-
-      - run: ./gradlew packageMsi
-
-      - name: Rename binary with platform suffix
-        run: |
-          $file = Get-ChildItem -Path composeApp/build/compose/binaries/main/msi/*.msi | Select-Object -First 1
-          Rename-Item -Path $file.FullName -NewName ($file.BaseName + "-Windows" + $file.Extension)
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: windows
-          path: composeApp/build/compose/binaries/main/msi/*-Windows.msi
+#
+#  build-macos:
+#    runs-on: macos-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#
+#      - uses: actions/setup-java@v5
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#          cache: 'gradle'
+#
+#      - uses: gradle/actions/setup-gradle@v6
+#
+#      - run: ./gradlew allTests
+#
+#      - run: ./gradlew packageDmg
+#
+#      - name: Rename binary with platform suffix
+#        run: |
+#          file=$(ls composeApp/build/compose/binaries/main/dmg/*.dmg)
+#          mv "$file" "${file%.dmg}-MacOS.dmg"
+#
+#      - uses: actions/upload-artifact@v7
+#        with:
+#          name: macos
+#          path: composeApp/build/compose/binaries/main/dmg/*-MacOS.dmg
+#
+#  build-windows:
+#    runs-on: windows-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#
+#      - uses: actions/setup-java@v5
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#          cache: 'gradle'
+#
+#      - uses: gradle/actions/setup-gradle@v6
+#
+#      - run: ./gradlew allTests
+#
+#      - run: ./gradlew packageMsi
+#
+#      - name: Rename binary with platform suffix
+#        run: |
+#          $file = Get-ChildItem -Path composeApp/build/compose/binaries/main/msi/*.msi | Select-Object -First 1
+#          Rename-Item -Path $file.FullName -NewName ($file.BaseName + "-Windows" + $file.Extension)
+#
+#      - uses: actions/upload-artifact@v7
+#        with:
+#          name: windows
+#          path: composeApp/build/compose/binaries/main/msi/*-Windows.msi
 
   build-web:
     runs-on: ubuntu-latest
