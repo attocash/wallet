@@ -31,7 +31,7 @@
           },
           {
             "key": "Permissions-Policy",
-            "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), publickey-credentials-get=(), clipboard-read=(self), clipboard-write=(self)"
+            "value": "camera=(self), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), publickey-credentials-get=(), clipboard-read=(self), clipboard-write=(self)"
           },
           {
             "key": "Cross-Origin-Opener-Policy",
