@@ -28,11 +28,12 @@ fun main() {
             debugScreen = webDebugScreen(),
             debugPassword = webDebugPassword(),
             initialNavOverride = webDebugMainScreen(),
-            qrScannerContent = { onResult, onError, _ ->
+            qrScannerContent = { onResult, onError, onDismiss ->
                 QrScannerView(
                     modifier = Modifier.width(400.dp),
                     onQrCodeScanned = onResult,
-                    onScanError = onError
+                    onScanError = onError,
+                    onDismiss = onDismiss
                 )
             }
         )

@@ -81,7 +81,9 @@ internal fun getUserMedia(video: HTMLVideoElement, onSuccess: () -> Unit, onErro
         navigator.mediaDevices.getUserMedia(constraints)
             .then(function(stream) {
                 video.srcObject = stream;
-                video.play();
+                return video.play();
+            })
+            .then(function() {
                 onSuccess();
             })
             .catch(function(err) {

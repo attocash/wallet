@@ -2,19 +2,12 @@ package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import kotlinx.browser.document
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 
@@ -22,9 +15,9 @@ import org.w3c.dom.Node
 fun QrScannerView(
     modifier: Modifier = Modifier,
     onQrCodeScanned: (String) -> Unit,
-    onScanError: (String) -> Unit
+    onScanError: (String) -> Unit,
+    onDismiss: () -> Unit = {}
 ) {
-    var scannedValue by remember { mutableStateOf<String?>(null) }
     val scanner = remember { WasmQrScanner() }
 
     DisposableEffect(Unit) {
@@ -39,9 +32,31 @@ fun QrScannerView(
         container.id = "qr-scanner-container"
         document.body?.appendChild(container)
 
+        // Cancel button as an HTML element so it renders on top of the video
+        val cancelBtn = document.createElement("button") as HTMLButtonElement
+        cancelBtn.textContent = "Cancel"
+        cancelBtn.style.position = "absolute"
+        cancelBtn.style.bottom = "32px"
+        cancelBtn.style.left = "50%"
+        cancelBtn.style.transform = "translateX(-50%)"
+        cancelBtn.style.zIndex = "10000"
+        cancelBtn.style.padding = "12px 32px"
+        cancelBtn.style.fontSize = "16px"
+        cancelBtn.style.color = "white"
+        cancelBtn.style.backgroundColor = "rgba(255,255,255,0.2)"
+        cancelBtn.style.border = "1px solid rgba(255,255,255,0.4)"
+        cancelBtn.style.borderRadius = "8px"
+        cancelBtn.style.cursor = "pointer"
+        cancelBtn.onclick = {
+            scanner.stopScanning()
+            container.remove()
+            onDismiss()
+            null
+        }
+        container.appendChild(cancelBtn)
+
         scanner.startScanning(
             onResult = { result ->
-                scannedValue = result
                 onQrCodeScanned(result)
                 container.remove()
             },
@@ -62,22 +77,5 @@ fun QrScannerView(
         }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (scannedValue != null) {
-            Text(
-                text = "Scanned: ${scannedValue}",
-                color = Color.White,
-                modifier = Modifier.padding(16.dp)
-            )
-        } else {
-            Text(
-                text = "Scanning...",
-                color = Color.White,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
+    Box(modifier = modifier.fillMaxSize())
 }
