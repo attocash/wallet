@@ -2,7 +2,6 @@ package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoNetwork
 import cash.atto.wallet.model.HomeResponse
-import cash.atto.wallet.model.Metric
 import cash.atto.wallet.model.getPriceUsd
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import io.ktor.client.*
@@ -45,32 +44,17 @@ class HomeRepository(
         }
     }
 
-    suspend fun fetchHome(): HomeResponse? {
+    private suspend fun fetchHome(): HomeResponse? {
         val baseUrl = network.gatekeerperUrl()
-        return try {
-            val metrics = fetchMetrics(baseUrl)
-            val projection = fetchProjectionHome(baseUrl)
-
-            val homeResponse = HomeResponse(
-                metrics = metrics.ifEmpty { projection?.metrics.orEmpty() },
-                addresses = projection?.addresses.orEmpty(),
-                voters = projection?.voters.orEmpty()
-            )
-
-            _homeResponse.emit(homeResponse)
-            homeResponse
-        } catch (e: Exception) {
-            println("Error fetching home: ${e.message} ${e.stackTraceToString()}")
-            null
-        }
+        val projection = fetchProjectionHome(baseUrl)
+        projection?.let { _homeResponse.emit(it) }
+        return projection
     }
-
-    private suspend fun fetchMetrics(baseUrl: String): List<Metric> =
-        client.get("${baseUrl}/metrics").body()
 
     private suspend fun fetchProjectionHome(baseUrl: String): HomeResponse? = try {
         client.get("${baseUrl}/projections/home").body<HomeResponse>()
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        println("Error fetching home projection: ${e.message} ${e.stackTraceToString()}")
         null
     }
 
