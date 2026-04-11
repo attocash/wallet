@@ -14,23 +14,23 @@ data class HomeResponse(
 }
 
 fun HomeResponse.getMetricValue(name: String): String? {
-    return metricMap[name]?.value
+    return metrics.getMetricValue(name)
 }
 
 fun HomeResponse.getPriceUsd(): String? {
-    return getMetricValue("price.usd")
+    return metrics.getPriceUsd()
 }
 
 fun HomeResponse.getCirculatingSupply(): String? {
-    return getMetricValue("supply.circulating")
+    return metrics.getCirculatingSupply()
 }
 
 fun HomeResponse.getAverageConfirmationMs(): String? {
-    return getMetricValue("network.confirmation-time.ms.average")
+    return metrics.getAverageConfirmationMs()
 }
 
 fun HomeResponse.getStakingApy(): String? {
-    return getMetricValue("distribution.staking.annual-percentage-yield.effective")
+    return metrics.getStakingApy()
 }
 
 fun HomeResponse.getVoter(address: String): Voter? {

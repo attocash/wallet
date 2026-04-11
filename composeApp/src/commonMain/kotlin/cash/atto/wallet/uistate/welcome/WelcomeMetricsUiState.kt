@@ -1,6 +1,6 @@
 package cash.atto.wallet.uistate.welcome
 
-import cash.atto.wallet.model.HomeResponse
+import cash.atto.wallet.model.MetricsResponse
 import cash.atto.wallet.model.getAverageConfirmationMs
 import cash.atto.wallet.model.getCirculatingSupply
 import cash.atto.wallet.model.getPriceUsd
@@ -21,7 +21,7 @@ data class WelcomeMetricsUiState(
     }
 }
 
-fun HomeResponse.toWelcomeMetricsUiState(): WelcomeMetricsUiState {
+fun MetricsResponse.toWelcomeMetricsUiState(): WelcomeMetricsUiState {
     val priceUsd = getPriceUsd()?.toBigDecimalOrNull()
     val circulatingSupply = getCirculatingSupply()?.toBigDecimalOrNull()
     val confirmation = getAverageConfirmationMs()?.toBigDecimalOrNull()

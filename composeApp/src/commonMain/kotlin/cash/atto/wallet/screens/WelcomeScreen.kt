@@ -47,13 +47,10 @@ import attowallet.composeapp.generated.resources.welcome_message
 import attowallet.composeapp.generated.resources.welcome_stats_confirmation
 import attowallet.composeapp.generated.resources.welcome_stats_confirmation_description
 import attowallet.composeapp.generated.resources.welcome_stats_confirmation_unit
-import attowallet.composeapp.generated.resources.welcome_stats_confirmation_value
 import attowallet.composeapp.generated.resources.welcome_stats_market_cap
 import attowallet.composeapp.generated.resources.welcome_stats_market_cap_description
-import attowallet.composeapp.generated.resources.welcome_stats_market_cap_value
 import attowallet.composeapp.generated.resources.welcome_stats_price
 import attowallet.composeapp.generated.resources.welcome_stats_price_description
-import attowallet.composeapp.generated.resources.welcome_stats_price_value
 import attowallet.composeapp.generated.resources.welcome_title
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
@@ -66,17 +63,18 @@ import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_surface_alt
 import cash.atto.wallet.ui.dark_text_dim
 import cash.atto.wallet.ui.dark_text_muted
-import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.ui.dark_violet
 import cash.atto.wallet.ui.dark_violet_soft
 import cash.atto.wallet.ui.dark_violet_soft_hover
+import cash.atto.wallet.viewmodel.WelcomeViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import org.koin.compose.viewmodel.koinViewModel
 
 private val WelcomePageBackground = dark_bg
 private val WelcomeCardBackground = dark_surface
@@ -100,6 +98,8 @@ fun WelcomeScreen(
     onCreateSecretClicked: () -> Unit,
     onImportSecretClicked: () -> Unit
 ) {
+    val viewModel = koinViewModel<WelcomeViewModel>()
+    val metrics by viewModel.state.collectAsState()
     val windowSizeClass = calculateWindowSizeClass()
     val compact = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
     val scrollState = rememberScrollState()
@@ -125,7 +125,6 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             WelcomeHeader(compact = compact)
-
             if (compact) {
                 Column(
                     modifier = Modifier
@@ -159,14 +158,14 @@ fun WelcomeScreen(
                 ) {
                     WelcomeStatCard(
                         label = stringResource(Res.string.welcome_stats_market_cap),
-                        value = stringResource(Res.string.welcome_stats_market_cap_value),
+                        value = metrics.marketCapValue,
                         description = stringResource(Res.string.welcome_stats_market_cap_description),
                         labelColor = WelcomeGold,
-                        textAlign = TextAlign.Start
+                        textAlign = TextAlign.Center
                     )
                     WelcomeStatCard(
                         label = stringResource(Res.string.welcome_stats_confirmation),
-                        value = stringResource(Res.string.welcome_stats_confirmation_value),
+                        value = metrics.confirmationValue,
                         valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
                         description = stringResource(Res.string.welcome_stats_confirmation_description),
                         labelColor = WelcomeViolet,
@@ -175,10 +174,10 @@ fun WelcomeScreen(
                     )
                     WelcomeStatCard(
                         label = stringResource(Res.string.welcome_stats_price),
-                        value = stringResource(Res.string.welcome_stats_price_value),
+                        value = metrics.priceUsdValue,
                         description = stringResource(Res.string.welcome_stats_price_description),
                         labelColor = WelcomeGreen,
-                        textAlign = TextAlign.End,
+                        textAlign = TextAlign.Center,
                         monoValue = true
                     )
                 }
@@ -219,7 +218,7 @@ fun WelcomeScreen(
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
                         label = stringResource(Res.string.welcome_stats_market_cap),
-                        value = stringResource(Res.string.welcome_stats_market_cap_value),
+                        value = metrics.marketCapValue,
                         description = stringResource(Res.string.welcome_stats_market_cap_description),
                         labelColor = WelcomeGold,
                         textAlign = TextAlign.Start
@@ -227,7 +226,7 @@ fun WelcomeScreen(
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
                         label = stringResource(Res.string.welcome_stats_confirmation),
-                        value = stringResource(Res.string.welcome_stats_confirmation_value),
+                        value = metrics.confirmationValue,
                         valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
                         description = stringResource(Res.string.welcome_stats_confirmation_description),
                         labelColor = WelcomeViolet,
@@ -237,7 +236,7 @@ fun WelcomeScreen(
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
                         label = stringResource(Res.string.welcome_stats_price),
-                        value = stringResource(Res.string.welcome_stats_price_value),
+                        value = metrics.priceUsdValue,
                         description = stringResource(Res.string.welcome_stats_price_description),
                         labelColor = WelcomeGreen,
                         textAlign = TextAlign.End,
