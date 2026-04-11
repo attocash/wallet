@@ -74,6 +74,7 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ATTO_APPLICATION_LIVE }}
           channelId: preview
+          expires: 30d
 
   deploy:
     concurrency:
