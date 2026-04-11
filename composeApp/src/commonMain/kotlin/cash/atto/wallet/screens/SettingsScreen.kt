@@ -45,12 +45,12 @@ fun SettingsScreen(
         subtitle = stringResource(Res.string.settings_subtitle),
         onBack = onBackClick
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val compact = maxWidth < 1040.dp
 
             if (compact) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     SettingsActionsPanel(
@@ -64,11 +64,11 @@ fun SettingsScreen(
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
                     SettingsActionsPanel(
-                        modifier = Modifier.weight(5f).fillMaxHeight(),
+                        modifier = Modifier.weight(5f),
                         uiState = uiState,
                         onBackupClick = onBackupClick,
                         onLockClick = onLockClick,

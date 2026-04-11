@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -89,7 +88,7 @@ fun TransactionsContent(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TransactionsSummaryGrid(transactions = transactions)
@@ -103,12 +102,8 @@ fun TransactionsContent(
                     )
                 }
             } else {
-                androidx.compose.foundation.lazy.LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(transactions.size) { index ->
-                        val transaction = transactions[index]
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    transactions.forEach { transaction ->
                         Box(modifier = Modifier.clickable { selectedTransaction = transaction }) {
                             AttoTransactionCard(transaction = transaction)
                         }

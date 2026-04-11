@@ -7,13 +7,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -261,52 +258,46 @@ private fun SendFromContent(
         subtitle = "Instant, feeless transfers to any Atto address",
         onBack = onBackClick
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val compact = maxWidth < 1120.dp
 
             if (compact) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    item {
-                        SendFormPanel(
-                            modifier = Modifier.fillMaxWidth(),
-                            uiState = uiState,
-                            scannerError = scannerError.value,
-                            hasQrScanner = qrScannerContent != null,
-                            onToggleInputMode = onToggleInputMode,
-                            onAmountChanged = onAmountChanged,
-                            onAddressChanged = onAddressChanged,
-                            onShowQr = {
-                                scannerError.value = null
-                                showQrScanner.value = true
-                            },
-                            onSendClicked = onSendClicked,
-                            onFeeInfoClick = { showFeeInfo.value = true }
-                        )
-                    }
+                    SendFormPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                        uiState = uiState,
+                        scannerError = scannerError.value,
+                        hasQrScanner = qrScannerContent != null,
+                        onToggleInputMode = onToggleInputMode,
+                        onAmountChanged = onAmountChanged,
+                        onAddressChanged = onAddressChanged,
+                        onShowQr = {
+                            scannerError.value = null
+                            showQrScanner.value = true
+                        },
+                        onSendClicked = onSendClicked,
+                        onFeeInfoClick = { showFeeInfo.value = true }
+                    )
 
-                    item {
-                        Text(
-                            text = "Recent Sent",
-                            color = dark_text_primary,
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600)
-                        )
-                    }
+                    Text(
+                        text = "Recent Sent",
+                        color = dark_text_primary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600)
+                    )
 
                     if (recentTransactions.isEmpty()) {
-                        item {
-                            AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = "Sent transfers will appear here after your first outgoing transaction.",
-                                    color = dark_text_secondary,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
+                        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "Sent transfers will appear here after your first outgoing transaction.",
+                                color = dark_text_secondary,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     } else {
-                        items(recentTransactions) { transaction ->
+                        recentTransactions.forEach { transaction ->
                             AttoTransactionCard(
                                 transaction = transaction,
                                 onClick = { selectedTransaction.value = transaction }
@@ -316,11 +307,11 @@ private fun SendFromContent(
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     SendFormPanel(
-                        modifier = Modifier.width(500.dp).fillMaxHeight(),
+                        modifier = Modifier.width(500.dp),
                         uiState = uiState,
                         scannerError = scannerError.value,
                         hasQrScanner = qrScannerContent != null,

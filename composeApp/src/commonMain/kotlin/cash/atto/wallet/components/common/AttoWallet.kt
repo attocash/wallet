@@ -1,42 +1,14 @@
 package cash.atto.wallet.components.common
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.ArrowDownward
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,25 +23,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.logo
-import attowallet.composeapp.generated.resources.main_nav_overview
-import attowallet.composeapp.generated.resources.main_nav_receive
-import attowallet.composeapp.generated.resources.main_nav_send
-import attowallet.composeapp.generated.resources.main_nav_settings
-import attowallet.composeapp.generated.resources.main_nav_transactions
+import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.MainScreenNavDestination
-import cash.atto.wallet.ui.attoFontFamily
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_accent_soft
-import cash.atto.wallet.ui.dark_bg
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_danger
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_text_dim
-import cash.atto.wallet.ui.dark_text_primary
-import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import org.jetbrains.compose.resources.painterResource
@@ -243,11 +199,23 @@ fun AttoShellNavRow(
 ) {
     val scrollState = rememberScrollState()
     val items = listOf(
-        MainScreenNavDestination.OVERVIEW to Pair(Icons.Outlined.AccountBalanceWallet, stringResource(Res.string.main_nav_overview)),
+        MainScreenNavDestination.OVERVIEW to Pair(
+            Icons.Outlined.AccountBalanceWallet,
+            stringResource(Res.string.main_nav_overview)
+        ),
         MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
-        MainScreenNavDestination.RECEIVE to Pair(Icons.Outlined.ArrowDownward, stringResource(Res.string.main_nav_receive)),
-        MainScreenNavDestination.TRANSACTIONS to Pair(Icons.Outlined.History, stringResource(Res.string.main_nav_transactions)),
-        MainScreenNavDestination.SETTINGS to Pair(Icons.Outlined.Settings, stringResource(Res.string.main_nav_settings)),
+        MainScreenNavDestination.RECEIVE to Pair(
+            Icons.Outlined.ArrowDownward,
+            stringResource(Res.string.main_nav_receive)
+        ),
+        MainScreenNavDestination.TRANSACTIONS to Pair(
+            Icons.Outlined.History,
+            stringResource(Res.string.main_nav_transactions)
+        ),
+        MainScreenNavDestination.SETTINGS to Pair(
+            Icons.Outlined.Settings,
+            stringResource(Res.string.main_nav_settings)
+        ),
     )
 
     Row(
@@ -304,11 +272,17 @@ fun AttoPageFrame(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            onBack?.let {
-                AttoBackButton(onClick = it)
-            }
+        onBack?.let {
+            AttoBackButton(onClick = it)
+        }
 
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -341,9 +315,7 @@ fun AttoPageFrame(
                     )
                 }
             }
-        }
 
-        Box(modifier = Modifier.fillMaxSize()) {
             content()
         }
     }
@@ -433,7 +405,7 @@ fun AttoTransactionList(
 ) {
     val items = transactions.filterNotNull()
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (items.isEmpty()) {
@@ -445,12 +417,9 @@ fun AttoTransactionList(
                 )
             }
         } else {
-            androidx.compose.foundation.lazy.LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items.size) { index ->
-                    AttoTransactionCard(transaction = items[index])
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items.forEach { transaction ->
+                    AttoTransactionCard(transaction = transaction)
                 }
             }
         }
@@ -466,7 +435,7 @@ fun AttoTransactionSection(
     onTransactionClick: ((TransactionUiState) -> Unit)? = null
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
@@ -476,7 +445,7 @@ fun AttoTransactionSection(
         )
         AttoTransactionList(
             transactions = transactions,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             emptyMessage = emptyMessage,
             onTransactionClick = onTransactionClick
         )
@@ -492,7 +461,7 @@ fun AttoTransactionList(
 ) {
     val items = transactions.filterNotNull()
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (items.isEmpty()) {
@@ -504,12 +473,8 @@ fun AttoTransactionList(
                 )
             }
         } else {
-            androidx.compose.foundation.lazy.LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items.size) { index ->
-                    val transaction = items[index]
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items.forEach { transaction ->
                     AttoTransactionCard(
                         transaction = transaction,
                         onClick = onTransactionClick?.let { { it(transaction) } }
@@ -519,7 +484,6 @@ fun AttoTransactionList(
         }
     }
 }
-
 
 
 @Composable

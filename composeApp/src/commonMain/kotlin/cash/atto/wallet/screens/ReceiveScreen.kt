@@ -81,12 +81,12 @@ fun ReceiveContent(
         subtitle = "Share your address or QR code to receive Atto",
         onBack = onBackClick
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val compact = maxWidth < 1120.dp
 
             if (compact) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ReceiveQrColumn(
@@ -107,11 +107,11 @@ fun ReceiveContent(
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     ReceiveQrColumn(
-                        modifier = Modifier.width(480.dp).fillMaxHeight(),
+                        modifier = Modifier.width(480.dp),
                         address = address,
                         paymentRequest = paymentRequest,
                         requestedAmount = requestedAmount,
@@ -267,13 +267,13 @@ private fun ReceiveActivityColumn(
     onTransactionClick: (TransactionUiState) -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         AttoTransactionSection(
             title = "Recent Received",
             transactions = transactions,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             emptyMessage = "Incoming transfers will appear here after the wallet receives ATTO.",
             onTransactionClick = onTransactionClick
         )

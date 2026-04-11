@@ -2,8 +2,6 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -57,9 +55,9 @@ import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.uistate.settings.VoterUIState
 import cash.atto.wallet.viewmodel.VoterViewModel
-import kotlinx.coroutines.launch
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -123,7 +121,7 @@ private fun StakingContent(
                 CircularProgressIndicator(color = dark_accent)
             }
         } else {
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val compact = maxWidth < 1120.dp
 
                 val currentVoter = uiState.voters.find { it.address == uiState.currentVoter }
@@ -134,9 +132,7 @@ private fun StakingContent(
 
                 if (compact) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         StakingCurrentCard(
@@ -159,7 +155,7 @@ private fun StakingContent(
                     }
                 } else {
                     Row(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         Column(
@@ -180,9 +176,7 @@ private fun StakingContent(
                             StakingInfoCard(modifier = Modifier.fillMaxWidth())
                         }
                         StakingVotersSection(
-                            modifier = Modifier
-                                .weight(7f)
-                                .verticalScroll(rememberScrollState()),
+                            modifier = Modifier.weight(7f),
                             uiState = uiState,
                             onSelect = { selectedVoter = it }
                         )
