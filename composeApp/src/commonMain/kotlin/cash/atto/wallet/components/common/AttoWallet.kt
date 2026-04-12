@@ -308,37 +308,76 @@ fun AttoPageFrame(
             modifier = layoutModifier,
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Text(
-                        text = title,
-                        color = dark_text_primary,
-                        style =
-                            MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.W600,
-                                fontSize = 32.sp,
-                            ),
-                    )
-                    Text(
-                        text = subtitle,
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val stackActions = maxWidth < 900.dp
 
-                actions?.let { actionContent ->
+                if (stackActions) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = title,
+                                color = dark_text_primary,
+                                style =
+                                    MaterialTheme.typography.headlineMedium.copy(
+                                        fontWeight = FontWeight.W600,
+                                        fontSize = 32.sp,
+                                    ),
+                            )
+                            Text(
+                                text = subtitle,
+                                color = dark_text_secondary,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        actions?.let { actionContent ->
+                            Row(
+                                modifier = Modifier.align(Alignment.End),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                content = actionContent,
+                            )
+                        }
+                    }
+                } else {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = actionContent,
-                    )
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = title,
+                                color = dark_text_primary,
+                                style =
+                                    MaterialTheme.typography.headlineMedium.copy(
+                                        fontWeight = FontWeight.W600,
+                                        fontSize = 32.sp,
+                                    ),
+                            )
+                            Text(
+                                text = subtitle,
+                                color = dark_text_secondary,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        actions?.let { actionContent ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                content = actionContent,
+                            )
+                        }
+                    }
                 }
             }
 
