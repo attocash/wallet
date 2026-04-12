@@ -22,7 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.isCompactWidth
@@ -39,100 +40,107 @@ fun AttoModal(
     scrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .zIndex(20f),
-        contentAlignment = Alignment.Center,
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
     ) {
-        val mobile = isCompactWidth()
-
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onDismiss,
-                    ),
-        )
-
-        Column(
-            modifier =
-                modifier
-                    .then(
-                        if (mobile) {
-                            Modifier.fillMaxSize()
-                        } else {
-                            Modifier.width(desktopWidth)
-                        },
-                    ).background(
-                        color = dark_surface,
-                        shape = if (mobile) RoundedCornerShape(0.dp) else RoundedCornerShape(16.dp),
-                    ).clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
-                    ),
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(
+            val mobile = isCompactWidth()
+
+            Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = title,
-                    color = Color.White,
-                    style =
-                        MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 20.sp,
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onDismiss,
                         ),
-                )
-                Box(
-                    modifier =
-                        Modifier
-                            .size(28.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = onDismiss,
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = "Close",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            }
-
-            if (showDivider) {
-                HorizontalDivider(color = dark_border)
-            }
+            )
 
             Column(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
+                    modifier
                         .then(
-                            if (scrollable) {
-                                Modifier.verticalScroll(rememberScrollState())
+                            if (mobile) {
+                                Modifier.fillMaxSize()
                             } else {
-                                Modifier
+                                Modifier.width(desktopWidth)
                             },
-                        ).padding(contentPadding),
-                verticalArrangement = Arrangement.spacedBy(contentSpacing),
+                        ).background(
+                            color = dark_surface,
+                            shape = if (mobile) RoundedCornerShape(0.dp) else RoundedCornerShape(16.dp),
+                        ).clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {},
+                        ),
             ) {
-                content()
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 20.sp,
+                            ),
+                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(28.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onDismiss,
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Close",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+
+                if (showDivider) {
+                    HorizontalDivider(color = dark_border)
+                }
+
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = false)
+                            .then(
+                                if (scrollable) {
+                                    Modifier.verticalScroll(rememberScrollState())
+                                } else {
+                                    Modifier
+                                },
+                            ).padding(contentPadding),
+                    verticalArrangement = Arrangement.spacedBy(contentSpacing),
+                ) {
+                    content()
+                }
             }
         }
     }

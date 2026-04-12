@@ -63,6 +63,7 @@ private fun StakingContent(
 
             StakingConfirmDialog(
                 voterLabel = voter.label,
+                voterAddress = voter.address,
                 voterApr = "${((voterApy * 100).toLong() / 100.0)}%",
                 voterUptime = formatLastVoted(voter.lastVotedAt),
                 onDismiss = { selectedVoter = null },
@@ -395,6 +396,7 @@ private fun StakingVoterCard(
 @Composable
 private fun StakingConfirmDialog(
     voterLabel: String,
+    voterAddress: String,
     voterApr: String,
     voterUptime: String,
     onDismiss: () -> Unit,
@@ -407,55 +409,45 @@ private fun StakingConfirmDialog(
         contentPadding = PaddingValues(20.dp),
         contentSpacing = 24.dp,
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = "Delegate to $voterLabel?",
-                color = dark_text_primary,
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W600),
-            )
-            Text(
-                text = "This will change your current voting delegation.",
-                color = dark_text_secondary,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        AttoCopyField(
+            label = "VOTER",
+            value = voterAddress,
+            maxLines = 2,
+        )
 
-        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-            StakingMetricRow("APR", voterApr, dark_success)
-            StakingMetricRow("Last Voted", voterUptime, showDivider = false)
-        }
-
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(dark_accent.copy(alpha = 0.03f))
-                    .border(1.dp, dark_accent.copy(alpha = 0.19f), RoundedCornerShape(8.dp))
-                    .padding(16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "A change transaction will be created. You can change your voter at any time.",
-                color = dark_accent,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W600),
-            )
-        }
+        AttoDetailField(
+            label = "LABEL",
+            value = voterLabel,
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            AttoButton(
-                text = "Cancel",
-                onClick = onDismiss,
+            AttoDetailField(
+                label = "APR",
+                value = voterApr,
                 modifier = Modifier.weight(1f),
-                variant = AttoButtonVariant.Outlined,
             )
+            AttoDetailField(
+                label = "LAST VOTED",
+                value = voterUptime,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        HorizontalDivider(color = dark_border)
+
+        Text(
+            text = "A change transaction will be created. You can change your voter at any time.",
+            color = dark_text_secondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             AttoButton(
                 text = "Confirm",
                 onClick = onConfirm,
