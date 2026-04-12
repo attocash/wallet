@@ -2,32 +2,15 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,26 +23,8 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_error_address
 import attowallet.composeapp.generated.resources.send_error_amount
 import attowallet.composeapp.generated.resources.send_scan_qr
-import cash.atto.wallet.components.common.AttoAmountField
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
-import cash.atto.wallet.components.common.AttoLoader
-import cash.atto.wallet.components.common.AttoModal
-import cash.atto.wallet.components.common.AttoPageFrame
-import cash.atto.wallet.components.common.AttoPanelCard
-import cash.atto.wallet.components.common.AttoTransactionCard
-import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
-import cash.atto.wallet.components.common.AttoTransactionSection
-import cash.atto.wallet.components.common.attoAmountFieldColors
-import cash.atto.wallet.ui.AttoFormatter
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_danger
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_text_dim
-import cash.atto.wallet.ui.dark_text_primary
-import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.components.common.*
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.uistate.send.SendFromUiState
@@ -251,8 +216,8 @@ private fun SendFromContent(
             Text(
                 text =
                     "Atto transactions don't have fees because the network doesn't pay miners " +
-                        "or validators per transaction. Instead of charging users, Atto uses " +
-                        "a tiny proof of work only to prevent spam - so sending money stays free.",
+                            "or validators per transaction. Instead of charging users, Atto uses " +
+                            "a tiny proof of work only to prevent spam - so sending money stays free.",
                 color = dark_text_secondary,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -265,7 +230,7 @@ private fun SendFromContent(
         onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val compact = maxWidth < 1120.dp
+            val compact = isCompactWidth()
 
             if (compact) {
                 Column(

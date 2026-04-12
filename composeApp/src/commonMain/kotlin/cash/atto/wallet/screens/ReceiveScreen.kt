@@ -25,6 +25,7 @@ import cash.atto.wallet.components.common.*
 import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -85,7 +86,7 @@ fun ReceiveContent(
         onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val compact = maxWidth < 1120.dp
+            val compact = isCompactWidth()
 
             if (compact) {
                 Column(

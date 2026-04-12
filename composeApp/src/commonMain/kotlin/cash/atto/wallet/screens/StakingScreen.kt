@@ -2,34 +2,13 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,24 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
-import cash.atto.wallet.components.common.AttoCard
-import cash.atto.wallet.components.common.AttoModal
-import cash.atto.wallet.components.common.AttoPageFrame
-import cash.atto.wallet.components.common.AttoPanelCard
+import cash.atto.wallet.components.common.*
 import cash.atto.wallet.model.Voter
 import cash.atto.wallet.model.calculateEntityWeightPercentage
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_accent_soft
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_surface_alt
-import cash.atto.wallet.ui.dark_text_dim
-import cash.atto.wallet.ui.dark_text_primary
-import cash.atto.wallet.ui.dark_text_secondary
-import cash.atto.wallet.ui.dark_text_tertiary
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.settings.VoterUIState
 import cash.atto.wallet.viewmodel.VoterViewModel
 import kotlinx.coroutines.launch
@@ -120,7 +85,7 @@ private fun StakingContent(
             }
         } else {
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val compact = maxWidth < 1120.dp
+                val compact = isCompactWidth()
 
                 val currentVoter = uiState.voters.find { it.address == uiState.currentVoter }
                 val currentVoterHealthy =
@@ -140,7 +105,8 @@ private fun StakingContent(
                             voterAddress = uiState.currentVoter.orEmpty(),
                             apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                             weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                            entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
+                            entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
+                                ?: "—",
                             lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
                             healthy = currentVoterHealthy,
                             onChangeClick = { selectedVoter = currentVoter },
@@ -167,7 +133,8 @@ private fun StakingContent(
                                 voterAddress = uiState.currentVoter.orEmpty(),
                                 apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                                 weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                                entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
+                                entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
+                                    ?: "—",
                                 lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
                                 healthy = currentVoterHealthy,
                                 onChangeClick = { selectedVoter = currentVoter },
@@ -245,7 +212,7 @@ private fun StakingInfoCard(modifier: Modifier) {
         Text(
             text =
                 "Delegate your voting weight to a voter node to earn rewards. " +
-                    "Voters help secure the network by validating transactions.",
+                        "Voters help secure the network by validating transactions.",
             color = dark_text_secondary,
             style = MaterialTheme.typography.bodySmall,
         )

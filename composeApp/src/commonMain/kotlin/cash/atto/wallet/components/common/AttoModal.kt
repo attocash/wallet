@@ -3,18 +3,7 @@ package cash.atto.wallet.components.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.isCompactWidth
 
 @Composable
 fun AttoModal(
@@ -56,7 +46,7 @@ fun AttoModal(
                 .zIndex(20f),
         contentAlignment = Alignment.Center,
     ) {
-        val mobile = maxWidth < 768.dp
+        val mobile = isCompactWidth()
 
         Box(
             modifier =

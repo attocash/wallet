@@ -1,11 +1,6 @@
 package cash.atto.wallet.components.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Visibility
@@ -18,15 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.secret_copy
-import attowallet.composeapp.generated.resources.secret_title
-import attowallet.composeapp.generated.resources.settings_backup_hide
-import attowallet.composeapp.generated.resources.settings_backup_show
+import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoWordChip
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -104,7 +96,7 @@ private fun BackupWordGrid(
     val rightColumn = words.drop(midpoint)
 
     BoxWithConstraints(modifier = modifier) {
-        val compact = maxWidth < 420.dp
+        val compact = isCompactWidth()
 
         if (compact) {
             Column(

@@ -1,48 +1,21 @@
 package cash.atto.wallet.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ArrowDownward
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,26 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
-import cash.atto.wallet.components.common.AttoCard
-import cash.atto.wallet.components.common.AttoCopyButton
-import cash.atto.wallet.components.common.AttoModal
-import cash.atto.wallet.components.common.AttoTransactionCard
-import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
-import cash.atto.wallet.ui.AttoFormatter
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_accent_soft
-import cash.atto.wallet.ui.dark_bg
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_surface_alt
-import cash.atto.wallet.ui.dark_text_dim
-import cash.atto.wallet.ui.dark_text_muted
-import cash.atto.wallet.ui.dark_text_secondary
-import cash.atto.wallet.ui.dark_text_tertiary
-import cash.atto.wallet.ui.dark_violet
+import cash.atto.wallet.components.common.*
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -170,7 +125,7 @@ private fun OverviewContent(
                 .fillMaxSize()
                 .background(OverviewBg),
     ) {
-        val compact = maxWidth < 1024.dp
+        val compact = isCompactWidth()
         val contentScroll = rememberScrollState()
 
         if (modalOpen) {

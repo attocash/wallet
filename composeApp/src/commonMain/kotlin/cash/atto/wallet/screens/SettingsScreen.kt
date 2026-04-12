@@ -46,7 +46,7 @@ fun SettingsScreen(
         onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val compact = maxWidth < 1040.dp
+            val compact = isCompactWidth()
 
             if (compact) {
                 Column(

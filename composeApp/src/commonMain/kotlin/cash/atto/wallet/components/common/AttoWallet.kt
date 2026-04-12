@@ -56,7 +56,7 @@ fun AttoWallet(
                     .padding(WindowInsets.safeDrawing.asPaddingValues()),
         ) {
             val shellMaxWidth = maxWidth
-            val compact = shellMaxWidth < 768.dp
+            val compact = shellMaxWidth.isCompactWidth()
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -209,26 +209,26 @@ fun AttoShellNavRow(
     val items =
         listOf(
             MainScreenNavDestination.OVERVIEW to
-                Pair(
-                    Icons.Outlined.AccountBalanceWallet,
-                    stringResource(Res.string.main_nav_overview),
-                ),
+                    Pair(
+                        Icons.Outlined.AccountBalanceWallet,
+                        stringResource(Res.string.main_nav_overview),
+                    ),
             MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
             MainScreenNavDestination.RECEIVE to
-                Pair(
-                    Icons.Outlined.ArrowDownward,
-                    stringResource(Res.string.main_nav_receive),
-                ),
+                    Pair(
+                        Icons.Outlined.ArrowDownward,
+                        stringResource(Res.string.main_nav_receive),
+                    ),
             MainScreenNavDestination.TRANSACTIONS to
-                Pair(
-                    Icons.Outlined.History,
-                    stringResource(Res.string.main_nav_transactions),
-                ),
+                    Pair(
+                        Icons.Outlined.History,
+                        stringResource(Res.string.main_nav_transactions),
+                    ),
             MainScreenNavDestination.SETTINGS to
-                Pair(
-                    Icons.Outlined.Settings,
-                    stringResource(Res.string.main_nav_settings),
-                ),
+                    Pair(
+                        Icons.Outlined.Settings,
+                        stringResource(Res.string.main_nav_settings),
+                    ),
         )
 
     Row(
@@ -309,7 +309,7 @@ fun AttoPageFrame(
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val stackActions = maxWidth < 900.dp
+                val stackActions = isCompactWidth()
 
                 if (stackActions) {
                     Column(

@@ -1,46 +1,15 @@
 package cash.atto.wallet.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.VerifiedUser
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,44 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.secret_check_all_items
-import attowallet.composeapp.generated.resources.secret_checklist_one_description
-import attowallet.composeapp.generated.resources.secret_checklist_one_title
-import attowallet.composeapp.generated.resources.secret_checklist_three_description
-import attowallet.composeapp.generated.resources.secret_checklist_three_title
-import attowallet.composeapp.generated.resources.secret_checklist_two_description
-import attowallet.composeapp.generated.resources.secret_checklist_two_title
-import attowallet.composeapp.generated.resources.secret_confirm_backup_hint
-import attowallet.composeapp.generated.resources.secret_confirm_backup_title
-import attowallet.composeapp.generated.resources.secret_confirm_tab
-import attowallet.composeapp.generated.resources.secret_continue_create_password
-import attowallet.composeapp.generated.resources.secret_copied
-import attowallet.composeapp.generated.resources.secret_copy
-import attowallet.composeapp.generated.resources.secret_help_body_one
-import attowallet.composeapp.generated.resources.secret_help_body_two
-import attowallet.composeapp.generated.resources.secret_help_title
-import attowallet.composeapp.generated.resources.secret_help_warning
-import attowallet.composeapp.generated.resources.secret_recovery_title
-import attowallet.composeapp.generated.resources.secret_view_hint
-import attowallet.composeapp.generated.resources.secret_view_tab
-import attowallet.composeapp.generated.resources.secret_view_title
-import attowallet.composeapp.generated.resources.secret_written_down
+import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoBackButton
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoRoundButton
 import cash.atto.wallet.components.common.AttoWordChip
-import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_accent_border_hover
-import cash.atto.wallet.ui.dark_accent_soft
-import cash.atto.wallet.ui.dark_accent_soft_hover
-import cash.atto.wallet.ui.dark_bg
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_text_muted
-import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import kotlinx.coroutines.delay
@@ -517,7 +454,7 @@ private fun RecoveryPhraseGrid(
     val rightColumn = words.drop(midpoint)
 
     BoxWithConstraints(modifier = modifier) {
-        val compact = maxWidth < 520.dp
+        val compact = isCompactWidth()
 
         if (compact) {
             Column(

@@ -4,13 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,13 +15,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,14 +29,7 @@ import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTransactionCard
 import cash.atto.wallet.platform.exportCsvFile
-import cash.atto.wallet.ui.AttoFormatter
-import cash.atto.wallet.ui.dark_bg
-import cash.atto.wallet.ui.dark_border
-import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_text_muted
-import cash.atto.wallet.ui.dark_text_primary
-import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -192,7 +173,7 @@ private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
         }
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val compact = maxWidth < 760.dp
+        val compact = isCompactWidth()
         val rows =
             listOf(
                 Triple("Total Transactions", transactions.size.toString(), dark_text_primary),
