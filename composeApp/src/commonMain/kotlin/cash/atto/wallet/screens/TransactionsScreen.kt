@@ -28,6 +28,7 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTransactionCard
+import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
 import cash.atto.wallet.platform.exportCsvFile
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -100,7 +101,7 @@ fun TransactionsContent(
         },
     ) {
         selectedTransaction?.let { transaction ->
-            TransactionDetailsDialog(
+            AttoTransactionDetailsDialog(
                 transaction = transaction,
                 onDismiss = { selectedTransaction = null },
             )
@@ -376,66 +377,6 @@ private fun TransactionsSummaryCard(
             color = accent,
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W700),
         )
-    }
-}
-
-@Composable
-private fun TransactionDetailsDialog(
-    transaction: TransactionUiState,
-    onDismiss: () -> Unit,
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Transaction Details",
-                color = dark_text_primary,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
-            )
-            TransactionsDetailRow(
-                "Type",
-                transaction.type.name
-                    .lowercase()
-                    .replaceFirstChar { it.uppercase() },
-            )
-            TransactionsDetailRow("Hash", transaction.hash ?: "Unavailable")
-            TransactionsDetailRow("Source", transaction.source)
-            TransactionsDetailRow("Amount", transaction.shownAmount)
-            TransactionsDetailRow("Timestamp", transaction.formattedTimestamp)
-            AttoButton(
-                text = "Close",
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    }
-}
-
-@Composable
-private fun TransactionsDetailRow(
-    label: String,
-    value: String,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = label,
-            color = dark_text_secondary,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(dark_bg)
-                    .padding(12.dp),
-        ) {
-            Text(
-                text = value,
-                color = dark_text_primary,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        HorizontalDivider(color = dark_border)
     }
 }
 
