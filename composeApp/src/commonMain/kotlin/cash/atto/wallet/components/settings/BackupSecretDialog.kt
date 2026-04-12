@@ -18,7 +18,6 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoWordChip
-import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -96,7 +95,7 @@ private fun BackupWordGrid(
     val rightColumn = words.drop(midpoint)
 
     BoxWithConstraints(modifier = modifier) {
-        val compact = isCompactWidth()
+        val compact = maxWidth < 420.dp
 
         if (compact) {
             Column(

@@ -454,7 +454,7 @@ private fun RecoveryPhraseGrid(
     val rightColumn = words.drop(midpoint)
 
     BoxWithConstraints(modifier = modifier) {
-        val compact = isCompactWidth()
+        val compact = maxWidth < 520.dp
 
         if (compact) {
             Column(
