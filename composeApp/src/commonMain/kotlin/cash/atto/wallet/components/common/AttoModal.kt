@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
 
@@ -48,72 +47,79 @@ fun AttoModal(
     contentPadding: PaddingValues = PaddingValues(24.dp),
     contentSpacing: Dp = 16.dp,
     scrollable: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-            .zIndex(20f),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .zIndex(20f),
+        contentAlignment = Alignment.Center,
     ) {
         val mobile = maxWidth < 768.dp
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismiss
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onDismiss,
+                    ),
         )
 
         Column(
-            modifier = modifier
-                .then(
-                    if (mobile) Modifier.fillMaxSize()
-                    else Modifier.width(desktopWidth)
-                )
-                .background(
-                    color = dark_surface,
-                    shape = if (mobile) RoundedCornerShape(0.dp) else RoundedCornerShape(16.dp)
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {}
-                )
+            modifier =
+                modifier
+                    .then(
+                        if (mobile) {
+                            Modifier.fillMaxSize()
+                        } else {
+                            Modifier.width(desktopWidth)
+                        },
+                    ).background(
+                        color = dark_surface,
+                        shape = if (mobile) RoundedCornerShape(0.dp) else RoundedCornerShape(16.dp),
+                    ).clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {},
+                    ),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = title,
                     color = Color.White,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 20.sp
-                    )
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.W600,
+                            fontSize = 20.sp,
+                        ),
                 )
                 Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onDismiss
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(28.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onDismiss,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = "Close",
                         tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -123,15 +129,18 @@ fun AttoModal(
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
-                    .then(
-                        if (scrollable) Modifier.verticalScroll(rememberScrollState())
-                        else Modifier
-                    )
-                    .padding(contentPadding),
-                verticalArrangement = Arrangement.spacedBy(contentSpacing)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .then(
+                            if (scrollable) {
+                                Modifier.verticalScroll(rememberScrollState())
+                            } else {
+                                Modifier
+                            },
+                        ).padding(contentPadding),
+                verticalArrangement = Arrangement.spacedBy(contentSpacing),
             ) {
                 content()
             }

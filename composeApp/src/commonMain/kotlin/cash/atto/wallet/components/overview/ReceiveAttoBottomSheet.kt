@@ -2,36 +2,14 @@ package cash.atto.wallet.components.overview
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,16 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.ic_copy
-import attowallet.composeapp.generated.resources.ic_share
-import attowallet.composeapp.generated.resources.overview_receive_address
-import attowallet.composeapp.generated.resources.overview_receive_copy
-import attowallet.composeapp.generated.resources.overview_receive_share
-import attowallet.composeapp.generated.resources.send_from_amount_hint
+import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoAmountInputField
 import cash.atto.wallet.components.common.BottomSheet
-import cash.atto.wallet.components.common.QRCodeImage
+import cash.atto.wallet.components.common.qrCodeImage
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -73,13 +45,13 @@ fun ReceiveAttoBottomSheet(
 ) = address?.let {
     BottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         ReceiveAttoContent(
             address = address,
             priceUsd = priceUsd,
             onCopy = onCopy,
-            onShare = onShare
+            onShare = onShare,
         )
     }
 }
@@ -91,7 +63,7 @@ fun ReceiveAttoContent(
     priceUsd: BigDecimal?,
     onPaymentRequestChanged: (String) -> Unit = {},
     onCopy: (String) -> Unit,
-    onShare: ((String) -> Unit)? = null
+    onShare: ((String) -> Unit)? = null,
 ) {
     var amountInput by rememberSaveable(address) { mutableStateOf("") }
     var isUsdMode by rememberSaveable(address) { mutableStateOf(false) }
@@ -118,7 +90,7 @@ fun ReceiveAttoContent(
                 amountInput = ""
             },
             onCopy = onCopy,
-            onShare = onShare
+            onShare = onShare,
         )
     } else {
         ReceiveAttoContentExtended(
@@ -133,7 +105,7 @@ fun ReceiveAttoContent(
                 amountInput = ""
             },
             onCopy = onCopy,
-            onShare = onShare
+            onShare = onShare,
         )
     }
 }
@@ -151,54 +123,55 @@ fun ReceiveAttoContentCompact(
     onShare: ((String) -> Unit)?,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color.White),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(Res.string.overview_receive_address),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
         )
 
         Text(
             text = displayAddress,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Box(Modifier.height(240.dp)) {
             Text(
                 text = displayAddress,
-                modifier = Modifier
-                    .wrapContentSize(
-                        align = Alignment.Center,
-                        unbounded = true
-                    )
-                    .width(800.dp)
-                    .padding(top = 40.dp),
+                modifier =
+                    Modifier
+                        .wrapContentSize(
+                            align = Alignment.Center,
+                            unbounded = true,
+                        ).width(800.dp)
+                        .padding(top = 40.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 textAlign = TextAlign.Center,
                 softWrap = false,
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
             )
 
-            QRCodeImage(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .border(
-                        width = 3.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
-                        shape = RoundedCornerShape(32.dp)
-                    )
-                    .padding(18.dp),
+            qrCodeImage(
+                modifier =
+                    Modifier
+                        .align(Alignment.Center)
+                        .clip(RoundedCornerShape(32.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(
+                            width = 3.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(32.dp),
+                        ).padding(18.dp),
                 url = paymentRequest,
-                contentDescription = "QR"
+                contentDescription = "QR",
             )
         }
 
@@ -208,14 +181,14 @@ fun ReceiveAttoContentCompact(
             equivalentDisplay = equivalentDisplay,
             onAmountInputChanged = onAmountInputChanged,
             onToggleInputMode = onToggleInputMode,
-            modifier = Modifier.width(qrContentWidth)
+            modifier = Modifier.width(qrContentWidth),
         )
 
         ReceiveActionButtons(
             paymentRequest = paymentRequest,
             fillWidth = true,
             onCopy = onCopy,
-            onShare = onShare
+            onShare = onShare,
         )
     }
 }
@@ -233,39 +206,40 @@ fun ReceiveAttoContentExtended(
     onShare: ((String) -> Unit)?,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .widthIn(max = 760.dp)
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .widthIn(max = 760.dp)
+                .background(Color.White),
         verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(Res.string.overview_receive_address),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
         )
 
         Text(
             text = displayAddress,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
-        QRCodeImage(
-            modifier = Modifier
-                .size(qrContentWidth)
-                .clip(RoundedCornerShape(32.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .border(
-                    width = 3.dp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
-                    shape = RoundedCornerShape(32.dp)
-                )
-                .padding(18.dp),
+        qrCodeImage(
+            modifier =
+                Modifier
+                    .size(qrContentWidth)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(
+                        width = 3.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+                        shape = RoundedCornerShape(32.dp),
+                    ).padding(18.dp),
             url = paymentRequest,
-            contentDescription = "QR"
+            contentDescription = "QR",
         )
 
         ReceiveAmountField(
@@ -274,14 +248,14 @@ fun ReceiveAttoContentExtended(
             equivalentDisplay = equivalentDisplay,
             onAmountInputChanged = onAmountInputChanged,
             onToggleInputMode = onToggleInputMode,
-            modifier = Modifier.width(qrContentWidth)
+            modifier = Modifier.width(qrContentWidth),
         )
 
         ReceiveActionButtons(
             paymentRequest = paymentRequest,
             fillWidth = true,
             onCopy = onCopy,
-            onShare = onShare
+            onShare = onShare,
         )
     }
 }
@@ -297,20 +271,21 @@ private fun ReceiveAmountField(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = "REQUESTED AMOUNT",
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .background(gray_100)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(gray_100)
+                    .padding(16.dp),
         ) {
             AttoAmountInputField(
                 value = amountInput,
@@ -318,7 +293,7 @@ private fun ReceiveAmountField(
                 isUsdMode = isUsdMode,
                 onToggleInputMode = onToggleInputMode,
                 equivalentDisplay = equivalentDisplay,
-                placeholder = stringResource(Res.string.send_from_amount_hint)
+                placeholder = stringResource(Res.string.send_from_amount_hint),
             )
         }
     }
@@ -334,33 +309,35 @@ private fun ReceiveActionButtons(
     Row(
         modifier = if (fillWidth) Modifier.fillMaxWidth() else Modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Button(
             onClick = { onCopy(paymentRequest) },
             modifier = if (fillWidth) Modifier.weight(1f) else Modifier,
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp
-            ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            contentPadding = PaddingValues(19.dp)
+            elevation =
+                ButtonDefaults.buttonElevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                ),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            contentPadding = PaddingValues(19.dp),
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_copy),
-                    contentDescription = "Copy icon"
+                    contentDescription = "Copy icon",
                 )
 
                 Text(
                     text = stringResource(Res.string.overview_receive_copy),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         }
@@ -369,28 +346,30 @@ private fun ReceiveActionButtons(
             Button(
                 onClick = { onShare(paymentRequest) },
                 modifier = if (fillWidth) Modifier.wrapContentSize() else Modifier,
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    disabledElevation = 0.dp,
-                    hoveredElevation = 0.dp,
-                    focusedElevation = 0.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                contentPadding = PaddingValues(19.dp)
+                elevation =
+                    ButtonDefaults.buttonElevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        disabledElevation = 0.dp,
+                        hoveredElevation = 0.dp,
+                        focusedElevation = 0.dp,
+                    ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                    ),
+                contentPadding = PaddingValues(19.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(
                         imageVector = vectorResource(Res.drawable.ic_share),
-                        contentDescription = "Share icon"
+                        contentDescription = "Share icon",
                     )
 
                     Text(
                         text = stringResource(Res.string.overview_receive_share),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
             }
@@ -411,7 +390,7 @@ fun ReceiveAttoContentCompactPreview() {
             onAmountInputChanged = {},
             onToggleInputMode = {},
             onCopy = {},
-            onShare = {}
+            onShare = {},
         )
     }
 }
@@ -429,7 +408,7 @@ fun ReceiveAttoContentExtendedPreview() {
             onAmountInputChanged = {},
             onToggleInputMode = {},
             onCopy = {},
-            onShare = {}
+            onShare = {},
         )
     }
 }
@@ -444,7 +423,7 @@ fun ReceiveAttoBottomSheetPreview() {
             address = "address",
             priceUsd = BigDecimal.parseString("0.25"),
             onCopy = {},
-            onShare = {}
+            onShare = {},
         )
     }
 }
@@ -476,7 +455,7 @@ private fun parseDecimal(value: String): BigDecimal? =
 private fun receiveAmountAtto(
     amountInput: String,
     isUsdMode: Boolean,
-    priceUsd: BigDecimal?
+    priceUsd: BigDecimal?,
 ): String? {
     val parsedAmount = parseDecimal(amountInput) ?: return null
 
@@ -484,10 +463,11 @@ private fun receiveAmountAtto(
         if (priceUsd == null || priceUsd == BigDecimal.ZERO) {
             null
         } else {
-            parsedAmount.divide(
-                priceUsd,
-                DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING)
-            ).toStringExpanded()
+            parsedAmount
+                .divide(
+                    priceUsd,
+                    DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING),
+                ).toStringExpanded()
         }
     } else {
         parsedAmount.toStringExpanded()
@@ -497,7 +477,7 @@ private fun receiveAmountAtto(
 private fun receiveEquivalentDisplay(
     amountInput: String,
     isUsdMode: Boolean,
-    priceUsd: BigDecimal?
+    priceUsd: BigDecimal?,
 ): String {
     val parsedAmount = parseDecimal(amountInput) ?: return ""
 
@@ -520,7 +500,7 @@ private fun receiveEquivalentDisplay(
 
 private fun displayAddress(address: String): String =
     address.substring(0, address.length / 2) +
-            "\n" +
-            address.substring(address.length / 2, address.length)
+        "\n" +
+        address.substring(address.length / 2, address.length)
 
 private val qrContentWidth = 280.dp

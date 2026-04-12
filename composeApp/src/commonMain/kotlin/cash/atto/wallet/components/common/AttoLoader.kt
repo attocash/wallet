@@ -20,30 +20,36 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun AttoLoader(
     modifier: Modifier = Modifier,
     alpha: Float = 1f,
-    darkMode: Boolean = false
+    darkMode: Boolean = false,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .zIndex(10f)
-            .pointerInput(Unit) {
-                detectTapGestures {}
-            }
+        modifier =
+            modifier
+                .fillMaxSize()
+                .zIndex(10f)
+                .pointerInput(Unit) {
+                    detectTapGestures {}
+                },
     ) {
-        val backgroundColor = if (darkMode)
-            MaterialTheme.colorScheme.onSurface
-        else MaterialTheme.colorScheme.surface
+        val backgroundColor =
+            if (darkMode) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
 
         Box(
-            Modifier.fillMaxSize()
-                .background(color = backgroundColor.copy(alpha))
+            Modifier
+                .fillMaxSize()
+                .background(color = backgroundColor.copy(alpha)),
         )
 
         CircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .width(64.dp),
-            color = MaterialTheme.colorScheme.primary
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .width(64.dp),
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }

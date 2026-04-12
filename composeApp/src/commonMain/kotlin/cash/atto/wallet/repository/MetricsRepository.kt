@@ -17,16 +17,19 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 
 class MetricsRepository(
-    private val network: AttoNetwork
+    private val network: AttoNetwork,
 ) {
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
+    private val client =
+        HttpClient {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                    },
+                )
+            }
         }
-    }
 
     private val _metricsResponse = MutableStateFlow<MetricsResponse?>(null)
     val metricsResponse = _metricsResponse.asStateFlow()
@@ -49,10 +52,11 @@ class MetricsRepository(
         return response
     }
 
-    private suspend fun fetchMetricsProjection(baseUrl: String): MetricsResponse? = try {
-        client.get("${baseUrl}/projections/metrics").body<MetricsResponse>()
-    } catch (e: Exception) {
-        println("Error fetching metrics projection: ${e.message} ${e.stackTraceToString()}")
-        null
-    }
+    private suspend fun fetchMetricsProjection(baseUrl: String): MetricsResponse? =
+        try {
+            client.get("$baseUrl/projections/metrics").body<MetricsResponse>()
+        } catch (e: Exception) {
+            println("Error fetching metrics projection: ${e.message} ${e.stackTraceToString()}")
+            null
+        }
 }

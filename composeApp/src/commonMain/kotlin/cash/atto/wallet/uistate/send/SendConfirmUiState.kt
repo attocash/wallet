@@ -7,5 +7,5 @@ data class SendConfirmUiState(
     val amountUsd: BigDecimal?,
     val address: String?,
     val showLoader: Boolean,
-    val accountHeight: ULong? = null
+    val accountHeight: ULong? = null,
 )

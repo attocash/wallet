@@ -16,47 +16,53 @@ data class Voter(
     val addedAt: String,
     val description: String,
     val voteWeight: String,
-    val lastVotedAt: Instant
+    val lastVotedAt: Instant,
 ) {
-
     val voteWeightPercentage
-        get() = voteWeight.let {
-            val weight = BigDecimal.parseString(voteWeight)
-            val maxSupply = BigDecimal.parseString(
-                cash.atto.commons.AttoAmount.MAX.raw.toString()
-            )
-            val hundred = BigDecimal.parseString("100.00")
+        get() =
+            voteWeight.let {
+                val weight = BigDecimal.parseString(voteWeight)
+                val maxSupply =
+                    BigDecimal.parseString(
+                        cash.atto.commons.AttoAmount.MAX.raw
+                            .toString(),
+                    )
+                val hundred = BigDecimal.parseString("100.00")
 
-            val mode = DecimalMode(
-                decimalPrecision = 5,
-                scale = 2,
-                roundingMode = RoundingMode.ROUND_HALF_CEILING
-            )
+                val mode =
+                    DecimalMode(
+                        decimalPrecision = 5,
+                        scale = 2,
+                        roundingMode = RoundingMode.ROUND_HALF_CEILING,
+                    )
 
-            val percentage = (weight * hundred).divide(maxSupply, decimalMode = mode)
+                val percentage = (weight * hundred).divide(maxSupply, decimalMode = mode)
 
-            return@let percentage
-        }
-
+                return@let percentage
+            }
 }
 
 fun Voter.calculateEntityWeightPercentage(allVoters: List<Voter>): BigDecimal {
     val entityVoters = allVoters.filter { it.entity == this.entity }
 
-    val totalWeight = entityVoters.fold(BigDecimal.ZERO) { acc, voter ->
-        acc + BigDecimal.parseString(voter.voteWeight)
-    }
+    val totalWeight =
+        entityVoters.fold(BigDecimal.ZERO) { acc, voter ->
+            acc + BigDecimal.parseString(voter.voteWeight)
+        }
 
-    val maxSupply = BigDecimal.parseString(
-        cash.atto.commons.AttoAmount.MAX.raw.toString()
-    )
+    val maxSupply =
+        BigDecimal.parseString(
+            cash.atto.commons.AttoAmount.MAX.raw
+                .toString(),
+        )
     val hundred = BigDecimal.parseString("100.00")
 
-    val mode = DecimalMode(
-        decimalPrecision = 5,
-        scale = 2,
-        roundingMode = RoundingMode.ROUND_HALF_CEILING
-    )
+    val mode =
+        DecimalMode(
+            decimalPrecision = 5,
+            scale = 2,
+            roundingMode = RoundingMode.ROUND_HALF_CEILING,
+        )
 
     return (totalWeight * hundred).divide(maxSupply, decimalMode = mode)
 }

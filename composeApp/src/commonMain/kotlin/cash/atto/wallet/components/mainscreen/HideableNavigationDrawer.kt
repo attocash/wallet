@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -35,8 +34,6 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_atto_chevron_left
 import attowallet.composeapp.generated.resources.ic_atto_chevron_right
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.primaryGradient
-import cash.atto.wallet.ui.secondaryGradient
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -45,32 +42,34 @@ fun HideableNavigationDrawer(
     modifier: Modifier = Modifier,
     header: @Composable () -> Unit,
     drawerContent: @Composable () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
         val drawerExpanded = remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Box(Modifier.size(48.dp, 48.dp)
-                    .clip(CircleShape)
-                    .background(
-                        color = MaterialTheme.colorScheme
-                            .onSurface
-                            .copy(alpha = 0.05f)
-                    )
-                    .clickable { drawerExpanded.value = true }
+                Box(
+                    Modifier
+                        .size(48.dp, 48.dp)
+                        .clip(CircleShape)
+                        .background(
+                            color =
+                                MaterialTheme.colorScheme
+                                    .onSurface
+                                    .copy(alpha = 0.05f),
+                        ).clickable { drawerExpanded.value = true },
                 ) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
                         imageVector = vectorResource(Res.drawable.ic_atto_chevron_right),
-                        contentDescription = "backIcon"
+                        contentDescription = "backIcon",
                     )
                 }
 
@@ -84,59 +83,67 @@ fun HideableNavigationDrawer(
 
         if (drawerExpanded.value) {
             Box(Modifier.fillMaxSize()) {
-                Box(Modifier.fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.2f))
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.2f)),
                 )
             }
         }
 
         AnimatedVisibility(
             visible = drawerExpanded.value,
-            enter = slideIn(
-                animationSpec = tween(700),
-                initialOffset = { size -> IntOffset(-size.width, 0) }
-            ),
-            exit = slideOut(
-                animationSpec = tween(700),
-                targetOffset = { size -> IntOffset(-size.width, 0) }
-            )
+            enter =
+                slideIn(
+                    animationSpec = tween(700),
+                    initialOffset = { size -> IntOffset(-size.width, 0) },
+                ),
+            exit =
+                slideOut(
+                    animationSpec = tween(700),
+                    targetOffset = { size -> IntOffset(-size.width, 0) },
+                ),
         ) {
             Row(Modifier.fillMaxSize()) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(0.75f)
-                        .fillMaxHeight()
-                        .background(
-                            color = MaterialTheme.colorScheme.tertiary
-
-                        )
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(0.75f)
+                            .fillMaxHeight()
+                            .background(
+                                color = MaterialTheme.colorScheme.tertiary,
+                            ).padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Box(Modifier.size(48.dp, 48.dp)
-                        .clip(CircleShape)
-                        .background(
-                            color = MaterialTheme.colorScheme
-                                .onSurface
-                                .copy(alpha = 0.05f)
-                        )
-                        .clickable { drawerExpanded.value = false }
+                    Box(
+                        Modifier
+                            .size(48.dp, 48.dp)
+                            .clip(CircleShape)
+                            .background(
+                                color =
+                                    MaterialTheme.colorScheme
+                                        .onSurface
+                                        .copy(alpha = 0.05f),
+                            ).clickable { drawerExpanded.value = false },
                     ) {
                         Icon(
                             modifier = Modifier.align(Alignment.Center),
                             imageVector = vectorResource(Res.drawable.ic_atto_chevron_left),
-                            contentDescription = "backIcon"
+                            contentDescription = "backIcon",
                         )
                     }
 
                     drawerContent()
                 }
 
-                Box(Modifier.weight(1f)
-                    .fillMaxHeight()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { drawerExpanded.value = false }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { drawerExpanded.value = false },
                 )
             }
         }
@@ -153,7 +160,7 @@ fun HideableNavigationDrawerPreview() {
             },
             drawerContent = {
                 NavigationDrawerItemPreview()
-            }
+            },
         ) {
             Text("Hello")
         }

@@ -19,91 +19,100 @@ data class OverviewUiState(
     val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO,
     val addressLabelResolver: (String) -> String? = { null },
     val voterLabelResolver: (String) -> String? = { null },
-    val voterName: String? = null
+    val voterName: String? = null,
 ) {
     val headerUiState
-        get() = OverviewHeaderUiState(
-            attoCoins = balance
-        )
+        get() =
+            OverviewHeaderUiState(
+                attoCoins = balance,
+            )
 
     @OptIn(ExperimentalTime::class)
     val transactionListUiState
-        get() = TransactionListUiState(
-            transactions = entries
-                .filterNotNull()
-                .sortedByDescending { it.height }
-                .mapNotNull {
-                    val subjectAddress = AttoAddress(
-                        it.subjectAlgorithm,
-                        it.subjectPublicKey
-                    ).toString()
-                    
-                    when (it.blockType) {
-                        AttoBlockType.SEND -> TransactionUiState(
-                            type = TransactionType.SEND,
-                            amount = "- " + it.amount().toString(AttoUnit.ATTO),
-                            source = subjectAddress,
-                            sourceLabel = addressLabelResolver(subjectAddress),
-                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height,
-                            hash = it.hash.toString()
-                        )
+        get() =
+            TransactionListUiState(
+                transactions =
+                    entries
+                        .filterNotNull()
+                        .sortedByDescending { it.height }
+                        .mapNotNull {
+                            val subjectAddress =
+                                AttoAddress(
+                                    it.subjectAlgorithm,
+                                    it.subjectPublicKey,
+                                ).toString()
 
-                        AttoBlockType.RECEIVE -> TransactionUiState(
-                            type = TransactionType.RECEIVE,
-                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
-                            source = subjectAddress,
-                            sourceLabel = addressLabelResolver(subjectAddress),
-                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height,
-                            hash = it.hash.toString()
-                        )
-                        AttoBlockType.OPEN -> TransactionUiState(
-                            type = TransactionType.OPEN,
-                            amount = "+ " + it.amount().toString(AttoUnit.ATTO),
-                            source = subjectAddress,
-                            sourceLabel = addressLabelResolver(subjectAddress),
-                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height,
-                            hash = it.hash.toString()
-                        )
+                            when (it.blockType) {
+                                AttoBlockType.SEND ->
+                                    TransactionUiState(
+                                        type = TransactionType.SEND,
+                                        amount = "- " + it.amount().toString(AttoUnit.ATTO),
+                                        source = subjectAddress,
+                                        sourceLabel = addressLabelResolver(subjectAddress),
+                                        timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
+                                        height = it.height,
+                                        hash = it.hash.toString(),
+                                    )
 
-                        AttoBlockType.CHANGE -> TransactionUiState(
-                            type = TransactionType.CHANGE,
-                            amount = null,
-                            source = subjectAddress,
-                            sourceLabel = voterLabelResolver(subjectAddress),
-                            timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
-                            height = it.height,
-                            hash = it.hash.toString()
-                        )
+                                AttoBlockType.RECEIVE ->
+                                    TransactionUiState(
+                                        type = TransactionType.RECEIVE,
+                                        amount = "+ " + it.amount().toString(AttoUnit.ATTO),
+                                        source = subjectAddress,
+                                        sourceLabel = addressLabelResolver(subjectAddress),
+                                        timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
+                                        height = it.height,
+                                        hash = it.hash.toString(),
+                                    )
+                                AttoBlockType.OPEN ->
+                                    TransactionUiState(
+                                        type = TransactionType.OPEN,
+                                        amount = "+ " + it.amount().toString(AttoUnit.ATTO),
+                                        source = subjectAddress,
+                                        sourceLabel = addressLabelResolver(subjectAddress),
+                                        timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
+                                        height = it.height,
+                                        hash = it.hash.toString(),
+                                    )
 
-                        else -> null
-                    }
-                },
-            showHint = entries.isEmpty()
-        )
+                                AttoBlockType.CHANGE ->
+                                    TransactionUiState(
+                                        type = TransactionType.CHANGE,
+                                        amount = null,
+                                        source = subjectAddress,
+                                        sourceLabel = voterLabelResolver(subjectAddress),
+                                        timestamp = Instant.fromEpochMilliseconds(it.timestamp.toEpochMilliseconds()),
+                                        height = it.height,
+                                        hash = it.hash.toString(),
+                                    )
+
+                                else -> null
+                            }
+                        },
+                showHint = entries.isEmpty(),
+            )
 
     companion object {
-        val DEFAULT = OverviewUiState(
-            balance = null,
-            priceUsd = null,
-            entries = List<AttoAccountEntry?>(2) { null },
-            receiveAddress = null
-        )
+        val DEFAULT =
+            OverviewUiState(
+                balance = null,
+                priceUsd = null,
+                entries = List<AttoAccountEntry?>(2) { null },
+                receiveAddress = null,
+            )
 
-        suspend fun empty() = OverviewUiState(
-            balance = null,
-            priceUsd = null,
-            entries = emptyList(),
-            receiveAddress = null
-        )
+        suspend fun empty() =
+            OverviewUiState(
+                balance = null,
+                priceUsd = null,
+                entries = emptyList(),
+                receiveAddress = null,
+            )
     }
 
-    private fun AttoAccountEntry.amount(): AttoAmount {
-        return when (this.blockType) {
+    private fun AttoAccountEntry.amount(): AttoAmount =
+        when (this.blockType) {
             AttoBlockType.SEND -> this.previousBalance - this.balance
             else -> this.balance - this.previousBalance
         }
-    }
 }

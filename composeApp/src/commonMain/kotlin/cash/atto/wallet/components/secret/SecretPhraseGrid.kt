@@ -12,20 +12,20 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun SecretPhraseGridCompact(
     words: List<String>,
-    hidden: Boolean
+    hidden: Boolean,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         itemsIndexed(
-            words
+            words,
         ) { index, item ->
             SecretWordCompact(
                 ordinal = index + 1,
                 word = item,
-                hidden = hidden
+                hidden = hidden,
             )
         }
     }
@@ -34,20 +34,20 @@ fun SecretPhraseGridCompact(
 @Composable
 fun SecretPhraseGridExpanded(
     words: List<String>,
-    hidden: Boolean
+    hidden: Boolean,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(6),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         itemsIndexed(
-            words
+            words,
         ) { index, item ->
             SecretWordExpanded(
                 ordinal = index + 1,
                 word = item,
-                hidden = hidden
+                hidden = hidden,
             )
         }
     }
@@ -58,10 +58,11 @@ fun SecretPhraseGridExpanded(
 fun SecretPhraseGridCompactPreview() {
     AttoWalletTheme {
         SecretPhraseGridCompact(
-            words = (1..24)
-                .map { "Word$it" }
-                .toList(),
-            hidden = false
+            words =
+                (1..24)
+                    .map { "Word$it" }
+                    .toList(),
+            hidden = false,
         )
     }
 }
@@ -71,10 +72,11 @@ fun SecretPhraseGridCompactPreview() {
 fun SecretPhraseGridExpandedPreview() {
     AttoWalletTheme {
         SecretPhraseGridExpanded(
-            words = (1..24)
-                .map { "Word$it" }
-                .toList(),
-            hidden = false
+            words =
+                (1..24)
+                    .map { "Word$it" }
+                    .toList(),
+            hidden = false,
         )
     }
 }

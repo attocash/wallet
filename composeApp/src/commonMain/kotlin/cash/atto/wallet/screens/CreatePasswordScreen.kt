@@ -1,41 +1,28 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.ContentType
-import androidx.compose.ui.autofill.contentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoBackButton
-import cash.atto.wallet.components.common.AttoScreenSubtitle
 import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoPasswordField
+import cash.atto.wallet.components.common.AttoScreenSubtitle
 import cash.atto.wallet.components.common.AttoScreenTitle
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_accent_border_hover
 import cash.atto.wallet.ui.dark_bg
@@ -45,7 +32,6 @@ import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_secondary
-import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import kotlinx.coroutines.launch
@@ -67,7 +53,7 @@ private val PasswordDanger = dark_danger
 @Composable
 fun CreatePasswordScreen(
     onBackNavigation: () -> Unit,
-    onConfirmClick: () -> Unit
+    onConfirmClick: () -> Unit,
 ) {
     val viewModel = koinViewModel<CreatePasswordViewModel>()
     val uiState = viewModel.state.collectAsState()
@@ -93,7 +79,7 @@ fun CreatePasswordScreen(
             coroutineScope.launch {
                 viewModel.setPasswordConfirm(it)
             }
-        }
+        },
     )
 }
 
@@ -103,7 +89,7 @@ fun CreatePassword(
     onBackNavigation: () -> Unit,
     onConfirmClick: () -> Unit,
     onPasswordChanged: (String) -> Unit,
-    onPasswordConfirmChanged: (String) -> Unit
+    onPasswordConfirmChanged: (String) -> Unit,
 ) {
     var showPassword by remember { mutableStateOf(false) }
     var showPasswordConfirm by remember { mutableStateOf(false) }
@@ -122,57 +108,62 @@ fun CreatePassword(
     val scrollState = rememberScrollState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PasswordPageBackground)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(PasswordPageBackground),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 40.dp,
-                    bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 40.dp,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(
+                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 40.dp,
+                        bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 40.dp,
+                        start = 24.dp,
+                        end = 24.dp,
+                    ),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BoxWithConstraints(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
+                contentAlignment = Alignment.TopCenter,
             ) {
                 val shellWidth = if (maxWidth > 576.dp) 576.dp else maxWidth
 
                 Column(
                     modifier = Modifier.width(shellWidth),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 32.dp),
-                        horizontalArrangement = Arrangement.Start
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.Start,
                     ) {
                         AttoBackButton(onClick = onBackNavigation)
                     }
 
                     AttoScreenTitle(
-                        text = stringResource(Res.string.password_create_title)
+                        text = stringResource(Res.string.password_create_title),
                     )
 
                     AttoScreenSubtitle(
                         text = stringResource(Res.string.password_create_text),
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .padding(horizontal = 16.dp)
+                        modifier =
+                            Modifier
+                                .padding(top = 12.dp)
+                                .padding(horizontal = 16.dp),
                     )
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 40.dp),
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
                         PasswordField(
                             label = stringResource(Res.string.password_field_label),
@@ -181,7 +172,7 @@ fun CreatePassword(
                             revealed = showPassword,
                             onRevealToggle = { showPassword = !showPassword },
                             onValueChange = onPasswordChanged,
-                            imeAction = ImeAction.Next
+                            imeAction = ImeAction.Next,
                         )
 
                         Column {
@@ -197,13 +188,13 @@ fun CreatePassword(
                                     if (canProceed) {
                                         onConfirmClick()
                                     }
-                                }
+                                },
                             )
 
                             if (showMismatch || passwordsMatch) {
                                 PasswordMatchState(
                                     matches = passwordsMatch,
-                                    modifier = Modifier.padding(top = 8.dp)
+                                    modifier = Modifier.padding(top = 8.dp),
                                 )
                             }
                         }
@@ -213,16 +204,17 @@ fun CreatePassword(
                             hasUpperCase = hasUpperCase,
                             hasLowerCase = hasLowerCase,
                             hasNumber = hasNumber,
-                            hasSpecial = hasSpecial
+                            hasSpecial = hasSpecial,
                         )
                     }
 
                     AttoButton(
                         text = stringResource(Res.string.password_create_next),
                         onClick = onConfirmClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
                         enabled = canProceed,
                     )
                 }
@@ -230,7 +222,6 @@ fun CreatePassword(
         }
     }
 }
-
 
 @Composable
 private fun PasswordField(
@@ -241,7 +232,7 @@ private fun PasswordField(
     onRevealToggle: () -> Unit,
     onValueChange: (String) -> Unit,
     imeAction: ImeAction,
-    onDone: () -> Unit = {}
+    onDone: () -> Unit = {},
 ) {
     AttoPasswordField(
         value = value,
@@ -258,31 +249,33 @@ private fun PasswordField(
 @Composable
 private fun PasswordMatchState(
     matches: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = if (matches) Icons.Outlined.Check else Icons.Outlined.Close,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            tint = if (matches) PasswordSuccess else PasswordDanger
+            tint = if (matches) PasswordSuccess else PasswordDanger,
         )
 
         Text(
-            text = if (matches) {
-                stringResource(Res.string.password_match)
-            } else {
-                stringResource(Res.string.password_no_match)
-            },
+            text =
+                if (matches) {
+                    stringResource(Res.string.password_match)
+                } else {
+                    stringResource(Res.string.password_no_match)
+                },
             color = if (matches) PasswordSuccess else PasswordDanger,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp
-            )
+            style =
+                MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
+                ),
         )
     }
 }
@@ -293,23 +286,25 @@ private fun PasswordRequirementsCard(
     hasUpperCase: Boolean,
     hasLowerCase: Boolean,
     hasNumber: Boolean,
-    hasSpecial: Boolean
+    hasSpecial: Boolean,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PasswordSurface, RoundedCornerShape(8.dp))
-            .border(1.dp, PasswordBorder, RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(PasswordSurface, RoundedCornerShape(8.dp))
+                .border(1.dp, PasswordBorder, RoundedCornerShape(8.dp))
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = stringResource(Res.string.password_requirements_title),
             color = PasswordTextSecondary,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.W500,
-                fontSize = 13.sp
-            )
+            style =
+                MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 13.sp,
+                ),
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -325,27 +320,28 @@ private fun PasswordRequirementsCard(
 @Composable
 private fun PasswordRequirement(
     satisfied: Boolean,
-    text: String
+    text: String,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(16.dp)
-                .background(
-                    color = if (satisfied) PasswordSuccess else PasswordBorder,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(16.dp)
+                    .background(
+                        color = if (satisfied) PasswordSuccess else PasswordBorder,
+                        shape = CircleShape,
+                    ),
+            contentAlignment = Alignment.Center,
         ) {
             if (satisfied) {
                 Icon(
                     imageVector = Icons.Outlined.Check,
                     contentDescription = null,
                     modifier = Modifier.size(10.dp),
-                    tint = PasswordTextPrimary
+                    tint = PasswordTextPrimary,
                 )
             }
         }
@@ -353,14 +349,14 @@ private fun PasswordRequirement(
         Text(
             text = text,
             color = if (satisfied) PasswordSuccess else PasswordTextTertiary,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.W400,
-                fontSize = 13.sp
-            )
+            style =
+                MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.W400,
+                    fontSize = 13.sp,
+                ),
         )
     }
 }
-
 
 @Preview
 @Composable
@@ -371,7 +367,7 @@ fun CreatePasswordPreview() {
             onBackNavigation = {},
             onConfirmClick = {},
             onPasswordChanged = {},
-            onPasswordConfirmChanged = {}
+            onPasswordConfirmChanged = {},
         )
     }
 }

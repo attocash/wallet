@@ -19,7 +19,6 @@ class SecurityUtil {
     }
     private val charset by lazy {
         charset("UTF-8")
-
     }
     private val keyStore by lazy {
         KeyStore.getInstance(provider).apply {
@@ -30,48 +29,53 @@ class SecurityUtil {
         KeyGenerator.getInstance(KEY_ALGORITHM_AES, provider)
     }
 
-    fun encryptData(keyAlias: String, text: String): Pair<ByteArray, ByteArray> {
-        val key = if (keyStore.containsAlias(keyAlias))
-            getSecretKey(keyAlias)
-        else generateSecretKey(keyAlias)
+    fun encryptData(
+        keyAlias: String,
+        text: String,
+    ): Pair<ByteArray, ByteArray> {
+        val key =
+            if (keyStore.containsAlias(keyAlias)) {
+                getSecretKey(keyAlias)
+            } else {
+                generateSecretKey(keyAlias)
+            }
 
         cipher.init(
             Cipher.ENCRYPT_MODE,
-            key
+            key,
         )
 
         return Pair(
             first = cipher.iv,
-            second = cipher.doFinal(text.toByteArray(charset))
+            second = cipher.doFinal(text.toByteArray(charset)),
         )
     }
 
     fun decryptData(
         keyAlias: String,
         iv: ByteArray,
-        encryptedData: ByteArray
+        encryptedData: ByteArray,
     ): String {
         cipher.init(
             Cipher.DECRYPT_MODE,
             getSecretKey(keyAlias),
-            GCMParameterSpec(128, iv)
+            GCMParameterSpec(128, iv),
         )
 
         return cipher.doFinal(encryptedData).toString(charset)
     }
 
-    private fun generateSecretKey(keyAlias: String): SecretKey {
-        return keyGenerator.apply {
-            init(
-                KeyGenParameterSpec
-                    .Builder(keyAlias, PURPOSE_ENCRYPT or PURPOSE_DECRYPT)
-                    .setBlockModes(BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(ENCRYPTION_PADDING_NONE)
-                    .build()
-            )
-        }.generateKey()
-    }
+    private fun generateSecretKey(keyAlias: String): SecretKey =
+        keyGenerator
+            .apply {
+                init(
+                    KeyGenParameterSpec
+                        .Builder(keyAlias, PURPOSE_ENCRYPT or PURPOSE_DECRYPT)
+                        .setBlockModes(BLOCK_MODE_GCM)
+                        .setEncryptionPaddings(ENCRYPTION_PADDING_NONE)
+                        .build(),
+                )
+            }.generateKey()
 
-    private fun getSecretKey(keyAlias: String) =
-        (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
+    private fun getSecretKey(keyAlias: String) = (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
 }

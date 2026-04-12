@@ -39,34 +39,38 @@ fun AttoSendButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Surface(
-        modifier = modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                onClick = onClick
-            ),
+        modifier =
+            modifier
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = onClick,
+                ),
         shape = RoundedCornerShape(62.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = MaterialTheme.colorScheme.primaryGradient
-                    )
-                )
-                .padding(5.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors = MaterialTheme.colorScheme.primaryGradient,
+                            ),
+                    ).padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                Modifier.size(52.dp, 52.dp)
+                Modifier
+                    .size(52.dp, 52.dp)
                     .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.secondary)
+                    .background(color = MaterialTheme.colorScheme.secondary),
             ) {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_arrow_up),
                     contentDescription = "send icon",
                     modifier = Modifier.align(Alignment.Center),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
 
@@ -75,7 +79,7 @@ fun AttoSendButton(
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }

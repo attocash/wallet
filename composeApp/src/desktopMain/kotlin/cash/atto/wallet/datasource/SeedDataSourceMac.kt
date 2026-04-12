@@ -7,11 +7,10 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
 class SeedDataSourceMac : SeedDataSourceDesktopImpl {
-
     private val macCred = MacCred()
 
-    private val _seedChannel = Channel<String?>()
-    override val seed = _seedChannel.consumeAsFlow()
+    private val seedChannel = Channel<String?>()
+    override val seed = seedChannel.consumeAsFlow()
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
@@ -31,11 +30,11 @@ class SeedDataSourceMac : SeedDataSourceDesktopImpl {
 
     private suspend fun getSeed() {
         try {
-            _seedChannel.send(
-                macCred.getSeed()
+            seedChannel.send(
+                macCred.getSeed(),
             )
         } catch (ex: Exception) {
-            _seedChannel.send(null)
+            seedChannel.send(null)
         }
     }
 }

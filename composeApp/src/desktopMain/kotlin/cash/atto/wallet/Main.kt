@@ -13,9 +13,10 @@ import java.awt.Dimension
 
 fun main() {
     val lifecycle = LifecycleRegistry()
-    val navComponent = runOnUiThread {
-        DWNavigationComponent(DefaultComponentContext(lifecycle))
-    }
+    val navComponent =
+        runOnUiThread {
+            DWNavigationComponent(DefaultComponentContext(lifecycle))
+        }
 
     application {
         initKoin()
@@ -25,10 +26,11 @@ fun main() {
             onCloseRequest = ::exitApplication,
             title = "Atto Wallet",
         ) {
-            window.minimumSize = Dimension(
-                1344,
-                800
-            )
+            window.minimumSize =
+                Dimension(
+                    1396,
+                    900,
+                )
 
             LifecycleController(
                 lifecycleRegistry = lifecycle,

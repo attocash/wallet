@@ -9,24 +9,28 @@ class UnsafeSeedDataSource : SeedDataSourceDesktopImpl {
     private val seedFile = File("Seed.txt")
 
     init {
-        if (!seedFile.exists())
+        if (!seedFile.exists()) {
             seedFile.createNewFile()
+        }
     }
 
-    override val seed = flow {
-        if (seedFile.length() == 0L) {
-            emit(null)
-        }
-
-        seedFile.inputStream()
-            .bufferedReader()
-            .lineSequence()
-            .forEach { line ->
-                emit(line)
+    override val seed =
+        flow {
+            if (seedFile.length() == 0L) {
+                emit(null)
             }
-    }.flowOn(Dispatchers.IO)
+
+            seedFile
+                .inputStream()
+                .bufferedReader()
+                .lineSequence()
+                .forEach { line ->
+                    emit(line)
+                }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun setSeed(seed: String) = seedFile.writeText(seed)
+
     override suspend fun clearSeed() {
         seedFile.delete()
     }

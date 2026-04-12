@@ -9,5 +9,5 @@ class SendResultUiState(
     val amountUsd: BigDecimal?,
     val address: String?,
     val elapsedMs: Long? = null,
-    val sendBlock: AttoSendBlock? = null
+    val sendBlock: AttoSendBlock? = null,
 )

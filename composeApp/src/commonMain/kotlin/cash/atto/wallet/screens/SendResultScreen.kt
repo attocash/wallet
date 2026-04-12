@@ -44,9 +44,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @Composable
-fun SendResultScreen(
-    onClose: () -> Unit
-) {
+fun SendResultScreen(onClose: () -> Unit) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -58,7 +56,7 @@ fun SendResultScreen(
                 viewModel.clearTransactionData()
                 onClose.invoke()
             }
-        }
+        },
     )
 }
 
@@ -66,90 +64,101 @@ fun SendResultScreen(
 @Composable
 fun SendResult(
     uiState: SendResultUiState,
-    onClose: () -> Unit
+    onClose: () -> Unit,
 ) {
     val isSuccess = uiState.result == SendTransactionUiState.SendOperationResult.SUCCESS
-    val accentColor = if (isSuccess)
-        dark_success
-    else
-        dark_danger
+    val accentColor =
+        if (isSuccess) {
+            dark_success
+        } else {
+            dark_danger
+        }
 
     AttoModal(
         title = if (isSuccess) "Transaction Sent" else stringResource(Res.string.send_failure_title),
-        onDismiss = onClose
+        onDismiss = onClose,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(68.dp)
-                    .background(dark_surface, RoundedCornerShape(16.dp))
-                    .border(1.dp, dark_border, RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(68.dp)
+                        .background(dark_surface, RoundedCornerShape(16.dp))
+                        .border(1.dp, dark_border, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = if (isSuccess) Icons.Outlined.Done else Icons.Outlined.Close,
                     contentDescription = null,
                     modifier = Modifier.size(29.dp),
-                    tint = accentColor
+                    tint = accentColor,
                 )
             }
 
             Text(
                 text = "${AttoFormatter.format(uiState.amount)} ATTO",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    color = dark_success
-                ),
-                color = accentColor
+                style =
+                    MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = dark_success,
+                    ),
+                color = accentColor,
             )
 
             uiState.amountUsd?.let {
                 Text(
                     text = AttoFormatter.formatUsd(it),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = dark_text_tertiary
+                    color = dark_text_tertiary,
                 )
             }
         }
 
         val block = uiState.sendBlock
-        val confirmedAmount = uiState.amount?.toStringExpanded()
-            ?: runCatching { block?.amount?.toString(AttoUnit.ATTO) }.getOrNull()
+        val confirmedAmount =
+            uiState.amount?.toStringExpanded()
+                ?: runCatching { block?.amount?.toString(AttoUnit.ATTO) }.getOrNull()
 
         if (isSuccess) {
             AttoTransactionCard(
-                transaction = TransactionUiState(
-                    type = TransactionType.SEND,
-                    amount = confirmedAmount,
-                    source = block?.receiverPublicKey
-                        ?.toAddress(block.receiverAlgorithm)?.value
-                        ?: uiState.address.orEmpty(),
-                    sourceLabel = null,
-                    timestamp = block?.timestamp?.value
-                        ?: Clock.System.now(),
-                    height = block?.height ?: AttoHeight(0u),
-                    hash = block?.hash?.value?.toHex()
-                )
+                transaction =
+                    TransactionUiState(
+                        type = TransactionType.SEND,
+                        amount = confirmedAmount,
+                        source =
+                            block
+                                ?.receiverPublicKey
+                                ?.toAddress(block.receiverAlgorithm)
+                                ?.value
+                                ?: uiState.address.orEmpty(),
+                        sourceLabel = null,
+                        timestamp =
+                            block?.timestamp?.value
+                                ?: Clock.System.now(),
+                        height = block?.height ?: AttoHeight(0u),
+                        hash = block?.hash?.value?.toHex(),
+                    ),
             )
         }
 
         if (isSuccess && uiState.elapsedMs != null) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 Text(
                     text = "Confirmed in ${uiState.elapsedMs}ms",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 10.sp
-                    ),
-                    color = dark_text_tertiary
+                    style =
+                        MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.W600,
+                            fontSize = 10.sp,
+                        ),
+                    color = dark_text_tertiary,
                 )
             }
         }
@@ -158,7 +167,7 @@ fun SendResult(
             text = stringResource(Res.string.send_close),
             onClick = onClose,
             modifier = Modifier.fillMaxWidth(),
-            variant = AttoButtonVariant.Outlined
+            variant = AttoButtonVariant.Outlined,
         )
     }
 }
@@ -168,14 +177,15 @@ fun SendResult(
 fun SendResultPreview() {
     AttoWalletTheme {
         SendResult(
-            uiState = SendResultUiState(
-                result = SendTransactionUiState.SendOperationResult.SUCCESS,
-                amount = BigDecimal.TEN,
-                amountUsd = null,
-                address = "atto://address",
-                elapsedMs = 342
-            ),
-            onClose = {}
+            uiState =
+                SendResultUiState(
+                    result = SendTransactionUiState.SendOperationResult.SUCCESS,
+                    amount = BigDecimal.TEN,
+                    amountUsd = null,
+                    address = "atto://address",
+                    elapsedMs = 342,
+                ),
+            onClose = {},
         )
     }
 }

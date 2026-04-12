@@ -12,9 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PersistentWorkCache(
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : AttoWorkCache {
-
     private val dao = appDatabase.workDao()
     private val _hasCachedWork = MutableStateFlow(false)
 

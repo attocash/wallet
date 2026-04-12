@@ -3,8 +3,9 @@ package cash.atto.wallet.components.common
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLVideoElement
 
-internal fun loadZXingScript(): Unit = js(
-    """
+internal fun loadZXingScript(): Unit =
+    js(
+        """
     {
         if (window.__zxingLoaded) return;
         if (window.__zxingLoading) return;
@@ -21,15 +22,17 @@ internal fun loadZXingScript(): Unit = js(
         };
         document.head.appendChild(script);
     }
-"""
-)
+""",
+    )
 
-internal fun isZXingReady(): Boolean = js(
-    """(typeof window.__zxingLoaded !== 'undefined' && window.__zxingLoaded === true)"""
-)
+internal fun isZXingReady(): Boolean =
+    js(
+        """(typeof window.__zxingLoaded !== 'undefined' && window.__zxingLoaded === true)""",
+    )
 
-internal fun decodeQrFromCanvas(canvas: HTMLCanvasElement): JsString? = js(
-    """
+internal fun decodeQrFromCanvas(canvas: HTMLCanvasElement): JsString? =
+    js(
+        """
     {
         try {
             var ZXingLib = window.ZXing || (typeof ZXing !== 'undefined' ? ZXing : null);
@@ -44,11 +47,12 @@ internal fun decodeQrFromCanvas(canvas: HTMLCanvasElement): JsString? = js(
             return null;
         }
     }
-"""
-)
+""",
+    )
 
-internal fun createVideoElement(): HTMLVideoElement = js(
-    """
+internal fun createVideoElement(): HTMLVideoElement =
+    js(
+        """
     {
         var video = document.createElement('video');
         video.setAttribute('autoplay', '');
@@ -61,21 +65,27 @@ internal fun createVideoElement(): HTMLVideoElement = js(
         video.style.objectFit = 'cover';
         return video;
     }
-"""
-)
+""",
+    )
 
-internal fun createCanvasElement(): HTMLCanvasElement = js(
-    """
+internal fun createCanvasElement(): HTMLCanvasElement =
+    js(
+        """
     {
         var canvas = document.createElement('canvas');
         canvas.style.display = 'none';
         return canvas;
     }
-"""
-)
+""",
+    )
 
-internal fun getUserMedia(video: HTMLVideoElement, onSuccess: () -> Unit, onError: (JsString) -> Unit): Unit = js(
-    """
+internal fun getUserMedia(
+    video: HTMLVideoElement,
+    onSuccess: () -> Unit,
+    onError: (JsString) -> Unit,
+): Unit =
+    js(
+        """
     {
         var constraints = { video: { facingMode: { ideal: 'environment' } } };
         navigator.mediaDevices.getUserMedia(constraints)
@@ -90,11 +100,12 @@ internal fun getUserMedia(video: HTMLVideoElement, onSuccess: () -> Unit, onErro
                 onError(err.message || 'Camera access denied');
             });
     }
-"""
-)
+""",
+    )
 
-internal fun stopMediaStream(video: HTMLVideoElement): Unit = js(
-    """
+internal fun stopMediaStream(video: HTMLVideoElement): Unit =
+    js(
+        """
     {
         if (video.srcObject) {
             var tracks = video.srcObject.getTracks();
@@ -104,11 +115,15 @@ internal fun stopMediaStream(video: HTMLVideoElement): Unit = js(
             video.srcObject = null;
         }
     }
-"""
-)
+""",
+    )
 
-internal fun drawVideoFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement): Boolean = js(
-    """
+internal fun drawVideoFrame(
+    video: HTMLVideoElement,
+    canvas: HTMLCanvasElement,
+): Boolean =
+    js(
+        """
     {
         if (video.readyState !== video.HAVE_ENOUGH_DATA) return false;
         canvas.width = video.videoWidth;
@@ -118,13 +133,18 @@ internal fun drawVideoFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement):
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         return true;
     }
-"""
-)
+""",
+    )
 
-internal fun setIntervalMs(callback: () -> Unit, ms: Int): Int = js(
-    """(setInterval(callback, ms))"""
-)
+internal fun setIntervalMs(
+    callback: () -> Unit,
+    ms: Int,
+): Int =
+    js(
+        """(setInterval(callback, ms))""",
+    )
 
-internal fun clearIntervalId(id: Int): Unit = js(
-    """(clearInterval(id))"""
-)
+internal fun clearIntervalId(id: Int): Unit =
+    js(
+        """(clearInterval(id))""",
+    )

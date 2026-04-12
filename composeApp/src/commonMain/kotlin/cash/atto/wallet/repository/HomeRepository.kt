@@ -19,16 +19,19 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 
 class HomeRepository(
-    private val network: AttoNetwork
+    private val network: AttoNetwork,
 ) {
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
+    private val client =
+        HttpClient {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                    },
+                )
+            }
         }
-    }
 
     private val _homeResponse = MutableStateFlow<HomeResponse?>(null)
     val homeResponse = _homeResponse.asStateFlow()
@@ -51,16 +54,16 @@ class HomeRepository(
         return projection
     }
 
-    private suspend fun fetchProjectionHome(baseUrl: String): HomeResponse? = try {
-        client.get("${baseUrl}/projections/home").body<HomeResponse>()
-    } catch (e: Exception) {
-        println("Error fetching home projection: ${e.message} ${e.stackTraceToString()}")
-        null
-    }
+    private suspend fun fetchProjectionHome(baseUrl: String): HomeResponse? =
+        try {
+            client.get("$baseUrl/projections/home").body<HomeResponse>()
+        } catch (e: Exception) {
+            println("Error fetching home projection: ${e.message} ${e.stackTraceToString()}")
+            null
+        }
 
-    fun getPriceUsd(): BigDecimal? {
-        return homeResponse.value?.getPriceUsd()?.let {
+    fun getPriceUsd(): BigDecimal? =
+        homeResponse.value?.getPriceUsd()?.let {
             BigDecimal.parseString(it)
         }
-    }
 }

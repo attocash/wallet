@@ -17,22 +17,22 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun AttoOutlinedTextCard(
     text: String,
-    color: Color
+    color: Color,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = color,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(19.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = color,
+                    shape = MaterialTheme.shapes.medium,
+                ).padding(19.dp),
     ) {
         Text(
             text = text,
             modifier = Modifier.align(Alignment.Center),
-            color = color
+            color = color,
         )
     }
 }
@@ -43,7 +43,7 @@ fun AttoOutlinedTextCardPreview() {
     AttoWalletTheme {
         AttoOutlinedTextCard(
             text = "Text",
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

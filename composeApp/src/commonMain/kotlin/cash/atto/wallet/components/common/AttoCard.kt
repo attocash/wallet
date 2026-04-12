@@ -33,32 +33,34 @@ fun AttoCard(
     border: Color = dark_border,
     contentPadding: PaddingValues = PaddingValues(20.dp),
     onClick: (() -> Unit)? = null,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val cornerRadius = 12.dp
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = if (hovered) hoverBackground else background,
-                shape = RoundedCornerShape(cornerRadius)
-            )
-            .border(
-                width = 1.dp,
-                color = if (hovered) dark_accent.copy(alpha = 0.32f) else border,
-                shape = RoundedCornerShape(cornerRadius)
-            )
-            .let {
-                if (onClick == null) it else it.clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = onClick
-                )
-            }
-            .padding(contentPadding),
-        content = content
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(
+                    color = if (hovered) hoverBackground else background,
+                    shape = RoundedCornerShape(cornerRadius),
+                ).border(
+                    width = 1.dp,
+                    color = if (hovered) dark_accent.copy(alpha = 0.32f) else border,
+                    shape = RoundedCornerShape(cornerRadius),
+                ).let {
+                    if (onClick == null) {
+                        it
+                    } else {
+                        it.clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = onClick,
+                        )
+                    }
+                }.padding(contentPadding),
+        content = content,
     )
 }

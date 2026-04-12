@@ -15,22 +15,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun BalanceChip(
     modifier: Modifier = Modifier,
-    uiState: BalanceChipUiState
+    uiState: BalanceChipUiState,
 ) {
     Box(
-        modifier.clip(MaterialTheme.shapes.medium)
+        modifier
+            .clip(MaterialTheme.shapes.medium)
             .background(color = MaterialTheme.colorScheme.surface)
-            .padding(32.dp)
+            .padding(32.dp),
     ) {
         Column(
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart),
         ) {
             Text(
                 text = AttoFormatter.format(uiState.attoCoins),
@@ -39,34 +39,45 @@ fun BalanceChip(
             )
             val usdText = uiState.usdValue?.let { "~ $${it.toPlainString()} USD" } ?: ""
             val apyText = uiState.apy?.let { " · ${it.toPlainString()}% APY" } ?: ""
-            val apyColor = if (uiState.apy != null && uiState.apy > com.ionspin.kotlin.bignum.decimal.BigDecimal.ZERO) {
-                androidx.compose.ui.graphics.Color(0xFF4CAF50)
-            } else {
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            }
+            val apyColor =
+                if (uiState.apy != null && uiState.apy > com.ionspin.kotlin.bignum.decimal.BigDecimal.ZERO) {
+                    androidx.compose.ui.graphics
+                        .Color(0xFF4CAF50)
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                }
             if (usdText.isNotEmpty() || apyText.isNotEmpty()) {
                 Text(
-                    text = androidx.compose.ui.text.buildAnnotatedString {
-                        append(usdText)
-                        pushStyle(androidx.compose.ui.text.SpanStyle(color = apyColor))
-                        append(apyText)
-                        pop()
-                    },
+                    text =
+                        androidx.compose.ui.text.buildAnnotatedString {
+                            append(usdText)
+                            pushStyle(
+                                androidx.compose.ui.text
+                                    .SpanStyle(color = apyColor),
+                            )
+                            append(apyText)
+                            pop()
+                        },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W300,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 )
             }
 
             if (uiState.pendingReceivableCount > 0) {
                 Text(
-                    text = "${uiState.pendingReceivableCount} pending receive" +
-                        if (uiState.pendingReceivableCount == 1) "" else "s" +
-                        " · ${AttoFormatter.format(uiState.pendingReceivableAmount)} ATTO",
+                    text =
+                        "${uiState.pendingReceivableCount} pending receive" +
+                            if (uiState.pendingReceivableCount == 1) {
+                                ""
+                            } else {
+                                "s" +
+                                    " · ${AttoFormatter.format(uiState.pendingReceivableAmount)} ATTO"
+                            },
                     fontSize = 14.sp,
                     fontWeight = FontWeight.W400,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
         }

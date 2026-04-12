@@ -5,7 +5,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
-import cash.atto.wallet.components.common.QrScannerView
+import cash.atto.wallet.components.common.qrScannerView
 import cash.atto.wallet.di.viewModelModule
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -15,53 +15,52 @@ import org.koin.core.context.startKoin
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     val lifecycle = LifecycleRegistry()
-    val navComponent = DWNavigationComponent(
-        componentContext = DefaultComponentContext(lifecycle),
-        initialDestination = initialWebDestination()
-    )
+    val navComponent =
+        DWNavigationComponent(
+            componentContext = DefaultComponentContext(lifecycle),
+            initialDestination = initialWebDestination(),
+        )
 
     startKoin { modules(viewModelModule) }
 
     ComposeViewport(viewportContainerId = "AttoWallet") {
         AttoApp(
             component = navComponent,
-            debugScreen = webDebugScreen(),
-            debugPassword = webDebugPassword(),
-            initialNavOverride = webDebugMainScreen(),
+//            debugScreen = webDebugScreen(),
+//            debugPassword = webDebugPassword(),
+//            initialNavOverride = webDebugMainScreen(),
             qrScannerContent = { onResult, onError, onDismiss ->
-                QrScannerView(
+                qrScannerView(
                     modifier = Modifier.width(400.dp),
                     onQrCodeScanned = onResult,
                     onScanError = onError,
-                    onDismiss = onDismiss
+                    onDismiss = onDismiss,
                 )
-            }
+            },
         )
     }
 }
 
-private fun initialWebDestination(): AttoDestination {
-    return when (webQueryParam("screen")) {
+private fun initialWebDestination(): AttoDestination =
+    when (webQueryParam("screen")) {
         "welcome" -> AttoDestination.Welcome
         "overview",
         "send",
         "receive",
         "transactions",
         "settings",
-        "staking" -> AttoDestination.DesktopMain
+        "staking",
+        -> AttoDestination.DesktopMain
 
         "secretPhrase", "recovery-phrase" -> AttoDestination.RecoveryPhrase
         "importSecret", "import-phrase" -> AttoDestination.ImportPhrase
         "createPassword", "create-password" -> AttoDestination.CreatePassword
         else -> AttoDestination.Welcome
     }
-}
 
-internal fun webDebugScreen(): String? =
-    webQueryParam("screen")
+internal fun webDebugScreen(): String? = webQueryParam("screen")
 
-internal fun webDebugPassword(): String? =
-    webQueryParam("password")
+internal fun webDebugPassword(): String? = webQueryParam("password")
 
 internal fun webDebugMainScreen(): MainScreenNavDestination? =
     when (webDebugScreen()) {
@@ -74,8 +73,7 @@ internal fun webDebugMainScreen(): MainScreenNavDestination? =
         else -> null
     }
 
-private fun webQueryParam(key: String): String? =
-    webQueryParams()[key]
+private fun webQueryParam(key: String): String? = webQueryParams()[key]
 
 private fun webQueryParams(): Map<String, String> =
     window.location.search
@@ -89,9 +87,7 @@ private fun webQueryParams(): Map<String, String> =
             val rawValue = pieces.getOrElse(1) { "" }
 
             decodeQueryComponent(rawKey) to decodeQueryComponent(rawValue)
-        }
-        .toMap()
+        }.toMap()
 
 @OptIn(ExperimentalWasmJsInterop::class)
-private fun decodeQueryComponent(value: String): String =
-    js("decodeURIComponent(value.replace(/\\+/g, '%20'))")
+private fun decodeQueryComponent(value: String): String = js("decodeURIComponent(value.replace(/\\+/g, '%20'))")

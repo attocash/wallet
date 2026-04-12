@@ -12,11 +12,11 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 
 @Composable
-fun QrScannerView(
+fun qrScannerView(
     modifier: Modifier = Modifier,
     onQrCodeScanned: (String) -> Unit,
     onScanError: (String) -> Unit,
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val scanner = remember { WasmQrScanner() }
 
@@ -63,7 +63,7 @@ fun QrScannerView(
             onError = { message ->
                 onScanError(message)
                 container.remove()
-            }
+            },
         )
 
         val videoEl = scanner.videoElement

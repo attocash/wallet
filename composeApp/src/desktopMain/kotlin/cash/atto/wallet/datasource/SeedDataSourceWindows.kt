@@ -7,11 +7,10 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
 class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
-
     private val winCred = WinCred()
 
-    private val _seedChannel = Channel<String?>()
-    override val seed = _seedChannel.consumeAsFlow()
+    private val seedChannel = Channel<String?>()
+    override val seed = seedChannel.consumeAsFlow()
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
@@ -23,7 +22,7 @@ class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
         winCred.setCredential(
             target = APP_NAME,
             userName = USERNAME,
-            password = seed
+            password = seed,
         )
 
         getSeed()
@@ -36,12 +35,13 @@ class SeedDataSourceWindows : SeedDataSourceDesktopImpl {
 
     private suspend fun getSeed() {
         try {
-            _seedChannel.send(
-                winCred.getCredential(APP_NAME)
-                    .ifEmpty { null }
+            seedChannel.send(
+                winCred
+                    .getCredential(APP_NAME)
+                    .ifEmpty { null },
             )
         } catch (ex: Exception) {
-            _seedChannel.send(null)
+            seedChannel.send(null)
         }
     }
 

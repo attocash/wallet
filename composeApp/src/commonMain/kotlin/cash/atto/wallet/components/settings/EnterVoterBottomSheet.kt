@@ -35,24 +35,25 @@ fun EnterVoterBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(),
     onChange: (String) -> Unit,
     onClose: () -> Unit,
-    showError: Boolean
+    showError: Boolean,
 ) {
-    val input = remember {
-        mutableStateOf("")
-    }
+    val input =
+        remember {
+            mutableStateOf("")
+        }
 
     BottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Text(
             text = stringResource(Res.string.staking_change_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
 
         TextField(
             value = input.value,
-            onValueChange = { input.value = it }
+            onValueChange = { input.value = it },
         )
 
         if (showError) {
@@ -60,7 +61,7 @@ fun EnterVoterBottomSheet(
                 text = stringResource(Res.string.staking_error_address),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelMedium,
             )
         }
 
@@ -69,18 +70,20 @@ fun EnterVoterBottomSheet(
         Button(
             onClick = { onChange.invoke(input.value) },
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp
-            ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            contentPadding = PaddingValues(19.dp)
+            elevation =
+                ButtonDefaults.buttonElevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                ),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            contentPadding = PaddingValues(19.dp),
         ) {
             Text(text = stringResource(Res.string.staking_change))
         }
@@ -88,18 +91,20 @@ fun EnterVoterBottomSheet(
         Button(
             onClick = onClose,
             modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp
-            ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-            ),
-            contentPadding = PaddingValues(19.dp)
+            elevation =
+                ButtonDefaults.buttonElevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                ),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ),
+            contentPadding = PaddingValues(19.dp),
         ) {
             Text(text = stringResource(Res.string.staking_close))
         }
@@ -115,7 +120,7 @@ fun EnterRepresentativeBottomSheetPreview() {
             onDismissRequest = {},
             onChange = {},
             onClose = {},
-            showError = true
+            showError = true,
         )
     }
 }

@@ -14,114 +14,138 @@ import org.jetbrains.compose.resources.vectorResource
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class TransactionUiState @OptIn(ExperimentalTime::class) constructor(
-    val type: TransactionType,
-    val amount: String?,
-    val source: String,
-    val sourceLabel: String? = null,
-    val timestamp: Instant,
-    val height: AttoHeight,
-    val hash: String? = null,
-) {
-
-    var shownAmount = amount?.let { a ->
-        if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
-            val sign = a.split(' ').getOrNull(0)
-            val number = a.split(' ').getOrNull(1)
-
-            "$sign ${AttoFormatter.format(number)}"
-        } else AttoFormatter.format(amount)
-    } ?: " "
-
-    val icon: ImageVector
-        @Composable
-        get() = when (type) {
-            TransactionType.OPEN -> vectorResource(Res.drawable.ic_arrow_down)
-            TransactionType.SEND -> vectorResource(Res.drawable.ic_arrow_up)
-            TransactionType.RECEIVE -> vectorResource(Res.drawable.ic_arrow_down)
-            TransactionType.CHANGE -> Icons.Outlined.Refresh
-        }
-
-    val typeString
-        @Composable
-        get() = when (type) {
-            TransactionType.OPEN -> {
-                val label = sourceLabel ?: ""
-                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_from)} $label"
-                else stringResource(Res.string.overview_hint_type_from)
-            }
-
-            TransactionType.SEND -> {
-                val label = sourceLabel ?: ""
-                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_to)} $label"
-                else stringResource(Res.string.overview_hint_type_to)
-            }
-
-            TransactionType.RECEIVE -> {
-                val label = sourceLabel ?: ""
-                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_from)} $label"
-                else stringResource(Res.string.overview_hint_type_from)
-            }
-
-            TransactionType.CHANGE -> {
-                val label = sourceLabel ?: ""
-                if (label.isNotEmpty()) "${stringResource(Res.string.overview_hint_type_change)} $label"
-                else stringResource(Res.string.overview_hint_type_change)
-            }
-        }
-
-    val shownSource
-        @Composable
-        get() = when (type) {
-            TransactionType.OPEN ->
-                "${stringResource(Res.string.overview_transaction_from)} $source"
-
-            TransactionType.SEND ->
-                "${stringResource(Res.string.overview_transaction_to)} $source"
-
-            TransactionType.RECEIVE ->
-                "${stringResource(Res.string.overview_transaction_from)} $source"
-
-            TransactionType.CHANGE ->
-                "${stringResource(Res.string.overview_transaction_from)} $source"
-        }
-
-    val cardGradient: Brush
-        @Composable
-        get() {
-            val colors = when (type) {
-                TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
-                TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
-                else -> MaterialTheme.colorScheme.errorGradient
-            }
-
-            return Brush.horizontalGradient(
-                colors.map { it.copy(alpha = 0.2f) }
-            )
-        }
-
-    val iconGradient: Brush
-        @Composable
-        get() {
-            val colors = when (type) {
-                TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
-                TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
-                else -> MaterialTheme.colorScheme.errorGradient
-            }
-
-            return Brush.horizontalGradient(
-                colors.map { it.copy(alpha = 0.45f) }
-            )
-        }
-
-    val shownHeight: String
-        get() = AttoFormatter.format(height.value)
-
+data class TransactionUiState
     @OptIn(ExperimentalTime::class)
-    val formattedTimestamp: String
-        get() = AttoDateFormatter.format(timestamp)
-}
+    constructor(
+        val type: TransactionType,
+        val amount: String?,
+        val source: String,
+        val sourceLabel: String? = null,
+        val timestamp: Instant,
+        val height: AttoHeight,
+        val hash: String? = null,
+    ) {
+        var shownAmount =
+            amount?.let { a ->
+                if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
+                    val sign = a.split(' ').getOrNull(0)
+                    val number = a.split(' ').getOrNull(1)
+
+                    "$sign ${AttoFormatter.format(number)}"
+                } else {
+                    AttoFormatter.format(amount)
+                }
+            } ?: " "
+
+        val icon: ImageVector
+            @Composable
+            get() =
+                when (type) {
+                    TransactionType.OPEN -> vectorResource(Res.drawable.ic_arrow_down)
+                    TransactionType.SEND -> vectorResource(Res.drawable.ic_arrow_up)
+                    TransactionType.RECEIVE -> vectorResource(Res.drawable.ic_arrow_down)
+                    TransactionType.CHANGE -> Icons.Outlined.Refresh
+                }
+
+        val typeString
+            @Composable
+            get() =
+                when (type) {
+                    TransactionType.OPEN -> {
+                        val label = sourceLabel ?: ""
+                        if (label.isNotEmpty()) {
+                            "${stringResource(Res.string.overview_hint_type_from)} $label"
+                        } else {
+                            stringResource(Res.string.overview_hint_type_from)
+                        }
+                    }
+
+                    TransactionType.SEND -> {
+                        val label = sourceLabel ?: ""
+                        if (label.isNotEmpty()) {
+                            "${stringResource(Res.string.overview_hint_type_to)} $label"
+                        } else {
+                            stringResource(Res.string.overview_hint_type_to)
+                        }
+                    }
+
+                    TransactionType.RECEIVE -> {
+                        val label = sourceLabel ?: ""
+                        if (label.isNotEmpty()) {
+                            "${stringResource(Res.string.overview_hint_type_from)} $label"
+                        } else {
+                            stringResource(Res.string.overview_hint_type_from)
+                        }
+                    }
+
+                    TransactionType.CHANGE -> {
+                        val label = sourceLabel ?: ""
+                        if (label.isNotEmpty()) {
+                            "${stringResource(Res.string.overview_hint_type_change)} $label"
+                        } else {
+                            stringResource(Res.string.overview_hint_type_change)
+                        }
+                    }
+                }
+
+        val shownSource
+            @Composable
+            get() =
+                when (type) {
+                    TransactionType.OPEN ->
+                        "${stringResource(Res.string.overview_transaction_from)} $source"
+
+                    TransactionType.SEND ->
+                        "${stringResource(Res.string.overview_transaction_to)} $source"
+
+                    TransactionType.RECEIVE ->
+                        "${stringResource(Res.string.overview_transaction_from)} $source"
+
+                    TransactionType.CHANGE ->
+                        "${stringResource(Res.string.overview_transaction_from)} $source"
+                }
+
+        val cardGradient: Brush
+            @Composable
+            get() {
+                val colors =
+                    when (type) {
+                        TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
+                        TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
+                        else -> MaterialTheme.colorScheme.errorGradient
+                    }
+
+                return Brush.horizontalGradient(
+                    colors.map { it.copy(alpha = 0.2f) },
+                )
+            }
+
+        val iconGradient: Brush
+            @Composable
+            get() {
+                val colors =
+                    when (type) {
+                        TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
+                        TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
+                        else -> MaterialTheme.colorScheme.errorGradient
+                    }
+
+                return Brush.horizontalGradient(
+                    colors.map { it.copy(alpha = 0.45f) },
+                )
+            }
+
+        val shownHeight: String
+            get() = AttoFormatter.format(height.value)
+
+        @OptIn(ExperimentalTime::class)
+        val formattedTimestamp: String
+            get() = AttoDateFormatter.format(timestamp)
+    }
 
 enum class TransactionType {
-    OPEN, SEND, RECEIVE, CHANGE;
+    OPEN,
+    SEND,
+    RECEIVE,
+    CHANGE,
 }

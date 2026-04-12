@@ -12,10 +12,13 @@ import cash.atto.wallet.Config
 
 @Database(
     entities = [AccountEntryAndroid::class, WorkAndroid::class],
-    version = Config.DATABASE_VERSION
+    version = Config.DATABASE_VERSION,
 )
-abstract class AppDatabaseAndroid : RoomDatabase(), AppDatabase {
+abstract class AppDatabaseAndroid :
+    RoomDatabase(),
+    AppDatabase {
     abstract override fun accountEntryDao(): AccountEntryDaoAndroid
+
     abstract override fun workDao(): WorkDaoAndroid
 }
 
@@ -23,15 +26,15 @@ abstract class AppDatabaseAndroid : RoomDatabase(), AppDatabase {
 interface AccountEntryDaoAndroid : AccountEntryDao {
     @Query(
         "SELECT entry from accountEntries " +
-                "WHERE publicKey = :publicKey " +
-                "ORDER BY height DESC LIMIT 1"
+            "WHERE publicKey = :publicKey " +
+            "ORDER BY height DESC LIMIT 1",
     )
     override suspend fun last(publicKey: ByteArray): ByteArray?
 
     @Query(
         "SELECT entry from accountEntries " +
-                "WHERE publicKey = :publicKey " +
-                "ORDER BY height DESC"
+            "WHERE publicKey = :publicKey " +
+            "ORDER BY height DESC",
     )
     override suspend fun list(publicKey: ByteArray): List<String>
 
@@ -61,32 +64,34 @@ data class AccountEntryAndroid(
     override val hash: ByteArray,
     override val publicKey: ByteArray,
     override val height: Long,
-    override val entry: String
+    override val entry: String,
 ) : AccountEntry
 
 @Entity(tableName = "work")
 data class WorkAndroid(
     @PrimaryKey
     override val publicKey: ByteArray,
-    override val value: ByteArray
+    override val value: ByteArray,
 ) : Work
 
 actual fun createAccountEntry(
     hash: ByteArray,
     publicKey: ByteArray,
     height: Long,
-    entry: String
-): AccountEntry = AccountEntryAndroid(
-    hash = hash,
-    publicKey = publicKey,
-    height = height,
-    entry = entry
-)
+    entry: String,
+): AccountEntry =
+    AccountEntryAndroid(
+        hash = hash,
+        publicKey = publicKey,
+        height = height,
+        entry = entry,
+    )
 
 actual fun createWork(
     publicKey: ByteArray,
-    value: ByteArray
-): Work = WorkAndroid(
-    publicKey = publicKey,
-    value = value
-)
+    value: ByteArray,
+): Work =
+    WorkAndroid(
+        publicKey = publicKey,
+        value = value,
+    )

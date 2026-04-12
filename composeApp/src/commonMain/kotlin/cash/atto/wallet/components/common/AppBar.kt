@@ -26,28 +26,31 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun AppBar(onBackNavigation: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                top = WindowInsets.systemBars
-                    .asPaddingValues()
-                    .calculateTopPadding()
-            )
-            .padding(start = 16.dp, top = 30.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    top =
+                        WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateTopPadding(),
+                ).padding(start = 16.dp, top = 30.dp),
     ) {
-        Box(Modifier.size(48.dp, 48.dp)
-            .clip(CircleShape)
-            .background(
-                color = MaterialTheme.colorScheme
-                    .onSurface
-                    .copy(alpha = 0.05f)
-            )
-            .clickable { onBackNavigation.invoke() }
+        Box(
+            Modifier
+                .size(48.dp, 48.dp)
+                .clip(CircleShape)
+                .background(
+                    color =
+                        MaterialTheme.colorScheme
+                            .onSurface
+                            .copy(alpha = 0.05f),
+                ).clickable { onBackNavigation.invoke() },
         ) {
             Icon(
                 modifier = Modifier.align(Alignment.Center),
                 imageVector = vectorResource(Res.drawable.ic_atto_chevron_left),
-                contentDescription = "backIcon"
+                contentDescription = "backIcon",
             )
         }
     }

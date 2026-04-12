@@ -48,7 +48,7 @@ fun AttoCopyButton(
     confirmTint: Color = Color(0xFF4CAF50),
     contentDescription: String? = "Copy",
     confirmationDurationMs: Long = 1000L,
-    onCopied: (() -> Unit)? = null
+    onCopied: (() -> Unit)? = null,
 ) {
     val clipboardManager = LocalClipboardManager.current
     var copied by remember { mutableStateOf(false) }
@@ -61,23 +61,24 @@ fun AttoCopyButton(
     }
 
     Box(
-        modifier = modifier
-            .size(size)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                clipboardManager.setText(AnnotatedString(text))
-                copied = true
-                onCopied?.invoke()
-            },
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(size)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    clipboardManager.setText(AnnotatedString(text))
+                    copied = true
+                    onCopied?.invoke()
+                },
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
             contentDescription = contentDescription,
             tint = if (copied) confirmTint else tint,
-            modifier = Modifier.size(size * 2 / 3)
+            modifier = Modifier.size(size * 2 / 3),
         )
     }
 }

@@ -17,20 +17,23 @@ fun getDatabaseBuilder(): AppDatabase {
     val homeDir = System.getProperty("user.home")
     val dbFile = File(homeDir, ".atto/wallet.db")
     dbFile.parentFile?.mkdirs()
-    return Room.databaseBuilder<AppDatabaseDesktop>(dbFile.absolutePath)
+    return Room
+        .databaseBuilder<AppDatabaseDesktop>(dbFile.absolutePath)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 }
 
-actual val databaseModule = module {
-    single<AppDatabase> { getDatabaseBuilder() }
-}
+actual val databaseModule =
+    module {
+        single<AppDatabase> { getDatabaseBuilder() }
+    }
 
-actual val dataSourceModule = module {
-    includes(databaseModule)
-    singleOf(::PasswordDataSource)
-    singleOf(::SaltDataSource)
-    singleOf(::SeedDataSource)
-    singleOf(::SeedAESInteractor)
-}
+actual val dataSourceModule =
+    module {
+        includes(databaseModule)
+        singleOf(::PasswordDataSource)
+        singleOf(::SaltDataSource)
+        singleOf(::SeedDataSource)
+        singleOf(::SeedAESInteractor)
+    }

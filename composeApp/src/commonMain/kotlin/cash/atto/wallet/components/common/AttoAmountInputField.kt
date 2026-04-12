@@ -33,31 +33,32 @@ fun AttoAmountInputField(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 6.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = if (isUsdMode) "Amount (USD)" else "Amount (ATTO)",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             )
 
             Surface(
                 onClick = onToggleInputMode,
                 shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
             ) {
                 Text(
                     text = if (isUsdMode) "Switch to ATTO" else "Switch to USD",
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -73,20 +74,22 @@ fun AttoAmountInputField(
             supportingText = {
                 Text(
                     text = if (isError) errorText.orEmpty() else equivalentDisplay,
-                    color = if (isError) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
-                    }
+                    color =
+                        if (isError) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+                        },
                 )
             },
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true
+            singleLine = true,
         )
     }
 }

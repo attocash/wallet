@@ -40,7 +40,6 @@ import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
-
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -52,53 +51,59 @@ fun TransactionItem(uiState: TransactionUiState) {
     if (showDetailDialog && uiState.hash != null) {
         TransactionDetailDialog(
             uiState = uiState,
-            onDismiss = { showDetailDialog = false }
+            onDismiss = { showDetailDialog = false },
         )
     }
 
     Box(
-        Modifier.clip(MaterialTheme.shapes.medium)
+        Modifier
+            .clip(MaterialTheme.shapes.medium)
             .background(brush = uiState.cardGradient)
-            .clickable { showDetailDialog = true }
+            .clickable { showDetailDialog = true },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 Modifier.weight(0.57f),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    Modifier.size(52.dp, 52.dp)
+                    Modifier
+                        .size(52.dp, 52.dp)
                         .clip(CircleShape)
                         .rotate(45f)
-                        .background(brush = uiState.iconGradient)
+                        .background(brush = uiState.iconGradient),
                 ) {
                     Icon(
                         imageVector = uiState.icon,
                         contentDescription = "operation type icon",
-                        modifier = Modifier.align(Alignment.Center)
-                            .rotate(-45f),
-                        tint = MaterialTheme.colorScheme.secondaryContainer
+                        modifier =
+                            Modifier
+                                .align(Alignment.Center)
+                                .rotate(-45f),
+                        tint = MaterialTheme.colorScheme.secondaryContainer,
                     )
                 }
 
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(uiState.typeString)
                     Text(
                         text = uiState.shownAmount,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                     )
                     Text(
                         text = uiState.formattedTimestamp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.44f),
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
@@ -106,12 +111,12 @@ fun TransactionItem(uiState: TransactionUiState) {
             Column(
                 modifier = Modifier.weight(0.43f),
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
                     text = "#" + uiState.shownHeight,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
                 Text(
                     text = uiState.source,
@@ -119,7 +124,7 @@ fun TransactionItem(uiState: TransactionUiState) {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.44f),
                     textAlign = TextAlign.End,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
+                    maxLines = 2,
                 )
             }
         }
@@ -129,7 +134,7 @@ fun TransactionItem(uiState: TransactionUiState) {
 @Composable
 fun TransactionDetailDialog(
     uiState: TransactionUiState,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val uriHandler = LocalUriHandler.current
@@ -137,16 +142,16 @@ fun TransactionDetailDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.dp),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
                     text = "Transaction Details",
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -164,33 +169,33 @@ fun TransactionDetailDialog(
                 TransactionDetailField(
                     label = if (uiState.type == TransactionType.CHANGE) "Voter" else "Address",
                     value = uiState.source,
-                    maxLines = 3
+                    maxLines = 3,
                 )
 
                 TransactionDetailField(
                     label = "Transaction Hash",
                     value = uiState.hash.orEmpty(),
-                    maxLines = 3
+                    maxLines = 3,
                 )
 
                 Spacer(Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TextButton(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(uiState.hash.orEmpty()))
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("Copy Hash")
                     }
 
                     TextButton(
                         onClick = { uriHandler.openUri(explorerUrl) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("View in Explorer")
                     }
@@ -198,7 +203,7 @@ fun TransactionDetailDialog(
 
                 TextButton(
                     onClick = onDismiss,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.End),
                 ) {
                     Text("Close")
                 }
@@ -211,20 +216,24 @@ fun TransactionDetailDialog(
 private fun TransactionDetailField(
     label: String,
     value: String,
-    maxLines: Int = 1
+    maxLines: Int = 1,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         )
         Text(
             text = value,
-            style = if (maxLines > 1) MaterialTheme.typography.bodySmall
-                    else MaterialTheme.typography.bodyLarge,
+            style =
+                if (maxLines > 1) {
+                    MaterialTheme.typography.bodySmall
+                } else {
+                    MaterialTheme.typography.bodyLarge
+                },
             maxLines = maxLines,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -240,8 +249,8 @@ fun TransactionItemPreview() {
                 amount = "A little Atto",
                 source = "someone",
                 timestamp = Clock.System.now(),
-                height = AttoHeight(0UL)
-            )
+                height = AttoHeight(0UL),
+            ),
         )
     }
 }

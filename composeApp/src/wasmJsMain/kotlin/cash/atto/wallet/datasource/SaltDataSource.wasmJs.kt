@@ -7,7 +7,6 @@ import org.w3c.dom.get
 import org.w3c.dom.set
 
 actual class SaltDataSource {
-
     actual suspend fun get(): String {
         var salt = localStorage[SALT_KEY]
         if (salt == null) {

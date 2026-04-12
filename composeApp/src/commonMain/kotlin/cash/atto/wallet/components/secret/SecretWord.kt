@@ -11,13 +11,13 @@ fun SecretWordCompact(
     ordinal: Int,
     word: String,
     hidden: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AttoWordChip(
         ordinal = ordinal,
         word = word,
         hidden = hidden,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -26,13 +26,13 @@ fun SecretWordExpanded(
     ordinal: Int,
     word: String,
     hidden: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AttoWordChip(
         ordinal = ordinal,
         word = word,
         hidden = hidden,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -43,7 +43,7 @@ fun SecretWordCompactPreview() {
         SecretWordCompact(
             ordinal = 1,
             word = "Word",
-            hidden = false
+            hidden = false,
         )
     }
 }
@@ -55,7 +55,7 @@ fun SecretWordExpandedPreview() {
         SecretWordExpanded(
             ordinal = 1,
             word = "Word",
-            hidden = false
+            hidden = false,
         )
     }
 }

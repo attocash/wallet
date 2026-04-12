@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class VotersResponse(
     val apy: String,
     val voters: List<Voter>,
-    val entities: List<Entity>
+    val entities: List<Entity>,
 )

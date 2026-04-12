@@ -4,22 +4,21 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.main_nav_overview
 import attowallet.composeapp.generated.resources.main_nav_receive
 import attowallet.composeapp.generated.resources.main_nav_send
+import attowallet.composeapp.generated.resources.main_nav_settings
 import attowallet.composeapp.generated.resources.main_nav_staking
+import attowallet.composeapp.generated.resources.main_nav_transactions
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import org.jetbrains.compose.resources.StringResource
-import attowallet.composeapp.generated.resources.main_nav_transactions
-import attowallet.composeapp.generated.resources.main_nav_settings
 
 // Navigation component used for desktop and web targets
 class DWNavigationComponent(
     componentContext: ComponentContext,
-    initialDestination: AttoDestination = AttoDestination.Welcome
+    initialDestination: AttoDestination = AttoDestination.Welcome,
 ) : ComponentContext by componentContext {
-
     val navigation = StackNavigation<AttoDestination>()
 
     val childStack: Value<ChildStack<*, AttoDestination>> =
@@ -33,17 +32,17 @@ class DWNavigationComponent(
 
     private fun createChild(
         destination: AttoDestination,
-        componentContext: ComponentContext
+        componentContext: ComponentContext,
     ): AttoDestination = destination
 }
 
 enum class MainScreenNavDestination(
-    val destinationName: StringResource
+    val destinationName: StringResource,
 ) {
     OVERVIEW(Res.string.main_nav_overview),
     SEND(Res.string.main_nav_send),
     RECEIVE(Res.string.main_nav_receive),
     TRANSACTIONS(Res.string.main_nav_transactions),
     SETTINGS(Res.string.main_nav_settings),
-    STAKING(Res.string.main_nav_staking);
+    STAKING(Res.string.main_nav_staking),
 }

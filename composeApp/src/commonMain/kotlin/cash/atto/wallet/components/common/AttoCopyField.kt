@@ -29,21 +29,22 @@ fun AttoCopyField(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    maxLines: Int = 3
+    maxLines: Int = 3,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AttoCapsLabel(label)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(FieldBackground)
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(FieldBackground)
+                    .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = value,
@@ -51,16 +52,17 @@ fun AttoCopyField(
                 color = Color.White,
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.W600,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 13.sp,
+                    ),
             )
             AttoCopyButton(
                 text = value,
                 tint = dark_text_tertiary,
-                contentDescription = "Copy $label"
+                contentDescription = "Copy $label",
             )
         }
     }
@@ -70,28 +72,30 @@ fun AttoCopyField(
 fun AttoDetailField(
     label: String,
     value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AttoCapsLabel(label)
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(FieldBackground)
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(FieldBackground)
+                    .padding(12.dp),
         ) {
             Text(
                 text = value,
                 color = Color.White,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.W600,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 13.sp,
+                    ),
             )
         }
     }
@@ -102,10 +106,11 @@ fun AttoCapsLabel(text: String) {
     Text(
         text = text,
         color = dark_text_tertiary,
-        style = MaterialTheme.typography.labelSmall.copy(
-            fontWeight = FontWeight.W500,
-            fontSize = 11.sp,
-            letterSpacing = 0.8.sp
-        )
+        style =
+            MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.W500,
+                fontSize = 11.sp,
+                letterSpacing = 0.8.sp,
+            ),
     )
 }

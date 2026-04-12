@@ -15,9 +15,12 @@ private external fun currentLocale(): String
         hour: '2-digit',
         minute: '2-digit'
     }).format(new Date(iso))
-"""
+""",
 )
-private external fun formatDateTime(isoString: String, locale: String): String
+private external fun formatDateTime(
+    isoString: String,
+    locale: String,
+): String
 
 @JsFun(
     """
@@ -26,16 +29,17 @@ private external fun formatDateTime(isoString: String, locale: String): String
         month: 'short',
         year: 'numeric'
     }).format(new Date(iso))
-"""
+""",
 )
-private external fun formatDateOnly(isoString: String, locale: String): String
+private external fun formatDateOnly(
+    isoString: String,
+    locale: String,
+): String
 
 actual object AttoDateFormatter {
     @OptIn(ExperimentalTime::class)
-    actual fun format(value: Instant): String =
-        formatDateTime(value.toString(), currentLocale())
+    actual fun format(value: Instant): String = formatDateTime(value.toString(), currentLocale())
 
     @OptIn(ExperimentalTime::class)
-    actual fun formatDate(value: Instant): String =
-        formatDateOnly(value.toString(), currentLocale())
+    actual fun formatDate(value: Instant): String = formatDateOnly(value.toString(), currentLocale())
 }

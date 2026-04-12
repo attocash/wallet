@@ -4,7 +4,6 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-
 expect object AttoDateFormatter {
     @OptIn(ExperimentalTime::class)
     fun format(value: Instant): String
@@ -12,7 +11,6 @@ expect object AttoDateFormatter {
     @OptIn(ExperimentalTime::class)
     fun formatDate(value: Instant): String
 }
-
 
 fun AttoDateFormatter.formatRelativeDate(value: Instant): String {
     if (value.toEpochMilliseconds() == 0L) {

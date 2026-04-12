@@ -10,5 +10,5 @@ data class Entity(
     val website: String,
     val tags: List<String>,
     val addedAt: String,
-    val description: String
+    val description: String,
 )

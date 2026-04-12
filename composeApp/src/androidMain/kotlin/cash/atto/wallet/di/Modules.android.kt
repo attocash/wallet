@@ -15,20 +15,23 @@ import org.koin.dsl.module
 
 fun getDatabaseBuilder(ctx: Context): AppDatabase {
     val dbFile = ctx.getDatabasePath("atto-wallet.db")
-    return Room.databaseBuilder<AppDatabaseAndroid>(ctx, dbFile.absolutePath)
+    return Room
+        .databaseBuilder<AppDatabaseAndroid>(ctx, dbFile.absolutePath)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 }
 
-actual val databaseModule = module {
-    single<AppDatabase> { getDatabaseBuilder(get()) }
-}
+actual val databaseModule =
+    module {
+        single<AppDatabase> { getDatabaseBuilder(get()) }
+    }
 
-actual val dataSourceModule = module {
-    includes(databaseModule)
-    singleOf(::PasswordDataSource)
-    singleOf(::SeedAESInteractor)
-    singleOf(::SaltDataSource)
-    singleOf(::SeedDataSource)
-}
+actual val dataSourceModule =
+    module {
+        includes(databaseModule)
+        singleOf(::PasswordDataSource)
+        singleOf(::SeedAESInteractor)
+        singleOf(::SaltDataSource)
+        singleOf(::SeedDataSource)
+    }

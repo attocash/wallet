@@ -23,34 +23,34 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun LogoutDialog(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AttoModal(
         title = stringResource(Res.string.logout_title),
         onDismiss = onDismiss,
         desktopWidth = 420.dp,
         showDivider = false,
-        contentPadding = PaddingValues(24.dp)
+        contentPadding = PaddingValues(24.dp),
     ) {
         Text(
             text = stringResource(Res.string.logout_text),
             color = Color.White.copy(alpha = 0.7f),
             fontSize = 14.sp,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         AttoButton(
             text = stringResource(Res.string.logout_confirm),
             variant = AttoButtonVariant.Danger,
             onClick = onConfirm,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         AttoButton(
             text = stringResource(Res.string.logout_cancel),
             variant = AttoButtonVariant.Outlined,
             onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

@@ -30,21 +30,23 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 fun AttoTransactionCard(
     transaction: TransactionUiState,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
-    val accent = when (transaction.type) {
-        TransactionType.OPEN -> dark_accent
-        TransactionType.SEND -> Color(0xFFEF4444)
-        TransactionType.RECEIVE -> dark_success
-        TransactionType.CHANGE -> dark_violet
-    }
+    val accent =
+        when (transaction.type) {
+            TransactionType.OPEN -> dark_accent
+            TransactionType.SEND -> Color(0xFFEF4444)
+            TransactionType.RECEIVE -> dark_success
+            TransactionType.CHANGE -> dark_violet
+        }
     val amountText = transaction.shownAmount.replace(" ", "")
-    val directionLabel = when (transaction.type) {
-        TransactionType.OPEN -> "FROM"
-        TransactionType.SEND -> "TO"
-        TransactionType.RECEIVE -> "FROM"
-        TransactionType.CHANGE -> "TO"
-    }
+    val directionLabel =
+        when (transaction.type) {
+            TransactionType.OPEN -> "FROM"
+            TransactionType.SEND -> "TO"
+            TransactionType.RECEIVE -> "FROM"
+            TransactionType.CHANGE -> "TO"
+        }
     val sourceText = transaction.sourceLabel ?: transaction.source
     val sourceColor = if (transaction.sourceLabel != null) dark_accent else dark_text_muted
     val sourceFont = if (transaction.sourceLabel != null) attoFontFamily() else FontFamily.Monospace
@@ -53,112 +55,121 @@ fun AttoTransactionCard(
     AttoCard(
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
-        onClick = onClick
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(accent.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(accent.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = when (transaction.type) {
-                        TransactionType.OPEN -> Icons.Outlined.LockOpen
-                        TransactionType.SEND -> Icons.Outlined.ArrowUpward
-                        TransactionType.RECEIVE -> Icons.Outlined.ArrowDownward
-                        TransactionType.CHANGE -> Icons.Outlined.SyncAlt
-                    },
+                    imageVector =
+                        when (transaction.type) {
+                            TransactionType.OPEN -> Icons.Outlined.LockOpen
+                            TransactionType.SEND -> Icons.Outlined.ArrowUpward
+                            TransactionType.RECEIVE -> Icons.Outlined.ArrowDownward
+                            TransactionType.CHANGE -> Icons.Outlined.SyncAlt
+                        },
                     contentDescription = transaction.type.name,
                     tint = accent,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             }
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = when (transaction.type) {
-                            TransactionType.OPEN -> "Open"
-                            TransactionType.SEND -> "Sent"
-                            TransactionType.RECEIVE -> "Received"
-                            TransactionType.CHANGE -> "Change"
-                        },
+                        text =
+                            when (transaction.type) {
+                                TransactionType.OPEN -> "Open"
+                                TransactionType.SEND -> "Sent"
+                                TransactionType.RECEIVE -> "Received"
+                                TransactionType.CHANGE -> "Change"
+                            },
                         color = Color.White,
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 15.sp
-                        )
+                        style =
+                            MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 15.sp,
+                            ),
                     )
                     Text(
                         text = "#${transaction.shownHeight}",
                         color = dark_text_dim,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp
-                        )
+                        style =
+                            MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                            ),
                     )
                 }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
                         text = directionLabel,
                         color = dark_text_dim,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.W500,
-                            fontSize = 10.sp,
-                            letterSpacing = 0.8.sp
-                        )
+                        style =
+                            MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.W500,
+                                fontSize = 10.sp,
+                                letterSpacing = 0.8.sp,
+                            ),
                     )
                     Text(
                         text = sourceText,
                         color = sourceColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontFamily = sourceFont,
-                            fontWeight = sourceWeight,
-                            fontSize = if (transaction.sourceLabel != null) 12.sp else 11.sp
-                        )
+                        style =
+                            MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = sourceFont,
+                                fontWeight = sourceWeight,
+                                fontSize = if (transaction.sourceLabel != null) 12.sp else 11.sp,
+                            ),
                     )
                 }
             }
 
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 transaction.amount?.let {
                     Text(
                         text = amountText,
                         color = if (transaction.type == TransactionType.RECEIVE) dark_success else Color.White,
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 16.sp
-                        )
+                        style =
+                            MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 16.sp,
+                            ),
                     )
                 }
                 Text(
                     text = transaction.formattedTimestamp,
                     color = dark_text_tertiary,
                     textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 11.sp
-                    )
+                    style =
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.W400,
+                            fontSize = 11.sp,
+                        ),
                 )
             }
         }

@@ -18,16 +18,18 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun PermanentNavigationDrawer(
     drawerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxSize()
-            .then(modifier),
-        horizontalArrangement = Arrangement.spacedBy(32.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(32.dp),
     ) {
         Surface(
             modifier = Modifier.width(450.dp),
-            color = Color.Transparent
+            color = Color.Transparent,
         ) {
             drawerContent()
         }
@@ -43,7 +45,7 @@ fun PermanentNavigationDrawerPreview() {
         PermanentNavigationDrawer(
             drawerContent = {
                 NavigationDrawerItemPreview()
-            }
+            },
         ) {
             Text("Hello")
         }

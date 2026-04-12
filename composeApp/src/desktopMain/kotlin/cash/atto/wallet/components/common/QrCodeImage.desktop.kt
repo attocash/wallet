@@ -11,10 +11,10 @@ import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import java.nio.charset.Charset
 
 @Composable
-actual fun QRCodeImage(
+actual fun qrCodeImage(
     modifier: Modifier,
     url: String,
-    contentDescription: String
+    contentDescription: String,
 ) {
     Box(Modifier.height(300.dp)) {
         try {
@@ -27,7 +27,7 @@ actual fun QRCodeImage(
             Image(
                 modifier = modifier.padding(16.dp),
                 painter = rememberQrCodePainter(String(url.toByteArray(Charsets.UTF_8))),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
         }
     }

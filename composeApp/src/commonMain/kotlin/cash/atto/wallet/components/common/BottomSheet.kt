@@ -28,29 +28,32 @@ fun BottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    content: @Composable() (ColumnScope.() -> Unit)
+    content:
+        @Composable()
+        (ColumnScope.() -> Unit),
 ) = ModalBottomSheet(
     onDismissRequest = onDismissRequest,
     modifier = modifier,
     sheetState = sheetState,
     dragHandle = null,
-    contentWindowInsets = { WindowInsets(0,0,0,0) }
+    contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
-            .background(
-                Brush.horizontalGradient(
-                    MaterialTheme.colorScheme.primaryGradient
-                )
-            )
-            .padding(
-                start = 16.dp,
-                top = 8.dp,
-                end = 16.dp,
-                bottom = 32.dp
-            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        MaterialTheme.colorScheme.primaryGradient,
+                    ),
+                ).padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    end = 16.dp,
+                    bottom = 32.dp,
+                ),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BottomSheetStud()
         content()

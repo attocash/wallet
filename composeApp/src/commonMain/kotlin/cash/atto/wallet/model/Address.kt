@@ -8,5 +8,5 @@ data class Address(
     val label: String,
     val entity: String,
     val addedAt: String,
-    val description: String
+    val description: String,
 )

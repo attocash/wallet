@@ -16,16 +16,17 @@ import kotlin.coroutines.suspendCoroutine
             .then(text => onSuccess(text ?? null))
             .catch(() => onError());
     }
-    """
+    """,
 )
 private external fun readClipboardTextJs(
     onSuccess: (String?) -> Unit,
-    onError: () -> Unit
+    onError: () -> Unit,
 )
 
-actual suspend fun readClipboardText(): String? = suspendCoroutine { continuation ->
-    readClipboardTextJs(
-        onSuccess = { continuation.resume(it) },
-        onError = { continuation.resume(null) }
-    )
-}
+actual suspend fun readClipboardText(): String? =
+    suspendCoroutine { continuation ->
+        readClipboardTextJs(
+            onSuccess = { continuation.resume(it) },
+            onError = { continuation.resume(null) },
+        )
+    }

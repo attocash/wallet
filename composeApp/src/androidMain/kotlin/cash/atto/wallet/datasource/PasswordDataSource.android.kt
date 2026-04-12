@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 actual class PasswordDataSource(
-    context: Context
+    context: Context,
 ) {
     private val securityUtil = SecurityUtil()
     private val securityKeyAlias = "password-store"
@@ -27,43 +27,53 @@ actual class PasswordDataSource(
 
     actual suspend fun getPassword(seed: String): String? {
         val encryptedSeed = encryptSeed(seed)
-        val key = stringPreferencesKey("$PASSWORD_KEY${encryptedSeed}")
-        val passwordFlow = dataStore.data
-            .map { preferences ->
-                with(preferences[key] ?: return@map null) {
-                    val (ivString, valueString) = this.split(ivToStringSeparator, limit = 2)
+        val key = stringPreferencesKey("$PASSWORD_KEY$encryptedSeed")
+        val passwordFlow =
+            dataStore.data
+                .map { preferences ->
+                    with(preferences[key] ?: return@map null) {
+                        val (ivString, valueString) = this.split(ivToStringSeparator, limit = 2)
 
-                    return@map securityUtil.decryptData(
-                        keyAlias = securityKeyAlias + encryptedSeed,
-                        iv = ivString.split(bytesToStringSeparator)
-                            .map { it.toByte() }
-                            .toByteArray(),
-                        encryptedData = valueString.split(bytesToStringSeparator)
-                            .map { it.toByte() }
-                            .toByteArray()
-                    )
+                        return@map securityUtil.decryptData(
+                            keyAlias = securityKeyAlias + encryptedSeed,
+                            iv =
+                                ivString
+                                    .split(bytesToStringSeparator)
+                                    .map { it.toByte() }
+                                    .toByteArray(),
+                            encryptedData =
+                                valueString
+                                    .split(bytesToStringSeparator)
+                                    .map { it.toByte() }
+                                    .toByteArray(),
+                        )
+                    }
                 }
-            }
 
         val passwordChannel = Channel<String?>()
 
         dataSourceJob?.cancel()
-        dataSourceJob = dataSourceScope.launch {
-            passwordFlow.collect {
-                passwordChannel.send(it)
+        dataSourceJob =
+            dataSourceScope.launch {
+                passwordFlow.collect {
+                    passwordChannel.send(it)
+                }
             }
-        }
 
         return passwordChannel.receive()
     }
 
-    actual suspend fun setPassword(seed: String, password: String) {
+    actual suspend fun setPassword(
+        seed: String,
+        password: String,
+    ) {
         val encryptedSeed = encryptSeed(seed)
-        val key = stringPreferencesKey("$PASSWORD_KEY${encryptedSeed}")
-        val (iv, encryptedValue) = securityUtil.encryptData(
-            securityKeyAlias + encryptedSeed,
-            password
-        )
+        val key = stringPreferencesKey("$PASSWORD_KEY$encryptedSeed")
+        val (iv, encryptedValue) =
+            securityUtil.encryptData(
+                securityKeyAlias + encryptedSeed,
+                password,
+            )
 
         val ivString = iv.joinToString(bytesToStringSeparator)
         val valueString = encryptedValue.joinToString(bytesToStringSeparator)
@@ -77,9 +87,7 @@ actual class PasswordDataSource(
         dataStore.edit { it.clear() }
     }
 
-    private fun encryptSeed(seed: String): String {
-        return seed.hashCode().toString()
-    }
+    private fun encryptSeed(seed: String): String = seed.hashCode().toString()
 
     companion object {
         private const val PASSWORD_KEY = "password"

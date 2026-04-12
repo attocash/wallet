@@ -8,26 +8,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_text_secondary
 
 @Composable
 fun AttoScreenTitle(
     text: String,
     modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Center
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     Text(
         text = text,
         modifier = modifier,
         color = Color.White,
         textAlign = textAlign,
-        style = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = FontWeight.W600,
-            fontSize = 36.sp,
-            lineHeight = 39.6.sp,
-            letterSpacing = (-0.72).sp
-        )
+        style =
+            MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.W600,
+                fontSize = 36.sp,
+                lineHeight = 39.6.sp,
+                letterSpacing = (-0.72).sp,
+            ),
     )
 }
 
@@ -35,17 +35,18 @@ fun AttoScreenTitle(
 fun AttoScreenSubtitle(
     text: String,
     modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Center
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     Text(
         text = text,
         modifier = modifier,
         color = dark_text_secondary,
         textAlign = textAlign,
-        style = MaterialTheme.typography.bodyMedium.copy(
-            fontWeight = FontWeight.W400,
-            fontSize = 14.sp,
-            lineHeight = 21.sp
-        )
+        style =
+            MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.W400,
+                fontSize = 14.sp,
+                lineHeight = 21.sp,
+            ),
     )
 }

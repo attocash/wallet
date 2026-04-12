@@ -4,15 +4,13 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 
 object AttoFormatter {
-    fun format(value: BigDecimal?): String {
-        return value?.toStringExpanded()
+    fun format(value: BigDecimal?): String =
+        value
+            ?.toStringExpanded()
             ?.let { AttoLocalizedFormatter.format(it) }
             ?: "…"
-    }
 
-    fun format(value: String?): String {
-        return value?.let { AttoLocalizedFormatter.format(it) } ?: "…"
-    }
+    fun format(value: String?): String = value?.let { AttoLocalizedFormatter.format(it) } ?: "…"
 
     fun formatUsd(value: BigDecimal?): String {
         if (value == null) return ""
@@ -20,6 +18,5 @@ object AttoFormatter {
         return "~ $${ rounded.toStringExpanded() } USD"
     }
 
-    fun format(value: ULong): String =
-        AttoLocalizedFormatter.format(value.toString())
+    fun format(value: ULong): String = AttoLocalizedFormatter.format(value.toString())
 }

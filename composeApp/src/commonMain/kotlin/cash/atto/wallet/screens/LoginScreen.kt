@@ -34,10 +34,8 @@ import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.password_wrong
 import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoPasswordField
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_bg
 import cash.atto.wallet.ui.dark_border_subtle
 import cash.atto.wallet.ui.dark_surface
@@ -56,41 +54,44 @@ private val UnlockDanger = Color(0xFFE56A6A)
 @Composable
 fun LoginScreen(
     onSubmitPassword: (String?) -> Unit,
-    passwordValid: Boolean = true
+    passwordValid: Boolean = true,
 ) {
     var input by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(UnlockBackground),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(UnlockBackground),
+        contentAlignment = Alignment.Center,
     ) {
         BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center,
         ) {
             val shellWidth = if (maxWidth > 480.dp) 480.dp else maxWidth
 
             Column(
                 modifier = Modifier.width(shellWidth),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(68.dp)
-                        .background(UnlockIconBackground, RoundedCornerShape(16.dp))
-                        .border(1.dp, UnlockBorder, RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(68.dp)
+                            .background(UnlockIconBackground, RoundedCornerShape(16.dp))
+                            .border(1.dp, UnlockBorder, RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Lock,
                         contentDescription = null,
                         tint = Color(0xFFF4B620),
-                        modifier = Modifier.size(29.dp)
+                        modifier = Modifier.size(29.dp),
                     )
                 }
 
@@ -98,12 +99,13 @@ fun LoginScreen(
                     text = "Unlock Wallet",
                     modifier = Modifier.padding(top = 24.dp),
                     color = UnlockTextPrimary,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 35.sp,
-                        lineHeight = 39.sp,
-                        letterSpacing = (-0.3).sp
-                    )
+                    style =
+                        MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.W600,
+                            fontSize = 35.sp,
+                            lineHeight = 39.sp,
+                            letterSpacing = (-0.3).sp,
+                        ),
                 )
 
                 Text(
@@ -111,18 +113,20 @@ fun LoginScreen(
                     modifier = Modifier.padding(top = 9.dp),
                     color = UnlockTextSecondary,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 12.sp,
-                        lineHeight = 18.sp
-                    )
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.W400,
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp,
+                        ),
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 22.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 22.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     AttoPasswordField(
                         value = input,
@@ -140,9 +144,10 @@ fun LoginScreen(
                         Text(
                             text = stringResource(Res.string.password_wrong),
                             color = UnlockDanger,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 11.sp
-                            )
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 11.sp,
+                                ),
                         )
                     }
                 }
@@ -150,25 +155,28 @@ fun LoginScreen(
                 AttoButton(
                     text = "Unlock",
                     onClick = { onSubmitPassword(input) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
                 )
 
                 HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    color = UnlockBorder
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                    color = UnlockBorder,
                 )
 
                 Text(
                     text = "Forgot password? Use recovery phrase",
                     modifier = Modifier.padding(top = 11.dp),
                     color = UnlockTextSecondary,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 11.sp
-                    )
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 11.sp,
+                        ),
                 )
             }
         }

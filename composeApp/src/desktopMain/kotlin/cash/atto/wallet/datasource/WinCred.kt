@@ -10,7 +10,6 @@ import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
 class WinCred : CredAdvapi32 {
-
     fun getCredential(target: String?): String {
         val pcredMem = PCREDENTIAL()
 
@@ -32,7 +31,11 @@ class WinCred : CredAdvapi32 {
     }
 
     @Throws(UnsupportedEncodingException::class)
-    fun setCredential(target: String, userName: String, password: String): Boolean {
+    fun setCredential(
+        target: String,
+        userName: String,
+        password: String,
+    ): Boolean {
         val credMem: CredAdvapi32.CREDENTIAL = CredAdvapi32.CREDENTIAL()
 
         credMem.Flags = 0
@@ -67,7 +70,7 @@ class WinCred : CredAdvapi32 {
         targetName: String?,
         type: Int,
         flags: Int,
-        pcredential: PCREDENTIAL?
+        pcredential: PCREDENTIAL?,
     ): Boolean {
         synchronized(INSTANCE) {
             return INSTANCE.CredRead(targetName, type, flags, pcredential)
@@ -75,14 +78,21 @@ class WinCred : CredAdvapi32 {
     }
 
     @Throws(LastErrorException::class)
-    override fun CredWrite(credential: CredAdvapi32.CREDENTIAL?, flags: Int): Boolean {
+    override fun CredWrite(
+        credential: CredAdvapi32.CREDENTIAL?,
+        flags: Int,
+    ): Boolean {
         synchronized(INSTANCE) {
             return INSTANCE.CredWrite(credential, flags)
         }
     }
 
     @Throws(LastErrorException::class)
-    override fun CredDelete(targetName: String?, type: Int, flags: Int): Boolean {
+    override fun CredDelete(
+        targetName: String?,
+        type: Int,
+        flags: Int,
+    ): Boolean {
         synchronized(INSTANCE) {
             return INSTANCE.CredDelete(targetName, type, flags)
         }

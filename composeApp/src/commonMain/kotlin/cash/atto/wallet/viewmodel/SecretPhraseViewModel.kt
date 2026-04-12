@@ -10,18 +10,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SecretPhraseViewModel(
-    private val appStateRepository: AppStateRepository
+    private val appStateRepository: AppStateRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(SecretPhraseUiState.DEFAULT)
     val state = _state.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
-            _state.value = SecretPhraseUiState(
-                words = appStateRepository.generateNewSecret(),
-                hidden = false
-            )
+            _state.value =
+                SecretPhraseUiState(
+                    words = appStateRepository.generateNewSecret(),
+                    hidden = false,
+                )
         }
     }
 }

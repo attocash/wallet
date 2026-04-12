@@ -16,13 +16,13 @@ external interface SubtleCrypto {
     fun encrypt(
         algorithm: JsAny,
         key: CryptoKey,
-        data: Uint8Array
+        data: Uint8Array,
     ): Promise<Uint8Array>
 
     fun decrypt(
         algorithm: JsAny,
         key: CryptoKey,
-        data: Uint8Array
+        data: Uint8Array,
     ): Promise<Uint8Array>
 
     fun deriveBits(

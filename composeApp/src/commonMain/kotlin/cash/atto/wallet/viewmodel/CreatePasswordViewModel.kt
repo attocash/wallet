@@ -9,41 +9,42 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class CreatePasswordViewModel(
     private val appStateRepository: AppStateRepository,
-    private val checkPasswordInteractor: CheckPasswordInteractor
+    private val checkPasswordInteractor: CheckPasswordInteractor,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(CreatePasswordUIState.DEFAULT)
     val state = _state.asStateFlow()
 
     suspend fun setPassword(password: String?) {
         _state.emit(
             state.value.copy(
-                password = password
-            )
+                password = password,
+            ),
         )
     }
 
     suspend fun setPasswordConfirm(passwordConfirm: String?) {
         _state.emit(
             state.value.copy(
-                passwordConfirm = passwordConfirm
-            )
+                passwordConfirm = passwordConfirm,
+            ),
         )
     }
 
     suspend fun savePassword(): Boolean {
         var checkResult = checkPasswordInteractor.invoke(state.value.password)
-        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID)
+        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
             checkResult = checkPasswordsMatch()
+        }
 
         _state.emit(
             state.value.copy(
-                checkState = checkResult
-            )
+                checkState = checkResult,
+            ),
         )
 
-        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID)
+        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
             appStateRepository.savePassword(state.value.password!!)
+        }
 
         return checkResult == CreatePasswordUIState.PasswordCheckState.VALID
     }
@@ -54,8 +55,10 @@ class CreatePasswordViewModel(
 
     private fun checkPasswordsMatch(): CreatePasswordUIState.PasswordCheckState =
         with(state.value) {
-            if (password != passwordConfirm)
+            if (password != passwordConfirm) {
                 CreatePasswordUIState.PasswordCheckState.NON_MATCHING
-            else CreatePasswordUIState.PasswordCheckState.VALID
+            } else {
+                CreatePasswordUIState.PasswordCheckState.VALID
+            }
         }
 }

@@ -25,7 +25,6 @@ import attowallet.composeapp.generated.resources.ic_chevron_down
 import attowallet.composeapp.generated.resources.ic_chevron_up
 import attowallet.composeapp.generated.resources.ic_nav_settings
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.primaryGradient
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -33,36 +32,39 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ExpandableDrawerItem(
     label: String,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    val drawerOpened = remember {
-        mutableStateOf(false)
-    }
+    val drawerOpened =
+        remember {
+            mutableStateOf(false)
+        }
 
     Column(
         Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(
-                brush = Brush.horizontalGradient(
-                    MaterialTheme.colorScheme.primaryGradient.map {
-                        it.copy(alpha = 0.4f)
-                    }
-                )
-            )
+                brush =
+                    Brush.horizontalGradient(
+                        MaterialTheme.colorScheme.primaryGradient.map {
+                            it.copy(alpha = 0.4f)
+                        },
+                    ),
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { drawerOpened.value = !drawerOpened.value }
-                .padding(start = 32.dp, top = 24.dp, end = 16.dp, bottom = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { drawerOpened.value = !drawerOpened.value }
+                    .padding(start = 32.dp, top = 24.dp, end = 16.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_nav_settings),
                 contentDescription = "Settings Icon",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Text(
@@ -73,15 +75,19 @@ fun ExpandableDrawerItem(
             )
 
             Icon(
-                imageVector = if (drawerOpened.value)
-                    vectorResource(Res.drawable.ic_chevron_up)
-                else vectorResource(Res.drawable.ic_chevron_down),
-                contentDescription = "Drawer toggle"
+                imageVector =
+                    if (drawerOpened.value) {
+                        vectorResource(Res.drawable.ic_chevron_up)
+                    } else {
+                        vectorResource(Res.drawable.ic_chevron_down)
+                    },
+                contentDescription = "Drawer toggle",
             )
         }
 
-        if (drawerOpened.value)
+        if (drawerOpened.value) {
             content()
+        }
     }
 }
 
@@ -90,7 +96,7 @@ fun ExpandableDrawerItem(
 fun ExpandableDrawerItemPreview() {
     AttoWalletTheme {
         ExpandableDrawerItem(
-            label = "Label"
+            label = "Label",
         ) {
             Text("Content")
         }

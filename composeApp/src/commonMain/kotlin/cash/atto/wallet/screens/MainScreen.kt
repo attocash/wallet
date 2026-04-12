@@ -21,11 +21,13 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MainScreen(
     onLogoutNavigation: () -> Unit,
     initialNavOverride: MainScreenNavDestination? = null,
-    qrScannerContent: (@Composable (
-        onResult: (String) -> Unit,
-        onError: (String) -> Unit,
-        onDismiss: () -> Unit
-    ) -> Unit)? = null
+    qrScannerContent: (
+        @Composable (
+            onResult: (String) -> Unit,
+            onError: (String) -> Unit,
+            onDismiss: () -> Unit,
+        ) -> Unit
+    )? = null,
 ) {
     val viewModel = koinViewModel<MainScreenViewModel>()
     val workCache = koinInject<PersistentWorkCache>()
@@ -36,9 +38,10 @@ fun MainScreen(
         workCache.get()
     }
 
-    val navState = rememberSaveable {
-        mutableStateOf(initialNavOverride ?: MainScreenNavDestination.OVERVIEW)
-    }
+    val navState =
+        rememberSaveable {
+            mutableStateOf(initialNavOverride ?: MainScreenNavDestination.OVERVIEW)
+        }
 
     val showBackupDialog = rememberSaveable { mutableStateOf(false) }
 
@@ -56,12 +59,12 @@ fun MainScreen(
             viewModel.hideLogoutDialog()
             onLogoutNavigation()
         },
-        qrScannerContent = qrScannerContent
+        qrScannerContent = qrScannerContent,
     )
 
     if (showBackupDialog.value) {
         BackupSecretDialog(
-            onDismiss = { showBackupDialog.value = false }
+            onDismiss = { showBackupDialog.value = false },
         )
     }
 }
@@ -77,53 +80,62 @@ fun MainScreenContent(
     onShowLogout: () -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit,
-    qrScannerContent: (@Composable (
-        onResult: (String) -> Unit,
-        onError: (String) -> Unit,
-        onDismiss: () -> Unit
-    ) -> Unit)? = null
+    qrScannerContent: (
+        @Composable (
+            onResult: (String) -> Unit,
+            onError: (String) -> Unit,
+            onDismiss: () -> Unit,
+        ) -> Unit
+    )? = null,
 ) {
     AttoWallet(
         navState = navState,
         onNavStateChanged = onNavStateChanged,
         balanceUiState = uiState.balanceChipUiState,
         hasCachedWork = hasCachedWork,
-        onLock = onLock
+        onLock = onLock,
     ) {
-        val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-        }
+        val viewModelStoreOwner =
+            checkNotNull(LocalViewModelStoreOwner.current) {
+                "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+            }
 
         CompositionLocalProvider(
-            LocalViewModelStoreOwner provides viewModelStoreOwner
+            LocalViewModelStoreOwner provides viewModelStoreOwner,
         ) {
             when (navState) {
-                MainScreenNavDestination.OVERVIEW -> OverviewScreen(
-                    onSendClick = { onNavStateChanged(MainScreenNavDestination.SEND) },
-                    onReceiveClick = { onNavStateChanged(MainScreenNavDestination.RECEIVE) },
-                    onTransactionsClick = { onNavStateChanged(MainScreenNavDestination.TRANSACTIONS) },
-                    onStakingClick = { onNavStateChanged(MainScreenNavDestination.STAKING) }
-                )
-                MainScreenNavDestination.SEND -> SendScreen(
-                    onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
-                    qrScannerContent = qrScannerContent
-                )
-                MainScreenNavDestination.RECEIVE -> ReceiveScreen(
-                    onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) }
-                )
-                MainScreenNavDestination.TRANSACTIONS -> TransactionsScreen(
-                    onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) }
-                )
-                MainScreenNavDestination.STAKING -> StakingScreen(
-                    onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) }
-                )
-                MainScreenNavDestination.SETTINGS -> SettingsScreen(
-                    uiState = uiState.settingsUiState,
-                    onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
-                    onBackupClick = onBackupClick,
-                    onLockClick = onLock,
-                    onLogoutClick = onShowLogout
-                )
+                MainScreenNavDestination.OVERVIEW ->
+                    OverviewScreen(
+                        onSendClick = { onNavStateChanged(MainScreenNavDestination.SEND) },
+                        onReceiveClick = { onNavStateChanged(MainScreenNavDestination.RECEIVE) },
+                        onTransactionsClick = { onNavStateChanged(MainScreenNavDestination.TRANSACTIONS) },
+                        onStakingClick = { onNavStateChanged(MainScreenNavDestination.STAKING) },
+                    )
+                MainScreenNavDestination.SEND ->
+                    SendScreen(
+                        onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                        qrScannerContent = qrScannerContent,
+                    )
+                MainScreenNavDestination.RECEIVE ->
+                    ReceiveScreen(
+                        onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                    )
+                MainScreenNavDestination.TRANSACTIONS ->
+                    TransactionsScreen(
+                        onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                    )
+                MainScreenNavDestination.STAKING ->
+                    StakingScreen(
+                        onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                    )
+                MainScreenNavDestination.SETTINGS ->
+                    SettingsScreen(
+                        uiState = uiState.settingsUiState,
+                        onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                        onBackupClick = onBackupClick,
+                        onLockClick = onLock,
+                        onLogoutClick = onShowLogout,
+                    )
             }
         }
     }
@@ -131,7 +143,7 @@ fun MainScreenContent(
     if (uiState.showLogoutDialog) {
         LogoutDialog(
             onDismiss = onDismissLogout,
-            onConfirm = onConfirmLogout
+            onConfirm = onConfirmLogout,
         )
     }
 }

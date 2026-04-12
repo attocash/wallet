@@ -15,20 +15,21 @@ data class SendFromUiState(
     val showLoader: Boolean,
     val isUsdMode: Boolean = false,
     val equivalentDisplay: String = "",
-    val priceUsd: BigDecimal? = null
+    val priceUsd: BigDecimal? = null,
 ) {
     companion object {
-        val DEFAULT = SendFromUiState(
-            accountName = null,
-            accountSeed = null,
-            accountBalance = null,
-            accountBalanceUsd = null,
-            amountString = null,
-            amountUsd = null,
-            address = null,
-            showAmountError = false,
-            showAddressError = false,
-            showLoader = true
-        )
+        val DEFAULT =
+            SendFromUiState(
+                accountName = null,
+                accountSeed = null,
+                accountBalance = null,
+                accountBalanceUsd = null,
+                amountString = null,
+                amountUsd = null,
+                address = null,
+                showAmountError = false,
+                showAddressError = false,
+                showLoader = true,
+            )
     }
 }

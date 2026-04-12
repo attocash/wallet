@@ -23,7 +23,7 @@ data class SendTransactionUiState(
     val priceUsd: BigDecimal? = null,
     val isUsdMode: Boolean = false,
     val elapsedMs: Long? = null,
-    val sendBlock: AttoSendBlock? = null
+    val sendBlock: AttoSendBlock? = null,
 ) {
     private fun parseDecimal(value: String?): BigDecimal? =
         try {
@@ -53,60 +53,68 @@ data class SendTransactionUiState(
                 ?: "USD price unavailable"
         }
     }
+
     val sendFromUiState
-        get() = account?.let {
-            val accountBalance = it.balance.toString(AttoUnit.ATTO)
-            SendFromUiState(
-                accountName = "Main Account",
-                accountSeed = it.publicKey
-                    .toAddress(AttoAlgorithm.V1)
-                    .value,
-                accountBalance = accountBalance,
-                accountBalanceUsd = amountUsd(parseDecimal(accountBalance)),
-                amountString = amountString,
-                amountUsd = amountUsd(parseDecimal(amountString)),
-                address = address,
-                showAmountError = showAmountError,
-                showAddressError = showAddressError,
-                showLoader = showLoader,
-                isUsdMode = isUsdMode,
-                equivalentDisplay = equivalentDisplay(),
-                priceUsd = priceUsd
-            )
-        } ?: SendFromUiState.DEFAULT
+        get() =
+            account?.let {
+                val accountBalance = it.balance.toString(AttoUnit.ATTO)
+                SendFromUiState(
+                    accountName = "Main Account",
+                    accountSeed =
+                        it.publicKey
+                            .toAddress(AttoAlgorithm.V1)
+                            .value,
+                    accountBalance = accountBalance,
+                    accountBalanceUsd = amountUsd(parseDecimal(accountBalance)),
+                    amountString = amountString,
+                    amountUsd = amountUsd(parseDecimal(amountString)),
+                    address = address,
+                    showAmountError = showAmountError,
+                    showAddressError = showAddressError,
+                    showLoader = showLoader,
+                    isUsdMode = isUsdMode,
+                    equivalentDisplay = equivalentDisplay(),
+                    priceUsd = priceUsd,
+                )
+            } ?: SendFromUiState.DEFAULT
 
     val sendConfirmUiState
-        get() = SendConfirmUiState(
-            amount = amount,
-            amountUsd = amountUsd(amount),
-            address = address,
-            showLoader = showLoader,
-            accountHeight = account?.height?.value
-        )
+        get() =
+            SendConfirmUiState(
+                amount = amount,
+                amountUsd = amountUsd(amount),
+                address = address,
+                showLoader = showLoader,
+                accountHeight = account?.height?.value,
+            )
 
     val sendResultUiState
-        get() = SendResultUiState(
-            result = operationResult,
-            amount = amount,
-            amountUsd = amountUsd(amount),
-            address = address,
-            elapsedMs = elapsedMs,
-            sendBlock = sendBlock
-        )
+        get() =
+            SendResultUiState(
+                result = operationResult,
+                amount = amount,
+                amountUsd = amountUsd(amount),
+                address = address,
+                elapsedMs = elapsedMs,
+                sendBlock = sendBlock,
+            )
 
     enum class SendOperationResult {
-        UNKNOWN, SUCCESS, FAILURE
+        UNKNOWN,
+        SUCCESS,
+        FAILURE,
     }
 
     companion object {
-        val DEFAULT = SendTransactionUiState(
-            account = null,
-            amountString = null,
-            amount = null,
-            address = null,
-            operationResult = SendOperationResult.UNKNOWN,
-            elapsedMs = null,
-            isUsdMode = false
-        )
+        val DEFAULT =
+            SendTransactionUiState(
+                account = null,
+                amountString = null,
+                amount = null,
+                address = null,
+                operationResult = SendOperationResult.UNKNOWN,
+                elapsedMs = null,
+                isUsdMode = false,
+            )
     }
 }

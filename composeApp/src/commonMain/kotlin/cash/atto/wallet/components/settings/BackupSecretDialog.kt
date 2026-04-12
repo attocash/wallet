@@ -32,9 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun BackupSecretDialog(
-    onDismiss: () -> Unit
-) {
+fun BackupSecretDialog(onDismiss: () -> Unit) {
     val viewModel = koinViewModel<BackupSecretViewModel>()
     val uiState by viewModel.state.collectAsState()
     val clipboardManager = LocalClipboardManager.current
@@ -43,44 +41,55 @@ fun BackupSecretDialog(
         title = stringResource(Res.string.secret_title),
         onDismiss = onDismiss,
         desktopWidth = 560.dp,
-        contentPadding = PaddingValues(20.dp)
+        contentPadding = PaddingValues(20.dp),
     ) {
-            BackupWordGrid(
-                words = uiState.words,
-                hidden = uiState.hidden,
-                modifier = Modifier.fillMaxWidth()
+        BackupWordGrid(
+            words = uiState.words,
+            hidden = uiState.hidden,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            AttoButton(
+                variant = AttoButtonVariant.Outlined,
+                text =
+                    stringResource(
+                        if (uiState.hidden) {
+                            Res.string.settings_backup_show
+                        } else {
+                            Res.string.settings_backup_hide
+                        },
+                    ),
+                onClick = {
+                    if (uiState.hidden) {
+                        viewModel.showSecretPhrase()
+                    } else {
+                        viewModel.hideSecretPhrase()
+                    }
+                },
+                icon =
+                    if (uiState.hidden) {
+                        Icons.Outlined.Visibility
+                    } else {
+                        Icons.Outlined.VisibilityOff
+                    },
+                modifier = Modifier.weight(1f),
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                AttoButton(
-                    variant = AttoButtonVariant.Outlined,
-                    text = stringResource(
-                        if (uiState.hidden) Res.string.settings_backup_show
-                        else Res.string.settings_backup_hide
-                    ),
-                    onClick = {
-                        if (uiState.hidden) viewModel.showSecretPhrase()
-                        else viewModel.hideSecretPhrase()
-                    },
-                    icon = if (uiState.hidden) Icons.Outlined.Visibility
-                        else Icons.Outlined.VisibilityOff,
-                    modifier = Modifier.weight(1f)
-                )
-
-                AttoButton(
-                    text = stringResource(Res.string.secret_copy),
-                    onClick = {
-                        clipboardManager.setText(
-                            AnnotatedString(uiState.words.joinToString(" "))
-                        )
-                    },
-                    icon = Icons.Outlined.ContentCopy,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            AttoButton(
+                text = stringResource(Res.string.secret_copy),
+                onClick = {
+                    clipboardManager.setText(
+                        AnnotatedString(uiState.words.joinToString(" ")),
+                    )
+                },
+                icon = Icons.Outlined.ContentCopy,
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 
@@ -88,7 +97,7 @@ fun BackupSecretDialog(
 private fun BackupWordGrid(
     words: List<String>,
     hidden: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val midpoint = (words.size + 1) / 2
     val leftColumn = words.take(midpoint)
@@ -99,14 +108,14 @@ private fun BackupWordGrid(
 
         if (compact) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 words.forEachIndexed { index, word ->
                     AttoWordChip(
                         ordinal = index + 1,
                         word = word,
                         hidden = hidden,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -114,31 +123,31 @@ private fun BackupWordGrid(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     leftColumn.forEachIndexed { index, word ->
                         AttoWordChip(
                             ordinal = index + 1,
                             word = word,
                             hidden = hidden,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     rightColumn.forEachIndexed { index, word ->
                         AttoWordChip(
                             ordinal = midpoint + index + 1,
                             word = word,
                             hidden = hidden,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }

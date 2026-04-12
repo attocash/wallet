@@ -38,21 +38,24 @@ fun TextCard(
     overflow: TextOverflow = TextOverflow.Ellipsis,
     softWrap: Boolean = false,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
-    style: TextStyle = LocalTextStyle.current
+    style: TextStyle = LocalTextStyle.current,
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background,
+            ),
     ) {
         Text(
             text = text,
-            modifier = Modifier.fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 12.dp,
+                    ),
             color = color,
             fontSize = fontSize,
             fontStyle = fontStyle,
@@ -66,7 +69,7 @@ fun TextCard(
             softWrap = softWrap,
             maxLines = 1,
             onTextLayout = onTextLayout,
-            style = style
+            style = style,
         )
     }
 }

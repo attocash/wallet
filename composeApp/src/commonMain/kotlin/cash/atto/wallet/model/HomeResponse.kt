@@ -6,41 +6,25 @@ import kotlinx.serialization.Serializable
 data class HomeResponse(
     val metrics: List<Metric>,
     val addresses: List<Address> = emptyList(),
-    val voters: List<Voter> = emptyList()
+    val voters: List<Voter> = emptyList(),
 ) {
     val metricMap = metrics.associateBy { it.name }
     val addressMap = addresses.associateBy { it.address }
     val voterMap = voters.associateBy { it.address }
 }
 
-fun HomeResponse.getMetricValue(name: String): String? {
-    return metrics.getMetricValue(name)
-}
+fun HomeResponse.getMetricValue(name: String): String? = metrics.getMetricValue(name)
 
-fun HomeResponse.getPriceUsd(): String? {
-    return metrics.getPriceUsd()
-}
+fun HomeResponse.getPriceUsd(): String? = metrics.getPriceUsd()
 
-fun HomeResponse.getCirculatingSupply(): String? {
-    return metrics.getCirculatingSupply()
-}
+fun HomeResponse.getCirculatingSupply(): String? = metrics.getCirculatingSupply()
 
-fun HomeResponse.getAverageConfirmationMs(): String? {
-    return metrics.getAverageConfirmationMs()
-}
+fun HomeResponse.getAverageConfirmationMs(): String? = metrics.getAverageConfirmationMs()
 
-fun HomeResponse.getStakingApy(): String? {
-    return metrics.getStakingApy()
-}
+fun HomeResponse.getStakingApy(): String? = metrics.getStakingApy()
 
-fun HomeResponse.getVoter(address: String): Voter? {
-    return voterMap[address]
-}
+fun HomeResponse.getVoter(address: String): Voter? = voterMap[address]
 
-fun HomeResponse.getAddressLabel(address: String): String? {
-    return addressMap[address]?.label
-}
+fun HomeResponse.getAddressLabel(address: String): String? = addressMap[address]?.label
 
-fun HomeResponse.getVoterLabel(address: String): String? {
-    return voterMap[address]?.label
-}
+fun HomeResponse.getVoterLabel(address: String): String? = voterMap[address]?.label

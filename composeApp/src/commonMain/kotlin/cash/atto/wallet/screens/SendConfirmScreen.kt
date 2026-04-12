@@ -36,7 +36,7 @@ import kotlin.time.ExperimentalTime
 fun SendConfirmScreen(
     onBackNavigation: () -> Unit,
     onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
 ) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
@@ -58,7 +58,7 @@ fun SendConfirmScreen(
                     onConfirm.invoke()
                 }
             },
-            onCancel = onCancel
+            onCancel = onCancel,
         )
     }
 }
@@ -70,53 +70,56 @@ fun SendConfirmContent(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     hasCachedWork: Boolean = true,
-    isSending: Boolean = false
+    isSending: Boolean = false,
 ) {
     val now = Clock.System.now()
     val previewHeight = uiState.accountHeight?.let { it + 1u } ?: 1uL
     val receiverAddress = uiState.address?.let { normalizeAttoUri(it) } ?: "Unavailable"
 
-    val previewTransaction = TransactionUiState(
-        type = TransactionType.SEND,
-        amount = uiState.amount?.toStringExpanded(),
-        source = receiverAddress,
-        sourceLabel = null,
-        timestamp = now,
-        height = AttoHeight(previewHeight),
-        hash = null
-    )
+    val previewTransaction =
+        TransactionUiState(
+            type = TransactionType.SEND,
+            amount = uiState.amount?.toStringExpanded(),
+            source = receiverAddress,
+            sourceLabel = null,
+            timestamp = now,
+            height = AttoHeight(previewHeight),
+            hash = null,
+        )
 
     AttoModal(
         title = "Confirm Transaction",
-        onDismiss = onCancel
+        onDismiss = onCancel,
     ) {
         AttoCopyField(
             label = "TO",
             value = receiverAddress,
-            maxLines = 2
+            maxLines = 2,
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             AttoCapsLabel("AMOUNT")
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = uiState.amount?.let { "${AttoFormatter.format(it)} ATTO" } ?: "Unavailable",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.W700,
-                        fontSize = 20.sp
-                    )
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.W700,
+                            fontSize = 20.sp,
+                        ),
                 )
                 uiState.amountUsd?.let {
                     Text(
                         text = AttoFormatter.formatUsd(it),
                         color = dark_accent,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.W600
-                        )
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.W600,
+                            ),
                     )
                 }
             }
@@ -125,7 +128,7 @@ fun SendConfirmContent(
         AttoCapsLabel("PREVIEW")
 
         AttoTransactionCard(
-            transaction = previewTransaction
+            transaction = previewTransaction,
         )
 
         HorizontalDivider(color = dark_border)
@@ -133,7 +136,9 @@ fun SendConfirmContent(
         if (isSending) {
             var elapsedMs by remember { mutableStateOf(0L) }
             LaunchedEffect(Unit) {
-                val start = kotlin.time.TimeSource.Monotonic.markNow()
+                val start =
+                    kotlin.time.TimeSource.Monotonic
+                        .markNow()
                 while (true) {
                     elapsedMs = start.elapsedNow().inWholeMilliseconds
                     kotlinx.coroutines.delay(10)
@@ -154,7 +159,7 @@ fun SendConfirmContent(
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     color = Color(0xFF111827),
-                    strokeWidth = 2.dp
+                    strokeWidth = 2.dp,
                 )
             }
         } else {
@@ -167,7 +172,6 @@ fun SendConfirmContent(
     }
 }
 
-
 private fun normalizeAttoUri(address: String): String =
     when {
         address.startsWith("atto://") -> address
@@ -176,7 +180,9 @@ private fun normalizeAttoUri(address: String): String =
     }
 
 enum class SendScreenState {
-    SEND, CONFIRM, RESULT;
+    SEND,
+    CONFIRM,
+    RESULT,
 }
 
 @Preview
@@ -184,15 +190,16 @@ enum class SendScreenState {
 fun SendConfirmPreview() {
     AttoWalletTheme {
         SendConfirmContent(
-            uiState = SendConfirmUiState(
-                amount = BigDecimal.TEN,
-                amountUsd = null,
-                address = "atto://address",
-                showLoader = false,
-                accountHeight = 42u
-            ),
+            uiState =
+                SendConfirmUiState(
+                    amount = BigDecimal.TEN,
+                    amountUsd = null,
+                    address = "atto://address",
+                    showLoader = false,
+                    accountHeight = 42u,
+                ),
             onConfirm = {},
-            onCancel = {}
+            onCancel = {},
         )
     }
 }

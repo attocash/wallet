@@ -9,30 +9,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ImportSecretViewModel(
-    private val appStateRepository: AppStateRepository
+    private val appStateRepository: AppStateRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(ImportSecretUiState.DEFAULT)
     val state = _state.asStateFlow()
 
     suspend fun updateInput(value: String) {
         _state.emit(
             state.value
-                .copy(input = value)
+                .copy(input = value),
         )
 
         checkWallet()
     }
 
     suspend fun importWallet(): Boolean {
-        if (!checkWallet())
+        if (!checkWallet()) {
             return false
+        }
 
         state.value
             .input
             ?.let {
                 appStateRepository.importSecret(
-                    it.split(' ')
+                    it.split(' '),
                 )
             }
 
@@ -44,12 +44,12 @@ class ImportSecretViewModel(
             val mnemonic = AttoMnemonic(state.value.input.orEmpty())
             _state.emit(
                 state.value
-                    .copy(errorMessage = null)
+                    .copy(errorMessage = null),
             )
         } catch (ex: AttoMnemonicException) {
             _state.emit(
                 state.value
-                    .copy(errorMessage = ex.message)
+                    .copy(errorMessage = ex.message),
             )
 
             return false

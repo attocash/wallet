@@ -20,16 +20,19 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 
 class VotersRepository(
-    private val network: AttoNetwork
+    private val network: AttoNetwork,
 ) {
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
+    private val client =
+        HttpClient {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                    },
+                )
+            }
         }
-    }
 
     private val _votersResponse = MutableStateFlow<VotersResponse?>(null)
     val votersResponse = _votersResponse.asStateFlow()
@@ -48,7 +51,7 @@ class VotersRepository(
     suspend fun fetchVoters(): VotersResponse? {
         val baseUrl = network.gatekeerperUrl()
         return try {
-            val response = client.get("${baseUrl}/projections/voters")
+            val response = client.get("$baseUrl/projections/voters")
             val votersResponse = response.body<VotersResponse>()
             _votersResponse.emit(votersResponse)
             votersResponse
@@ -58,11 +61,12 @@ class VotersRepository(
         }
     }
 
-    fun getVoterLabel(address: String): String? {
-        return votersResponse.value?.voters?.find {
-            it.address == address
-        }?.label
-    }
+    fun getVoterLabel(address: String): String? =
+        votersResponse.value
+            ?.voters
+            ?.find {
+                it.address == address
+            }?.label
 
     fun calculateUserApy(voterAddress: String): BigDecimal? {
         val response = votersResponse.value ?: return null
@@ -73,11 +77,12 @@ class VotersRepository(
         val sharePercentage = BigDecimal.fromInt(voter.sharePercentage)
         val hundred = BigDecimal.fromInt(100)
 
-        val mode = DecimalMode(
-            decimalPrecision = 5,
-            scale = 2,
-            roundingMode = RoundingMode.ROUND_HALF_CEILING
-        )
+        val mode =
+            DecimalMode(
+                decimalPrecision = 5,
+                scale = 2,
+                roundingMode = RoundingMode.ROUND_HALF_CEILING,
+            )
 
         return (globalApy * sharePercentage).divide(hundred, decimalMode = mode)
     }

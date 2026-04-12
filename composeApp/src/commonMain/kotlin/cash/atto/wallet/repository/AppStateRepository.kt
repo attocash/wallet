@@ -14,14 +14,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 class AppStateRepository(
     private val seedDataSource: SeedDataSource,
     private val tempSeedDataSource: TempSeedDataSource,
     private val passwordDataSource: PasswordDataSource,
-    private val seedAESInteractor: SeedAESInteractor
+    private val seedAESInteractor: SeedAESInteractor,
 ) {
     private val _state = MutableStateFlow(AppState.DEFAULT)
     val state = _state.asStateFlow()
@@ -57,7 +56,7 @@ class AppStateRepository(
                         setAuthState(
                             password?.let {
                                 AppState.AuthState.SESSION_INVALID
-                            } ?: AppState.AuthState.NO_PASSWORD
+                            } ?: AppState.AuthState.NO_PASSWORD,
                         )
                     }
                 } ?: setAuthState(AppState.AuthState.NO_SEED)
@@ -70,9 +69,11 @@ class AppStateRepository(
         val seed = mnemonic.words.joinToString(" ")
 
         // If in web, don't store the seed yet
-        if (getPlatform().type == PlatformType.WEB)
+        if (getPlatform().type == PlatformType.WEB) {
             tempSeedDataSource.seed = seed
-        else seedDataSource.setSeed(seed)
+        } else {
+            seedDataSource.setSeed(seed)
+        }
 
         setAuthState(AppState.AuthState.NEW_ACCOUNT)
 
@@ -83,23 +84,27 @@ class AppStateRepository(
         val seed = secret.joinToString(" ")
 
         // If in web, don't store the seed yet
-        if (getPlatform().type == PlatformType.WEB)
+        if (getPlatform().type == PlatformType.WEB) {
             tempSeedDataSource.seed = seed
-        else seedDataSource.setSeed(seed)
+        } else {
+            seedDataSource.setSeed(seed)
+        }
 
         val password = passwordDataSource.getPassword(seed)
-        if (password == null)
+        if (password == null) {
             setAuthState(AppState.AuthState.NEW_ACCOUNT)
+        }
     }
 
     suspend fun submitPassword(password: String): Boolean {
         when (getPlatform().type) {
             PlatformType.WEB -> {
-                val decrypted = seedAESInteractor
-                    .decryptSeed(
-                        encryptedSeed = state.value.encryptedSeed.orEmpty(),
-                        password = password
-                    )
+                val decrypted =
+                    seedAESInteractor
+                        .decryptSeed(
+                            encryptedSeed = state.value.encryptedSeed.orEmpty(),
+                            password = password,
+                        )
 
                 try {
                     val mnemonic = AttoMnemonic(decrypted)
@@ -107,8 +112,7 @@ class AppStateRepository(
                     startSession()
 
                     return true
-                }
-                catch (ex: Exception) {
+                } catch (ex: Exception) {
                     return false
                 }
             }
@@ -130,7 +134,7 @@ class AppStateRepository(
         if (getPlatform().type == PlatformType.WEB) {
             tempSeedDataSource.seed?.let {
                 seedDataSource.setSeed(
-                    seedAESInteractor.encryptSeed(it, password)
+                    seedAESInteractor.encryptSeed(it, password),
                 )
             }
         }
@@ -141,7 +145,7 @@ class AppStateRepository(
             ?.let {
                 passwordDataSource.setPassword(
                     seed = it.joinToString(" "),
-                    password = password
+                    password = password,
                 )
 
                 setPassword(password)
@@ -164,59 +168,56 @@ class AppStateRepository(
         setAuthState(AppState.AuthState.SESSION_INVALID)
     }
 
-    private suspend fun setEncryptedSeed(
-        encryptedSeed: String?
-    ) {
+    private suspend fun setEncryptedSeed(encryptedSeed: String?) {
         _state.emit(
             state.value.copy(
-                encryptedSeed = encryptedSeed
-            )
+                encryptedSeed = encryptedSeed,
+            ),
         )
     }
 
-    private suspend fun setMnemonic(
-        mnemonic: AttoMnemonic?,
-    ) {
+    private suspend fun setMnemonic(mnemonic: AttoMnemonic?) {
         _state.emit(
             state.value.copy(
-                mnemonic = mnemonic
-            )
+                mnemonic = mnemonic,
+            ),
         )
     }
 
     private suspend fun setAuthState(authState: AppState.AuthState) {
         _state.emit(
             state.value.copy(
-                authState = authState
-            )
+                authState = authState,
+            ),
         )
     }
 
     private suspend fun setPassword(password: String?) {
         _state.emit(
             state.value.copy(
-                password = password
-            )
+                password = password,
+            ),
         )
     }
 
     private suspend fun startSession() {
         _state.emit(
             state.value.copy(
-                authState = AppState.AuthState.SESSION_VALID
-            )
+                authState = AppState.AuthState.SESSION_VALID,
+            ),
         )
 
         sessionJob?.cancel()
-        sessionJob = sessionScope.launch {
-            delay(SESSION_DURATION)
+        sessionJob =
+            sessionScope.launch {
+                delay(SESSION_DURATION)
 
-            _state.emit(
-                state.value.copy(
-                    authState = AppState.AuthState.SESSION_INVALID
+                _state.emit(
+                    state.value.copy(
+                        authState = AppState.AuthState.SESSION_INVALID,
+                    ),
                 )
-            )
-        }
+            }
     }
 
     companion object {

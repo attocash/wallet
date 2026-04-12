@@ -13,7 +13,7 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 @Composable
 fun AttoTransactionDetailsDialog(
     transaction: TransactionUiState,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val hash = transaction.hash
@@ -22,45 +22,49 @@ fun AttoTransactionDetailsDialog(
     AttoModal(
         title = "Transaction Details",
         onDismiss = onDismiss,
-        contentSpacing = 18.dp
+        contentSpacing = 18.dp,
     ) {
-            AttoCopyField(
-                label = "Transaction Hash",
-                value = hash ?: "Unavailable"
-            )
-            AttoDetailField(
-                label = "Type",
-                value = transaction.type.name.lowercase().replaceFirstChar { it.uppercase() }
-            )
-            AttoDetailField(
-                label = "Amount",
-                value = transaction.shownAmount.ifBlank { "Unavailable" }
-            )
-            AttoCopyField(
-                label = when (transaction.type) {
+        AttoCopyField(
+            label = "Transaction Hash",
+            value = hash ?: "Unavailable",
+        )
+        AttoDetailField(
+            label = "Type",
+            value =
+                transaction.type.name
+                    .lowercase()
+                    .replaceFirstChar { it.uppercase() },
+        )
+        AttoDetailField(
+            label = "Amount",
+            value = transaction.shownAmount.ifBlank { "Unavailable" },
+        )
+        AttoCopyField(
+            label =
+                when (transaction.type) {
                     TransactionType.OPEN -> "Voter"
                     TransactionType.SEND -> "Receiver"
                     TransactionType.RECEIVE -> "Sender"
                     TransactionType.CHANGE -> "Voter"
                 },
-                value = transaction.source
-            )
-            AttoDetailField(
-                label = "Height",
-                value = "#${transaction.shownHeight}"
-            )
-            AttoDetailField(
-                label = "Timestamp",
-                value = transaction.formattedTimestamp
-            )
+            value = transaction.source,
+        )
+        AttoDetailField(
+            label = "Height",
+            value = "#${transaction.shownHeight}",
+        )
+        AttoDetailField(
+            label = "Timestamp",
+            value = transaction.formattedTimestamp,
+        )
 
-            if (explorerUrl != null) {
-                AttoButton(
-                    text = "View in Explorer",
-                    onClick = { uriHandler.openUri(explorerUrl) },
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = Icons.AutoMirrored.Outlined.ArrowForward,
-                )
-            }
+        if (explorerUrl != null) {
+            AttoButton(
+                text = "View in Explorer",
+                onClick = { uriHandler.openUri(explorerUrl) },
+                modifier = Modifier.fillMaxWidth(),
+                icon = Icons.AutoMirrored.Outlined.ArrowForward,
+            )
+        }
     }
 }

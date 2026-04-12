@@ -10,10 +10,12 @@ data class AppState(
     val mnemonic: AttoMnemonic?,
     val authState: AuthState,
     val password: String?,
-    val index: UInt = 0U
+    val index: UInt = 0U,
 ) {
     suspend fun getSeed() = mnemonic?.toSeed()
+
     suspend fun getPrivateKey() = getSeed()?.toPrivateKey(index)
+
     suspend fun getPublicKey() = getPrivateKey()?.toPublicKey()
 
     enum class AuthState {
@@ -22,15 +24,16 @@ data class AppState(
         NO_PASSWORD,
         NO_SEED,
         SESSION_INVALID,
-        SESSION_VALID;
+        SESSION_VALID,
     }
 
     companion object {
-        val DEFAULT = AppState(
-            encryptedSeed = null,
-            mnemonic = null,
-            authState = AuthState.UNKNOWN,
-            password = null
-        )
+        val DEFAULT =
+            AppState(
+                encryptedSeed = null,
+                mnemonic = null,
+                authState = AuthState.UNKNOWN,
+                password = null,
+            )
     }
 }

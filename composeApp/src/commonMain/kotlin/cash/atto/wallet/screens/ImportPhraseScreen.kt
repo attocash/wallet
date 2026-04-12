@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
@@ -64,7 +64,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.secret_import_hint
-import attowallet.composeapp.generated.resources.secret_import_invalid_title_plural
 import attowallet.composeapp.generated.resources.secret_import_paste
 import attowallet.composeapp.generated.resources.secret_import_paste_hint
 import attowallet.composeapp.generated.resources.secret_import_paste_success
@@ -77,11 +76,9 @@ import cash.atto.commons.AttoMnemonic
 import cash.atto.commons.AttoMnemonicDictionary
 import cash.atto.commons.AttoMnemonicException
 import cash.atto.wallet.clipboard.readClipboardText
-import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.components.common.AttoBackButton
 import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
+import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_accent_soft
 import cash.atto.wallet.ui.dark_bg
@@ -93,7 +90,6 @@ import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_surface_deep
 import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_secondary
-import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import kotlinx.coroutines.delay
@@ -116,10 +112,10 @@ private val ImportGoldSoft = dark_accent_soft
 private val ImportDanger = dark_danger
 private val ImportSuccess = dark_success
 
-private const val ImportWordCount = 24
-private val ImportDictionaryWords = AttoMnemonicDictionary.list
-private val ImportDictionarySet = AttoMnemonicDictionary.set
-private const val ImportMnemonicInvalidMessage = "Mnemonic is invalid"
+private const val IMPORT_WORD_COUNT = 24
+private val IMPORT_DICTIONARY_WORDS = AttoMnemonicDictionary.list
+private val IMPORT_DICTIONARY_SET = AttoMnemonicDictionary.set
+private const val IMPORT_MNEMONIC_INVALID_MESSAGE = "Mnemonic is invalid"
 
 private fun splitMnemonicWords(value: String?): List<String> =
     value
@@ -127,13 +123,11 @@ private fun splitMnemonicWords(value: String?): List<String> =
         .trim()
         .split(Regex("\\s+"))
         .filter { it.isNotBlank() }
-        .take(ImportWordCount)
+        .take(IMPORT_WORD_COUNT)
 
-private fun toWordSlots(words: List<String>): List<String> =
-    List(ImportWordCount) { index -> words.getOrNull(index).orEmpty() }
+private fun toWordSlots(words: List<String>): List<String> = List(IMPORT_WORD_COUNT) { index -> words.getOrNull(index).orEmpty() }
 
-private fun normalizeWordInput(value: String): String =
-    value.lowercase().filter { it.isLetter() }
+private fun normalizeWordInput(value: String): String = value.lowercase().filter { it.isLetter() }
 
 private fun joinMnemonicWords(words: List<String>): String =
     words
@@ -144,7 +138,7 @@ private fun joinMnemonicWords(words: List<String>): String =
 @Composable
 fun ImportPhraseScreen(
     onBackNavigation: () -> Unit,
-    onImportAccount: () -> Unit
+    onImportAccount: () -> Unit,
 ) {
     val viewModel = koinViewModel<ImportSecretViewModel>()
     val uiState = viewModel.state.collectAsState()
@@ -164,7 +158,7 @@ fun ImportPhraseScreen(
                     onImportAccount()
                 }
             }
-        }
+        },
     )
 }
 
@@ -173,15 +167,16 @@ fun ImportPhrase(
     uiState: ImportSecretUiState,
     onBackNavigation: () -> Unit,
     onInputChanged: (String) -> Unit,
-    onDoneClicked: () -> Unit
+    onDoneClicked: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    val words = remember {
-        mutableStateListOf<String>().apply {
-            repeat(ImportWordCount) { add("") }
+    val words =
+        remember {
+            mutableStateListOf<String>().apply {
+                repeat(IMPORT_WORD_COUNT) { add("") }
+            }
         }
-    }
     var pasted by remember { mutableStateOf(false) }
     var focusedIndex by remember { mutableStateOf<Int?>(null) }
     var didLoadInitialInput by remember { mutableStateOf(false) }
@@ -189,7 +184,7 @@ fun ImportPhrase(
     LaunchedEffect(uiState.input) {
         if (!didLoadInitialInput) {
             val inputWords = toWordSlots(splitMnemonicWords(uiState.input))
-            repeat(ImportWordCount) { index ->
+            repeat(IMPORT_WORD_COUNT) { index ->
                 words[index] = inputWords[index]
             }
             didLoadInitialInput = true
@@ -205,67 +200,73 @@ fun ImportPhrase(
 
     val normalizedWords = words.map(::normalizeWordInput)
     val filledCount = normalizedWords.count { it.isNotBlank() }
-    val hasCompletePhrase = filledCount == ImportWordCount
-    val invalidWordIndices = if (hasCompletePhrase) {
-        normalizedWords.mapIndexedNotNull { index, word ->
-            if (word !in ImportDictionarySet) index else null
-        }.toSet()
-    } else {
-        emptySet()
-    }
-    val mnemonicError = remember(normalizedWords) {
-        if (!hasCompletePhrase || invalidWordIndices.isNotEmpty()) {
-            null
+    val hasCompletePhrase = filledCount == IMPORT_WORD_COUNT
+    val invalidWordIndices =
+        if (hasCompletePhrase) {
+            normalizedWords
+                .mapIndexedNotNull { index, word ->
+                    if (word !in IMPORT_DICTIONARY_SET) index else null
+                }.toSet()
         } else {
-            try {
-                AttoMnemonic(normalizedWords)
+            emptySet()
+        }
+    val mnemonicError =
+        remember(normalizedWords) {
+            if (!hasCompletePhrase || invalidWordIndices.isNotEmpty()) {
                 null
-            } catch (exception: AttoMnemonicException) {
-                exception.message ?: "Invalid mnemonic"
+            } else {
+                try {
+                    AttoMnemonic(normalizedWords)
+                    null
+                } catch (exception: AttoMnemonicException) {
+                    exception.message ?: "Invalid mnemonic"
+                }
             }
         }
-    }
     val showInvalidState = mnemonicError != null
-    val progress = filledCount / ImportWordCount.toFloat()
+    val progress = filledCount / IMPORT_WORD_COUNT.toFloat()
     val canSubmit = hasCompletePhrase && invalidWordIndices.isEmpty() && mnemonicError == null
 
     fun syncWords(nextWords: List<String>) = onInputChanged(joinMnemonicWords(nextWords))
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ImportPageBackground)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(ImportPageBackground),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 32.dp,
-                    bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 40.dp,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(
+                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 32.dp,
+                        bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 40.dp,
+                        start = 24.dp,
+                        end = 24.dp,
+                    ),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BoxWithConstraints(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
+                contentAlignment = Alignment.TopCenter,
             ) {
                 val shellWidth = if (maxWidth > 736.dp) 736.dp else maxWidth
 
                 Column(
                     modifier = Modifier.width(shellWidth),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 32.dp),
-                        horizontalArrangement = Arrangement.Start
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.Start,
                     ) {
                         AttoBackButton(
-                            onClick = onBackNavigation
+                            onClick = onBackNavigation,
                         )
                     }
 
@@ -273,45 +274,49 @@ fun ImportPhrase(
                         text = stringResource(Res.string.secret_import_title),
                         color = ImportTextPrimary,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 36.sp,
-                            lineHeight = 39.6.sp,
-                            letterSpacing = (-0.72).sp
-                        )
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 36.sp,
+                                lineHeight = 39.6.sp,
+                                letterSpacing = (-0.72).sp,
+                            ),
                     )
 
                     Text(
                         text = stringResource(Res.string.secret_import_hint),
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .padding(horizontal = 18.dp),
+                        modifier =
+                            Modifier
+                                .padding(top = 12.dp)
+                                .padding(horizontal = 18.dp),
                         color = ImportTextSecondary,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.W400,
-                            fontSize = 14.sp,
-                            lineHeight = 21.sp
-                        )
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.W400,
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                            ),
                     )
 
                     ImportPasteCard(
                         pasted = pasted,
                         onPasteClick = {
                             coroutineScope.launch {
-                                val clipboardWords = readClipboardText()
-                                    .orEmpty()
-                                    .trim()
-                                    .lowercase()
-                                    .split(Regex("[^a-z]+"))
-                                    .filter { it.isNotBlank() }
-                                    .take(ImportWordCount)
+                                val clipboardWords =
+                                    readClipboardText()
+                                        .orEmpty()
+                                        .trim()
+                                        .lowercase()
+                                        .split(Regex("[^a-z]+"))
+                                        .filter { it.isNotBlank() }
+                                        .take(IMPORT_WORD_COUNT)
 
                                 if (clipboardWords.isEmpty()) {
                                     return@launch
                                 }
 
-                                repeat(ImportWordCount) { index ->
+                                repeat(IMPORT_WORD_COUNT) { index ->
                                     words[index] = clipboardWords.getOrNull(index).orEmpty()
                                 }
 
@@ -319,51 +324,56 @@ fun ImportPhrase(
                                 pasted = true
                             }
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
                     )
 
                     ImportProgressCard(
                         filledCount = filledCount,
                         progress = progress,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
                     )
 
                     if (showInvalidState) {
                         ImportInvalidCard(
-                            message = ImportMnemonicInvalidMessage,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
+                            message = IMPORT_MNEMONIC_INVALID_MESSAGE,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
                         )
                     }
 
                     ImportWordsGrid(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp),
                         words = words,
                         invalidWordIndices = emptySet(),
                         focusedIndex = focusedIndex,
                         onFocusedIndexChange = { focusedIndex = it },
                         onWordChange = { index, next ->
-                            val pastedWords = if (next.any { !it.isLetter() }) {
-                                next
-                                    .trim()
-                                    .lowercase()
-                                    .split(Regex("[^a-z]+"))
-                                    .filter { it.isNotBlank() }
-                            } else {
-                                emptyList()
-                            }
+                            val pastedWords =
+                                if (next.any { !it.isLetter() }) {
+                                    next
+                                        .trim()
+                                        .lowercase()
+                                        .split(Regex("[^a-z]+"))
+                                        .filter { it.isNotBlank() }
+                                } else {
+                                    emptyList()
+                                }
 
                             if (pastedWords.size > 1) {
                                 pastedWords.forEachIndexed { offset, pastedWord ->
                                     val targetIndex = index + offset
-                                    if (targetIndex < ImportWordCount) {
+                                    if (targetIndex < IMPORT_WORD_COUNT) {
                                         words[targetIndex] = pastedWord
                                     }
                                 }
@@ -372,16 +382,17 @@ fun ImportPhrase(
                             }
 
                             syncWords(words.toList())
-                        }
+                        },
                     )
 
                     AttoButton(
                         text = stringResource(Res.string.secret_import_submit),
                         enabled = canSubmit,
                         onClick = onDoneClicked,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 28.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 28.dp),
                     )
                 }
             }
@@ -396,18 +407,18 @@ private fun ImportWordsGrid(
     focusedIndex: Int?,
     onFocusedIndexChange: (Int?) -> Unit,
     onWordChange: (Int, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val leftColumn = words.take(ImportWordCount / 2)
-    val rightColumn = words.drop(ImportWordCount / 2)
+    val leftColumn = words.take(IMPORT_WORD_COUNT / 2)
+    val rightColumn = words.drop(IMPORT_WORD_COUNT / 2)
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             leftColumn.forEachIndexed { index, word ->
                 ImportWordField(
@@ -416,105 +427,121 @@ private fun ImportWordsGrid(
                     isInvalid = index in invalidWordIndices,
                     focused = focusedIndex == index,
                     onFocusChange = { isFocused -> onFocusedIndexChange(if (isFocused) index else focusedIndex?.takeIf { it != index }) },
-                    onValueChange = { onWordChange(index, it) }
+                    onValueChange = { onWordChange(index, it) },
                 )
             }
         }
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             rightColumn.forEachIndexed { index, word ->
-                val absoluteIndex = index + (ImportWordCount / 2)
+                val absoluteIndex = index + (IMPORT_WORD_COUNT / 2)
                 ImportWordField(
                     index = absoluteIndex,
                     value = word,
                     isInvalid = absoluteIndex in invalidWordIndices,
                     focused = focusedIndex == absoluteIndex,
-                    onFocusChange = { isFocused -> onFocusedIndexChange(if (isFocused) absoluteIndex else focusedIndex?.takeIf { it != absoluteIndex }) },
-                    onValueChange = { onWordChange(absoluteIndex, it) }
+                    onFocusChange = { isFocused ->
+                        onFocusedIndexChange(
+                            if (isFocused) {
+                                absoluteIndex
+                            } else {
+                                focusedIndex?.takeIf {
+                                    it !=
+                                        absoluteIndex
+                                }
+                            },
+                        )
+                    },
+                    onValueChange = { onWordChange(absoluteIndex, it) },
                 )
             }
         }
     }
 }
 
-
 @Composable
 private fun ImportPasteCard(
     pasted: Boolean,
     onPasteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .background(ImportSurface, RoundedCornerShape(16.dp))
-            .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
-            .padding(16.dp),
+        modifier =
+            modifier
+                .background(ImportSurface, RoundedCornerShape(16.dp))
+                .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
+                .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(44.dp)
-                .background(ImportGoldSoft, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(44.dp)
+                    .background(ImportGoldSoft, RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = if (pasted) Icons.Outlined.Check else Icons.Outlined.ContentPaste,
                 contentDescription = null,
                 tint = if (pasted) ImportSuccess else ImportGold,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
             )
         }
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
-                text = if (pasted) {
-                    stringResource(Res.string.secret_import_paste_success)
-                } else {
-                    stringResource(Res.string.secret_import_paste_title)
-                },
+                text =
+                    if (pasted) {
+                        stringResource(Res.string.secret_import_paste_success)
+                    } else {
+                        stringResource(Res.string.secret_import_paste_title)
+                    },
                 color = ImportTextPrimary,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 14.sp
-                )
+                style =
+                    MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 14.sp,
+                    ),
             )
 
             Text(
                 text = stringResource(Res.string.secret_import_paste_hint),
                 color = if (pasted) ImportSuccess else ImportTextSecondary,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontWeight = FontWeight.W400,
-                    fontSize = 12.sp,
-                    lineHeight = 18.sp
-                )
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.W400,
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp,
+                    ),
             )
         }
 
         Box(
-            modifier = Modifier
-                .background(ImportGold, RoundedCornerShape(10.dp))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onPasteClick
-                )
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .background(ImportGold, RoundedCornerShape(10.dp))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onPasteClick,
+                    ).padding(horizontal = 16.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = stringResource(Res.string.secret_import_paste),
                 color = ImportGoldDark,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 13.sp,
+                    ),
             )
         }
     }
@@ -524,55 +551,61 @@ private fun ImportPasteCard(
 private fun ImportProgressCard(
     filledCount: Int,
     progress: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .background(ImportSurface, RoundedCornerShape(16.dp))
-            .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier =
+            modifier
+                .background(ImportSurface, RoundedCornerShape(16.dp))
+                .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(Res.string.secret_import_progress),
                 color = ImportTextSecondary,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.W500,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 13.sp,
+                    ),
             )
 
             Text(
-                text = "$filledCount/$ImportWordCount",
+                text = "$filledCount/$IMPORT_WORD_COUNT",
                 color = ImportTextPrimary,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 13.sp,
+                    ),
             )
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .background(ImportBorderMuted, RoundedCornerShape(999.dp))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .background(ImportBorderMuted, RoundedCornerShape(999.dp)),
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(progress.coerceIn(0f, 1f))
-                    .height(8.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFFFFD666), ImportGold)
+                modifier =
+                    Modifier
+                        .fillMaxWidth(progress.coerceIn(0f, 1f))
+                        .height(8.dp)
+                        .background(
+                            brush =
+                                Brush.horizontalGradient(
+                                    colors = listOf(Color(0xFFFFD666), ImportGold),
+                                ),
+                            shape = RoundedCornerShape(999.dp),
                         ),
-                        shape = RoundedCornerShape(999.dp)
-                    )
             )
         }
     }
@@ -581,31 +614,33 @@ private fun ImportProgressCard(
 @Composable
 private fun ImportInvalidCard(
     message: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .background(Color(0xFF211719), RoundedCornerShape(16.dp))
-            .border(1.dp, Color(0xFF503033), RoundedCornerShape(16.dp))
-            .padding(16.dp),
+        modifier =
+            modifier
+                .background(Color(0xFF211719), RoundedCornerShape(16.dp))
+                .border(1.dp, Color(0xFF503033), RoundedCornerShape(16.dp))
+                .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = Icons.Outlined.ErrorOutline,
             contentDescription = null,
             tint = ImportDanger,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(18.dp),
         )
 
         Text(
-            text = message ?: ImportMnemonicInvalidMessage,
+            text = message ?: IMPORT_MNEMONIC_INVALID_MESSAGE,
             color = Color(0xFFF2B8BC),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontWeight = FontWeight.W500,
-                fontSize = 13.sp,
-                lineHeight = 18.sp
-            )
+            style =
+                MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                ),
         )
     }
 }
@@ -617,122 +652,133 @@ private fun ImportWordField(
     isInvalid: Boolean,
     focused: Boolean,
     onFocusChange: (Boolean) -> Unit,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
 ) {
     val density = LocalDensity.current
     val normalized = value.trim().lowercase()
-    val suggestions = remember(value) {
-        if (normalized.length < 2) {
-            emptyList()
-        } else {
-            ImportDictionaryWords
-                .asSequence()
-                .filter { it.startsWith(normalized) }
-                .toList()
+    val suggestions =
+        remember(value) {
+            if (normalized.length < 2) {
+                emptyList()
+            } else {
+                IMPORT_DICTIONARY_WORDS
+                    .asSequence()
+                    .filter { it.startsWith(normalized) }
+                    .toList()
+            }
         }
-    }
-    val showFieldInvalid = normalized.isNotBlank() && normalized !in ImportDictionarySet && !focused
+    val showFieldInvalid = normalized.isNotBlank() && normalized !in IMPORT_DICTIONARY_SET && !focused
     var fieldWidth by remember { mutableStateOf(0.dp) }
 
     Box(
-        modifier = Modifier
-            .zIndex(if (focused && suggestions.isNotEmpty()) 1f else 0f)
+        modifier =
+            Modifier
+                .zIndex(if (focused && suggestions.isNotEmpty()) 1f else 0f),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(ImportSurfaceRaised, RoundedCornerShape(14.dp))
-                .border(
-                    width = 1.dp,
-                    color = if (isInvalid || showFieldInvalid) ImportDanger else ImportBorder,
-                    shape = RoundedCornerShape(14.dp)
-                )
-                .height(44.dp)
-                .padding(horizontal = 14.dp)
-                .onGloballyPositioned { coordinates ->
-                    fieldWidth = with(density) { coordinates.size.width.toDp() }
-                },
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(ImportSurfaceRaised, RoundedCornerShape(14.dp))
+                    .border(
+                        width = 1.dp,
+                        color = if (isInvalid || showFieldInvalid) ImportDanger else ImportBorder,
+                        shape = RoundedCornerShape(14.dp),
+                    ).height(44.dp)
+                    .padding(horizontal = 14.dp)
+                    .onGloballyPositioned { coordinates ->
+                        fieldWidth = with(density) { coordinates.size.width.toDp() }
+                    },
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "${index + 1}.",
-                modifier = Modifier
-                    .width(28.dp)
-                    .paddingFromBaseline(top = 16.dp),
+                modifier =
+                    Modifier
+                        .width(28.dp)
+                        .paddingFromBaseline(top = 16.dp),
                 color = if (isInvalid || showFieldInvalid) ImportDanger else ImportTextSecondary,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.W500,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
-                )
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                    ),
             )
 
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .zIndex(if (focused && suggestions.isNotEmpty()) 1f else 0f)
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .zIndex(if (focused && suggestions.isNotEmpty()) 1f else 0f),
             ) {
                 BasicTextField(
                     value = value,
                     onValueChange = { onValueChange(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { onFocusChange(it.isFocused) },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { onFocusChange(it.isFocused) },
                     singleLine = true,
                     cursorBrush = SolidColor(ImportGold),
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.W500,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = ImportTextPrimary
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = if (index == ImportWordCount - 1) ImeAction.Done else ImeAction.Next,
-                        capitalization = KeyboardCapitalization.None
-                    ),
+                    textStyle =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.W500,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            color = ImportTextPrimary,
+                        ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = if (index == IMPORT_WORD_COUNT - 1) ImeAction.Done else ImeAction.Next,
+                            capitalization = KeyboardCapitalization.None,
+                        ),
                     keyboardActions = KeyboardActions(),
                     decorationBox = { innerTextField ->
                         Box(
                             modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.CenterStart
+                            contentAlignment = Alignment.CenterStart,
                         ) {
                             if (value.isBlank()) {
                                 Text(
                                     text = stringResource(Res.string.secret_import_word_placeholder),
                                     color = ImportTextTertiary,
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = FontWeight.W400,
-                                        fontSize = 12.sp,
-                                        lineHeight = 16.sp
-                                    )
+                                    style =
+                                        MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 12.sp,
+                                            lineHeight = 16.sp,
+                                        ),
                                 )
                             }
 
                             innerTextField()
                         }
-                    }
+                    },
                 )
             }
 
             Box(
                 modifier = Modifier.width(18.dp),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 if (showFieldInvalid) {
                     Box(
-                        modifier = Modifier
-                            .size(16.dp)
-                            .background(ImportDanger, CircleShape),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(16.dp)
+                                .background(ImportDanger, CircleShape),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "!",
                             color = Color.White,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.W700,
-                                fontSize = 10.sp
-                            )
+                            style =
+                                MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.W700,
+                                    fontSize = 10.sp,
+                                ),
                         )
                     }
                 }
@@ -743,12 +789,13 @@ private fun ImportWordField(
             DropdownMenu(
                 expanded = true,
                 onDismissRequest = { onFocusChange(false) },
-                modifier = Modifier
-                    .width(fieldWidth + 2.dp)
-                    .background(ImportSurface, RoundedCornerShape(12.dp))
-                    .border(1.dp, ImportBorder, RoundedCornerShape(12.dp))
-                    .heightIn(max = 184.dp),
-                containerColor = ImportSurface
+                modifier =
+                    Modifier
+                        .width(fieldWidth + 2.dp)
+                        .background(ImportSurface, RoundedCornerShape(12.dp))
+                        .border(1.dp, ImportBorder, RoundedCornerShape(12.dp))
+                        .heightIn(max = 184.dp),
+                containerColor = ImportSurface,
             ) {
                 suggestions.forEach { suggestion ->
                     DropdownMenuItem(
@@ -756,16 +803,17 @@ private fun ImportWordField(
                             Text(
                                 text = suggestion,
                                 color = ImportTextPrimary,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.W500,
-                                    fontSize = 13.sp
-                                )
+                                style =
+                                    MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.W500,
+                                        fontSize = 13.sp,
+                                    ),
                             )
                         },
                         onClick = {
                             onValueChange(suggestion)
                             onFocusChange(false)
-                        }
+                        },
                     )
                 }
             }
@@ -773,19 +821,19 @@ private fun ImportWordField(
     }
 }
 
-
 @Preview
 @Composable
 private fun ImportSecretPreview() {
     AttoWalletTheme {
         ImportPhrase(
-            uiState = ImportSecretUiState(
-                input = (1..24).joinToString(" ") { "word$it" },
-                errorMessage = null
-            ),
+            uiState =
+                ImportSecretUiState(
+                    input = (1..24).joinToString(" ") { "word$it" },
+                    errorMessage = null,
+                ),
             onBackNavigation = {},
             onInputChanged = {},
-            onDoneClicked = {}
+            onDoneClicked = {},
         )
     }
 }

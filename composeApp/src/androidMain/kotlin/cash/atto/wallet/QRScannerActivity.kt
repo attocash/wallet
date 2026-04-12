@@ -30,7 +30,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class QRScannerActivity : ComponentActivity() {
-
     private lateinit var cameraExecutor: ExecutorService
     private var cameraProvider: ProcessCameraProvider? = null
     private var qrCode by mutableStateOf("")
@@ -52,11 +51,12 @@ class QRScannerActivity : ComponentActivity() {
 
                         finish()
                     } else {
-                        Toast.makeText(
-                            this@QRScannerActivity,
-                            R.string.qr_error,
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast
+                            .makeText(
+                                this@QRScannerActivity,
+                                R.string.qr_error,
+                                Toast.LENGTH_LONG,
+                            ).show()
                     }
                 }
             }
@@ -69,19 +69,23 @@ class QRScannerActivity : ComponentActivity() {
 
                     cameraProviderFuture.addListener({
                         cameraProvider = cameraProviderFuture.get()
-                        val preview = Preview.Builder()
-                            .build()
-                            .also { it.surfaceProvider = previewView.surfaceProvider }
+                        val preview =
+                            Preview
+                                .Builder()
+                                .build()
+                                .also { it.surfaceProvider = previewView.surfaceProvider }
 
-                        val imageAnalysis = ImageAnalysis.Builder()
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .build()
-                            .also {
-                                it.setAnalyzer(
-                                    cameraExecutor,
-                                    analyzer
-                                )
-                            }
+                        val imageAnalysis =
+                            ImageAnalysis
+                                .Builder()
+                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                .build()
+                                .also {
+                                    it.setAnalyzer(
+                                        cameraExecutor,
+                                        analyzer,
+                                    )
+                                }
 
                         try {
                             cameraProvider?.unbindAll()
@@ -89,7 +93,7 @@ class QRScannerActivity : ComponentActivity() {
                                 this,
                                 CameraSelector.DEFAULT_BACK_CAMERA,
                                 preview,
-                                imageAnalysis
+                                imageAnalysis,
                             )
                         } catch (e: Exception) {
                             Log.e("QrScannerActivity", "Camera binding failed", e)
@@ -97,7 +101,7 @@ class QRScannerActivity : ComponentActivity() {
                     }, ContextCompat.getMainExecutor(context))
 
                     previewView
-                }
+                },
             )
         }
     }
@@ -111,30 +115,29 @@ class QRScannerActivity : ComponentActivity() {
     }
 
     private class QrCodeAnalyzer(
-        private val onQrCodeDetected: (barcode: Barcode) -> Unit
+        private val onQrCodeDetected: (barcode: Barcode) -> Unit,
     ) : ImageAnalysis.Analyzer {
-
         private var scanner = BarcodeScanning.getClient()
 
         @OptIn(ExperimentalGetImage::class)
         override fun analyze(imageProxy: ImageProxy) {
             val mediaImage = imageProxy.image
             if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(
-                    mediaImage,
-                    imageProxy.imageInfo.rotationDegrees
-                )
+                val image =
+                    InputImage.fromMediaImage(
+                        mediaImage,
+                        imageProxy.imageInfo.rotationDegrees,
+                    )
 
-                scanner.process(image)
+                scanner
+                    .process(image)
                     .addOnSuccessListener { barcodes ->
                         for (barcode in barcodes) {
                             onQrCodeDetected(barcode)
                         }
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Log.e("QrCodeAnalyzer", "Barcode scanning failed", e)
-                    }
-                    .addOnCompleteListener {
+                    }.addOnCompleteListener {
                         imageProxy.close()
                     }
             }

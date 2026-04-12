@@ -18,9 +18,8 @@ import kotlinx.coroutines.launch
 
 class VoterViewModel(
     private val walletManagerRepository: WalletManagerRepository,
-    private val votersRepository: VotersRepository
+    private val votersRepository: VotersRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(VoterUIState.DEFAULT)
     val state = _state.asStateFlow()
 
@@ -42,7 +41,7 @@ class VoterViewModel(
     suspend fun setVoter(address: String): Boolean {
         if (checkAddress(address)) {
             walletManagerRepository.changeRepresentative(
-                AttoAddress.parse(address)
+                AttoAddress.parse(address),
             )
 
             updateRepresentative(walletManagerRepository.state.value)
@@ -57,22 +56,22 @@ class VoterViewModel(
         val result = AttoAddress.isValid(address)
 
         _state.emit(
-            state.value.copy(showError = !result)
+            state.value.copy(showError = !result),
         )
 
         return result
     }
 
-    private suspend fun updateRepresentative(
-        walletManager: AttoWalletManager?
-    ) {
-        if (walletManager?.account == null)
+    private suspend fun updateRepresentative(walletManager: AttoWalletManager?) {
+        if (walletManager?.account == null) {
             return
+        }
 
-        val representativeAddress = walletManager.account!!
-            .representativePublicKey
-            .toAddress(AttoAlgorithm.V1)
-            .value
+        val representativeAddress =
+            walletManager.account!!
+                .representativePublicKey
+                .toAddress(AttoAlgorithm.V1)
+                .value
 
         val votersResponse = votersRepository.votersResponse.value
         val voterLabel = votersRepository.getVoterLabel(representativeAddress)
@@ -80,10 +79,11 @@ class VoterViewModel(
 
         val voters = votersResponse?.voters ?: emptyList()
 
-        val votersSorted = voters.sortedWith(
-            compareByDescending<Voter> { it.sharePercentage }
-                .thenBy { it.voteWeight }
-        )
+        val votersSorted =
+            voters.sortedWith(
+                compareByDescending<Voter> { it.sharePercentage }
+                    .thenBy { it.voteWeight },
+            )
 
         val currentVoter = voters.find { it.address == representativeAddress }
         val currentVoterWeightPercentage = currentVoter?.voteWeightPercentage
@@ -102,8 +102,8 @@ class VoterViewModel(
                 voters = votersSorted,
                 entities = votersResponse?.entities ?: emptyList(),
                 isLoading = false,
-                showError = false
-            )
+                showError = false,
+            ),
         )
     }
 }

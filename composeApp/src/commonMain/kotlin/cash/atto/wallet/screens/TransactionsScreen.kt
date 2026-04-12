@@ -31,10 +31,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoTransactionCard
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.dark_bg
@@ -50,16 +49,16 @@ import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun TransactionsScreen(
-    onBackClick: () -> Unit
-) {
+fun TransactionsScreen(onBackClick: () -> Unit) {
     KoinContext {
         val overviewViewModel = koinViewModel<OverviewViewModel>()
         val overviewUiState = overviewViewModel.state.collectAsState()
 
         TransactionsContent(
-            transactions = overviewUiState.value.transactionListUiState.transactions.filterNotNull(),
-            onBackClick = onBackClick
+            transactions =
+                overviewUiState.value.transactionListUiState.transactions
+                    .filterNotNull(),
+            onBackClick = onBackClick,
         )
     }
 }
@@ -67,7 +66,7 @@ fun TransactionsScreen(
 @Composable
 fun TransactionsContent(
     transactions: List<TransactionUiState>,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
 
@@ -78,18 +77,18 @@ fun TransactionsContent(
         actions = {
             TransactionsActionButton("Filter", Icons.Outlined.FilterList)
             TransactionsActionButton("Export", Icons.Outlined.Download)
-        }
+        },
     ) {
         selectedTransaction?.let { transaction ->
             TransactionDetailsDialog(
                 transaction = transaction,
-                onDismiss = { selectedTransaction = null }
+                onDismiss = { selectedTransaction = null },
             )
         }
 
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             TransactionsSummaryGrid(transactions = transactions)
 
@@ -98,7 +97,7 @@ fun TransactionsContent(
                     Text(
                         text = "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here.",
                         color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             } else {
@@ -115,34 +114,33 @@ fun TransactionsContent(
 }
 
 @Composable
-private fun TransactionsSummaryGrid(
-    transactions: List<TransactionUiState>
-) {
+private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
     val received = transactions.filter { it.type == TransactionType.RECEIVE }.sumOf { parseAmount(it.amount) }
     val sent = transactions.filter { it.type == TransactionType.SEND }.sumOf { parseAmount(it.amount) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val compact = maxWidth < 760.dp
-        val rows = listOf(
-            Triple("Total Transactions", transactions.size.toString(), dark_text_primary),
-            Triple("Total Received", "+${formatAmount(received)}", dark_success),
-            Triple("Total Sent", "-${formatAmount(sent)}", dark_text_primary),
-            Triple("Net Change", formatSignedAmount(received - sent), dark_success)
-        )
+        val rows =
+            listOf(
+                Triple("Total Transactions", transactions.size.toString(), dark_text_primary),
+                Triple("Total Received", "+${formatAmount(received)}", dark_success),
+                Triple("Total Sent", "-${formatAmount(sent)}", dark_text_primary),
+                Triple("Net Change", formatSignedAmount(received - sent), dark_success),
+            )
 
         if (compact) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 rows.chunked(2).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         rowItems.forEach { (label, value, accent) ->
                             TransactionsSummaryCard(
                                 modifier = Modifier.weight(1f),
                                 label = label,
                                 value = value,
-                                accent = accent
+                                accent = accent,
                             )
                         }
                     }
@@ -151,14 +149,14 @@ private fun TransactionsSummaryGrid(
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 rows.forEach { (label, value, accent) ->
                     TransactionsSummaryCard(
                         modifier = Modifier.weight(1f),
                         label = label,
                         value = value,
-                        accent = accent
+                        accent = accent,
                     )
                 }
             }
@@ -169,26 +167,27 @@ private fun TransactionsSummaryGrid(
 @Composable
 private fun TransactionsActionButton(
     text: String,
-    icon: ImageVector
+    icon: ImageVector,
 ) {
     Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(dark_surface)
-            .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         androidx.compose.material3.Icon(
             imageVector = icon,
             contentDescription = text,
-            tint = dark_text_primary
+            tint = dark_text_primary,
         )
         Text(
             text = text,
             color = dark_text_primary,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
         )
     }
 }
@@ -198,18 +197,18 @@ private fun TransactionsSummaryCard(
     modifier: Modifier,
     label: String,
     value: String,
-    accent: Color
+    accent: Color,
 ) {
     AttoPanelCard(modifier = modifier) {
         Text(
             text = label,
             color = dark_text_secondary,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
         )
         Text(
             text = value,
             color = accent,
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W700)
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W700),
         )
     }
 }
@@ -217,16 +216,21 @@ private fun TransactionsSummaryCard(
 @Composable
 private fun TransactionDetailsDialog(
     transaction: TransactionUiState,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "Transaction Details",
                 color = dark_text_primary,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600)
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
             )
-            TransactionsDetailRow("Type", transaction.type.name.lowercase().replaceFirstChar { it.uppercase() })
+            TransactionsDetailRow(
+                "Type",
+                transaction.type.name
+                    .lowercase()
+                    .replaceFirstChar { it.uppercase() },
+            )
             TransactionsDetailRow("Hash", transaction.hash ?: "Unavailable")
             TransactionsDetailRow("Source", transaction.source)
             TransactionsDetailRow("Amount", transaction.shownAmount)
@@ -243,25 +247,26 @@ private fun TransactionDetailsDialog(
 @Composable
 private fun TransactionsDetailRow(
     label: String,
-    value: String
+    value: String,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = label,
             color = dark_text_secondary,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(dark_bg)
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(dark_bg)
+                    .padding(12.dp),
         ) {
             Text(
                 text = value,
                 color = dark_text_primary,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         HorizontalDivider(color = dark_border)
@@ -272,9 +277,14 @@ private fun formatSignedAmount(value: Double): String =
     if (value >= 0) "+${formatAmount(value)}" else "-${formatAmount(kotlin.math.abs(value))}"
 
 private fun parseAmount(amount: String?): Double {
-    val raw = amount.orEmpty().replace("+", "").replace("-", "").replace(",", "").trim()
+    val raw =
+        amount
+            .orEmpty()
+            .replace("+", "")
+            .replace("-", "")
+            .replace(",", "")
+            .trim()
     return raw.toDoubleOrNull() ?: 0.0
 }
 
-private fun formatAmount(amount: Double): String =
-    AttoFormatter.format(amount.toString())
+private fun formatAmount(amount: Double): String = AttoFormatter.format(amount.toString())

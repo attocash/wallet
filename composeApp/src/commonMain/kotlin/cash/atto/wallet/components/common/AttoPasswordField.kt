@@ -31,7 +31,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_text_muted
@@ -62,78 +61,86 @@ fun AttoPasswordField(
             Text(
                 text = label,
                 color = FieldTextSecondary,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.W500,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 13.sp,
+                    ),
             )
         }
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = if (label != null) 8.dp else 0.dp)
-                .border(1.dp, FieldBorder, RoundedCornerShape(8.dp)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = if (label != null) 8.dp else 0.dp)
+                    .border(1.dp, FieldBorder, RoundedCornerShape(8.dp)),
             singleLine = true,
             isError = isError,
             shape = RoundedCornerShape(8.dp),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.W400,
-                fontSize = 14.sp,
-                color = FieldTextPrimary
-            ),
+            textStyle =
+                MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
+                    color = FieldTextPrimary,
+                ),
             placeholder = {
                 Text(
                     text = placeholder,
                     color = Color(0xFF505050),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 14.sp
-                    )
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.W400,
+                            fontSize = 14.sp,
+                        ),
                 )
             },
             visualTransformation = if (revealed) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onRevealToggle
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onRevealToggle,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = if (revealed) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                         contentDescription = null,
                         tint = FieldTextMuted,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = imeAction
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { onDone() }
-            ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = FieldContainer,
-                unfocusedContainerColor = FieldContainer,
-                disabledContainerColor = FieldContainer,
-                errorContainerColor = FieldContainer,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent,
-                focusedTextColor = FieldTextPrimary,
-                unfocusedTextColor = FieldTextPrimary,
-                errorTextColor = FieldTextPrimary,
-                cursorColor = FieldCursor
-            )
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = imeAction,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = { onDone() },
+                ),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedContainerColor = FieldContainer,
+                    unfocusedContainerColor = FieldContainer,
+                    disabledContainerColor = FieldContainer,
+                    errorContainerColor = FieldContainer,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    focusedTextColor = FieldTextPrimary,
+                    unfocusedTextColor = FieldTextPrimary,
+                    errorTextColor = FieldTextPrimary,
+                    cursorColor = FieldCursor,
+                ),
         )
     }
 }

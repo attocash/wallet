@@ -26,37 +26,40 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun OverviewHeader(
     uiState: OverviewHeaderUiState,
     onSettingsClicked: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
         onSettingsClicked?.let {
-            Box(Modifier.align(Alignment.TopEnd)
-                .padding(top = 32.dp, end = 16.dp)
-                .size(48.dp, 48.dp)
-                .clip(CircleShape)
-                .background(
-                    color = MaterialTheme.colorScheme
-                        .surface
-                        .copy(alpha = 0.5f)
-                )
-                .clickable { it.invoke() }
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 32.dp, end = 16.dp)
+                    .size(48.dp, 48.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color =
+                            MaterialTheme.colorScheme
+                                .surface
+                                .copy(alpha = 0.5f),
+                    ).clickable { it.invoke() },
             ) {
                 Icon(
                     modifier = Modifier.align(Alignment.Center),
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "settings",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
 
         Column(
-            Modifier.align(Alignment.Center)
-                .padding(top = 80.dp)
+            Modifier
+                .align(Alignment.Center)
+                .padding(top = 80.dp),
         ) {
             Text(
                 text = AttoFormatter.format(uiState.attoCoins),
-                style = MaterialTheme.typography.displayLarge
+                style = MaterialTheme.typography.displayLarge,
             )
         }
     }
@@ -68,7 +71,7 @@ fun OverviewHeaderPreview() {
     AttoWalletTheme {
         OverviewHeader(
             uiState = OverviewHeaderUiState.DEFAULT,
-            onSettingsClicked = {}
+            onSettingsClicked = {},
         )
     }
 }

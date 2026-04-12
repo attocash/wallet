@@ -21,21 +21,23 @@ fun AttoOnboardingContainer(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(12.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    content: @Composable (ColumnScope) -> Unit
+    content: @Composable (ColumnScope) -> Unit,
 ) = Column(
-    modifier = modifier.clip(MaterialTheme.shapes.medium)
-        .background(color = MaterialTheme.colorScheme.surface)
-        .border(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme
-                .secondary
-                .copy(alpha = 0.5f),
-            shape = MaterialTheme.shapes.medium
-        )
-        .padding(40.dp),
+    modifier =
+        modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(color = MaterialTheme.colorScheme.surface)
+            .border(
+                width = 1.dp,
+                color =
+                    MaterialTheme.colorScheme
+                        .secondary
+                        .copy(alpha = 0.5f),
+                shape = MaterialTheme.shapes.medium,
+            ).padding(40.dp),
     verticalArrangement = verticalArrangement,
     horizontalAlignment = horizontalAlignment,
-    content = content
+    content = content,
 )
 
 @Preview

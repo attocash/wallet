@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.hours
 fun VoterDetailScreen(
     voterAddress: String,
     onBackNavigation: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     val viewModel = koinViewModel<VoterViewModel>()
     val uiState = viewModel.state.collectAsState()
@@ -64,7 +64,7 @@ fun VoterDetailScreen(
                 }
                 onConfirm()
             }
-        }
+        },
     )
 }
 
@@ -76,7 +76,7 @@ fun VoterDetailScreenContent(
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     val windowSizeClass = calculateWindowSizeClass()
 
@@ -87,7 +87,7 @@ fun VoterDetailScreenContent(
             calculatedApy = calculatedApy,
             isLoading = isLoading,
             onBackNavigation = onBackNavigation,
-            onConfirm = onConfirm
+            onConfirm = onConfirm,
         )
     } else {
         VoterDetailScreenExpanded(
@@ -96,7 +96,7 @@ fun VoterDetailScreenContent(
             calculatedApy = calculatedApy,
             isLoading = isLoading,
             onBackNavigation = onBackNavigation,
-            onConfirm = onConfirm
+            onConfirm = onConfirm,
         )
     }
 }
@@ -108,33 +108,36 @@ fun VoterDetailScreenCompact(
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        modifier = Modifier.background(
-            brush = Brush.horizontalGradient(
-                colors = MaterialTheme.colorScheme.primaryGradient
-            )
-        ),
+        modifier =
+            Modifier.background(
+                brush =
+                    Brush.horizontalGradient(
+                        colors = MaterialTheme.colorScheme.primaryGradient,
+                    ),
+            ),
         containerColor = Color.Transparent,
         content = { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(padding)
+                    .padding(padding),
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(top = 6.dp)
-                        .clip(BottomSheetShape)
-                        .background(color = MaterialTheme.colorScheme.surface)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(top = 6.dp)
+                            .clip(BottomSheetShape)
+                            .background(color = MaterialTheme.colorScheme.surface),
                 ) {
                     if (isLoading || voter == null) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.align(Alignment.Center),
                         )
                     } else {
                         VoterDetailContent(
@@ -142,14 +145,15 @@ fun VoterDetailScreenCompact(
                             allVoters = allVoters,
                             calculatedApy = calculatedApy,
                             onConfirm = onConfirm,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
                         )
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -160,20 +164,21 @@ fun VoterDetailScreenExpanded(
     calculatedApy: Double,
     isLoading: Boolean,
     onBackNavigation: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     Scaffold(
         topBar = { AppBar(onBackNavigation) },
-        modifier = Modifier.paint(
-            painter = painterResource(Res.drawable.atto_background_desktop),
-            contentScale = ContentScale.FillBounds
-        ),
+        modifier =
+            Modifier.paint(
+                painter = painterResource(Res.drawable.atto_background_desktop),
+                contentScale = ContentScale.FillBounds,
+            ),
         containerColor = Color.Transparent,
         content = {
             Box(Modifier.fillMaxSize()) {
                 if (isLoading || voter == null) {
                     CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
                     VoterDetailContent(
@@ -181,17 +186,18 @@ fun VoterDetailScreenExpanded(
                         allVoters = allVoters,
                         calculatedApy = calculatedApy,
                         onConfirm = onConfirm,
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .fillMaxHeight(0.85f)
-                            .align(Alignment.Center)
-                            .clip(RoundedCornerShape(50.dp))
-                            .background(color = MaterialTheme.colorScheme.surface)
-                            .padding(48.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth(0.6f)
+                                .fillMaxHeight(0.85f)
+                                .align(Alignment.Center)
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(color = MaterialTheme.colorScheme.surface)
+                                .padding(48.dp),
                     )
                 }
             }
-        }
+        },
     )
 }
 
@@ -201,7 +207,7 @@ fun VoterDetailContent(
     allVoters: List<Voter>,
     calculatedApy: Double,
     onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
 
@@ -221,11 +227,11 @@ fun VoterDetailContent(
     Column(
         modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(Res.string.voter_detail_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -234,22 +240,23 @@ fun VoterDetailContent(
         Text(
             text = voter.label,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = voter.description,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
@@ -257,46 +264,47 @@ fun VoterDetailContent(
         // Details Card
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_entity),
-                    value = voter.entity
+                    value = voter.entity,
                 )
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_share),
-                    value = "${voter.sharePercentage}%"
+                    value = "${voter.sharePercentage}%",
                 )
 
                 val formattedApy = (kotlin.math.round(calculatedApy * 100) / 100).toString()
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_apy),
                     value = "$formattedApy%",
-                    valueColor = if (apyIsZero) warningColor else green_700
+                    valueColor = if (apyIsZero) warningColor else green_700,
                 )
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_entity_weight),
                     value = "$entityWeightPercentage%",
-                    valueColor = if (weightAbove1Percent) warningColor else green_700
+                    valueColor = if (weightAbove1Percent) warningColor else green_700,
                 )
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_voter_weight),
-                    value = "$nodeWeightPercentage%"
+                    value = "$nodeWeightPercentage%",
                 )
 
                 DetailRow(
                     label = stringResource(Res.string.voter_detail_last_voted),
                     value = lastVotedAtFormatted,
-                    valueColor = if (hasNotVotedIn24H) warningColor else green_700
+                    valueColor = if (hasNotVotedIn24H) warningColor else green_700,
                 )
             }
         }
@@ -304,24 +312,25 @@ fun VoterDetailContent(
         // Address Card
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = stringResource(Res.string.voter_detail_address),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = voter.address,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -332,7 +341,7 @@ fun VoterDetailContent(
         AttoButton(
             text = stringResource(Res.string.voter_detail_confirm),
             onClick = onConfirm,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -341,22 +350,22 @@ fun VoterDetailContent(
 private fun DetailRow(
     label: String,
     value: String,
-    valueColor: Color = Color.Unspecified
+    valueColor: Color = Color.Unspecified,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = valueColor
+            color = valueColor,
         )
     }
 }
@@ -364,16 +373,17 @@ private fun DetailRow(
 @Preview
 @Composable
 fun VoterDetailScreenCompactPreview() {
-    val testVoter = Voter(
-        address = "atto://address123",
-        label = "Test Voter",
-        entity = "Test Entity",
-        sharePercentage = 80,
-        addedAt = "2024-01-01",
-        description = "This is a test voter description",
-        voteWeight = "1000000000000000000000000000",
-        lastVotedAt = Clock.System.now()
-    )
+    val testVoter =
+        Voter(
+            address = "atto://address123",
+            label = "Test Voter",
+            entity = "Test Entity",
+            sharePercentage = 80,
+            addedAt = "2024-01-01",
+            description = "This is a test voter description",
+            voteWeight = "1000000000000000000000000000",
+            lastVotedAt = Clock.System.now(),
+        )
     AttoWalletTheme {
         VoterDetailScreenCompact(
             voter = testVoter,
@@ -381,7 +391,7 @@ fun VoterDetailScreenCompactPreview() {
             calculatedApy = 5.5,
             isLoading = false,
             onBackNavigation = {},
-            onConfirm = {}
+            onConfirm = {},
         )
     }
 }
@@ -389,16 +399,17 @@ fun VoterDetailScreenCompactPreview() {
 @Preview
 @Composable
 fun VoterDetailScreenExpandedPreview() {
-    val testVoter = Voter(
-        address = "atto://address123",
-        label = "Test Voter",
-        entity = "Test Entity",
-        sharePercentage = 80,
-        addedAt = "2024-01-01",
-        description = "This is a test voter description",
-        voteWeight = "1000000000000000000000000000",
-        lastVotedAt = Clock.System.now()
-    )
+    val testVoter =
+        Voter(
+            address = "atto://address123",
+            label = "Test Voter",
+            entity = "Test Entity",
+            sharePercentage = 80,
+            addedAt = "2024-01-01",
+            description = "This is a test voter description",
+            voteWeight = "1000000000000000000000000000",
+            lastVotedAt = Clock.System.now(),
+        )
     AttoWalletTheme {
         VoterDetailScreenExpanded(
             voter = testVoter,
@@ -406,7 +417,7 @@ fun VoterDetailScreenExpandedPreview() {
             calculatedApy = 5.5,
             isLoading = false,
             onBackNavigation = {},
-            onConfirm = {}
+            onConfirm = {},
         )
     }
 }

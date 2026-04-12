@@ -7,5 +7,6 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kspCompose) apply false
+    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.room3) apply false
 }

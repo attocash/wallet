@@ -38,12 +38,12 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     onBackupClick: () -> Unit,
     onLockClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
 ) {
     AttoPageFrame(
         title = stringResource(Res.string.settings_title),
         subtitle = stringResource(Res.string.settings_subtitle),
-        onBack = onBackClick
+        onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val compact = maxWidth < 1040.dp
@@ -51,28 +51,28 @@ fun SettingsScreen(
             if (compact) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     SettingsActionsPanel(
                         modifier = Modifier.fillMaxWidth(),
                         uiState = uiState,
                         onBackupClick = onBackupClick,
                         onLockClick = onLockClick,
-                        onLogoutClick = onLogoutClick
+                        onLogoutClick = onLogoutClick,
                     )
                     SettingsMetadataPanel(modifier = Modifier.fillMaxWidth())
                 }
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(32.dp)
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                 ) {
                     SettingsActionsPanel(
                         modifier = Modifier.weight(5f),
                         uiState = uiState,
                         onBackupClick = onBackupClick,
                         onLockClick = onLockClick,
-                        onLogoutClick = onLogoutClick
+                        onLogoutClick = onLogoutClick,
                     )
                     SettingsMetadataPanel(modifier = Modifier.weight(7f))
                 }
@@ -87,17 +87,17 @@ private fun SettingsActionsPanel(
     uiState: SettingsUiState,
     onBackupClick: () -> Unit,
     onLockClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         AttoSettingsActionRow(
             icon = Icons.Outlined.Key,
             title = "Recovery Phrase",
             subtitle = "View your 24-word recovery phrase",
-            onClick = onBackupClick
+            onClick = onBackupClick,
         )
 
         AttoSettingsActionRow(
@@ -105,29 +105,26 @@ private fun SettingsActionsPanel(
             title = "Logout",
             subtitle = "Clear keys and return to welcome screen",
             accent = dark_danger,
-            onClick = onLogoutClick
+            onClick = onLogoutClick,
         )
-
     }
 }
 
 @Composable
-private fun SettingsMetadataPanel(
-    modifier: Modifier
-) {
+private fun SettingsMetadataPanel(modifier: Modifier) {
     AttoPanelCard(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         SettingsInfoRow(
             label = "Version",
             value = "1.0.0",
-            valueColor = dark_text_primary
+            valueColor = dark_text_primary,
         )
         HorizontalDivider(color = dark_border)
         SettingsInfoRow(
             label = "Network",
             value = "Live",
-            valueColor = dark_success
+            valueColor = dark_success,
         )
     }
 }
@@ -136,25 +133,24 @@ private fun SettingsMetadataPanel(
 private fun SettingsInfoRow(
     label: String,
     value: String,
-    valueColor: Color
+    valueColor: Color,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             color = dark_text_secondary,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W500)
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W500),
         )
         Text(
             text = value,
             color = valueColor,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W500)
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W500),
         )
     }
 }
-
 
 @Composable
 private fun AttoSettingsActionRow(
@@ -163,50 +159,52 @@ private fun AttoSettingsActionRow(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     accent: Color = dark_text_primary,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(dark_surface)
-            .border(1.dp, dark_border, RoundedCornerShape(12.dp))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() }
-            .padding(horizontal = 18.dp, vertical = 18.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(12.dp))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { onClick() }
+                .padding(horizontal = 18.dp, vertical = 18.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(accent.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(accent.copy(alpha = 0.12f)),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
                 tint = accent,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
             )
         }
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = title,
                 color = dark_text_primary,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600)
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
             )
             subtitle?.let {
                 Text(
                     text = it,
                     color = dark_text_secondary,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
@@ -214,7 +212,7 @@ private fun AttoSettingsActionRow(
             imageVector = Icons.Outlined.ChevronRight,
             contentDescription = null,
             tint = if (accent == dark_danger) dark_danger else dark_text_dim,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
     }
 }

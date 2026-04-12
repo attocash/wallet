@@ -8,16 +8,16 @@ import androidx.compose.ui.unit.dp
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
 @Composable
-actual fun QRCodeImage(
+actual fun qrCodeImage(
     modifier: Modifier,
     url: String,
-    contentDescription: String
+    contentDescription: String,
 ) {
     if (url.isNotEmpty()) {
         Image(
             modifier = modifier.padding(16.dp),
             painter = rememberQrCodePainter(url),
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
         )
     }
 }

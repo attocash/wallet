@@ -32,26 +32,26 @@ enum class AttoButtonVariant(
         backgroundColor = dark_accent,
         textColor = Color(0xFF111827),
         fontWeight = FontWeight.W700,
-        borderColor = null
+        borderColor = null,
     ),
     Secondary(
         backgroundColor = dark_accent_soft,
         textColor = dark_text_primary,
         fontWeight = FontWeight.W600,
-        borderColor = Color(0x33F7B500)
+        borderColor = Color(0x33F7B500),
     ),
     Outlined(
         backgroundColor = dark_surface,
         textColor = Color.White,
         fontWeight = FontWeight.W600,
-        borderColor = dark_border
+        borderColor = dark_border,
     ),
     Danger(
         backgroundColor = Color(0xFFDA0004),
         textColor = Color.White,
         fontWeight = FontWeight.W700,
-        borderColor = null
-    )
+        borderColor = null,
+    ),
 }
 
 @Composable
@@ -60,30 +60,35 @@ fun AttoButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     variant: AttoButtonVariant = AttoButtonVariant.Accent,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
     Row(
-        modifier = modifier
-            .height(56.dp)
-            .clip(shape)
-            .background(
-                if (enabled) variant.backgroundColor
-                else variant.backgroundColor.copy(alpha = 0.4f)
-            )
-            .then(
-                if (variant.borderColor != null) Modifier.border(1.dp, variant.borderColor, shape)
-                else Modifier
-            )
-            .clickable(
-                enabled = enabled,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
+        modifier =
+            modifier
+                .height(56.dp)
+                .clip(shape)
+                .background(
+                    if (enabled) {
+                        variant.backgroundColor
+                    } else {
+                        variant.backgroundColor.copy(alpha = 0.4f)
+                    },
+                ).then(
+                    if (variant.borderColor != null) {
+                        Modifier.border(1.dp, variant.borderColor, shape)
+                    } else {
+                        Modifier
+                    },
+                ).clickable(
+                    enabled = enabled,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        content = content
+        content = content,
     )
 }
 
@@ -107,17 +112,18 @@ fun AttoButton(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
-                tint = variant.textColor
+                tint = variant.textColor,
             )
             Spacer(Modifier.width(8.dp))
         }
         Text(
             text = text,
             color = variant.textColor,
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontWeight = variant.fontWeight,
-                fontSize = 15.sp
-            )
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = variant.fontWeight,
+                    fontSize = 15.sp,
+                ),
         )
     }
 }
@@ -137,7 +143,7 @@ fun AttoButtonAccentPreview() {
         AttoButton(
             text = "Accent Button",
             onClick = {},
-            variant = AttoButtonVariant.Accent
+            variant = AttoButtonVariant.Accent,
         )
     }
 }

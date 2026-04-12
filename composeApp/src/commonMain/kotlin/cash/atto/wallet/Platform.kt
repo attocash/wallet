@@ -6,7 +6,11 @@ interface Platform {
 }
 
 enum class PlatformType {
-    ANDROID, WINDOWS, LINUX, MACOS, WEB;
+    ANDROID,
+    WINDOWS,
+    LINUX,
+    MACOS,
+    WEB,
 }
 
 expect fun getPlatform(): Platform

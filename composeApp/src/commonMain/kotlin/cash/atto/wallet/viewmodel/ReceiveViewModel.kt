@@ -14,9 +14,8 @@ import kotlinx.coroutines.launch
 
 class ReceiveViewModel(
     private val appStateRepository: AppStateRepository,
-    private val homeRepository: HomeRepository
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
-
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     private val _address = MutableStateFlow<String?>(null)
@@ -28,9 +27,10 @@ class ReceiveViewModel(
         viewModelScope.launch {
             appStateRepository.state.collect { appState ->
                 _address.emit(
-                    appState.getPublicKey()
+                    appState
+                        .getPublicKey()
                         ?.toAddress(AttoAlgorithm.V1)
-                        ?.value
+                        ?.value,
                 )
             }
         }

@@ -11,9 +11,9 @@ import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
+import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
-import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
@@ -49,15 +49,18 @@ class OverviewViewModel(
             _state.value = OverviewUiState.empty()
 
             appStateRepository.state.collect {
-                val receiveAddress = it.getPublicKey()
-                    ?.toAddress(AttoAlgorithm.V1)
-                    ?.value
+                val receiveAddress =
+                    it
+                        .getPublicKey()
+                        ?.toAddress(AttoAlgorithm.V1)
+                        ?.value
 
-                if (receiveAddress != state.value.receiveAddress)
+                if (receiveAddress != state.value.receiveAddress) {
                     clearAccountData()
+                }
 
                 _state.emit(
-                    state.value.copy(receiveAddress = receiveAddress)
+                    state.value.copy(receiveAddress = receiveAddress),
                 )
             }
         }
@@ -70,95 +73,105 @@ class OverviewViewModel(
                         "OverviewViewModel is collecting account information from wallet ${
                             AttoAddress(
                                 AttoAlgorithm.V1,
-                                wallet.publicKey
+                                wallet.publicKey,
                             )
-                        }"
+                        }",
                     )
                     accountCollectorJob?.cancel()
-                    accountCollectorJob = scope.launch {
-                        wallet.accountFlow.collect { account ->
-                            println("Account $account")
-                            val entries =
-                                persistentAccountEntryRepository.stream(account.publicKey).toList()
+                    accountCollectorJob =
+                        scope.launch {
+                            wallet.accountFlow.collect { account ->
+                                println("Account $account")
+                                val entries =
+                                    persistentAccountEntryRepository.stream(account.publicKey).toList()
 
-                            currentRepresentativeAddress = AttoAddress(
-                                account.representativeAlgorithm,
-                                account.representativePublicKey
-                            ).toString()
+                                currentRepresentativeAddress =
+                                    AttoAddress(
+                                        account.representativeAlgorithm,
+                                        account.representativePublicKey,
+                                    ).toString()
 
-                            _state.emit(
-                                state.value.copy(
-                                    balance = account.balance
-                                        .toString(AttoUnit.ATTO)
-                                        .toBigDecimal(),
-                                    priceUsd = homeRepository.getPriceUsd(),
-                                    apy = calculateApy(),
-                                    entries = entries,
-                                    addressLabelResolver = { address ->
-                                        homeRepository.homeResponse.value?.getAddressLabel(address)
-                                    },
-                                    voterLabelResolver = { address ->
-                                        homeRepository.homeResponse.value?.getVoterLabel(address)
-                                    },
-                                    voterName = currentRepresentativeAddress?.let {
-                                        homeRepository.homeResponse.value?.getVoterLabel(it)
-                                    }
+                                _state.emit(
+                                    state.value.copy(
+                                        balance =
+                                            account.balance
+                                                .toString(AttoUnit.ATTO)
+                                                .toBigDecimal(),
+                                        priceUsd = homeRepository.getPriceUsd(),
+                                        apy = calculateApy(),
+                                        entries = entries,
+                                        addressLabelResolver = { address ->
+                                            homeRepository.homeResponse.value?.getAddressLabel(address)
+                                        },
+                                        voterLabelResolver = { address ->
+                                            homeRepository.homeResponse.value?.getVoterLabel(address)
+                                        },
+                                        voterName =
+                                            currentRepresentativeAddress?.let {
+                                                homeRepository.homeResponse.value?.getVoterLabel(it)
+                                            },
+                                    ),
                                 )
-                            )
+                            }
                         }
-                    }
 
                     accountEntriesCollectorJob?.cancel()
-                    accountEntriesCollectorJob = scope.launch {
-                        persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
-                            _state.emit(
-                                state.value.copy(
-                                    priceUsd = homeRepository.getPriceUsd(),
-                                    apy = calculateApy(),
-                                    entries = persistentAccountEntryRepository.stream(wallet.publicKey)
-                                        .toList(),
-                                    addressLabelResolver = { address ->
-                                        homeRepository.homeResponse.value?.getAddressLabel(address)
-                                    },
-                                    voterLabelResolver = { address ->
-                                        homeRepository.homeResponse.value?.getVoterLabel(address)
-                                    },
-                                    voterName = currentRepresentativeAddress?.let {
-                                        homeRepository.homeResponse.value?.getVoterLabel(it)
-                                    }
+                    accountEntriesCollectorJob =
+                        scope.launch {
+                            persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
+                                _state.emit(
+                                    state.value.copy(
+                                        priceUsd = homeRepository.getPriceUsd(),
+                                        apy = calculateApy(),
+                                        entries =
+                                            persistentAccountEntryRepository
+                                                .stream(wallet.publicKey)
+                                                .toList(),
+                                        addressLabelResolver = { address ->
+                                            homeRepository.homeResponse.value?.getAddressLabel(address)
+                                        },
+                                        voterLabelResolver = { address ->
+                                            homeRepository.homeResponse.value?.getVoterLabel(address)
+                                        },
+                                        voterName =
+                                            currentRepresentativeAddress?.let {
+                                                homeRepository.homeResponse.value?.getVoterLabel(it)
+                                            },
+                                    ),
                                 )
-                            )
+                            }
                         }
-                    }
                 }
         }
 
         receivablesCollectorJob?.cancel()
-        receivablesCollectorJob = scope.launch {
-            walletManagerRepository.pendingReceivablesState.collect {
-                pendingReceivablesState = it
-                _state.emit(
-                    state.value.copy(
-                        pendingReceivableCount = it.count,
-                        pendingReceivableAmount = it.totalAmount
+        receivablesCollectorJob =
+            scope.launch {
+                walletManagerRepository.pendingReceivablesState.collect {
+                    pendingReceivablesState = it
+                    _state.emit(
+                        state.value.copy(
+                            pendingReceivableCount = it.count,
+                            pendingReceivableAmount = it.totalAmount,
+                        ),
                     )
-                )
+                }
             }
-        }
     }
 
     private fun calculateApy(): BigDecimal? {
         val homeResponse = homeRepository.homeResponse.value ?: return null
         val representativeAddress = currentRepresentativeAddress ?: return null
         val voter = homeResponse.getVoter(representativeAddress) ?: return null
-        val globalApy = homeResponse.getStakingApy()?.let { BigDecimal.parseString(it) }
-            ?: return null
+        val globalApy =
+            homeResponse.getStakingApy()?.let { BigDecimal.parseString(it) }
+                ?: return null
         if (voter.sharePercentage == 0) return null
         val sharePercentage = BigDecimal.fromInt(voter.sharePercentage)
         val hundred = BigDecimal.fromInt(100)
         return (globalApy * sharePercentage).divide(hundred).roundToDigitPositionAfterDecimalPoint(
             digitPosition = 2,
-            roundingMode = RoundingMode.ROUND_HALF_AWAY_FROM_ZERO
+            roundingMode = RoundingMode.ROUND_HALF_AWAY_FROM_ZERO,
         )
     }
 
@@ -168,8 +181,8 @@ class OverviewViewModel(
                 balance = null,
                 entries = emptyList(),
                 pendingReceivableCount = pendingReceivablesState.count,
-                pendingReceivableAmount = pendingReceivablesState.totalAmount
-            )
+                pendingReceivableAmount = pendingReceivablesState.totalAmount,
+            ),
         )
     }
 }

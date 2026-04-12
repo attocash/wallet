@@ -4,13 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,7 +27,6 @@ import attowallet.composeapp.generated.resources.safety_warning_title
 import cash.atto.wallet.components.common.AppBar
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.attoFontFamily
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -46,21 +41,24 @@ fun SafetyWarningScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         content = { innerPadding ->
             Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .padding(
-                        start = 16.dp,
-                        top = 20.dp,
-                        end = 16.dp,
-                        bottom = 16.dp
-                    )
+                modifier =
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .padding(
+                            start = 16.dp,
+                            top = 20.dp,
+                            end = 16.dp,
+                            bottom = 16.dp,
+                        ),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Text(
                         text = stringResource(Res.string.safety_warning_title),
@@ -71,33 +69,35 @@ fun SafetyWarningScreen(
                     Text(
                         text = stringResource(Res.string.safety_warning_description),
                         lineHeight = 22.sp,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
 
                     Row(
-                        modifier = Modifier.padding(top = 8.dp)
-                            .clip(MaterialTheme.shapes.medium)
-                            .background(color = MaterialTheme.colorScheme.secondary)
-                            .padding(
-                                start = 20.dp,
-                                top = 20.dp,
-                                end = 40.dp,
-                                bottom = 20.dp
-                            ),
+                        modifier =
+                            Modifier
+                                .padding(top = 8.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .background(color = MaterialTheme.colorScheme.secondary)
+                                .padding(
+                                    start = 20.dp,
+                                    top = 20.dp,
+                                    end = 40.dp,
+                                    bottom = 20.dp,
+                                ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             imageVector = vectorResource(Res.drawable.ic_lock),
                             contentDescription = "Lock icon",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
 
                         Text(
                             text = stringResource(Res.string.safety_warning_hint),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.W600,
-                            lineHeight = 22.sp
+                            lineHeight = 22.sp,
                         )
                     }
                 }
@@ -105,10 +105,10 @@ fun SafetyWarningScreen(
                 AttoButton(
                     text = stringResource(Res.string.safety_warning_confirm),
                     onClick = onConfirmClicked,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
-        }
+        },
     )
 }
 

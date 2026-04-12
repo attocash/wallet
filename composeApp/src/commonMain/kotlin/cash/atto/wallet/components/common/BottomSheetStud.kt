@@ -15,12 +15,15 @@ import cash.atto.wallet.ui.divider
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun BottomSheetStud() = Box(
-    modifier = Modifier.height(4.dp)
-        .width(32.dp)
-        .clip(RoundedCornerShape(2.dp))
-        .background(color = MaterialTheme.colorScheme.divider)
-)
+fun BottomSheetStud() =
+    Box(
+        modifier =
+            Modifier
+                .height(4.dp)
+                .width(32.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(color = MaterialTheme.colorScheme.divider),
+    )
 
 @Preview
 @Composable

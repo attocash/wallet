@@ -25,37 +25,43 @@ fun AttoTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: @Composable() (() -> Unit)? = null,
+    placeholder:
+        @Composable()
+        (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onDone: () -> Unit = {},
     isError: Boolean = false,
-    errorLabel: @Composable() (BoxScope.() -> Unit) = {},
+    errorLabel:
+        @Composable()
+        (BoxScope.() -> Unit) = {},
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
     Column(
-        horizontalAlignment = horizontalAlignment
+        horizontalAlignment = horizontalAlignment,
     ) {
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier.onPreviewKeyEvent {
-                if (
-                    it.key.keyCode == Key.Enter.keyCode ||
-                    it.key.keyCode == Key.Tab.keyCode
-                ) {
-                    onDone.invoke()
+            modifier =
+                modifier.onPreviewKeyEvent {
+                    if (
+                        it.key.keyCode == Key.Enter.keyCode ||
+                        it.key.keyCode == Key.Tab.keyCode
+                    ) {
+                        onDone.invoke()
 
-                    return@onPreviewKeyEvent true
-                }
+                        return@onPreviewKeyEvent true
+                    }
 
-                return@onPreviewKeyEvent false
-            },
+                    return@onPreviewKeyEvent false
+                },
             placeholder = placeholder,
             visualTransformation = visualTransformation,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { onDone.invoke() }
-            )
+            keyboardActions =
+                KeyboardActions(
+                    onDone = { onDone.invoke() },
+                ),
         )
 
         if (isError) {
@@ -72,7 +78,7 @@ fun AttoTextFieldPreview() {
     AttoWalletTheme {
         AttoTextField(
             value = "Text",
-            onValueChange = {}
+            onValueChange = {},
         )
     }
 }

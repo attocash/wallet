@@ -10,9 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class BackupSecretViewModel(
-    private val appStateRepository: AppStateRepository
+    private val appStateRepository: AppStateRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(SecretPhraseUiState.DEFAULT)
     val state = _state.asStateFlow()
 
@@ -24,18 +23,20 @@ class BackupSecretViewModel(
                 _state.emit(
                     SecretPhraseUiState(
                         words = it.words,
-                        hidden = true
-                    )
+                        hidden = true,
+                    ),
                 )
             }
         }
     }
 
-    fun hideSecretPhrase() = viewModelScope.launch {
-        _state.emit(state.value.copy(hidden = true))
-    }
+    fun hideSecretPhrase() =
+        viewModelScope.launch {
+            _state.emit(state.value.copy(hidden = true))
+        }
 
-    fun showSecretPhrase() = viewModelScope.launch {
-        _state.emit(state.value.copy(hidden = false))
-    }
+    fun showSecretPhrase() =
+        viewModelScope.launch {
+            _state.emit(state.value.copy(hidden = false))
+        }
 }

@@ -20,7 +20,7 @@ interface Security : Library {
         accountName: String,
         passwordLength: Int,
         passwordData: ByteArray,
-        itemRef: PointerByReference?
+        itemRef: PointerByReference?,
     ): Int
 
     fun SecKeychainFindGenericPassword(
@@ -31,21 +31,21 @@ interface Security : Library {
         accountName: String,
         passwordLength: IntArray?,
         passwordData: PointerByReference?,
-        itemRef: PointerByReference?
+        itemRef: PointerByReference?,
     ): Int
 
     fun SecKeychainItemDelete(itemRef: Pointer): Int
 
     fun SecKeychainItemFreeContent(
         attrList: Pointer?,
-        data: Pointer?
+        data: Pointer?,
     ): Int
 }
 
-
 @Structure.FieldOrder("name", "flags", "attributes")
-class MacSecretSchema(key: String) : Structure() {
-
+class MacSecretSchema(
+    key: String,
+) : Structure() {
     private val schemaName = "atto_wallet_${key}_schema"
 
     companion object {
@@ -60,18 +60,19 @@ class MacSecretSchema(key: String) : Structure() {
     var flags: Int = SECRET_SCHEMA_NONE
 
     @JvmField
-    var attributes: Array<Attribute> = arrayOf(
-        Attribute("key_type", SECRET_SCHEMA_ATTRIBUTE_STRING),
-        Attribute(key, SECRET_SCHEMA_ATTRIBUTE_STRING)
-    )
+    var attributes: Array<Attribute> =
+        arrayOf(
+            Attribute("key_type", SECRET_SCHEMA_ATTRIBUTE_STRING),
+            Attribute(key, SECRET_SCHEMA_ATTRIBUTE_STRING),
+        )
 
     @Structure.FieldOrder("name", "type")
     class Attribute() : Structure() {
         @JvmField
-        var name: String = ""  // Default value for name
+        var name: String = "" // Default value for name
 
         @JvmField
-        var type: Int = 0  // Default value for type (0 for string)
+        var type: Int = 0 // Default value for type (0 for string)
 
         constructor(name: String, type: Int) : this() {
             this.name = name
@@ -80,38 +81,44 @@ class MacSecretSchema(key: String) : Structure() {
     }
 
     init {
-        this.write()  // Write the structure
+        this.write() // Write the structure
     }
 }
 
-
-class MacCred() {
+class MacCred {
     val serviceName = "Atto Wallet"
 
     private val seedSecretSchema = SecretSchema(SEED_SCHEMA_KEY)
     private val passwordSecretSchema = SecretSchema(PASSWORD_SCHEMA_KEY)
 
     fun getSeed() = get(seedSecretSchema)
+
     fun storeSeed(seed: String) = store(seedSecretSchema, seed)
+
     fun deleteSeed() = delete(seedSecretSchema)
 
     fun getPassword() = get(passwordSecretSchema)
+
     fun storePassword(password: String) = store(passwordSecretSchema, password)
+
     fun deletePassword() = delete(passwordSecretSchema)
 
-
-    fun store(schema: SecretSchema, password: String): Boolean {
+    fun store(
+        schema: SecretSchema,
+        password: String,
+    ): Boolean {
         val passwordData = password.toByteArray(StandardCharsets.UTF_8)
-        val result = Security.INSTANCE.SecKeychainAddGenericPassword(
-            null,
-            serviceName.length,
-            serviceName,
-            schema.name.length,
-            schema.name,
-            passwordData.size,
-            passwordData,
-            null
-        )
+        val result =
+            Security.INSTANCE.SecKeychainAddGenericPassword(
+                null,
+                serviceName.length,
+                serviceName,
+                schema.name.length,
+                schema.name,
+                passwordData.size,
+                passwordData,
+                null,
+            )
         if (result != 0) {
             throw IllegalStateException("Failed to store password. Error code: $result")
         }
@@ -123,16 +130,17 @@ class MacCred() {
         val passwordData = PointerByReference()
         val itemRef = PointerByReference()
 
-        val result = Security.INSTANCE.SecKeychainFindGenericPassword(
-            null,
-            serviceName.length,
-            serviceName,
-            schema.name.length,
-            schema.name,
-            passwordLength,
-            passwordData,
-            itemRef
-        )
+        val result =
+            Security.INSTANCE.SecKeychainFindGenericPassword(
+                null,
+                serviceName.length,
+                serviceName,
+                schema.name.length,
+                schema.name,
+                passwordLength,
+                passwordData,
+                itemRef,
+            )
 
         return if (result == 0) {
             val passwordBytes = passwordData.value.getByteArray(0, passwordLength[0])
@@ -145,16 +153,17 @@ class MacCred() {
 
     fun delete(schema: SecretSchema): Boolean {
         val itemRef = PointerByReference()
-        val result = Security.INSTANCE.SecKeychainFindGenericPassword(
-            null,
-            serviceName.length,
-            serviceName,
-            schema.name.length,
-            schema.name,
-            null,
-            null,
-            itemRef
-        )
+        val result =
+            Security.INSTANCE.SecKeychainFindGenericPassword(
+                null,
+                serviceName.length,
+                serviceName,
+                schema.name.length,
+                schema.name,
+                null,
+                null,
+                itemRef,
+            )
 
         if (result != 0) {
             throw IllegalStateException("Failed to find item to delete. Error code: $result")

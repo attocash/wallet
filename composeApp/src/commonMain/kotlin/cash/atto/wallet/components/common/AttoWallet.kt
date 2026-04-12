@@ -31,7 +31,6 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-
 val LogoutShellIcon: ImageVector
     get() = Icons.AutoMirrored.Outlined.Logout
 
@@ -42,22 +41,24 @@ fun AttoWallet(
     balanceUiState: BalanceChipUiState,
     hasCachedWork: Boolean,
     onLock: () -> Unit,
-    content: @Composable BoxWithConstraintsScope.() -> Unit
+    content: @Composable BoxWithConstraintsScope.() -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(dark_bg)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(dark_bg),
     ) {
         BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(WindowInsets.safeDrawing.asPaddingValues())
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(WindowInsets.safeDrawing.asPaddingValues()),
         ) {
             val shellMaxWidth = maxWidth
             val compact = shellMaxWidth < 768.dp
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 AttoTopBar(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -66,24 +67,26 @@ fun AttoWallet(
                     onNavStateChanged = onNavStateChanged,
                     balanceUiState = balanceUiState,
                     hasCachedWork = hasCachedWork,
-                    onLock = onLock
+                    onLock = onLock,
                 )
                 HorizontalDivider(color = dark_border)
 
                 BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier =
+                        Modifier
+                            .fillMaxSize(),
                 ) {
                     Box(
-                        modifier = Modifier
-                            .widthIn(max = 1400.dp)
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .align(Alignment.TopCenter)
-                            .padding(
-                                horizontal = if (shellMaxWidth < 1024.dp) 20.dp else 32.dp,
-                                vertical = if (shellMaxWidth < 1024.dp) 24.dp else 40.dp
-                            )
+                        modifier =
+                            Modifier
+                                .widthIn(max = 1400.dp)
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .align(Alignment.TopCenter)
+                                .padding(
+                                    horizontal = if (shellMaxWidth < 1024.dp) 20.dp else 32.dp,
+                                    vertical = if (shellMaxWidth < 1024.dp) 24.dp else 40.dp,
+                                ),
                     ) {
                         this@BoxWithConstraints.content()
                     }
@@ -101,53 +104,55 @@ private fun AttoTopBar(
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     balanceUiState: BalanceChipUiState,
     hasCachedWork: Boolean,
-    onLock: () -> Unit
+    onLock: () -> Unit,
 ) {
     Row(
-        modifier = modifier
-            .widthIn(max = 1400.dp)
-            .fillMaxWidth()
-            .padding(horizontal = if (compact) 20.dp else 32.dp, vertical = 20.dp),
+        modifier =
+            modifier
+                .widthIn(max = 1400.dp)
+                .fillMaxWidth()
+                .padding(horizontal = if (compact) 20.dp else 32.dp, vertical = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             AttoShellBrandMark()
             Text(
                 text = "Atto Wallet",
                 color = dark_text_primary,
                 maxLines = 1,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 20.sp
-                )
+                style =
+                    MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 20.sp,
+                    ),
             )
         }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             AttoShellStatusIndicator(
                 compact = compact,
-                hasCachedWork = hasCachedWork
+                hasCachedWork = hasCachedWork,
             )
             AttoCircleIconButton(
                 icon = Icons.Outlined.Settings,
                 contentDescription = "Open settings",
                 tint = if (navState == MainScreenNavDestination.SETTINGS) dark_accent else dark_text_secondary,
                 background = Color.Transparent,
-                onClick = { onNavStateChanged(MainScreenNavDestination.SETTINGS) }
+                onClick = { onNavStateChanged(MainScreenNavDestination.SETTINGS) },
             )
             AttoCircleIconButton(
                 icon = Icons.Outlined.Lock,
                 contentDescription = "Lock wallet",
                 tint = dark_text_secondary,
                 background = Color.Transparent,
-                onClick = onLock
+                onClick = onLock,
             )
         }
     }
@@ -158,35 +163,38 @@ private fun AttoShellBrandMark() {
     Image(
         painter = painterResource(Res.drawable.logo),
         contentDescription = "Atto Wallet",
-        modifier = Modifier
-            .size(32.dp)
+        modifier =
+            Modifier
+                .size(32.dp),
     )
 }
 
 @Composable
 private fun AttoShellStatusIndicator(
     compact: Boolean,
-    hasCachedWork: Boolean
+    hasCachedWork: Boolean,
 ) {
     val statusColor = if (hasCachedWork) dark_success else dark_accent
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(if (compact) 10.dp else 8.dp)
-                .clip(CircleShape)
-                .background(statusColor)
+            modifier =
+                Modifier
+                    .size(if (compact) 10.dp else 8.dp)
+                    .clip(CircleShape)
+                    .background(statusColor),
         )
         if (!compact) {
             Text(
                 text = if (hasCachedWork) "Ready" else "Working",
                 color = statusColor,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 13.sp
-                )
+                style =
+                    MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 13.sp,
+                    ),
             )
         }
     }
@@ -195,37 +203,43 @@ private fun AttoShellStatusIndicator(
 @Composable
 fun AttoShellNavRow(
     navState: MainScreenNavDestination,
-    onNavStateChanged: (MainScreenNavDestination) -> Unit
+    onNavStateChanged: (MainScreenNavDestination) -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    val items = listOf(
-        MainScreenNavDestination.OVERVIEW to Pair(
-            Icons.Outlined.AccountBalanceWallet,
-            stringResource(Res.string.main_nav_overview)
-        ),
-        MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
-        MainScreenNavDestination.RECEIVE to Pair(
-            Icons.Outlined.ArrowDownward,
-            stringResource(Res.string.main_nav_receive)
-        ),
-        MainScreenNavDestination.TRANSACTIONS to Pair(
-            Icons.Outlined.History,
-            stringResource(Res.string.main_nav_transactions)
-        ),
-        MainScreenNavDestination.SETTINGS to Pair(
-            Icons.Outlined.Settings,
-            stringResource(Res.string.main_nav_settings)
-        ),
-    )
+    val items =
+        listOf(
+            MainScreenNavDestination.OVERVIEW to
+                Pair(
+                    Icons.Outlined.AccountBalanceWallet,
+                    stringResource(Res.string.main_nav_overview),
+                ),
+            MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
+            MainScreenNavDestination.RECEIVE to
+                Pair(
+                    Icons.Outlined.ArrowDownward,
+                    stringResource(Res.string.main_nav_receive),
+                ),
+            MainScreenNavDestination.TRANSACTIONS to
+                Pair(
+                    Icons.Outlined.History,
+                    stringResource(Res.string.main_nav_transactions),
+                ),
+            MainScreenNavDestination.SETTINGS to
+                Pair(
+                    Icons.Outlined.Settings,
+                    stringResource(Res.string.main_nav_settings),
+                ),
+        )
 
     Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(dark_surface)
-            .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-            .horizontalScroll(scrollState)
-            .padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
+                .horizontalScroll(scrollState)
+                .padding(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items.forEach { (destination, presentation) ->
             val selected = destination == navState
@@ -233,27 +247,28 @@ fun AttoShellNavRow(
             val contentColor = if (selected) Color(0xFF111827) else dark_text_primary
 
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(background)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onNavStateChanged(destination) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(background)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { onNavStateChanged(destination) }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = presentation.first,
                     contentDescription = presentation.second,
                     tint = contentColor,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
                 Text(
                     text = presentation.second,
                     color = contentColor,
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600)
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
                 )
             }
         }
@@ -266,44 +281,46 @@ fun AttoPageFrame(
     subtitle: String,
     onBack: (() -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         onBack?.let {
             AttoBackButton(onClick = it)
         }
 
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.Bottom,
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
                         text = title,
                         color = dark_text_primary,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 32.sp
-                        )
+                        style =
+                            MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 32.sp,
+                            ),
                     )
                     Text(
                         text = subtitle,
                         color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
@@ -311,7 +328,7 @@ fun AttoPageFrame(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        content = actionContent
+                        content = actionContent,
                     )
                 }
             }
@@ -325,40 +342,42 @@ fun AttoPageFrame(
 fun AttoPanelCard(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(20.dp),
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(dark_surface)
-            .border(1.dp, dark_border, RoundedCornerShape(12.dp))
-            .padding(contentPadding),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(12.dp))
+                .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        content = content
+        content = content,
     )
 }
 
 @Composable
 fun AttoMetricPill(
     label: String,
-    value: String
+    value: String,
 ) {
     Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(dark_surface)
-            .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
+                .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         Text(
             text = label,
             color = dark_text_secondary,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
         )
         Text(
             text = value,
             color = dark_text_primary,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
         )
     }
 }
@@ -369,51 +388,50 @@ fun AttoCircleIconButton(
     contentDescription: String,
     onClick: () -> Unit,
     tint: Color = dark_text_primary,
-    background: Color = Color(0x40192639)
+    background: Color = Color(0x40192639),
 ) {
     Box(
-        modifier = Modifier
-            .size(30.dp)
-            .clip(CircleShape)
-            .background(background)
-            .border(
-                width = if (background == Color.Transparent) 0.dp else 1.dp,
-                color = if (background == Color.Transparent) Color.Transparent else Color(0x1FFFFFFF),
-                shape = CircleShape
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() },
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(background)
+                .border(
+                    width = if (background == Color.Transparent) 0.dp else 1.dp,
+                    color = if (background == Color.Transparent) Color.Transparent else Color(0x1FFFFFFF),
+                    shape = CircleShape,
+                ).clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { onClick() },
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
             tint = tint,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
     }
 }
-
 
 @Composable
 fun AttoTransactionList(
     transactions: List<TransactionUiState?>,
     modifier: Modifier = Modifier,
-    emptyMessage: String
+    emptyMessage: String,
 ) {
     val items = transactions.filterNotNull()
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (items.isEmpty()) {
             AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = emptyMessage,
                     color = dark_text_secondary,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         } else {
@@ -432,22 +450,22 @@ fun AttoTransactionSection(
     transactions: List<TransactionUiState?>,
     modifier: Modifier = Modifier,
     emptyMessage: String,
-    onTransactionClick: ((TransactionUiState) -> Unit)? = null
+    onTransactionClick: ((TransactionUiState) -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = title,
             color = dark_text_primary,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
         )
         AttoTransactionList(
             transactions = transactions,
             modifier = Modifier.fillMaxWidth(),
             emptyMessage = emptyMessage,
-            onTransactionClick = onTransactionClick
+            onTransactionClick = onTransactionClick,
         )
     }
 }
@@ -457,19 +475,19 @@ fun AttoTransactionList(
     transactions: List<TransactionUiState?>,
     modifier: Modifier = Modifier,
     emptyMessage: String,
-    onTransactionClick: ((TransactionUiState) -> Unit)?
+    onTransactionClick: ((TransactionUiState) -> Unit)?,
 ) {
     val items = transactions.filterNotNull()
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (items.isEmpty()) {
             AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = emptyMessage,
                     color = dark_text_secondary,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         } else {
@@ -477,7 +495,7 @@ fun AttoTransactionList(
                 items.forEach { transaction ->
                     AttoTransactionCard(
                         transaction = transaction,
-                        onClick = onTransactionClick?.let { { it(transaction) } }
+                        onClick = onTransactionClick?.let { { it(transaction) } },
                     )
                 }
             }
@@ -485,53 +503,51 @@ fun AttoTransactionList(
     }
 }
 
-
 @Composable
 fun AttoSettingsInfoCard(
     title: String,
     lines: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AttoPanelCard(modifier = modifier) {
         Text(
             text = title,
             color = dark_text_primary,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600)
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
         )
         HorizontalDivider(color = dark_border)
         lines.forEach { line ->
             Text(
                 text = line,
                 color = dark_text_secondary,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
 }
 
 @Composable
-fun AttoBackButton(
-    onClick: () -> Unit
-) {
+fun AttoBackButton(onClick: () -> Unit) {
     Row(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .background(dark_surface)
-            .border(1.dp, dark_border, CircleShape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() }
-            .padding(10.dp),
+        modifier =
+            Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(dark_surface)
+                .border(1.dp, dark_border, CircleShape)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { onClick() }
+                .padding(10.dp),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
             contentDescription = "Back",
             tint = dark_text_primary,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
     }
 }

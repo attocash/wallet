@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
 
@@ -26,36 +25,38 @@ import cash.atto.wallet.ui.dark_surface
 fun AttoRoundButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .size(40.dp)
-            .background(dark_surface, CircleShape)
-            .border(1.dp, dark_border, CircleShape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
+        modifier =
+            modifier
+                .size(40.dp)
+                .background(dark_surface, CircleShape)
+                .border(1.dp, dark_border, CircleShape)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
         contentAlignment = Alignment.Center,
-        content = content
+        content = content,
     )
 }
 
 @Composable
 fun AttoBackButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AttoRoundButton(onClick = onClick, modifier = modifier) {
         Text(
             text = "‹",
             color = Color.White,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.W600,
-                fontSize = 16.sp
-            )
+            style =
+                MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.W600,
+                    fontSize = 16.sp,
+                ),
         )
     }
 }

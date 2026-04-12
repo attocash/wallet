@@ -13,31 +13,33 @@ import kotlin.time.ExperimentalTime
 
 data class TransactionListUiState(
     val transactions: List<TransactionUiState?>,
-    val showHint: Boolean
+    val showHint: Boolean,
 ) {
     companion object {
-        val DEFAULT = TransactionListUiState(
-            transactions = List(2) { null },
-            showHint = false
-        )
+        val DEFAULT =
+            TransactionListUiState(
+                transactions = List(2) { null },
+                showHint = false,
+            )
 
         @OptIn(ExperimentalTime::class)
         @Composable
-        fun Empty() = listOf(
-            TransactionUiState(
-                type = TransactionType.SEND,
-                amount = stringResource(Res.string.overview_hint_amount_to),
-                source = stringResource(Res.string.overview_hint_destination),
-                timestamp = Clock.System.now(),
-                height = AttoHeight(1UL),
-            ),
-            TransactionUiState(
-                type = TransactionType.RECEIVE,
-                amount = stringResource(Res.string.overview_hint_amount_from),
-                source = stringResource(Res.string.overview_hint_source),
-                timestamp = Clock.System.now(),
-                height = AttoHeight(0UL),
-            ),
-        )
+        fun Empty() =
+            listOf(
+                TransactionUiState(
+                    type = TransactionType.SEND,
+                    amount = stringResource(Res.string.overview_hint_amount_to),
+                    source = stringResource(Res.string.overview_hint_destination),
+                    timestamp = Clock.System.now(),
+                    height = AttoHeight(1UL),
+                ),
+                TransactionUiState(
+                    type = TransactionType.RECEIVE,
+                    amount = stringResource(Res.string.overview_hint_amount_from),
+                    source = stringResource(Res.string.overview_hint_source),
+                    timestamp = Clock.System.now(),
+                    height = AttoHeight(0UL),
+                ),
+            )
     }
 }

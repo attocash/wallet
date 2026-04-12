@@ -7,7 +7,7 @@ data class BalanceChipUiState(
     val usdValue: BigDecimal? = null,
     val apy: BigDecimal? = null,
     val pendingReceivableCount: Int = 0,
-    val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO
+    val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO,
 ) {
     companion object {
         val DEFAULT = BalanceChipUiState(null, null, null)

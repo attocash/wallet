@@ -5,7 +5,7 @@ import com.sun.jna.Memory
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.Structure
-import com.sun.jna.platform.win32.WinBase;
+import com.sun.jna.platform.win32.WinBase
 import com.sun.jna.win32.StdCallLibrary
 import com.sun.jna.win32.W32APIOptions
 
@@ -24,21 +24,22 @@ interface CredAdvapi32 : StdCallLibrary {
      *
      */
     open class CREDENTIAL_ATTRIBUTE : Structure() {
-        class ByReference : CREDENTIAL_ATTRIBUTE(), Structure.ByReference
+        class ByReference :
+            CREDENTIAL_ATTRIBUTE(),
+            Structure.ByReference
 
-        override fun getFieldOrder(): List<String> {
-            return mutableListOf(
+        override fun getFieldOrder(): List<String> =
+            mutableListOf(
                 "Keyword",
                 "Flags",
                 "ValueSize",
-                "Value"
+                "Value",
             )
-        }
 
         /**
          * Name of the application-specific attribute. Names should be of the form <CompanyName>_<Name>.
          * This member cannot be longer than CRED_MAX_STRING_LENGTH (256) characters.
-        </Name></CompanyName> */
+         </Name></CompanyName> */
         var Keyword: String? = null
 
         /**
@@ -67,9 +68,7 @@ interface CredAdvapi32 : StdCallLibrary {
      * Pointer to {@See CREDENTIAL_ATTRIBUTE} struct
      */
     class PCREDENTIAL_ATTRIBUTE : Structure {
-        override fun getFieldOrder(): List<String> {
-            return listOf("credential_attribute")
-        }
+        override fun getFieldOrder(): List<String> = listOf("credential_attribute")
 
         constructor() : super()
 
@@ -106,8 +105,8 @@ interface CredAdvapi32 : StdCallLibrary {
      * } CREDENTIAL, *PCREDENTIAL;
      */
     class CREDENTIAL : Structure {
-        override fun getFieldOrder(): List<String> {
-            return mutableListOf(
+        override fun getFieldOrder(): List<String> =
+            mutableListOf(
                 "Flags",
                 "Type",
                 "TargetName",
@@ -119,9 +118,8 @@ interface CredAdvapi32 : StdCallLibrary {
                 "AttributeCount",
                 "Attributes",
                 "TargetAlias",
-                "UserName"
+                "UserName",
             )
-        }
 
         constructor() : super()
 
@@ -211,11 +209,12 @@ interface CredAdvapi32 : StdCallLibrary {
         @JvmField
         var AttributeCount: Int = 0
 
+        // TODO: Model this as an array.
+
         /**
          * Application-defined attributes that are associated with the credential. This member can be read
          * and written.
          */
-        //notTODO: Need to make this into array
         @JvmField
         var Attributes: CREDENTIAL_ATTRIBUTE.ByReference? = null
 
@@ -250,9 +249,7 @@ interface CredAdvapi32 : StdCallLibrary {
      * Pointer to {@see CREDENTIAL} struct
      */
     class PCREDENTIAL : Structure {
-        override fun getFieldOrder(): List<String> {
-            return listOf("credential")
-        }
+        override fun getFieldOrder(): List<String> = listOf("credential")
 
         constructor() : super()
 
@@ -295,7 +292,12 @@ interface CredAdvapi32 : StdCallLibrary {
      * GetLastError
      */
     @Throws(LastErrorException::class)
-    fun CredRead(targetName: String?, type: Int, flags: Int, pcredential: PCREDENTIAL?): Boolean
+    fun CredRead(
+        targetName: String?,
+        type: Int,
+        flags: Int,
+        pcredential: PCREDENTIAL?,
+    ): Boolean
 
     /**
      * The CredWrite function creates a new credential or modifies an existing credential in the user's credential set.
@@ -320,7 +322,10 @@ interface CredAdvapi32 : StdCallLibrary {
      * GetLastError
      */
     @Throws(LastErrorException::class)
-    fun CredWrite(credential: CREDENTIAL?, flags: Int): Boolean
+    fun CredWrite(
+        credential: CREDENTIAL?,
+        flags: Int,
+    ): Boolean
 
     /**
      * The CredDelete function deletes a credential from the user's credential set. The credential set used is the one
@@ -346,7 +351,11 @@ interface CredAdvapi32 : StdCallLibrary {
      * GetLastError
      */
     @Throws(LastErrorException::class)
-    fun CredDelete(targetName: String?, type: Int, flags: Int): Boolean
+    fun CredDelete(
+        targetName: String?,
+        type: Int,
+        flags: Int,
+    ): Boolean
 
     /**
      * The CredFree function frees a buffer returned by any of the credentials management functions.
@@ -363,10 +372,12 @@ interface CredAdvapi32 : StdCallLibrary {
     fun CredFree(credential: Pointer?)
 
     companion object {
-        val INSTANCE: CredAdvapi32 = Native.load(
-            "Advapi32",
-            CredAdvapi32::class.java, W32APIOptions.UNICODE_OPTIONS
-        )
+        val INSTANCE: CredAdvapi32 =
+            Native.load(
+                "Advapi32",
+                CredAdvapi32::class.java,
+                W32APIOptions.UNICODE_OPTIONS,
+            )
 
         /**
          * CredRead flag

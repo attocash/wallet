@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WelcomeViewModel(
-    private val metricsRepository: MetricsRepository
+    private val metricsRepository: MetricsRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(WelcomeMetricsUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -20,7 +20,7 @@ class WelcomeViewModel(
         CoroutineScope(Dispatchers.Default).launch {
             metricsRepository.metricsResponse.collect { metricsResponse ->
                 _state.emit(
-                    metricsResponse?.toWelcomeMetricsUiState() ?: WelcomeMetricsUiState.DEFAULT
+                    metricsResponse?.toWelcomeMetricsUiState() ?: WelcomeMetricsUiState.DEFAULT,
                 )
             }
         }

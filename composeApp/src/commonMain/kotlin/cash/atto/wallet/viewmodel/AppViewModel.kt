@@ -16,9 +16,8 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(
     private val appStateRepository: AppStateRepository,
-    private val checkPasswordInteractor: CheckPasswordInteractor
+    private val checkPasswordInteractor: CheckPasswordInteractor,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(AppUiState.DEFAULT)
     val state = _state.asStateFlow()
 
@@ -27,20 +26,23 @@ class AppViewModel(
             appStateRepository.state.collect {
                 _state.emit(
                     AppUiState(
-                        shownScreen = when (it.authState) {
-                            AppState.AuthState.NEW_ACCOUNT -> AppUiState.ShownScreen.WELCOME
+                        shownScreen =
+                            when (it.authState) {
+                                AppState.AuthState.NEW_ACCOUNT -> AppUiState.ShownScreen.WELCOME
 
-                            AppState.AuthState.NO_PASSWORD ->
-                                if (getPlatform().type == PlatformType.WEB)
-                                    AppUiState.ShownScreen.PASSWORD_ENTER
-                                else AppUiState.ShownScreen.PASSWORD_CREATE
+                                AppState.AuthState.NO_PASSWORD ->
+                                    if (getPlatform().type == PlatformType.WEB) {
+                                        AppUiState.ShownScreen.PASSWORD_ENTER
+                                    } else {
+                                        AppUiState.ShownScreen.PASSWORD_CREATE
+                                    }
 
-                            AppState.AuthState.NO_SEED -> AppUiState.ShownScreen.WELCOME
-                            AppState.AuthState.SESSION_INVALID -> AppUiState.ShownScreen.PASSWORD_ENTER
-                            AppState.AuthState.SESSION_VALID -> AppUiState.ShownScreen.OVERVIEW
-                            AppState.AuthState.UNKNOWN -> AppUiState.ShownScreen.LOADER
-                        }
-                    )
+                                AppState.AuthState.NO_SEED -> AppUiState.ShownScreen.WELCOME
+                                AppState.AuthState.SESSION_INVALID -> AppUiState.ShownScreen.PASSWORD_ENTER
+                                AppState.AuthState.SESSION_VALID -> AppUiState.ShownScreen.OVERVIEW
+                                AppState.AuthState.UNKNOWN -> AppUiState.ShownScreen.LOADER
+                            },
+                    ),
                 )
             }
         }
@@ -48,8 +50,9 @@ class AppViewModel(
 
     suspend fun enterPassword(password: String?): Boolean {
         val checkResult = checkPasswordInteractor.invoke(password)
-        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID)
+        if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
             return appStateRepository.submitPassword(password!!)
+        }
 
         return false
     }

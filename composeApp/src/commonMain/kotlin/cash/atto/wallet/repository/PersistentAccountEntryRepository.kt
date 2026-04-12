@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.serialization.json.Json
 
 class PersistentAccountEntryRepository(
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : AttoAccountEntryRepository {
     private val dao = appDatabase.accountEntryDao()
 
@@ -26,8 +26,8 @@ class PersistentAccountEntryRepository(
                 entry.hash.value,
                 entry.publicKey.value,
                 entry.height.value.toLong(),
-                json
-            )
+                json,
+            ),
         )
         flow.emit(entry)
     }
@@ -38,11 +38,7 @@ class PersistentAccountEntryRepository(
         return entries.asFlow()
     }
 
-    override suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? {
-        return stream(publicKey).lastOrNull()
-    }
+    override suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? = stream(publicKey).lastOrNull()
 
-    fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> {
-        return flow.filter { it.publicKey == publicKey }
-    }
+    fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> = flow.filter { it.publicKey == publicKey }
 }

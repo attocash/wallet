@@ -34,9 +34,7 @@ import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ReceiveScreen(
-    onBackClick: () -> Unit
-) {
+fun ReceiveScreen(onBackClick: () -> Unit) {
     val viewModel = koinViewModel<ReceiveViewModel>()
     val address = viewModel.address.collectAsState()
     val priceUsd = viewModel.priceUsd.collectAsState()
@@ -45,11 +43,12 @@ fun ReceiveScreen(
     ReceiveContent(
         address = address.value.orEmpty(),
         priceUsd = priceUsd.value,
-        recentTransactions = overviewState.value.transactionListUiState.transactions
-            .filterNotNull()
-            .filter { it.type == TransactionType.RECEIVE }
-            .take(5),
-        onBackClick = onBackClick
+        recentTransactions =
+            overviewState.value.transactionListUiState.transactions
+                .filterNotNull()
+                .filter { it.type == TransactionType.RECEIVE }
+                .take(5),
+        onBackClick = onBackClick,
     )
 }
 
@@ -58,28 +57,32 @@ fun ReceiveContent(
     address: String,
     priceUsd: BigDecimal?,
     recentTransactions: List<TransactionUiState>,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     var requestedAmount by remember { mutableStateOf("") }
     var isUsdMode by remember { mutableStateOf(false) }
     var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
 
-    val amountAtto = if (isUsdMode) {
-        val usd = requestedAmount.toDoubleOrNull()
-        val price = priceUsd?.doubleValue(false)
-        if (usd != null && price != null && price > 0) (usd / price).toString() else null
-    } else {
-        requestedAmount.ifBlank { null }
-    }
+    val amountAtto =
+        if (isUsdMode) {
+            val usd = requestedAmount.toDoubleOrNull()
+            val price = priceUsd?.doubleValue(false)
+            if (usd != null && price != null && price > 0) (usd / price).toString() else null
+        } else {
+            requestedAmount.ifBlank { null }
+        }
 
-    val paymentRequest = if (address.isNotBlank()) {
-        AttoPaymentRequests.buildFromAtto(address, amountAtto)
-    } else ""
+    val paymentRequest =
+        if (address.isNotBlank()) {
+            AttoPaymentRequests.buildFromAtto(address, amountAtto)
+        } else {
+            ""
+        }
 
     AttoPageFrame(
         title = "Receive Atto",
         subtitle = "Share your address or QR code to receive Atto",
-        onBack = onBackClick
+        onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val compact = maxWidth < 1120.dp
@@ -87,7 +90,7 @@ fun ReceiveContent(
             if (compact) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     ReceiveQrColumn(
                         modifier = Modifier.fillMaxWidth(),
@@ -96,19 +99,22 @@ fun ReceiveContent(
                         requestedAmount = requestedAmount,
                         onRequestedAmountChange = { requestedAmount = it },
                         isUsdMode = isUsdMode,
-                        onToggleCurrency = { isUsdMode = !isUsdMode; requestedAmount = "" },
-                        priceUsd = priceUsd
+                        onToggleCurrency = {
+                            isUsdMode = !isUsdMode
+                            requestedAmount = ""
+                        },
+                        priceUsd = priceUsd,
                     )
                     ReceiveActivityColumn(
                         modifier = Modifier.fillMaxWidth(),
                         transactions = recentTransactions,
-                        onTransactionClick = { selectedTransaction = it }
+                        onTransactionClick = { selectedTransaction = it },
                     )
                 }
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     ReceiveQrColumn(
                         modifier = Modifier.width(480.dp),
@@ -117,13 +123,16 @@ fun ReceiveContent(
                         requestedAmount = requestedAmount,
                         onRequestedAmountChange = { requestedAmount = it },
                         isUsdMode = isUsdMode,
-                        onToggleCurrency = { isUsdMode = !isUsdMode; requestedAmount = "" },
-                        priceUsd = priceUsd
+                        onToggleCurrency = {
+                            isUsdMode = !isUsdMode
+                            requestedAmount = ""
+                        },
+                        priceUsd = priceUsd,
                     )
                     ReceiveActivityColumn(
                         modifier = Modifier.weight(1f),
                         transactions = recentTransactions,
-                        onTransactionClick = { selectedTransaction = it }
+                        onTransactionClick = { selectedTransaction = it },
                     )
                 }
             }
@@ -133,7 +142,7 @@ fun ReceiveContent(
     selectedTransaction?.let { transaction ->
         AttoTransactionDetailsDialog(
             transaction = transaction,
-            onDismiss = { selectedTransaction = null }
+            onDismiss = { selectedTransaction = null },
         )
     }
 }
@@ -147,11 +156,11 @@ private fun ReceiveQrColumn(
     onRequestedAmountChange: (String) -> Unit,
     isUsdMode: Boolean,
     onToggleCurrency: () -> Unit,
-    priceUsd: BigDecimal?
+    priceUsd: BigDecimal?,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
             AttoAmountField(
@@ -160,31 +169,32 @@ private fun ReceiveQrColumn(
                 isUsdMode = isUsdMode,
                 onToggleCurrency = onToggleCurrency,
                 priceUsd = priceUsd,
-                label = "Request Amount (Optional)"
+                label = "Request Amount (Optional)",
             )
         }
 
         AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White)
+                        .padding(24.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 if (paymentRequest.isNotBlank()) {
-                    QRCodeImage(
+                    qrCodeImage(
                         modifier = Modifier.size(280.dp),
                         url = paymentRequest,
-                        contentDescription = "Receive QR"
+                        contentDescription = "Receive QR",
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Outlined.QrCode2,
                         contentDescription = "Receive QR",
                         tint = dark_text_secondary,
-                        modifier = Modifier.size(120.dp)
+                        modifier = Modifier.size(120.dp),
                     )
                 }
             }
@@ -192,7 +202,7 @@ private fun ReceiveQrColumn(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = address.ifBlank { "Waiting..." },
@@ -200,7 +210,7 @@ private fun ReceiveQrColumn(
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
 
@@ -208,17 +218,17 @@ private fun ReceiveQrColumn(
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = "$requestedAmount ATTO",
                         color = dark_text_primary,
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W600)
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W600),
                     )
                     Text(
                         text = "Requested amount",
                         color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             } else {
@@ -227,7 +237,7 @@ private fun ReceiveQrColumn(
                     color = dark_text_secondary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
@@ -250,12 +260,17 @@ private fun ReceiveQrColumn(
                 }
             },
             variant = AttoButtonVariant.Outlined,
-            text = if (copied) "Copied!"
-            else if (requestedAmount.isNotBlank()) "Copy Address + Amount"
-            else "Copy Address",
+            text =
+                if (copied) {
+                    "Copied!"
+                } else if (requestedAmount.isNotBlank()) {
+                    "Copy Address + Amount"
+                } else {
+                    "Copy Address"
+                },
             icon = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
             modifier = Modifier.fillMaxWidth(),
-            enabled = paymentRequest.isNotBlank()
+            enabled = paymentRequest.isNotBlank(),
         )
     }
 }
@@ -264,18 +279,18 @@ private fun ReceiveQrColumn(
 private fun ReceiveActivityColumn(
     modifier: Modifier,
     transactions: List<TransactionUiState>,
-    onTransactionClick: (TransactionUiState) -> Unit
+    onTransactionClick: (TransactionUiState) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         AttoTransactionSection(
             title = "Recent Received",
             transactions = transactions,
             modifier = Modifier.fillMaxWidth(),
             emptyMessage = "Incoming transfers will appear here after the wallet receives ATTO.",
-            onTransactionClick = onTransactionClick
+            onTransactionClick = onTransactionClick,
         )
     }
 }

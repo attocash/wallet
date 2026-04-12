@@ -14,15 +14,17 @@ class PasswordDataSourceTest {
 
     private lateinit var passwordDataSource: PasswordDataSource
 
-    private val user1 = User(
-        seed = "seed1",
-        password = "password1"
-    )
+    private val user1 =
+        User(
+            seed = "seed1",
+            password = "password1",
+        )
 
-    private val user2 = User(
-        seed = "seed2",
-        password = "password2"
-    )
+    private val user2 =
+        User(
+            seed = "seed2",
+            password = "password2",
+        )
 
     @Before
     fun createDataSource() {
@@ -56,7 +58,7 @@ class PasswordDataSourceTest {
                     passwordDataSource.clear()
                     passwordDataSource.setPassword(
                         user1.seed,
-                        user1.password
+                        user1.password,
                     )
 
                     val expected = user1.password
@@ -78,22 +80,22 @@ class PasswordDataSourceTest {
 
                     passwordDataSource.setPassword(
                         user1.seed,
-                        user1.password
+                        user1.password,
                     )
 
                     passwordDataSource.setPassword(
                         user2.seed,
-                        user2.password
+                        user2.password,
                     )
 
                     assertEquals(
                         user1.password,
-                        passwordDataSource.getPassword(user1.seed)
+                        passwordDataSource.getPassword(user1.seed),
                     )
 
                     assertEquals(
                         user2.password,
-                        passwordDataSource.getPassword(user2.seed)
+                        passwordDataSource.getPassword(user2.seed),
                     )
 
                     passwordDataSource.clear()
@@ -103,6 +105,6 @@ class PasswordDataSourceTest {
 
     inner class User(
         val seed: String,
-        val password: String
+        val password: String,
     )
 }

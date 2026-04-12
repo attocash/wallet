@@ -43,20 +43,20 @@ import kotlin.time.ExperimentalTime
 fun TransactionsList(
     uiState: TransactionListUiState,
     modifier: Modifier = Modifier,
-    titleSize: TextUnit = 20.sp
+    titleSize: TextUnit = 20.sp,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(
             modifier = Modifier.padding(top = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_transactions),
                 contentDescription = "Transactions",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Text(
@@ -70,39 +70,48 @@ fun TransactionsList(
 
         if (uiState.showHint) {
             Box(
-                modifier = Modifier.fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(color = MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(color = MaterialTheme.colorScheme.primary)
+                        .padding(horizontal = 12.dp),
             ) {
-                Box(Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .background(brush = Brush.horizontalGradient(
-                        colors = MaterialTheme.colorScheme
-                            .primaryGradient
-                            .map { it.copy(alpha = 0.2f) }
-                    ))
-                    .padding(16.dp)
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .background(
+                            brush =
+                                Brush.horizontalGradient(
+                                    colors =
+                                        MaterialTheme.colorScheme
+                                            .primaryGradient
+                                            .map { it.copy(alpha = 0.2f) },
+                                ),
+                        ).padding(16.dp),
                 ) {
                     Text(
                         text = stringResource(Res.string.overview_hint),
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
         }
 
-        val shownItems = if (uiState.showHint) {
-            TransactionListUiState.Empty()
-        } else uiState.transactions
+        val shownItems =
+            if (uiState.showHint) {
+                TransactionListUiState.Empty()
+            } else {
+                uiState.transactions
+            }
 
         LazyColumn(
             contentPadding = PaddingValues(bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(shownItems) { transaction ->
                 transaction?.let { TransactionItem(it) }
@@ -118,24 +127,25 @@ fun TransactionsListPreview() {
     AttoWalletTheme {
         TransactionsList(
             TransactionListUiState(
-                transactions = listOf(
-                    TransactionUiState(
-                        type = TransactionType.SEND,
-                        amount = "A little Atto",
-                        source = "someone",
-                        timestamp = Clock.System.now(),
-                        height = AttoHeight(1UL),
+                transactions =
+                    listOf(
+                        TransactionUiState(
+                            type = TransactionType.SEND,
+                            amount = "A little Atto",
+                            source = "someone",
+                            timestamp = Clock.System.now(),
+                            height = AttoHeight(1UL),
+                        ),
+                        TransactionUiState(
+                            type = TransactionType.RECEIVE,
+                            amount = "A lot of Atto",
+                            source = "someone",
+                            timestamp = Clock.System.now(),
+                            height = AttoHeight(0UL),
+                        ),
                     ),
-                    TransactionUiState(
-                        type = TransactionType.RECEIVE,
-                        amount = "A lot of Atto",
-                        source = "someone",
-                        timestamp = Clock.System.now(),
-                        height = AttoHeight(0UL),
-                    ),
-                ),
-                showHint = true
-            )
+                showHint = true,
+            ),
         )
     }
 }

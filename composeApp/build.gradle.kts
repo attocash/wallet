@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.SourceTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -11,6 +12,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kspCompose)
+    alias(libs.plugins.ktlint)
     alias(libs.plugins.room3)
 }
 
@@ -38,13 +40,15 @@ kotlin {
         browser {
             commonWebpackConfig {
                 outputFileName = "attoWallet.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(project.rootDir.path)
-                        add(project.projectDir.path)
+                devServer =
+                    (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                        static =
+                            (static ?: mutableListOf()).apply {
+                                // Serve sources to debug inside browser
+                                add(project.rootDir.path)
+                                add(project.projectDir.path)
+                            }
                     }
-                }
             }
         }
         binaries.executable()
@@ -76,7 +80,6 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.atto.commons.wallet)
-
 
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
@@ -114,7 +117,7 @@ kotlin {
 
             implementation(libs.slf4j.simple)
 
-            //QR scanning
+            // QR scanning
             implementation(libs.androidx.camera.camera2) // Update to the latest version
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
@@ -147,8 +150,8 @@ kotlin {
             implementation(
                 npm(
                     "sqlite-web-worker",
-                    layout.projectDirectory.dir("sqlite-web-worker").asFile
-                )
+                    layout.projectDirectory.dir("sqlite-web-worker").asFile,
+                ),
             )
         }
     }
@@ -160,7 +163,10 @@ kotlin {
 
 android {
     namespace = "cash.atto.wallet"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -168,8 +174,14 @@ android {
 
     defaultConfig {
         applicationId = "cash.atto.wallet"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -202,6 +214,15 @@ room3 {
     schemaDirectory("$projectDir/schemas")
 }
 
+ktlint {
+    filter {
+        exclude { element ->
+            val path = element.file.path
+            path.contains("/build/generated/") || path.contains("\\build\\generated\\")
+        }
+    }
+}
+
 dependencies {
     implementation(libs.transport.runtime)
     testImplementation(libs.junit.jupiter)
@@ -217,6 +238,12 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = StandardCharsets.UTF_8.toString()
+}
+
+tasks.withType<SourceTask>().configureEach {
+    if (name.contains("ktlint", ignoreCase = true)) {
+        exclude("**/build/generated/**")
+    }
 }
 
 compose.desktop {
@@ -249,12 +276,17 @@ compose.desktop {
 afterEvaluate {
     val kspAndroidTasks = tasks.matching { it.name.startsWith("ksp") && it.name.endsWith("KotlinAndroid") }
 
-    val composeResourceGenerators = tasks.matching { t ->
-        t.name == "generateComposeResClass" ||
-                (t.name.startsWith("generate") &&
-                        (t.name.contains("ResourceAccessors", ignoreCase = true) ||
-                                t.name.contains("ResourceCollectors", ignoreCase = true)))
-    }
+    val composeResourceGenerators =
+        tasks.matching { t ->
+            t.name == "generateComposeResClass" ||
+                (
+                    t.name.startsWith("generate") &&
+                        (
+                            t.name.contains("ResourceAccessors", ignoreCase = true) ||
+                                t.name.contains("ResourceCollectors", ignoreCase = true)
+                        )
+                )
+        }
 
     kspAndroidTasks.configureEach {
         dependsOn(composeResourceGenerators)
