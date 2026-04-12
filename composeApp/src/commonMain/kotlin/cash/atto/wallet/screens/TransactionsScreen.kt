@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
@@ -74,6 +76,7 @@ fun TransactionsContent(
         title = "Transaction History",
         subtitle = "Complete record of all wallet transactions",
         onBack = onBackClick,
+        scrollable = false,
         actions = {
             TransactionsActionButton("Filter", Icons.Outlined.FilterList)
             TransactionsActionButton("Export", Icons.Outlined.Download)
@@ -86,26 +89,31 @@ fun TransactionsContent(
             )
         }
 
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TransactionsSummaryGrid(transactions = transactions)
+            item {
+                TransactionsSummaryGrid(transactions = transactions)
+            }
 
             if (transactions.isEmpty()) {
-                AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here.",
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                item {
+                    AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here.",
+                            color = dark_text_secondary,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             } else {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    transactions.forEach { transaction ->
-                        Box(modifier = Modifier.clickable { selectedTransaction = transaction }) {
-                            AttoTransactionCard(transaction = transaction)
-                        }
+                items(
+                    items = transactions,
+                    key = { transaction -> transaction.hash ?: transaction.height.value.toString() },
+                ) { transaction ->
+                    Box(modifier = Modifier.clickable { selectedTransaction = transaction }) {
+                        AttoTransactionCard(transaction = transaction)
                     }
                 }
             }
@@ -115,8 +123,16 @@ fun TransactionsContent(
 
 @Composable
 private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
-    val received = transactions.filter { it.type == TransactionType.RECEIVE }.sumOf { parseAmount(it.amount) }
-    val sent = transactions.filter { it.type == TransactionType.SEND }.sumOf { parseAmount(it.amount) }
+    val (received, sent) =
+        remember(transactions) {
+            transactions.fold(0.0 to 0.0) { (receivedTotal, sentTotal), transaction ->
+                when (transaction.type) {
+                    TransactionType.RECEIVE -> (receivedTotal + parseAmount(transaction.amount)) to sentTotal
+                    TransactionType.SEND -> receivedTotal to (sentTotal + parseAmount(transaction.amount))
+                    else -> receivedTotal to sentTotal
+                }
+            }
+        }
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val compact = maxWidth < 760.dp

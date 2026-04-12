@@ -280,6 +280,7 @@ fun AttoPageFrame(
     title: String,
     subtitle: String,
     onBack: (() -> Unit)? = null,
+    scrollable: Boolean = true,
     actions: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -291,12 +292,20 @@ fun AttoPageFrame(
             AttoBackButton(onClick = it)
         }
 
+        val contentModifier =
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
+
+        val layoutModifier =
+            if (scrollable) {
+                contentModifier.verticalScroll(rememberScrollState())
+            } else {
+                contentModifier
+            }
+
         Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+            modifier = layoutModifier,
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Row(
