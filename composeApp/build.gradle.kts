@@ -79,6 +79,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
 
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.io.core)
             implementation(libs.atto.commons.wallet)
 
             implementation(libs.androidx.lifecycle.viewmodel)

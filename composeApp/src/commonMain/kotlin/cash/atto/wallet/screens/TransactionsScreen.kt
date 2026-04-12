@@ -3,6 +3,7 @@ package cash.atto.wallet.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,18 +40,22 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTransactionCard
+import cash.atto.wallet.platform.exportCsvFile
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.dark_bg
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
+import kotlinx.coroutines.launch
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
 
 @Composable
 fun TransactionsScreen(onBackClick: () -> Unit) {
@@ -71,6 +78,16 @@ fun TransactionsContent(
     onBackClick: () -> Unit,
 ) {
     var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var selectedTypes by remember {
+        mutableStateOf(TransactionType.entries.toSet())
+    }
+    var exportMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val filteredTransactions =
+        remember(transactions, selectedTypes) {
+            transactions.filter { it.type in selectedTypes }
+        }
 
     AttoPageFrame(
         title = "Transaction History",
@@ -78,8 +95,27 @@ fun TransactionsContent(
         onBack = onBackClick,
         scrollable = false,
         actions = {
-            TransactionsActionButton("Filter", Icons.Outlined.FilterList)
-            TransactionsActionButton("Export", Icons.Outlined.Download)
+            TransactionsActionButton(
+                text = "Filter",
+                icon = Icons.Outlined.FilterList,
+                onClick = { showFilterDialog = true },
+            )
+            TransactionsActionButton(
+                text = "Export",
+                icon = Icons.Outlined.Download,
+                onClick = {
+                    val fileName = "transactions-${Clock.System.now().toEpochMilliseconds()}.csv"
+                    scope.launch {
+                        exportMessage =
+                            runCatching {
+                                val export = exportCsvFile(fileName, filteredTransactions)
+                                "CSV exported to ${export.location}"
+                            }.getOrElse { error ->
+                                error.message ?: "Unable to export CSV."
+                            }
+                    }
+                },
+            )
         },
     ) {
         selectedTransaction?.let { transaction ->
@@ -88,20 +124,41 @@ fun TransactionsContent(
                 onDismiss = { selectedTransaction = null },
             )
         }
+        if (showFilterDialog) {
+            TransactionFilterDialog(
+                selectedTypes = selectedTypes,
+                onDismiss = { showFilterDialog = false },
+                onApply = {
+                    selectedTypes = it
+                    showFilterDialog = false
+                },
+            )
+        }
+        exportMessage?.let { message ->
+            TransactionsMessageDialog(
+                title = "Export",
+                message = message,
+                onDismiss = { exportMessage = null },
+            )
+        }
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                TransactionsSummaryGrid(transactions = transactions)
+                TransactionsSummaryGrid(transactions = filteredTransactions)
             }
 
-            if (transactions.isEmpty()) {
+            if (filteredTransactions.isEmpty()) {
                 item {
                     AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here.",
+                            text = if (transactions.isEmpty()) {
+                                "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here."
+                            } else {
+                                "No transactions match the current filter."
+                            },
                             color = dark_text_secondary,
                             style = MaterialTheme.typography.bodyMedium,
                         )
@@ -109,7 +166,7 @@ fun TransactionsContent(
                 }
             } else {
                 items(
-                    items = transactions,
+                    items = filteredTransactions,
                     key = { transaction -> transaction.hash ?: transaction.height.value.toString() },
                 ) { transaction ->
                     Box(modifier = Modifier.clickable { selectedTransaction = transaction }) {
@@ -184,6 +241,7 @@ private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
 private fun TransactionsActionButton(
     text: String,
     icon: ImageVector,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier =
@@ -191,7 +249,11 @@ private fun TransactionsActionButton(
                 .clip(RoundedCornerShape(8.dp))
                 .background(dark_surface)
                 .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ).padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -205,6 +267,113 @@ private fun TransactionsActionButton(
             color = dark_text_primary,
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
         )
+    }
+}
+
+@Composable
+private fun TransactionFilterDialog(
+    selectedTypes: Set<TransactionType>,
+    onDismiss: () -> Unit,
+    onApply: (Set<TransactionType>) -> Unit,
+) {
+    var localSelection by remember(selectedTypes) { mutableStateOf(selectedTypes) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Filter Transactions",
+                color = dark_text_primary,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                TransactionType.entries.forEach { type ->
+                    val checked = type in localSelection
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(dark_bg)
+                                .clickable {
+                                    localSelection =
+                                        if (checked) {
+                                            localSelection - type
+                                        } else {
+                                            localSelection + type
+                                        }
+                                }.padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = { isChecked ->
+                                localSelection =
+                                    if (isChecked) {
+                                        localSelection + type
+                                    } else {
+                                        localSelection - type
+                                    }
+                            },
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = type.name,
+                                color = dark_text_primary,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.W600),
+                            )
+                            Text(
+                                text = transactionTypeDescription(type),
+                                color = dark_text_muted,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                AttoButton(
+                    text = "Reset",
+                    onClick = { localSelection = TransactionType.entries.toSet() },
+                    modifier = Modifier.weight(1f),
+                )
+                AttoButton(
+                    text = "Apply",
+                    onClick = { onApply(localSelection.ifEmpty { TransactionType.entries.toSet() }) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionsMessageDialog(
+    title: String,
+    message: String,
+    onDismiss: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = title,
+                color = dark_text_primary,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
+            )
+            Text(
+                text = message,
+                color = dark_text_secondary,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            AttoButton(
+                text = "Close",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -291,6 +460,14 @@ private fun TransactionsDetailRow(
 
 private fun formatSignedAmount(value: Double): String =
     if (value >= 0) "+${formatAmount(value)}" else "-${formatAmount(kotlin.math.abs(value))}"
+
+private fun transactionTypeDescription(type: TransactionType): String =
+    when (type) {
+        TransactionType.SEND -> "Outgoing transfers"
+        TransactionType.RECEIVE -> "Incoming transfers"
+        TransactionType.OPEN -> "Account opening entries"
+        TransactionType.CHANGE -> "Representative change entries"
+    }
 
 private fun parseAmount(amount: String?): Double {
     val raw =
