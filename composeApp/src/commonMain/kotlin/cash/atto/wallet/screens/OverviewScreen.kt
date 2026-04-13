@@ -132,6 +132,7 @@ private fun OverviewContent(
             AccountSwitcherDialog(
                 accounts = accounts,
                 selectedAccountId = selectedAccountId,
+                compact = compact,
                 onDismiss = { modalOpen = false },
                 onSelect = {
                     selectedAccountId = it
@@ -142,6 +143,7 @@ private fun OverviewContent(
         selectedTransaction?.let { transaction ->
             AttoTransactionDetailsDialog(
                 transaction = transaction,
+                compact = compact,
                 onDismiss = { selectedTransaction = null },
             )
         }
@@ -595,14 +597,13 @@ private fun OverviewRightColumn(
 private fun AccountSwitcherDialog(
     accounts: List<OverviewAccount>,
     selectedAccountId: Int,
+    compact: Boolean,
     onDismiss: () -> Unit,
     onSelect: (Int) -> Unit,
 ) {
     AttoModal(
         title = "Switch Account",
         onDismiss = onDismiss,
-        desktopWidth = 500.dp,
-        contentPadding = PaddingValues(16.dp),
         scrollable = false,
     ) {
         LazyColumn(

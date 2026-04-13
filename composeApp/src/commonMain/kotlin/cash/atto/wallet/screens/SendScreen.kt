@@ -131,6 +131,8 @@ private fun SendScreenContent(
     onCancelClicked: () -> Unit,
     onResultClosed: () -> Unit,
 ) {
+    val compact = isCompactWidth()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.Transparent,
@@ -156,6 +158,7 @@ private fun SendScreenContent(
             SendResult(
                 uiState = uiState.sendResultUiState,
                 onClose = onResultClosed,
+                compact = compact,
             )
         }
 
@@ -166,6 +169,7 @@ private fun SendScreenContent(
                 onCancel = onCancelClicked,
                 hasCachedWork = hasCachedWork,
                 isSending = uiState.sendConfirmUiState.showLoader,
+                compact = compact,
             )
         }
     }
@@ -187,6 +191,7 @@ private fun SendFromContent(
     var scannerError = remember { mutableStateOf<String?>(null) }
     var showFeeInfo = remember { mutableStateOf(false) }
     var selectedTransaction = remember { mutableStateOf<TransactionUiState?>(null) }
+    val compact = isCompactWidth()
 
     if (showQrScanner.value && qrScannerContent != null) {
         Dialog(onDismissRequest = { showQrScanner.value = false }) {
@@ -209,9 +214,6 @@ private fun SendFromContent(
         AttoModal(
             title = "Why Atto is Free?",
             onDismiss = { showFeeInfo.value = false },
-            showDivider = false,
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-            contentSpacing = 0.dp,
         ) {
             Text(
                 text =
@@ -230,8 +232,6 @@ private fun SendFromContent(
         onBack = onBackClick,
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val compact = isCompactWidth()
-
             if (compact) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -309,6 +309,7 @@ private fun SendFromContent(
     selectedTransaction.value?.let { transaction: TransactionUiState ->
         AttoTransactionDetailsDialog(
             transaction = transaction,
+            compact = compact,
             onDismiss = { selectedTransaction.value = null },
         )
     }

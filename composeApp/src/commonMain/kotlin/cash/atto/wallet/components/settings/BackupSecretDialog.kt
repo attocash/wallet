@@ -29,7 +29,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun BackupSecretDialog(onDismiss: () -> Unit) {
+fun BackupSecretDialog(
+    onDismiss: () -> Unit,
+    compact: Boolean = false,
+) {
     val viewModel = koinViewModel<BackupSecretViewModel>()
     val uiState by viewModel.state.collectAsState()
     val clipboardManager = LocalClipboardManager.current
@@ -45,12 +48,11 @@ fun BackupSecretDialog(onDismiss: () -> Unit) {
     AttoModal(
         title = stringResource(Res.string.secret_title),
         onDismiss = onDismiss,
-        desktopWidth = 560.dp,
-        contentPadding = PaddingValues(20.dp),
     ) {
         BackupWordGrid(
             words = uiState.words,
             hidden = uiState.hidden,
+            compact = compact,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -103,20 +105,38 @@ fun BackupSecretDialog(onDismiss: () -> Unit) {
 private fun BackupWordGrid(
     words: List<String>,
     hidden: Boolean,
+    compact: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val midpoint = (words.size + 1) / 2
     val leftColumn = words.take(midpoint)
     val rightColumn = words.drop(midpoint)
 
-    BoxWithConstraints(modifier = modifier) {
-        val compact = maxWidth < 420.dp
-
-        if (compact) {
+    if (compact) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            words.forEachIndexed { index, word ->
+                AttoWordChip(
+                    ordinal = index + 1,
+                    word = word,
+                    hidden = hidden,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
             Column(
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                words.forEachIndexed { index, word ->
+                leftColumn.forEachIndexed { index, word ->
                     AttoWordChip(
                         ordinal = index + 1,
                         word = word,
@@ -125,37 +145,17 @@ private fun BackupWordGrid(
                     )
                 }
             }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Top,
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    leftColumn.forEachIndexed { index, word ->
-                        AttoWordChip(
-                            ordinal = index + 1,
-                            word = word,
-                            hidden = hidden,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    rightColumn.forEachIndexed { index, word ->
-                        AttoWordChip(
-                            ordinal = midpoint + index + 1,
-                            word = word,
-                            hidden = hidden,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                rightColumn.forEachIndexed { index, word ->
+                    AttoWordChip(
+                        ordinal = midpoint + index + 1,
+                        word = word,
+                        hidden = hidden,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         }

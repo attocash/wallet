@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.common.AttoWallet
 import cash.atto.wallet.components.settings.BackupSecretDialog
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.repository.PersistentWorkCache
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
@@ -65,6 +66,7 @@ fun MainScreen(
     if (showBackupDialog.value) {
         BackupSecretDialog(
             onDismiss = { showBackupDialog.value = false },
+            compact = isCompactWidth(),
         )
     }
 }

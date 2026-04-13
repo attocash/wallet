@@ -63,6 +63,7 @@ fun ReceiveContent(
     var requestedAmount by remember { mutableStateOf("") }
     var isUsdMode by remember { mutableStateOf(false) }
     var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
+    val compact = isCompactWidth()
 
     val amountAtto =
         if (isUsdMode) {
@@ -143,6 +144,7 @@ fun ReceiveContent(
     selectedTransaction?.let { transaction ->
         AttoTransactionDetailsDialog(
             transaction = transaction,
+            compact = compact,
             onDismiss = { selectedTransaction = null },
         )
     }

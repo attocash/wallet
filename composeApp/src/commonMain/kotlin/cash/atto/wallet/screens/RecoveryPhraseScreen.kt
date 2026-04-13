@@ -88,6 +88,7 @@ fun RecoveryPhrase(
     val checkedItems = remember { mutableStateListOf<Int>() }
     val allChecked = checkedItems.size == 3
     val scrollState = rememberScrollState()
+    val compact = isCompactWidth()
 
     LaunchedEffect(copied) {
         if (copied) {
@@ -182,7 +183,10 @@ fun RecoveryPhrase(
         }
 
         if (showHelp) {
-            RecoveryPhraseHelpDialog(onDismiss = { showHelp = false })
+            RecoveryPhraseHelpDialog(
+                compact = compact,
+                onDismiss = { showHelp = false },
+            )
         }
     }
 }
@@ -454,7 +458,7 @@ private fun RecoveryPhraseGrid(
     val rightColumn = words.drop(midpoint)
 
     BoxWithConstraints(modifier = modifier) {
-        val compact = maxWidth < 520.dp
+        val compact = maxWidth.isCompactWidth()
 
         if (compact) {
             Column(
@@ -692,13 +696,13 @@ private fun RecoveryContinueButton(
 }
 
 @Composable
-private fun RecoveryPhraseHelpDialog(onDismiss: () -> Unit) {
+private fun RecoveryPhraseHelpDialog(
+    compact: Boolean,
+    onDismiss: () -> Unit,
+) {
     AttoModal(
         title = stringResource(Res.string.secret_help_title),
         onDismiss = onDismiss,
-        desktopWidth = 520.dp,
-        showDivider = false,
-        contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
     ) {
         Text(
             text = stringResource(Res.string.secret_help_body_one),

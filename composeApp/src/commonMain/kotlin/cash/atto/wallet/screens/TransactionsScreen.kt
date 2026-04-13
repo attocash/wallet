@@ -66,6 +66,7 @@ fun TransactionsContent(
     }
     var exportMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val compact = isCompactWidth()
     val filteredTransactions =
         remember(transactions, selectedTypes) {
             transactions.filter { it.type in selectedTypes }
@@ -103,6 +104,7 @@ fun TransactionsContent(
         selectedTransaction?.let { transaction ->
             AttoTransactionDetailsDialog(
                 transaction = transaction,
+                compact = compact,
                 onDismiss = { selectedTransaction = null },
             )
         }

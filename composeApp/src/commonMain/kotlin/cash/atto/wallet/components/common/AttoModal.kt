@@ -19,24 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.isCompactWidth
+
+private val attoModalWidth = 520.dp
+private val attoModalContentPadding = PaddingValues(20.dp)
+private val attoModalContentSpacing = 24.dp
 
 @Composable
 fun AttoModal(
     title: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    desktopWidth: Dp = 550.dp,
-    showDivider: Boolean = true,
-    contentPadding: PaddingValues = PaddingValues(24.dp),
-    contentSpacing: Dp = 16.dp,
     scrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -53,8 +51,6 @@ fun AttoModal(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            val mobile = isCompactWidth()
-
             Box(
                 modifier =
                     Modifier
@@ -70,14 +66,10 @@ fun AttoModal(
                 modifier =
                     modifier
                         .then(
-                            if (mobile) {
-                                Modifier.fillMaxSize()
-                            } else {
-                                Modifier.width(desktopWidth)
-                            },
+                            Modifier.width(attoModalWidth),
                         ).background(
                             color = dark_surface,
-                            shape = if (mobile) RoundedCornerShape(0.dp) else RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(16.dp),
                         ).clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -121,9 +113,7 @@ fun AttoModal(
                     }
                 }
 
-                if (showDivider) {
-                    HorizontalDivider(color = dark_border)
-                }
+                HorizontalDivider(color = dark_border)
 
                 Column(
                     modifier =
@@ -136,8 +126,8 @@ fun AttoModal(
                                 } else {
                                     Modifier
                                 },
-                            ).padding(contentPadding),
-                    verticalArrangement = Arrangement.spacedBy(contentSpacing),
+                            ).padding(attoModalContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(attoModalContentSpacing),
                 ) {
                     content()
                 }

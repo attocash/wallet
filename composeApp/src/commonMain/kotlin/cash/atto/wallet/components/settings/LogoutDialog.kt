@@ -1,6 +1,5 @@
 package cash.atto.wallet.components.settings
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +28,7 @@ import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.isCompactWidth
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -43,9 +43,6 @@ fun LogoutDialog(
     AttoModal(
         title = stringResource(Res.string.logout_title),
         onDismiss = onDismiss,
-        desktopWidth = 420.dp,
-        showDivider = false,
-        contentPadding = PaddingValues(24.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

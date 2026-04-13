@@ -6,13 +6,13 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.unit.dp
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 
 @Composable
 fun AttoTransactionDetailsDialog(
     transaction: TransactionUiState,
+    compact: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -22,7 +22,6 @@ fun AttoTransactionDetailsDialog(
     AttoModal(
         title = "Transaction Details",
         onDismiss = onDismiss,
-        contentSpacing = 18.dp,
     ) {
         AttoCopyField(
             label = "Transaction Hash",

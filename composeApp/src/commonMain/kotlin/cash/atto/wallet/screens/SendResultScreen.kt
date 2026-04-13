@@ -48,6 +48,7 @@ fun SendResultScreen(onClose: () -> Unit) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val compact = isCompactWidth()
 
     SendResult(
         uiState = uiState.value.sendResultUiState,
@@ -57,6 +58,7 @@ fun SendResultScreen(onClose: () -> Unit) {
                 onClose.invoke()
             }
         },
+        compact = compact,
     )
 }
 
@@ -65,6 +67,7 @@ fun SendResultScreen(onClose: () -> Unit) {
 fun SendResult(
     uiState: SendResultUiState,
     onClose: () -> Unit,
+    compact: Boolean = false,
 ) {
     val isSuccess = uiState.result == SendTransactionUiState.SendOperationResult.SUCCESS
     val accentColor =

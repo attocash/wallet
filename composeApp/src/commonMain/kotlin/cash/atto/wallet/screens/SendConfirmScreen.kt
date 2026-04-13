@@ -20,6 +20,7 @@ import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.uistate.send.SendConfirmUiState
@@ -41,6 +42,7 @@ fun SendConfirmScreen(
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val compact = isCompactWidth()
 
     Box(Modifier.fillMaxSize()) {
         if (uiState.value.sendConfirmUiState.showLoader) {
@@ -50,6 +52,7 @@ fun SendConfirmScreen(
         SendConfirmContent(
             uiState = uiState.value.sendConfirmUiState,
             isSending = uiState.value.sendConfirmUiState.showLoader,
+            compact = compact,
             onConfirm = {
                 coroutineScope.launch {
                     viewModel.showLoader()
@@ -71,6 +74,7 @@ fun SendConfirmContent(
     onCancel: () -> Unit,
     hasCachedWork: Boolean = true,
     isSending: Boolean = false,
+    compact: Boolean = false,
 ) {
     val now = Clock.System.now()
     val previewHeight = uiState.accountHeight?.let { it + 1u } ?: 1uL
