@@ -12,8 +12,11 @@
     <!-- logout -->
     <string name="logout_cancel">CANCEL</string>
     <string name="logout_confirm">DELETE INFO AND LOGOUT</string>
-    <string name="logout_text">Logging out will remove your keys and account information from your device. If your secret phrase is not backed up, you will never be able to access your funds again.</string>
-    <string name="logout_title">WARNING</string>
+    <string name="logout_input_hint">Type WIPE to continue</string>
+    <string name="logout_input_label">Type WIPE</string>
+    <string name="logout_text">Logging out will remove your wallet keys and local account data from this device.</string>
+    <string name="logout_text_recovery">Your wallet can still be recovered at any time with your 24-word recovery phrase. If you do not have that phrase, DO NOT CONTINUE.</string>
+    <string name="logout_title">WIPE LOCAL WALLET?</string>
 
     <!-- main -->
     <string name="main_title">Atto</string>

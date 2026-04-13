@@ -40,6 +40,9 @@ fun AttoApp(
             submitPassword = {
                 viewModel.enterPassword(it)
             },
+            onLogout = {
+                viewModel.logout()
+            },
         )
     }
 }
@@ -60,6 +63,7 @@ fun AttoNavHost(
         ) -> Unit
     )? = null,
     submitPassword: suspend (String?) -> Boolean,
+    onLogout: () -> Unit,
 ) {
     if (debugScreen == "login") {
         val passwordValid =
@@ -76,6 +80,10 @@ fun AttoNavHost(
                 }
             },
             passwordValid = passwordValid.value,
+            onLogout = {
+                onLogout()
+                component.navigation.popToFirst()
+            },
         )
         return
     }
@@ -112,6 +120,10 @@ fun AttoNavHost(
                     }
                 },
                 passwordValid = passwordValid.value,
+                onLogout = {
+                    onLogout()
+                    component.navigation.popToFirst()
+                },
             )
         }
 

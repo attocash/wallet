@@ -83,10 +83,7 @@ fun AttoWallet(
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .align(Alignment.TopCenter)
-                                .padding(
-                                    horizontal = if (shellMaxWidth < 1024.dp) 20.dp else 32.dp,
-                                    vertical = if (shellMaxWidth < 1024.dp) 24.dp else 40.dp,
-                                ),
+                                .padding(all = 20.dp,),
                     ) {
                         this@BoxWithConstraints.content()
                     }

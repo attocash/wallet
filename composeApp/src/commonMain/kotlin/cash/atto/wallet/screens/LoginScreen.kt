@@ -2,27 +2,16 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,12 +24,9 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.password_wrong
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPasswordField
-import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.dark_bg
-import cash.atto.wallet.ui.dark_border_subtle
-import cash.atto.wallet.ui.dark_surface
-import cash.atto.wallet.ui.dark_text_primary
-import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.components.common.AttoRoundButton
+import cash.atto.wallet.components.settings.LogoutDialog
+import cash.atto.wallet.ui.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -55,20 +41,40 @@ private val UnlockDanger = Color(0xFFE56A6A)
 fun LoginScreen(
     onSubmitPassword: (String?) -> Unit,
     passwordValid: Boolean = true,
+    onLogout: () -> Unit = {},
 ) {
     var input by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(UnlockBackground),
-        contentAlignment = Alignment.Center,
     ) {
+        AttoRoundButton(
+            onClick = { showLogoutDialog = true },
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 12.dp,
+                        end = 12.dp,
+                    ),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.Logout,
+                contentDescription = "Logout",
+                tint = UnlockTextPrimary,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+
         BoxWithConstraints(
             modifier =
                 Modifier
+                    .align(Alignment.Center)
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
             contentAlignment = Alignment.Center,
@@ -170,7 +176,7 @@ fun LoginScreen(
                 )
 
                 Text(
-                    text = "Forgot password? Use recovery phrase",
+                    text = "Forgot your password? Log out and re-import your recovery phrase",
                     modifier = Modifier.padding(top = 11.dp),
                     color = UnlockTextSecondary,
                     style =
@@ -179,6 +185,16 @@ fun LoginScreen(
                         ),
                 )
             }
+        }
+
+        if (showLogoutDialog) {
+            LogoutDialog(
+                onDismiss = { showLogoutDialog = false },
+                onConfirm = {
+                    showLogoutDialog = false
+                    onLogout()
+                },
+            )
         }
     }
 }

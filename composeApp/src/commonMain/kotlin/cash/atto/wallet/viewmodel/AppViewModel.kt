@@ -56,4 +56,10 @@ class AppViewModel(
 
         return false
     }
+
+    fun logout() {
+        CoroutineScope(Dispatchers.Default).launch {
+            appStateRepository.deleteKeys()
+        }
+    }
 }
