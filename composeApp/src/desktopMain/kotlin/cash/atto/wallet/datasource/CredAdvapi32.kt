@@ -1,3 +1,5 @@
+@file:Suppress("ClassName", "FunctionName", "PropertyName")
+
 package cash.atto.wallet.datasource
 
 import com.sun.jna.LastErrorException

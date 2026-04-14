@@ -28,19 +28,33 @@ class AppViewModel(
                     AppUiState(
                         shownScreen =
                             when (it.authState) {
-                                AppState.AuthState.NEW_ACCOUNT -> AppUiState.ShownScreen.WELCOME
+                                AppState.AuthState.NEW_ACCOUNT -> {
+                                    AppUiState.ShownScreen.WELCOME
+                                }
 
-                                AppState.AuthState.NO_PASSWORD ->
+                                AppState.AuthState.NO_PASSWORD -> {
                                     if (getPlatform().type == PlatformType.WEB) {
                                         AppUiState.ShownScreen.PASSWORD_ENTER
                                     } else {
                                         AppUiState.ShownScreen.PASSWORD_CREATE
                                     }
+                                }
 
-                                AppState.AuthState.NO_SEED -> AppUiState.ShownScreen.WELCOME
-                                AppState.AuthState.SESSION_INVALID -> AppUiState.ShownScreen.PASSWORD_ENTER
-                                AppState.AuthState.SESSION_VALID -> AppUiState.ShownScreen.OVERVIEW
-                                AppState.AuthState.UNKNOWN -> AppUiState.ShownScreen.LOADER
+                                AppState.AuthState.NO_SEED -> {
+                                    AppUiState.ShownScreen.WELCOME
+                                }
+
+                                AppState.AuthState.SESSION_INVALID -> {
+                                    AppUiState.ShownScreen.PASSWORD_ENTER
+                                }
+
+                                AppState.AuthState.SESSION_VALID -> {
+                                    AppUiState.ShownScreen.OVERVIEW
+                                }
+
+                                AppState.AuthState.UNKNOWN -> {
+                                    AppUiState.ShownScreen.LOADER
+                                }
                             },
                     ),
                 )

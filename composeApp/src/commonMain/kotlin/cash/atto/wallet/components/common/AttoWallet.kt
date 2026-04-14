@@ -83,7 +83,7 @@ fun AttoWallet(
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .align(Alignment.TopCenter)
-                                .padding(all = 20.dp,),
+                                .padding(all = 20.dp),
                     ) {
                         this@BoxWithConstraints.content()
                     }
@@ -206,26 +206,26 @@ fun AttoShellNavRow(
     val items =
         listOf(
             MainScreenNavDestination.OVERVIEW to
-                    Pair(
-                        Icons.Outlined.AccountBalanceWallet,
-                        stringResource(Res.string.main_nav_overview),
-                    ),
+                Pair(
+                    Icons.Outlined.AccountBalanceWallet,
+                    stringResource(Res.string.main_nav_overview),
+                ),
             MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
             MainScreenNavDestination.RECEIVE to
-                    Pair(
-                        Icons.Outlined.ArrowDownward,
-                        stringResource(Res.string.main_nav_receive),
-                    ),
+                Pair(
+                    Icons.Outlined.ArrowDownward,
+                    stringResource(Res.string.main_nav_receive),
+                ),
             MainScreenNavDestination.TRANSACTIONS to
-                    Pair(
-                        Icons.Outlined.History,
-                        stringResource(Res.string.main_nav_transactions),
-                    ),
+                Pair(
+                    Icons.Outlined.History,
+                    stringResource(Res.string.main_nav_transactions),
+                ),
             MainScreenNavDestination.SETTINGS to
-                    Pair(
-                        Icons.Outlined.Settings,
-                        stringResource(Res.string.main_nav_settings),
-                    ),
+                Pair(
+                    Icons.Outlined.Settings,
+                    stringResource(Res.string.main_nav_settings),
+                ),
         )
 
     Row(

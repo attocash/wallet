@@ -132,11 +132,12 @@ fun TransactionsContent(
                 item {
                     AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = if (transactions.isEmpty()) {
-                                "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here."
-                            } else {
-                                "No transactions match the current filter."
-                            },
+                            text =
+                                if (transactions.isEmpty()) {
+                                    "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here."
+                                } else {
+                                    "No transactions match the current filter."
+                                },
                             color = dark_text_secondary,
                             style = MaterialTheme.typography.bodyMedium,
                         )

@@ -1,9 +1,9 @@
 package cash.atto.wallet.components.settings
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,13 +22,12 @@ import attowallet.composeapp.generated.resources.logout_input_label
 import attowallet.composeapp.generated.resources.logout_text
 import attowallet.composeapp.generated.resources.logout_text_recovery
 import attowallet.composeapp.generated.resources.logout_title
-import cash.atto.wallet.components.common.AttoCapsLabel
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
+import cash.atto.wallet.components.common.AttoCapsLabel
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.isCompactWidth
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

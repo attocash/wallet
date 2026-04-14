@@ -89,7 +89,9 @@ fun AttoNavHost(
     }
 
     when (uiState.shownScreen) {
-        AppUiState.ShownScreen.LOADER -> AttoLoader(modifier)
+        AppUiState.ShownScreen.LOADER -> {
+            AttoLoader(modifier)
+        }
 
         AppUiState.ShownScreen.PASSWORD_ENTER -> {
             val passwordValid =
@@ -149,7 +151,7 @@ fun AttoNavHost(
                 stack = component.childStack,
             ) { screen ->
                 when (screen.instance) {
-                    is AttoDestination.CreatePassword ->
+                    is AttoDestination.CreatePassword -> {
                         CreatePasswordScreen(
                             onBackNavigation = { component.navigation.pop() },
                             onConfirmClick = {
@@ -165,8 +167,9 @@ fun AttoNavHost(
                                 }
                             },
                         )
+                    }
 
-                    is AttoDestination.DesktopMain ->
+                    is AttoDestination.DesktopMain -> {
                         MainScreen(
                             onLogoutNavigation = {
                                 component.navigation.popToFirst()
@@ -174,29 +177,33 @@ fun AttoNavHost(
                             initialNavOverride = initialNavOverride,
                             qrScannerContent = qrScannerContent,
                         )
+                    }
 
-                    is AttoDestination.ImportPhrase ->
+                    is AttoDestination.ImportPhrase -> {
                         ImportPhraseScreen(
                             onBackNavigation = { component.navigation.pop() },
                             onImportAccount = {
                                 component.navigation.push(AttoDestination.CreatePassword)
                             },
                         )
+                    }
 
-                    is AttoDestination.Voter ->
+                    is AttoDestination.Voter -> {
                         VoterScreen(
                             onBackNavigation = { component.navigation.pop() },
                         )
+                    }
 
-                    is AttoDestination.RecoveryPhrase ->
+                    is AttoDestination.RecoveryPhrase -> {
                         RecoveryPhraseScreen(
                             onBackNavigation = { component.navigation.pop() },
                             onBackupConfirmClicked = {
                                 component.navigation.push(AttoDestination.CreatePassword)
                             },
                         )
+                    }
 
-                    is AttoDestination.Welcome ->
+                    is AttoDestination.Welcome -> {
                         WelcomeScreen(
                             onCreateSecretClicked = {
                                 component.navigation.push(AttoDestination.RecoveryPhrase)
@@ -205,6 +212,7 @@ fun AttoNavHost(
                                 component.navigation.push(AttoDestination.ImportPhrase)
                             },
                         )
+                    }
 
                     else -> {}
                 }

@@ -59,37 +59,41 @@ private fun formatCompactUsd(value: BigDecimal?): String {
     val thousand = BigDecimal.parseString("1000")
 
     return when {
-        value >= billion ->
+        value >= billion -> {
             "$" +
                 (value / billion)
                     .roundToDigitPositionAfterDecimalPoint(
                         2,
                         RoundingMode.ROUND_HALF_AWAY_FROM_ZERO,
                     ).toPlainString() + "B"
+        }
 
-        value >= million ->
+        value >= million -> {
             "$" +
                 (value / million)
                     .roundToDigitPositionAfterDecimalPoint(
                         2,
                         RoundingMode.ROUND_HALF_AWAY_FROM_ZERO,
                     ).toPlainString() + "M"
+        }
 
-        value >= thousand ->
+        value >= thousand -> {
             "$" +
                 (value / thousand)
                     .roundToDigitPositionAfterDecimalPoint(
                         2,
                         RoundingMode.ROUND_HALF_AWAY_FROM_ZERO,
                     ).toPlainString() + "K"
+        }
 
-        else ->
+        else -> {
             "$" +
                 value
                     .roundToDigitPositionAfterDecimalPoint(
                         2,
                         RoundingMode.ROUND_HALF_AWAY_FROM_ZERO,
                     ).toPlainString()
+        }
     }
 }
 

@@ -5,24 +5,32 @@ import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 class CheckPasswordInteractor {
     fun invoke(password: String?): CreatePasswordUIState.PasswordCheckState =
         when {
-            password == null ->
+            password == null -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            password.length < 8 ->
+            password.length < 8 -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            !password.any { it.isUpperCase() } ->
+            !password.any { it.isUpperCase() } -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            !password.any { it.isLowerCase() } ->
+            !password.any { it.isLowerCase() } -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            !password.any { it.isDigit() } ->
+            !password.any { it.isDigit() } -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            !password.any { !it.isLetterOrDigit() } ->
+            !password.any { !it.isLetterOrDigit() } -> {
                 cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.INVALID
+            }
 
-            else -> cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.VALID
+            else -> {
+                cash.atto.wallet.uistate.secret.CreatePasswordUIState.PasswordCheckState.VALID
+            }
         }
 }

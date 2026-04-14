@@ -116,6 +116,7 @@ class AppStateRepository(
                     return false
                 }
             }
+
             else -> {
                 if (password == state.value.password) {
                     startSession()

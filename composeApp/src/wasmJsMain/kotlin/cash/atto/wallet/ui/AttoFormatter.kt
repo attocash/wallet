@@ -59,8 +59,7 @@ private external fun intlFormatDateOnly(
     locale: String,
 ): String
 
-internal actual fun formatLocalized(value: String): String =
-    value.toDoubleOrNull()?.let { intlFormatNumber(it, currentLocale()) } ?: "…"
+internal actual fun formatLocalized(value: String): String = value.toDoubleOrNull()?.let { intlFormatNumber(it, currentLocale()) } ?: "…"
 
 @OptIn(ExperimentalTime::class)
 internal actual fun formatDateTime(value: Instant): String = intlFormatDateTime(value.toString(), currentLocale())

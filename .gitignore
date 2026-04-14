@@ -1,7 +1,6 @@
 *.iml
 .kotlin
 .gradle
-.ai
 design
 **/build/
 xcuserdata

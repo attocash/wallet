@@ -218,8 +218,8 @@ private fun SendFromContent(
             Text(
                 text =
                     "Atto transactions don't have fees because the network doesn't pay miners " +
-                            "or validators per transaction. Instead of charging users, Atto uses " +
-                            "a tiny proof of work only to prevent spam - so sending money stays free.",
+                        "or validators per transaction. Instead of charging users, Atto uses " +
+                        "a tiny proof of work only to prevent spam - so sending money stays free.",
                 color = dark_text_secondary,
                 style = MaterialTheme.typography.bodyMedium,
             )

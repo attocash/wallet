@@ -12,8 +12,9 @@ fun Dp.isCompactWidth(): Boolean = this < 600.dp
 @Composable
 fun isCompactWidth(): Boolean =
     with(LocalDensity.current) {
-        LocalWindowInfo.current.containerSize.width.toDp().isCompactWidth()
+        LocalWindowInfo.current.containerSize.width
+            .toDp()
+            .isCompactWidth()
     }
 
-fun BoxWithConstraintsScope.isCompactWidth(
-): Boolean = maxWidth.isCompactWidth()
+fun BoxWithConstraintsScope.isCompactWidth(): Boolean = maxWidth.isCompactWidth()

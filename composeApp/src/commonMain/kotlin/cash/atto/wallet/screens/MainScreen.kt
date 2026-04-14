@@ -10,9 +10,9 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.common.AttoWallet
 import cash.atto.wallet.components.settings.BackupSecretDialog
-import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.repository.PersistentWorkCache
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
 import org.koin.compose.koinInject
@@ -106,31 +106,41 @@ fun MainScreenContent(
             LocalViewModelStoreOwner provides viewModelStoreOwner,
         ) {
             when (navState) {
-                MainScreenNavDestination.OVERVIEW ->
+                MainScreenNavDestination.OVERVIEW -> {
                     OverviewScreen(
                         onSendClick = { onNavStateChanged(MainScreenNavDestination.SEND) },
                         onReceiveClick = { onNavStateChanged(MainScreenNavDestination.RECEIVE) },
                         onTransactionsClick = { onNavStateChanged(MainScreenNavDestination.TRANSACTIONS) },
                         onStakingClick = { onNavStateChanged(MainScreenNavDestination.STAKING) },
                     )
-                MainScreenNavDestination.SEND ->
+                }
+
+                MainScreenNavDestination.SEND -> {
                     SendScreen(
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                         qrScannerContent = qrScannerContent,
                     )
-                MainScreenNavDestination.RECEIVE ->
+                }
+
+                MainScreenNavDestination.RECEIVE -> {
                     ReceiveScreen(
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                     )
-                MainScreenNavDestination.TRANSACTIONS ->
+                }
+
+                MainScreenNavDestination.TRANSACTIONS -> {
                     TransactionsScreen(
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                     )
-                MainScreenNavDestination.STAKING ->
+                }
+
+                MainScreenNavDestination.STAKING -> {
                     StakingScreen(
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                     )
-                MainScreenNavDestination.SETTINGS ->
+                }
+
+                MainScreenNavDestination.SETTINGS -> {
                     SettingsScreen(
                         uiState = uiState.settingsUiState,
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
@@ -138,6 +148,7 @@ fun MainScreenContent(
                         onLockClick = onLock,
                         onLogoutClick = onShowLogout,
                     )
+                }
             }
         }
     }

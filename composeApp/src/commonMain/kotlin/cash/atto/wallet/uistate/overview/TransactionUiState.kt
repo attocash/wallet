@@ -92,17 +92,21 @@ data class TransactionUiState
             @Composable
             get() =
                 when (type) {
-                    TransactionType.OPEN ->
+                    TransactionType.OPEN -> {
                         "${stringResource(Res.string.overview_transaction_from)} $source"
+                    }
 
-                    TransactionType.SEND ->
+                    TransactionType.SEND -> {
                         "${stringResource(Res.string.overview_transaction_to)} $source"
+                    }
 
-                    TransactionType.RECEIVE ->
+                    TransactionType.RECEIVE -> {
                         "${stringResource(Res.string.overview_transaction_from)} $source"
+                    }
 
-                    TransactionType.CHANGE ->
+                    TransactionType.CHANGE -> {
                         "${stringResource(Res.string.overview_transaction_from)} $source"
+                    }
                 }
 
         val cardGradient: Brush

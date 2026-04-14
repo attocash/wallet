@@ -1,4 +1,3 @@
-import org.gradle.api.tasks.SourceTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -215,15 +214,6 @@ room3 {
     schemaDirectory("$projectDir/schemas")
 }
 
-ktlint {
-    filter {
-        exclude { element ->
-            val path = element.file.path
-            path.contains("/build/generated/") || path.contains("\\build\\generated\\")
-        }
-    }
-}
-
 dependencies {
     implementation(libs.transport.runtime)
     testImplementation(libs.junit.jupiter)
@@ -239,12 +229,6 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = StandardCharsets.UTF_8.toString()
-}
-
-tasks.withType<SourceTask>().configureEach {
-    if (name.contains("ktlint", ignoreCase = true)) {
-        exclude("**/build/generated/**")
-    }
 }
 
 compose.desktop {

@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package cash.atto.wallet.datasource
 
 import com.sun.jna.Library

@@ -107,8 +107,9 @@ private fun StakingContent(
                             voterAddress = uiState.currentVoter.orEmpty(),
                             apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                             weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                            entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
-                                ?: "—",
+                            entityWeight =
+                                uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
+                                    ?: "—",
                             lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
                             healthy = currentVoterHealthy,
                             onChangeClick = { selectedVoter = currentVoter },
@@ -135,8 +136,9 @@ private fun StakingContent(
                                 voterAddress = uiState.currentVoter.orEmpty(),
                                 apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                                 weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                                entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
-                                    ?: "—",
+                                entityWeight =
+                                    uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
+                                        ?: "—",
                                 lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
                                 healthy = currentVoterHealthy,
                                 onChangeClick = { selectedVoter = currentVoter },
@@ -214,7 +216,7 @@ private fun StakingInfoCard(modifier: Modifier) {
         Text(
             text =
                 "Delegate your voting weight to a voter node to earn rewards. " +
-                        "Voters help secure the network by validating transactions.",
+                    "Voters help secure the network by validating transactions.",
             color = dark_text_secondary,
             style = MaterialTheme.typography.bodySmall,
         )

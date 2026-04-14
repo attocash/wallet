@@ -44,6 +44,7 @@ fun main() {
 private fun initialWebDestination(): AttoDestination =
     when (webQueryParam("screen")) {
         "welcome" -> AttoDestination.Welcome
+
         "overview",
         "send",
         "receive",
@@ -53,8 +54,11 @@ private fun initialWebDestination(): AttoDestination =
         -> AttoDestination.DesktopMain
 
         "secretPhrase", "recovery-phrase" -> AttoDestination.RecoveryPhrase
+
         "importSecret", "import-phrase" -> AttoDestination.ImportPhrase
+
         "createPassword", "create-password" -> AttoDestination.CreatePassword
+
         else -> AttoDestination.Welcome
     }
 

@@ -43,7 +43,7 @@ data class OverviewUiState(
                                 ).toString()
 
                             when (it.blockType) {
-                                AttoBlockType.SEND ->
+                                AttoBlockType.SEND -> {
                                     TransactionUiState(
                                         type = TransactionType.SEND,
                                         amount = "- " + it.amount().toString(AttoUnit.ATTO),
@@ -53,8 +53,9 @@ data class OverviewUiState(
                                         height = it.height,
                                         hash = it.hash.toString(),
                                     )
+                                }
 
-                                AttoBlockType.RECEIVE ->
+                                AttoBlockType.RECEIVE -> {
                                     TransactionUiState(
                                         type = TransactionType.RECEIVE,
                                         amount = "+ " + it.amount().toString(AttoUnit.ATTO),
@@ -64,7 +65,9 @@ data class OverviewUiState(
                                         height = it.height,
                                         hash = it.hash.toString(),
                                     )
-                                AttoBlockType.OPEN ->
+                                }
+
+                                AttoBlockType.OPEN -> {
                                     TransactionUiState(
                                         type = TransactionType.OPEN,
                                         amount = "+ " + it.amount().toString(AttoUnit.ATTO),
@@ -74,8 +77,9 @@ data class OverviewUiState(
                                         height = it.height,
                                         hash = it.hash.toString(),
                                     )
+                                }
 
-                                AttoBlockType.CHANGE ->
+                                AttoBlockType.CHANGE -> {
                                     TransactionUiState(
                                         type = TransactionType.CHANGE,
                                         amount = null,
@@ -85,8 +89,11 @@ data class OverviewUiState(
                                         height = it.height,
                                         hash = it.hash.toString(),
                                     )
+                                }
 
-                                else -> null
+                                else -> {
+                                    null
+                                }
                             }
                         },
                 showHint = entries.isEmpty(),
