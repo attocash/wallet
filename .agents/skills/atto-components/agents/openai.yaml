@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atto Components"
+  short_description: "Reuse the wallet's Atto Compose UI."
+  default_prompt: "Use $atto-components to reuse and extend the existing Atto Compose components in this wallet project."

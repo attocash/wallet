@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atto Style"
+  short_description: "Apply the wallet Atto screen style."
+  default_prompt: "Use $atto-style to match the existing Atto wallet visual style in new or edited Compose screens."
