@@ -6,15 +6,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import kotlinx.browser.document
 import org.w3c.dom.HTMLDivElement
@@ -28,10 +22,15 @@ fun qrScannerView(
 ) {
     val scanner = remember { WasmQrScanner() }
     val container = remember { document.createElement("div") as HTMLDivElement }
-    var slotBounds by remember { mutableStateOf<Rect?>(null) }
 
     DisposableEffect(container) {
         container.style.position = "fixed"
+        container.style.left = "50%"
+        container.style.top = "calc(50% + 36px)"
+        container.style.transform = "translate(-50%, -50%)"
+        container.style.width = "min(480px, calc(100vw - 64px))"
+        container.style.height = "320px"
+        container.style.maxHeight = "calc(100vh - 220px)"
         container.style.zIndex = "9999"
         container.style.backgroundColor = "black"
         container.style.borderRadius = "12px"
@@ -65,25 +64,11 @@ fun qrScannerView(
         }
     }
 
-    DisposableEffect(slotBounds, container) {
-        slotBounds?.let { bounds ->
-            container.style.left = "${bounds.left}px"
-            container.style.top = "${bounds.top}px"
-            container.style.width = "${bounds.width}px"
-            container.style.height = "${bounds.height}px"
-        }
-
-        onDispose { }
-    }
-
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
                 .height(320.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .onGloballyPositioned { coordinates ->
-                    slotBounds = coordinates.boundsInWindow()
-                },
+                .clip(RoundedCornerShape(12.dp)),
     )
 }

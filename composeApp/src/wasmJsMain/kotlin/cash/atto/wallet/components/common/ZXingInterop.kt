@@ -57,9 +57,7 @@ internal fun createVideoElement(): HTMLVideoElement =
         var video = document.createElement('video');
         video.setAttribute('autoplay', '');
         video.setAttribute('playsinline', '');
-        video.style.position = 'absolute';
-        video.style.top = '0';
-        video.style.left = '0';
+        video.style.display = 'block';
         video.style.width = '100%';
         video.style.height = '100%';
         video.style.objectFit = 'cover';
