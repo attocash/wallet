@@ -1,6 +1,7 @@
 package cash.atto.wallet
 
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,12 +30,14 @@ fun main() {
 //            debugScreen = webDebugScreen(),
 //            debugPassword = webDebugPassword(),
 //            initialNavOverride = webDebugMainScreen(),
-            qrScannerContent = { onResult, onError, onDismiss ->
+            qrScannerContent = { onResult, onError, _ ->
                 qrScannerView(
-                    modifier = Modifier.width(400.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(320.dp),
                     onQrCodeScanned = onResult,
                     onScanError = onError,
-                    onDismiss = onDismiss,
                 )
             },
         )

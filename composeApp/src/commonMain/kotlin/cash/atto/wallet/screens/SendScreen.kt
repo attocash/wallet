@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_error_address
 import attowallet.composeapp.generated.resources.send_error_amount
@@ -194,7 +193,11 @@ private fun SendFromContent(
     val compact = isCompactWidth()
 
     if (showQrScanner.value && qrScannerContent != null) {
-        Dialog(onDismissRequest = { showQrScanner.value = false }) {
+        AttoModal(
+            title = "Scan QR Code",
+            onDismiss = { showQrScanner.value = false },
+            scrollable = false,
+        ) {
             qrScannerContent(
                 { result ->
                     scannerError.value = null

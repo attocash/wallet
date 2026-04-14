@@ -129,7 +129,12 @@ internal fun drawVideoFrame(
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         if (canvas.width === 0 || canvas.height === 0) return false;
-        var ctx = canvas.getContext('2d');
+        var ctx = canvas.__attoCtx;
+        if (!ctx) {
+            ctx = canvas.getContext('2d', { willReadFrequently: true }) || canvas.getContext('2d');
+            canvas.__attoCtx = ctx;
+        }
+        if (!ctx) return false;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         return true;
     }

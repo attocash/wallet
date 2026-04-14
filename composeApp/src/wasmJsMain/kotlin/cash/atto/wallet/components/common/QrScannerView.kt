@@ -1,13 +1,22 @@
 package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.dp
 import kotlinx.browser.document
-import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 
@@ -16,44 +25,20 @@ fun qrScannerView(
     modifier: Modifier = Modifier,
     onQrCodeScanned: (String) -> Unit,
     onScanError: (String) -> Unit,
-    onDismiss: () -> Unit = {},
 ) {
     val scanner = remember { WasmQrScanner() }
+    val container = remember { document.createElement("div") as HTMLDivElement }
+    var slotBounds by remember { mutableStateOf<Rect?>(null) }
 
-    DisposableEffect(Unit) {
-        val container = document.createElement("div") as HTMLDivElement
+    DisposableEffect(container) {
         container.style.position = "fixed"
-        container.style.top = "0"
-        container.style.left = "0"
-        container.style.width = "100vw"
-        container.style.height = "100vh"
         container.style.zIndex = "9999"
         container.style.backgroundColor = "black"
+        container.style.borderRadius = "12px"
+        container.style.setProperty("overflow", "hidden")
+        container.style.setProperty("pointer-events", "none")
         container.id = "qr-scanner-container"
         document.body?.appendChild(container)
-
-        // Cancel button as an HTML element so it renders on top of the video
-        val cancelBtn = document.createElement("button") as HTMLButtonElement
-        cancelBtn.textContent = "Cancel"
-        cancelBtn.style.position = "absolute"
-        cancelBtn.style.bottom = "32px"
-        cancelBtn.style.left = "50%"
-        cancelBtn.style.transform = "translateX(-50%)"
-        cancelBtn.style.zIndex = "10000"
-        cancelBtn.style.padding = "12px 32px"
-        cancelBtn.style.fontSize = "16px"
-        cancelBtn.style.color = "white"
-        cancelBtn.style.backgroundColor = "rgba(255,255,255,0.2)"
-        cancelBtn.style.border = "1px solid rgba(255,255,255,0.4)"
-        cancelBtn.style.borderRadius = "8px"
-        cancelBtn.style.cursor = "pointer"
-        cancelBtn.onclick = {
-            scanner.stopScanning()
-            container.remove()
-            onDismiss()
-            null
-        }
-        container.appendChild(cancelBtn)
 
         scanner.startScanning(
             onResult = { result ->
@@ -68,6 +53,9 @@ fun qrScannerView(
 
         val videoEl = scanner.videoElement
         if (videoEl != null) {
+            videoEl.style.width = "100%"
+            videoEl.style.height = "100%"
+            videoEl.style.objectFit = "cover"
             container.appendChild(videoEl as Node)
         }
 
@@ -77,5 +65,25 @@ fun qrScannerView(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize())
+    DisposableEffect(slotBounds, container) {
+        slotBounds?.let { bounds ->
+            container.style.left = "${bounds.left}px"
+            container.style.top = "${bounds.top}px"
+            container.style.width = "${bounds.width}px"
+            container.style.height = "${bounds.height}px"
+        }
+
+        onDispose { }
+    }
+
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(320.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .onGloballyPositioned { coordinates ->
+                    slotBounds = coordinates.boundsInWindow()
+                },
+    )
 }
