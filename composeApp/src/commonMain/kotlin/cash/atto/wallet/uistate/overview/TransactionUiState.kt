@@ -140,7 +140,7 @@ data class TransactionUiState
 
         @OptIn(ExperimentalTime::class)
         val formattedTimestamp: String
-            get() = AttoDateFormatter.format(timestamp)
+            get() = AttoFormatter.format(timestamp)
     }
 
 enum class TransactionType {

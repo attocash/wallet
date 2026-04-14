@@ -211,7 +211,7 @@ fun VoterDetailContent(
 ) {
     val scrollState = rememberScrollState()
 
-    val lastVotedAtFormatted = AttoDateFormatter.formatRelativeDate(voter.lastVotedAt)
+    val lastVotedAtFormatted = AttoFormatter.formatRelativeDate(voter.lastVotedAt)
     val nodeWeightPercentage = voter.voteWeightPercentage.toPlainString()
     val entityWeightPercentageValue = voter.calculateEntityWeightPercentage(allVoters)
     val entityWeightPercentage = entityWeightPercentageValue.toPlainString()

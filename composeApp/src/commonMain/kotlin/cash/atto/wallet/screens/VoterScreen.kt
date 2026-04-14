@@ -563,7 +563,7 @@ fun CurrentVoterCard(
                     )
                 }
                 if (currentVoterLastVotedAt != null) {
-                    val lastVotedText = AttoDateFormatter.formatRelativeDate(currentVoterLastVotedAt)
+                    val lastVotedText = AttoFormatter.formatRelativeDate(currentVoterLastVotedAt)
                     Text(
                         text = "Last voted: $lastVotedText",
                         style = MaterialTheme.typography.bodySmall,
@@ -590,7 +590,7 @@ fun VoterCard(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val lastVotedAtFormatted = AttoDateFormatter.formatRelativeDate(voter.lastVotedAt)
+    val lastVotedAtFormatted = AttoFormatter.formatRelativeDate(voter.lastVotedAt)
     val entityWeightPercentage = voter.calculateEntityWeightPercentage(allVoters)
     val entityWeightString = entityWeightPercentage.toPlainString()
 
