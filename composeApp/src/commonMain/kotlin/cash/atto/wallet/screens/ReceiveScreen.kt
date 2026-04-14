@@ -144,7 +144,6 @@ fun ReceiveContent(
     selectedTransaction?.let { transaction ->
         AttoTransactionDetailsDialog(
             transaction = transaction,
-            compact = compact,
             onDismiss = { selectedTransaction = null },
         )
     }

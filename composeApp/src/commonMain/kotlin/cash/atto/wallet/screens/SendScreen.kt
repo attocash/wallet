@@ -309,7 +309,6 @@ private fun SendFromContent(
     selectedTransaction.value?.let { transaction: TransactionUiState ->
         AttoTransactionDetailsDialog(
             transaction = transaction,
-            compact = compact,
             onDismiss = { selectedTransaction.value = null },
         )
     }

@@ -12,7 +12,6 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 @Composable
 fun AttoTransactionDetailsDialog(
     transaction: TransactionUiState,
-    compact: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current

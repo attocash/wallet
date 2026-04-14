@@ -143,7 +143,6 @@ private fun OverviewContent(
         selectedTransaction?.let { transaction ->
             AttoTransactionDetailsDialog(
                 transaction = transaction,
-                compact = compact,
                 onDismiss = { selectedTransaction = null },
             )
         }

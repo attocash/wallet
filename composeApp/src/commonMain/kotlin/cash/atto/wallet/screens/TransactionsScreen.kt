@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -24,11 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import cash.atto.wallet.components.common.AttoButton
-import cash.atto.wallet.components.common.AttoPageFrame
-import cash.atto.wallet.components.common.AttoPanelCard
-import cash.atto.wallet.components.common.AttoTransactionCard
-import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
+import cash.atto.wallet.components.common.*
 import cash.atto.wallet.platform.exportCsvFile
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -104,7 +99,6 @@ fun TransactionsContent(
         selectedTransaction?.let { transaction ->
             AttoTransactionDetailsDialog(
                 transaction = transaction,
-                compact = compact,
                 onDismiss = { selectedTransaction = null },
             )
         }
