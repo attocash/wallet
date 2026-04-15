@@ -14,7 +14,6 @@ Shared reusable components live in `composeApp/src/commonMain/kotlin/cash/atto/w
 - `AttoLoader`: loading indicator component.
 - `AttoModal`: shared modal container.
 - `AttoOnboardingContainer`: layout wrapper for onboarding flows.
-- `AttoOutlinedButton`: legacy outlined button wrapper; check `AttoButton` variants before using.
 - `AttoOutlinedTextCard`: outlined text card variant.
 - `AttoPasswordField`: password entry built on the project field styling.
 - `AttoReceiveButton`: receive-specific CTA.
