@@ -115,7 +115,7 @@ fun SendResult(
 
             uiState.amountUsd?.let {
                 Text(
-                    text = AttoFormatter.formatUsd(it),
+                    text = "~ \$${AttoFormatter.format(it)} USD",
                     style = MaterialTheme.typography.bodyMedium,
                     color = dark_text_tertiary,
                 )

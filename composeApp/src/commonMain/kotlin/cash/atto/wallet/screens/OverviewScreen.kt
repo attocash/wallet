@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.ui.*
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -801,7 +802,7 @@ private fun OverviewSmallMeta(text: String) {
     )
 }
 
-private fun formatAmount(amount: Double): String = AttoFormatter.format(amount.toString())
+private fun formatAmount(amount: Double): String = AttoFormatter.format(BigDecimal.fromDouble(amount))
 
 private fun normalizeAttoUri(address: String): String =
     when {

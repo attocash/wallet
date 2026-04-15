@@ -496,7 +496,7 @@ private fun receiveEquivalentDisplay(
         if (priceUsd == null) {
             "USD price unavailable"
         } else {
-            AttoFormatter.formatUsd(parsedAmount.multiply(priceUsd))
+            "~ \$${AttoFormatter.format(parsedAmount.multiply(priceUsd))} USD"
         }
     }
 }

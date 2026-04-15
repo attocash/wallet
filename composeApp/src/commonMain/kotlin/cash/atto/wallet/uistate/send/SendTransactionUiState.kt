@@ -49,7 +49,7 @@ data class SendTransactionUiState(
                 "~ ${it.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_CEILING).toStringExpanded()} ATTO"
             } ?: "USD price unavailable"
         } else {
-            amountUsd(input)?.let { AttoFormatter.formatUsd(it) }
+            amountUsd(input)?.let { "~ \$${AttoFormatter.format(it)} USD" }
                 ?: "USD price unavailable"
         }
     }

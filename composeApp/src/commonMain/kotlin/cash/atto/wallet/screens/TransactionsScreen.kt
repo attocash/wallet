@@ -40,6 +40,7 @@ import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
 import cash.atto.wallet.platform.exportCsvFile
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.dark_bg
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_primary
@@ -388,4 +389,4 @@ private fun parseAmount(amount: String?): Double {
     return raw.toDoubleOrNull() ?: 0.0
 }
 
-private fun formatAmount(amount: Double): String = AttoFormatter.format(amount.toString())
+private fun formatAmount(amount: Double): String = AttoFormatter.format(BigDecimal.fromDouble(amount))

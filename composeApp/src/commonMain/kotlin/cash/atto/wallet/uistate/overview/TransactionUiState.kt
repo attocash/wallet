@@ -8,7 +8,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import attowallet.composeapp.generated.resources.*
 import cash.atto.commons.AttoHeight
-import cash.atto.wallet.ui.*
+import cash.atto.wallet.ui.AttoFormatter
+import cash.atto.wallet.ui.errorGradient
+import cash.atto.wallet.ui.primaryGradient
+import cash.atto.wallet.ui.secondaryGradient
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import kotlin.time.ExperimentalTime
@@ -29,11 +33,11 @@ data class TransactionUiState
             amount?.let { a ->
                 if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
                     val sign = a.split(' ').getOrNull(0)
-                    val number = a.split(' ').getOrNull(1)
+                    val number = try { a.split(' ').getOrNull(1)?.toBigDecimal() } catch (_: Exception) { null }
 
                     "$sign ${AttoFormatter.format(number)}"
                 } else {
-                    AttoFormatter.format(amount)
+                    AttoFormatter.format(try { a.toBigDecimal() } catch (_: Exception) { null })
                 }
             } ?: " "
 

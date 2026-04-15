@@ -109,9 +109,9 @@ fun AttoAmountField(
             if (amount != null && price > 0) {
                 val equivalent =
                     if (isUsdMode) {
-                        "~ ${AttoFormatter.format((amount / price).toString())} ATTO"
+                        "~ ${AttoFormatter.format(BigDecimal.fromDouble(amount / price))} ATTO"
                     } else {
-                        "~ \$${AttoFormatter.format((amount * price).toString())}"
+                        "~ \$${AttoFormatter.format(BigDecimal.fromDouble(amount * price))} USD"
                     }
                 Text(
                     text = equivalent,

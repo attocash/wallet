@@ -37,7 +37,7 @@ fun BalanceChip(
                 fontSize = 28.sp,
                 fontWeight = FontWeight.W300,
             )
-            val usdText = uiState.usdValue?.let { "~ $${it.toPlainString()} USD" } ?: ""
+            val usdText = uiState.usdValue?.let { "~ \$${AttoFormatter.format(it)} USD" } ?: ""
             val apyText = uiState.apy?.let { " · ${it.toPlainString()}% APY" } ?: ""
             val apyColor =
                 if (uiState.apy != null && uiState.apy > com.ionspin.kotlin.bignum.decimal.BigDecimal.ZERO) {

@@ -118,7 +118,7 @@ fun SendConfirmContent(
                 )
                 uiState.amountUsd?.let {
                     Text(
-                        text = AttoFormatter.formatUsd(it),
+                        text = "~ \$${AttoFormatter.format(it)} USD",
                         color = dark_accent,
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
