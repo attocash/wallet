@@ -39,6 +39,7 @@ fun AttoWallet(
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     balanceUiState: BalanceChipUiState,
+    isWalletInitialized: Boolean,
     hasCachedWork: Boolean,
     onLock: () -> Unit,
     content: @Composable BoxWithConstraintsScope.() -> Unit,
@@ -65,7 +66,7 @@ fun AttoWallet(
                     compact = compact,
                     navState = navState,
                     onNavStateChanged = onNavStateChanged,
-                    balanceUiState = balanceUiState,
+                    isWalletInitialized = isWalletInitialized,
                     hasCachedWork = hasCachedWork,
                     onLock = onLock,
                 )
@@ -99,7 +100,7 @@ private fun AttoTopBar(
     compact: Boolean,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
-    balanceUiState: BalanceChipUiState,
+    isWalletInitialized: Boolean,
     hasCachedWork: Boolean,
     onLock: () -> Unit,
 ) {
@@ -133,10 +134,12 @@ private fun AttoTopBar(
             horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AttoShellStatusIndicator(
-                compact = compact,
-                hasCachedWork = hasCachedWork,
-            )
+            if (isWalletInitialized) {
+                AttoShellStatusIndicator(
+                    compact = compact,
+                    hasCachedWork = hasCachedWork,
+                )
+            }
             AttoCircleIconButton(
                 icon = Icons.Outlined.Settings,
                 contentDescription = "Open settings",

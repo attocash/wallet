@@ -94,6 +94,7 @@ fun MainScreenContent(
         navState = navState,
         onNavStateChanged = onNavStateChanged,
         balanceUiState = uiState.balanceChipUiState,
+        isWalletInitialized = uiState.isWalletInitialized,
         hasCachedWork = hasCachedWork,
         onLock = onLock,
     ) {
@@ -108,10 +109,19 @@ fun MainScreenContent(
             when (navState) {
                 MainScreenNavDestination.OVERVIEW -> {
                     OverviewScreen(
-                        onSendClick = { onNavStateChanged(MainScreenNavDestination.SEND) },
+                        isWalletInitialized = uiState.isWalletInitialized,
+                        onSendClick = {
+                            if (uiState.isWalletInitialized) {
+                                onNavStateChanged(MainScreenNavDestination.SEND)
+                            }
+                        },
                         onReceiveClick = { onNavStateChanged(MainScreenNavDestination.RECEIVE) },
                         onTransactionsClick = { onNavStateChanged(MainScreenNavDestination.TRANSACTIONS) },
-                        onStakingClick = { onNavStateChanged(MainScreenNavDestination.STAKING) },
+                        onStakingClick = {
+                            if (uiState.isWalletInitialized) {
+                                onNavStateChanged(MainScreenNavDestination.STAKING)
+                            }
+                        },
                     )
                 }
 

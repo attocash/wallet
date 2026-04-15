@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -59,6 +60,7 @@ private val OverviewPurple = dark_violet
 
 @Composable
 fun OverviewScreen(
+    isWalletInitialized: Boolean,
     onSendClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onTransactionsClick: () -> Unit,
@@ -70,6 +72,7 @@ fun OverviewScreen(
 
         OverviewContent(
             uiState = overviewUiState.value,
+            isWalletInitialized = isWalletInitialized,
             onSendClick = onSendClick,
             onReceiveClick = onReceiveClick,
             onTransactionsClick = onTransactionsClick,
@@ -81,6 +84,7 @@ fun OverviewScreen(
 @Composable
 private fun OverviewContent(
     uiState: OverviewUiState,
+    isWalletInitialized: Boolean,
     onSendClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onTransactionsClick: () -> Unit,
@@ -174,6 +178,7 @@ private fun OverviewContent(
                             priceUsd = priceUsd,
                             stakingApy = stakingApy,
                             voterName = voterName,
+                            isWalletInitialized = isWalletInitialized,
                             onSwitchClick = { modalOpen = true },
                             onStakingClick = onStakingClick,
                             onSendClick = onSendClick,
@@ -200,6 +205,7 @@ private fun OverviewContent(
                             priceUsd = priceUsd,
                             stakingApy = stakingApy,
                             voterName = voterName,
+                            isWalletInitialized = isWalletInitialized,
                             onSwitchClick = { modalOpen = true },
                             onStakingClick = onStakingClick,
                             onSendClick = onSendClick,
@@ -227,6 +233,7 @@ private fun OverviewLeftColumn(
     priceUsd: com.ionspin.kotlin.bignum.decimal.BigDecimal?,
     stakingApy: String?,
     voterName: String?,
+    isWalletInitialized: Boolean,
     onSwitchClick: () -> Unit,
     onStakingClick: () -> Unit,
     onSendClick: () -> Unit,
@@ -418,13 +425,16 @@ private fun OverviewLeftColumn(
         val stakingHovered by stakingInteractionSource.collectIsHoveredAsState()
         OverviewCard(
             modifier =
-                Modifier.clickable(
-                    interactionSource = stakingInteractionSource,
-                    indication = null,
-                    onClick = onStakingClick,
-                ),
-            background = if (stakingHovered) OverviewSurfaceAlt else OverviewSurface,
-            borderColor = if (stakingHovered) OverviewAccent.copy(alpha = 0.32f) else OverviewBorder,
+                Modifier
+                    .alpha(if (isWalletInitialized) 1f else 0.55f)
+                    .clickable(
+                        enabled = isWalletInitialized,
+                        interactionSource = stakingInteractionSource,
+                        indication = null,
+                        onClick = onStakingClick,
+                    ),
+            background = if (isWalletInitialized && stakingHovered) OverviewSurfaceAlt else OverviewSurface,
+            borderColor = if (isWalletInitialized && stakingHovered) OverviewAccent.copy(alpha = 0.32f) else OverviewBorder,
             contentPadding = PaddingValues(24.dp),
         ) {
             Row(
@@ -489,7 +499,11 @@ private fun OverviewLeftColumn(
             AttoButton(
                 text = "Send",
                 onClick = onSendClick,
-                modifier = Modifier.weight(1f),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .alpha(if (isWalletInitialized) 1f else 0.55f),
+                enabled = isWalletInitialized,
                 icon = Icons.Outlined.ArrowUpward,
             )
             AttoButton(
