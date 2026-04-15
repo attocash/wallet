@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.*
@@ -59,7 +60,7 @@ fun AttoAmountField(
 
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { onValueChange(sanitizeAmountInput(it)) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(placeholder) },
             isError = isError,
@@ -82,7 +83,7 @@ fun AttoAmountField(
                 }
             },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = imeAction),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = imeAction),
             keyboardActions = keyboardActions,
             shape = RoundedCornerShape(8.dp),
             textStyle =
@@ -127,6 +128,23 @@ fun AttoAmountField(
             )
         }
     }
+}
+
+private fun sanitizeAmountInput(value: String): String {
+    val builder = StringBuilder()
+    var hasDecimalSeparator = false
+
+    value.forEach { character ->
+        when {
+            character.isDigit() -> builder.append(character)
+            character == '.' && !hasDecimalSeparator -> {
+                hasDecimalSeparator = true
+                builder.append(character)
+            }
+        }
+    }
+
+    return builder.toString()
 }
 
 @Composable
