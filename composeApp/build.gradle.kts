@@ -38,7 +38,6 @@ kotlin {
         outputModuleName.set("attoWallet")
         browser {
             commonWebpackConfig {
-                outputFileName = "attoWallet.js"
                 devServer =
                     (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                         static =
@@ -151,6 +150,12 @@ kotlin {
                 npm(
                     "sqlite-web-worker",
                     layout.projectDirectory.dir("sqlite-web-worker").asFile,
+                ),
+            )
+            implementation(
+                devNpm(
+                    "html-webpack-plugin",
+                    "5.6.3",
                 ),
             )
         }
