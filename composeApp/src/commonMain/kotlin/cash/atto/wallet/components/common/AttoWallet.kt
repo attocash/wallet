@@ -2,6 +2,7 @@ package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -131,7 +133,7 @@ private fun AttoTopBar(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isWalletInitialized) {
@@ -140,20 +142,25 @@ private fun AttoTopBar(
                     hasCachedWork = hasCachedWork,
                 )
             }
-            AttoCircleIconButton(
-                icon = Icons.Outlined.Settings,
-                contentDescription = "Open settings",
-                tint = if (navState == MainScreenNavDestination.SETTINGS) dark_accent else dark_text_secondary,
-                background = Color.Transparent,
-                onClick = { onNavStateChanged(MainScreenNavDestination.SETTINGS) },
-            )
-            AttoCircleIconButton(
-                icon = Icons.Outlined.Lock,
-                contentDescription = "Lock wallet",
-                tint = dark_text_secondary,
-                background = Color.Transparent,
-                onClick = onLock,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AttoCircleIconButton(
+                    icon = Icons.Outlined.Settings,
+                    contentDescription = "Open settings",
+                    tint = if (navState == MainScreenNavDestination.SETTINGS) dark_accent else dark_text_secondary,
+                    background = Color.Transparent,
+                    onClick = { onNavStateChanged(MainScreenNavDestination.SETTINGS) },
+                )
+                AttoCircleIconButton(
+                    icon = Icons.Outlined.Lock,
+                    contentDescription = "Lock wallet",
+                    tint = dark_text_secondary,
+                    background = Color.Transparent,
+                    onClick = onLock,
+                )
+            }
         }
     }
 }
@@ -186,17 +193,6 @@ private fun AttoShellStatusIndicator(
                     .clip(CircleShape)
                     .background(statusColor),
         )
-        if (!compact) {
-            Text(
-                text = if (hasCachedWork) "Ready" else "Working",
-                color = statusColor,
-                style =
-                    MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 13.sp,
-                    ),
-            )
-        }
     }
 }
 
@@ -438,18 +434,31 @@ fun AttoCircleIconButton(
     tint: Color = dark_text_primary,
     background: Color = Color(0x40192639),
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+    val transparentBackground = background == Color.Transparent
+    val buttonSize = if (transparentBackground) 24.dp else 30.dp
+    val iconSize = if (transparentBackground) 20.dp else buttonSize * 2 / 3
+
     Box(
         modifier =
             Modifier
-                .size(30.dp)
-                .clip(CircleShape)
-                .background(background)
-                .border(
-                    width = if (background == Color.Transparent) 0.dp else 1.dp,
-                    color = if (background == Color.Transparent) Color.Transparent else Color(0x1FFFFFFF),
-                    shape = CircleShape,
+                .size(buttonSize)
+                .then(
+                    if (transparentBackground) {
+                        Modifier
+                    } else {
+                        Modifier
+                            .clip(CircleShape)
+                            .background(background)
+                            .border(
+                                width = 1.dp,
+                                color = Color(0x1FFFFFFF),
+                                shape = CircleShape,
+                            )
+                    },
                 ).clickable(
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     indication = null,
                 ) { onClick() },
         contentAlignment = Alignment.Center,
@@ -457,8 +466,8 @@ fun AttoCircleIconButton(
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = tint,
-            modifier = Modifier.size(20.dp),
+            tint = attoHoverTint(tint, hovered),
+            modifier = Modifier.size(iconSize),
         )
     }
 }
@@ -576,15 +585,21 @@ fun AttoSettingsInfoCard(
 
 @Composable
 fun AttoBackButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+
     Row(
         modifier =
             Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(dark_surface)
-                .border(1.dp, dark_border, CircleShape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
+                .background(if (hovered) dark_surface_alt else dark_surface)
+                .border(
+                    1.dp,
+                    if (hovered) dark_border_subtle else dark_border,
+                    CircleShape,
+                ).clickable(
+                    interactionSource = interactionSource,
                     indication = null,
                 ) { onClick() }
                 .padding(10.dp),

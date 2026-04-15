@@ -4,17 +4,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -63,29 +66,39 @@ fun AttoButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+    val backgroundColor =
+        when {
+            !enabled -> variant.backgroundColor.copy(alpha = 0.4f)
+            hovered -> variant.hoverBackgroundColor()
+            else -> variant.backgroundColor
+        }
+    val borderColor =
+        when {
+            !enabled -> variant.borderColor
+            hovered -> variant.hoverBorderColor()
+            else -> variant.borderColor
+        }
+
     Row(
         modifier =
             modifier
                 .height(56.dp)
                 .clip(shape)
-                .background(
-                    if (enabled) {
-                        variant.backgroundColor
-                    } else {
-                        variant.backgroundColor.copy(alpha = 0.4f)
-                    },
-                ).then(
-                    if (variant.borderColor != null) {
-                        Modifier.border(1.dp, variant.borderColor, shape)
+                .background(backgroundColor)
+                .then(
+                    if (borderColor != null) {
+                        Modifier.border(1.dp, borderColor, shape)
                     } else {
                         Modifier
                     },
                 ).clickable(
                     enabled = enabled,
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     indication = null,
                     onClick = onClick,
-                ),
+                ).padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         content = content,
@@ -127,6 +140,21 @@ fun AttoButton(
         )
     }
 }
+
+private fun AttoButtonVariant.hoverBackgroundColor(): Color =
+    when (this) {
+        AttoButtonVariant.Accent -> lerp(backgroundColor, gold_100, 0.16f)
+        AttoButtonVariant.Secondary -> dark_accent_soft_hover
+        AttoButtonVariant.Outlined -> dark_surface_alt
+        AttoButtonVariant.Danger -> lerp(backgroundColor, Color.White, 0.08f)
+    }
+
+private fun AttoButtonVariant.hoverBorderColor(): Color? =
+    when (this) {
+        AttoButtonVariant.Secondary -> dark_border_subtle
+        AttoButtonVariant.Outlined -> dark_border_muted
+        else -> borderColor
+    }
 
 @Preview
 @Composable

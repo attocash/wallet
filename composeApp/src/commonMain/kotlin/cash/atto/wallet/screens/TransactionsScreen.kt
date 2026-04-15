@@ -1,10 +1,13 @@
 package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,18 +17,34 @@ import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import cash.atto.wallet.components.common.*
+import cash.atto.wallet.components.common.AttoButton
+import cash.atto.wallet.components.common.AttoButtonVariant
+import cash.atto.wallet.components.common.AttoPageFrame
+import cash.atto.wallet.components.common.AttoPanelCard
+import cash.atto.wallet.components.common.AttoTransactionCard
+import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
 import cash.atto.wallet.platform.exportCsvFile
-import cash.atto.wallet.ui.*
+import cash.atto.wallet.ui.AttoFormatter
+import cash.atto.wallet.ui.dark_bg
+import cash.atto.wallet.ui.dark_success
+import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_primary
+import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
@@ -73,14 +92,14 @@ fun TransactionsContent(
         onBack = onBackClick,
         scrollable = false,
         actions = {
-            TransactionsActionButton(
+            AttoButton(
                 text = "Filter",
-                icon = Icons.Outlined.FilterList,
                 onClick = { showFilterDialog = true },
+                icon = Icons.Outlined.FilterList,
+                variant = AttoButtonVariant.Outlined,
             )
-            TransactionsActionButton(
+            AttoButton(
                 text = "Export",
-                icon = Icons.Outlined.Download,
                 onClick = {
                     val fileName = "transactions-${Clock.System.now().toEpochMilliseconds()}.csv"
                     scope.launch {
@@ -93,6 +112,8 @@ fun TransactionsContent(
                             }
                     }
                 },
+                icon = Icons.Outlined.Download,
+                variant = AttoButtonVariant.Outlined,
             )
         },
     ) {
@@ -148,9 +169,10 @@ fun TransactionsContent(
                     items = filteredTransactions,
                     key = { transaction -> transaction.hash ?: transaction.height.value.toString() },
                 ) { transaction ->
-                    Box(modifier = Modifier.clickable { selectedTransaction = transaction }) {
-                        AttoTransactionCard(transaction = transaction)
-                    }
+                    AttoTransactionCard(
+                        transaction = transaction,
+                        onClick = { selectedTransaction = transaction },
+                    )
                 }
             }
         }
@@ -213,39 +235,6 @@ private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TransactionsActionButton(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(dark_surface)
-                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                ).padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        androidx.compose.material3.Icon(
-            imageVector = icon,
-            contentDescription = text,
-            tint = dark_text_primary,
-        )
-        Text(
-            text = text,
-            color = dark_text_primary,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
-        )
     }
 }
 

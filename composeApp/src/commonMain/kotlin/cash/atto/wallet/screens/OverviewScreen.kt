@@ -240,6 +240,8 @@ private fun OverviewLeftColumn(
     onReceiveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val stakingInteractionSource = remember { MutableInteractionSource() }
+    val stakingHovered by stakingInteractionSource.collectIsHoveredAsState()
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -421,20 +423,12 @@ private fun OverviewLeftColumn(
             }
         }
 
-        val stakingInteractionSource = remember { MutableInteractionSource() }
-        val stakingHovered by stakingInteractionSource.collectIsHoveredAsState()
         OverviewCard(
             modifier =
                 Modifier
-                    .alpha(if (isWalletInitialized) 1f else 0.55f)
-                    .clickable(
-                        enabled = isWalletInitialized,
-                        interactionSource = stakingInteractionSource,
-                        indication = null,
-                        onClick = onStakingClick,
-                    ),
-            background = if (isWalletInitialized && stakingHovered) OverviewSurfaceAlt else OverviewSurface,
-            borderColor = if (isWalletInitialized && stakingHovered) OverviewAccent.copy(alpha = 0.32f) else OverviewBorder,
+                    .alpha(if (isWalletInitialized) 1f else 0.55f),
+            interactionSource = if (isWalletInitialized) stakingInteractionSource else null,
+            onClick = if (isWalletInitialized) onStakingClick else null,
             contentPadding = PaddingValues(24.dp),
         ) {
             Row(
@@ -486,7 +480,7 @@ private fun OverviewLeftColumn(
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                     contentDescription = null,
-                    tint = OverviewTextDim,
+                    tint = attoHoverTint(OverviewTextDim, stakingHovered),
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -760,6 +754,8 @@ private fun OverviewCard(
     contentPadding: PaddingValues = PaddingValues(20.dp),
     background: Color = OverviewSurface,
     borderColor: Color = OverviewBorder,
+    interactionSource: MutableInteractionSource? = null,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     AttoCard(
@@ -767,6 +763,8 @@ private fun OverviewCard(
         background = background,
         border = borderColor,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
+        onClick = onClick,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

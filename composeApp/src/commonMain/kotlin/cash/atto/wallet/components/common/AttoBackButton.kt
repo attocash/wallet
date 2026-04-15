@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_border_subtle
 import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.dark_surface_alt
 
 @Composable
 fun AttoRoundButton(
@@ -27,14 +31,22 @@ fun AttoRoundButton(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+
     Box(
         modifier =
             modifier
                 .size(40.dp)
-                .background(dark_surface, CircleShape)
-                .border(1.dp, dark_border, CircleShape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
+                .background(
+                    color = if (hovered) dark_surface_alt else dark_surface,
+                    shape = CircleShape,
+                ).border(
+                    width = 1.dp,
+                    color = if (hovered) dark_border_subtle else dark_border,
+                    shape = CircleShape,
+                ).clickable(
+                    interactionSource = interactionSource,
                     indication = null,
                     onClick = onClick,
                 ),

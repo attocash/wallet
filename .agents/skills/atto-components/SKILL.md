@@ -19,6 +19,12 @@ Use shared Compose components first. Match theme, spacing, typography, and inter
 
 - Prefer `composeApp/src/commonMain` for reusable UI. Use platform-specific component directories only when the implementation truly depends on Android, Desktop, or Wasm APIs.
 - Prefer `AttoButton`, `AttoTextField`, `AttoCard`, `AttoModal`, and other shared wrappers over raw Material components when they cover the use case.
+- Prefer direct use of shared interactive components before adding screen-level wrappers.
+- When a shared component already supports `onClick`, `enabled`, hover, or other interaction behavior, use that API instead of wrapping it in extra `clickable` layers or custom containers.
+- If a shared component looks wrong in a valid screen usage, fix the shared component baseline first instead of patching one screen.
+- Avoid adding new customization parameters to shared components unless there is a repeated, real product need.
+- Shared reusable components should keep same look and behavior across screens. Do not create screen-specific variants when shared component should stay consistent.
+- For transaction UI, prefer `AttoTransactionCard` directly. Keep one visual treatment and one interaction pattern across overview, transactions, send, receive, and result screens.
 - Wrap previews in `AttoWalletTheme`.
 - Keep existing naming: reusable wallet-specific components start with `Atto`.
 - When adding a new reusable component, keep its API small and align parameter names with nearby components.

@@ -20,12 +20,17 @@ Use existing Atto look. Keep screens dark, calm, premium, structured. Gold and v
 
 - Use `dark_bg` for page background.
 - Use `dark_surface` for cards and panels.
-- Use `dark_surface_alt` for hover or raised state.
-- Use `dark_border` for panel outlines and separators.
+- Use `dark_surface_alt` for hover or raised backgrounds on cards, outlined buttons, and other dark controls.
+- Use `dark_border` for default outlines on cards, panels, and outlined buttons.
+- Use `dark_border_subtle` for secondary-button hover borders.
+- Use `dark_border_muted` for hover borders on outlined buttons and hoverable cards, including transaction cards.
 - Use `dark_text_primary` for main content.
 - Use `dark_text_secondary` for supporting copy.
 - Use dimmer text tokens for metadata.
 - Use `dark_accent` as main brand accent.
+- Use `gold_100` only for primary / accent button hover fill. Not for normal borders.
+- Use `dark_accent_soft` for soft accent secondary fill and `dark_accent_soft_hover` for its hover fill.
+- Avoid `dark_accent_border_hover` for normal hover feedback. Use only for selected, highlighted, or special-emphasis states.
 - Use `dark_violet` or `dark_success` only for secondary emphasis, status, or category split.
 - Keep corners rounded, not soft-heavy. Most panels use `RoundedCornerShape(12.dp)`. Small icon chips use `8.dp`.
 - Keep panels airy. Common inner padding: `20.dp` or `24.dp`.

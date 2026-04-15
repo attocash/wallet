@@ -3,6 +3,7 @@ package cash.atto.wallet.components.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import cash.atto.wallet.ui.attoHoverTint
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.dark_text_secondary
 
 private val attoModalWidth = 520.dp
 private val attoModalContentPadding = PaddingValues(20.dp)
@@ -76,6 +80,8 @@ fun AttoModal(
                             onClick = {},
                         ),
             ) {
+                val closeInteractionSource = remember { MutableInteractionSource() }
+                val closeHovered by closeInteractionSource.collectIsHoveredAsState()
                 Row(
                     modifier =
                         Modifier
@@ -98,7 +104,7 @@ fun AttoModal(
                             Modifier
                                 .size(28.dp)
                                 .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
+                                    interactionSource = closeInteractionSource,
                                     indication = null,
                                     onClick = onDismiss,
                                 ),
@@ -107,7 +113,7 @@ fun AttoModal(
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = "Close",
-                            tint = Color.White,
+                            tint = attoHoverTint(dark_text_secondary, closeHovered),
                             modifier = Modifier.size(24.dp),
                         )
                     }

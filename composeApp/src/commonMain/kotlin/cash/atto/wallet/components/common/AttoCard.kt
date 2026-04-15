@@ -13,8 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_border_muted
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_surface_alt
 
@@ -23,7 +23,7 @@ import cash.atto.wallet.ui.dark_surface_alt
  *
  * Provides a [dark_surface] background with a 1 dp [dark_border] outline and
  * rounded corners. On hover the background lightens to [dark_surface_alt] and
- * the border gains a subtle accent tint, matching the WelcomeScreen card style.
+ * the border darkens slightly to keep the edge readable without using accent color.
  */
 @Composable
 fun AttoCard(
@@ -32,12 +32,13 @@ fun AttoCard(
     hoverBackground: Color = dark_surface_alt,
     border: Color = dark_border,
     contentPadding: PaddingValues = PaddingValues(20.dp),
+    interactionSource: MutableInteractionSource? = null,
     onClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val cornerRadius = 12.dp
-    val interactionSource = remember { MutableInteractionSource() }
-    val hovered by interactionSource.collectIsHoveredAsState()
+    val resolvedInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
+    val hovered by resolvedInteractionSource.collectIsHoveredAsState()
 
     Box(
         modifier =
@@ -48,14 +49,14 @@ fun AttoCard(
                     shape = RoundedCornerShape(cornerRadius),
                 ).border(
                     width = 1.dp,
-                    color = if (hovered) dark_accent.copy(alpha = 0.32f) else border,
+                    color = if (hovered) dark_border_muted else border,
                     shape = RoundedCornerShape(cornerRadius),
                 ).let {
                     if (onClick == null) {
                         it
                     } else {
                         it.clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = resolvedInteractionSource,
                             indication = null,
                             onClick = onClick,
                         )

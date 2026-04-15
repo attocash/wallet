@@ -2,6 +2,7 @@ package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.ui.attoHoverTint
 import cash.atto.wallet.ui.dark_text_tertiary
 import kotlinx.coroutines.delay
 
@@ -51,6 +53,8 @@ fun AttoCopyButton(
     onCopied: (() -> Unit)? = null,
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
     var copied by remember { mutableStateOf(false) }
 
     LaunchedEffect(copied) {
@@ -65,7 +69,7 @@ fun AttoCopyButton(
             modifier
                 .size(size)
                 .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     indication = null,
                 ) {
                     clipboardManager.setText(AnnotatedString(text))
@@ -77,7 +81,7 @@ fun AttoCopyButton(
         Icon(
             imageVector = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
             contentDescription = contentDescription,
-            tint = if (copied) confirmTint else tint,
+            tint = if (copied) confirmTint else attoHoverTint(tint, hovered),
             modifier = Modifier.size(size * 2 / 3),
         )
     }
