@@ -37,13 +37,31 @@ internal fun decodeQrFromCanvas(canvas: HTMLCanvasElement): JsString? =
         try {
             var ZXingLib = window.ZXing || (typeof ZXing !== 'undefined' ? ZXing : null);
             if (!ZXingLib) return null;
-            var source = new ZXingLib.HTMLCanvasElementLuminanceSource(canvas);
+            var ctx = canvas.__attoCtx || canvas.getContext('2d');
+            if (!ctx) return null;
+            var width = canvas.width;
+            var height = canvas.height;
+            if (width === 0 || height === 0) return null;
+            var imageData = ctx.getImageData(0, 0, width, height);
+            var data = imageData.data;
+            var len = width * height;
+            var luminances = new Uint8ClampedArray(len);
+            for (var i = 0; i < len; i++) {
+                var offset = i * 4;
+                luminances[i] = ((data[offset] * 306 + data[offset + 1] * 601 + data[offset + 2] * 117 + 0x200) >> 10);
+            }
+            var source = new ZXingLib.RGBLuminanceSource(luminances, width, height);
             var binarizer = new ZXingLib.HybridBinarizer(source);
             var bitmap = new ZXingLib.BinaryBitmap(binarizer);
+            var hints = new Map();
+            hints.set(ZXingLib.DecodeHintType.TRY_HARDER, true);
             var reader = new ZXingLib.QRCodeReader();
-            var result = reader.decode(bitmap);
+            var result = reader.decode(bitmap, hints);
             return result ? result.getText() : null;
         } catch (e) {
+            if (e.name && e.name !== 'NotFoundException') {
+                console.error('QR decode error:', e);
+            }
             return null;
         }
     }
@@ -57,6 +75,8 @@ internal fun createVideoElement(): HTMLVideoElement =
         var video = document.createElement('video');
         video.setAttribute('autoplay', '');
         video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.muted = true;
         video.style.display = 'block';
         video.style.width = '100%';
         video.style.height = '100%';
@@ -86,13 +106,19 @@ internal fun getUserMedia(
         """
     {
         var constraints = { video: { facingMode: { ideal: 'environment' } } };
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(function(stream) {
-                video.srcObject = stream;
-                return video.play();
-            })
-            .then(function() {
-                onSuccess();
+        function startStream(c) {
+            return navigator.mediaDevices.getUserMedia(c)
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    return video.play();
+                })
+                .then(function() {
+                    onSuccess();
+                });
+        }
+        startStream(constraints)
+            .catch(function(err) {
+                return startStream({ video: true });
             })
             .catch(function(err) {
                 onError(err.message || 'Camera access denied');
@@ -124,8 +150,17 @@ internal fun drawVideoFrame(
         """
     {
         if (video.readyState !== video.HAVE_ENOUGH_DATA) return false;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        var vw = video.videoWidth;
+        var vh = video.videoHeight;
+        if (vw === 0 || vh === 0) return false;
+        var maxDim = 640;
+        if (vw > maxDim || vh > maxDim) {
+            var scale = maxDim / Math.max(vw, vh);
+            vw = Math.round(vw * scale);
+            vh = Math.round(vh * scale);
+        }
+        canvas.width = vw;
+        canvas.height = vh;
         if (canvas.width === 0 || canvas.height === 0) return false;
         var ctx = canvas.__attoCtx;
         if (!ctx) {
