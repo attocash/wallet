@@ -16,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -106,6 +108,8 @@ private fun AttoTopBar(
     hasCachedWork: Boolean,
     onLock: () -> Unit,
 ) {
+    val showCachedWorkInfo = rememberSaveable { mutableStateOf(false) }
+
     Row(
         modifier =
             modifier
@@ -140,6 +144,7 @@ private fun AttoTopBar(
                 AttoShellStatusIndicator(
                     compact = compact,
                     hasCachedWork = hasCachedWork,
+                    onClick = { showCachedWorkInfo.value = true },
                 )
             }
             Row(
@@ -163,6 +168,13 @@ private fun AttoTopBar(
             }
         }
     }
+
+    if (showCachedWorkInfo.value) {
+        CachedWorkInfoDialog(
+            hasCachedWork = hasCachedWork,
+            onDismiss = { showCachedWorkInfo.value = false },
+        )
+    }
 }
 
 @Composable
@@ -180,11 +192,19 @@ private fun AttoShellBrandMark() {
 private fun AttoShellStatusIndicator(
     compact: Boolean,
     hasCachedWork: Boolean,
+    onClick: () -> Unit,
 ) {
     val statusColor = if (hasCachedWork) dark_success else dark_accent
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
+        modifier =
+            Modifier
+                .size(28.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier =
@@ -193,6 +213,69 @@ private fun AttoShellStatusIndicator(
                     .clip(CircleShape)
                     .background(statusColor),
         )
+    }
+}
+
+@Composable
+private fun CachedWorkInfoDialog(
+    hasCachedWork: Boolean,
+    onDismiss: () -> Unit,
+) {
+    val highlightColor = if (hasCachedWork) dark_success else dark_accent
+    val highlightIcon = if (hasCachedWork) Icons.Outlined.CheckCircle else Icons.Outlined.WarningAmber
+    val highlightTitle = if (hasCachedWork) "Work ready" else "Preparing work"
+    val highlightDescription =
+        if (hasCachedWork) {
+            "Your wallet has already prepared the required work, so your next transaction can be sent immediately."
+        } else {
+            "Your wallet is preparing the required work in the background. Once it is ready, your next transaction can be sent immediately."
+        }
+
+    AttoModal(
+        title = "About spam protection",
+        onDismiss = onDismiss,
+    ) {
+        Text(
+            text =
+                "Before a transaction is sent, your wallet prepares a tiny amount of work. " +
+                    "This helps protect the network from spam. It does not cost any ATTO " +
+                    "and can be prepared ahead of time.",
+            color = dark_text_secondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(highlightColor.copy(alpha = 0.03f))
+                    .border(1.dp, highlightColor.copy(alpha = 0.19f), RoundedCornerShape(8.dp))
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Icon(
+                imageVector = highlightIcon,
+                contentDescription = null,
+                tint = highlightColor,
+                modifier = Modifier.size(18.dp),
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    text = highlightTitle,
+                    color = highlightColor,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W700),
+                )
+                Text(
+                    text = highlightDescription,
+                    color = dark_text_secondary,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
     }
 }
 
