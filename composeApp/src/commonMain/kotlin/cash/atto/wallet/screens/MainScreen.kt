@@ -50,7 +50,9 @@ fun MainScreen(
         uiState = uiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
+        showBackupDialog = showBackupDialog.value,
         onBackupClick = { showBackupDialog.value = true },
+        onDismissBackup = { showBackupDialog.value = false },
         hasCachedWork = hasCachedWork.value,
         onLock = { viewModel.lock() },
         onShowLogout = { viewModel.showLogoutDialog() },
@@ -62,13 +64,6 @@ fun MainScreen(
         },
         qrScannerContent = qrScannerContent,
     )
-
-    if (showBackupDialog.value) {
-        BackupSecretDialog(
-            onDismiss = { showBackupDialog.value = false },
-            compact = isCompactWidth(),
-        )
-    }
 }
 
 @Composable
@@ -76,7 +71,9 @@ fun MainScreenContent(
     uiState: MainScreenUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
+    showBackupDialog: Boolean,
     onBackupClick: () -> Unit,
+    onDismissBackup: () -> Unit,
     hasCachedWork: Boolean,
     onLock: () -> Unit,
     onShowLogout: () -> Unit,
@@ -106,6 +103,13 @@ fun MainScreenContent(
         CompositionLocalProvider(
             LocalViewModelStoreOwner provides viewModelStoreOwner,
         ) {
+            if (showBackupDialog) {
+                BackupSecretDialog(
+                    onDismiss = onDismissBackup,
+                    compact = isCompactWidth(),
+                )
+            }
+
             when (navState) {
                 MainScreenNavDestination.OVERVIEW -> {
                     OverviewScreen(

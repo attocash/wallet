@@ -4,7 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -23,14 +31,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.settings_subtitle
-import attowallet.composeapp.generated.resources.settings_title
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
-import cash.atto.wallet.ui.*
+import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_danger
+import cash.atto.wallet.ui.dark_success
+import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.dark_text_dim
+import cash.atto.wallet.ui.dark_text_primary
+import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.uistate.settings.SettingsUiState
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen(
@@ -41,16 +51,16 @@ fun SettingsScreen(
     onLogoutClick: () -> Unit,
 ) {
     AttoPageFrame(
-        title = stringResource(Res.string.settings_title),
-        subtitle = stringResource(Res.string.settings_subtitle),
+        title = "Settings",
+        subtitle = "Manage wallet recovery, device security, and application information.",
         onBack = onBackClick,
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val compact = isCompactWidth()
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val compact = maxWidth < 1040.dp
 
             if (compact) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     SettingsActionsPanel(
@@ -64,11 +74,11 @@ fun SettingsScreen(
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
                 ) {
                     SettingsActionsPanel(
-                        modifier = Modifier.weight(5f),
+                        modifier = Modifier.weight(5f).fillMaxSize(),
                         uiState = uiState,
                         onBackupClick = onBackupClick,
                         onLockClick = onLockClick,
@@ -111,7 +121,9 @@ private fun SettingsActionsPanel(
 }
 
 @Composable
-private fun SettingsMetadataPanel(modifier: Modifier) {
+private fun SettingsMetadataPanel(
+    modifier: Modifier,
+) {
     AttoPanelCard(
         modifier = modifier.fillMaxWidth(),
     ) {

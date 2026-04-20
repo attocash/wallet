@@ -1,11 +1,6 @@
 package cash.atto.wallet.components.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,14 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoWordChip
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -46,7 +39,7 @@ fun BackupSecretDialog(
     }
 
     AttoModal(
-        title = stringResource(Res.string.secret_title),
+        title = "Recovery Phrase",
         onDismiss = onDismiss,
     ) {
         BackupWordGrid(
@@ -62,14 +55,7 @@ fun BackupSecretDialog(
         ) {
             AttoButton(
                 variant = AttoButtonVariant.Outlined,
-                text =
-                    stringResource(
-                        if (uiState.hidden) {
-                            Res.string.settings_backup_show
-                        } else {
-                            Res.string.settings_backup_hide
-                        },
-                    ),
+                text = if (uiState.hidden) "Show phrase" else "Hide phrase",
                 onClick = {
                     if (uiState.hidden) {
                         viewModel.showSecretPhrase()
@@ -77,24 +63,17 @@ fun BackupSecretDialog(
                         viewModel.hideSecretPhrase()
                     }
                 },
-                icon =
-                    if (uiState.hidden) {
-                        Icons.Outlined.Visibility
-                    } else {
-                        Icons.Outlined.VisibilityOff
-                    },
                 modifier = Modifier.weight(1f),
             )
 
             AttoButton(
-                text = if (copied) "" else stringResource(Res.string.secret_copy),
+                text = if (copied) "" else "Copy",
                 onClick = {
                     clipboardManager.setText(
                         AnnotatedString(uiState.words.joinToString(" ")),
                     )
                     copied = true
                 },
-                icon = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
                 modifier = Modifier.weight(1f),
             )
         }

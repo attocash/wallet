@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -110,11 +107,14 @@ fun AttoModal(
                                 ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close",
-                            tint = attoHoverTint(dark_text_secondary, closeHovered),
-                            modifier = Modifier.size(24.dp),
+                        Text(
+                            text = "×",
+                            color = attoHoverTint(dark_text_secondary, closeHovered),
+                            style =
+                                MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.W500,
+                                    fontSize = 24.sp,
+                                ),
                         )
                     }
                 }

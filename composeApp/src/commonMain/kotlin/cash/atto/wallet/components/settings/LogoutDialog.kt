@@ -14,21 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.logout_cancel
-import attowallet.composeapp.generated.resources.logout_confirm
-import attowallet.composeapp.generated.resources.logout_input_hint
-import attowallet.composeapp.generated.resources.logout_input_label
-import attowallet.composeapp.generated.resources.logout_text
-import attowallet.composeapp.generated.resources.logout_text_recovery
-import attowallet.composeapp.generated.resources.logout_title
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoCapsLabel
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
-import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -40,7 +31,7 @@ fun LogoutDialog(
     val canConfirm = confirmationText == "WIPE"
 
     AttoModal(
-        title = stringResource(Res.string.logout_title),
+        title = "Logout",
         onDismiss = onDismiss,
     ) {
         Column(
@@ -48,34 +39,34 @@ fun LogoutDialog(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = stringResource(Res.string.logout_text),
+                text = "Logging out clears the wallet keys stored on this device.",
                 color = Color.White.copy(alpha = 0.7f),
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                text = stringResource(Res.string.logout_text_recovery),
+                text = "Make sure you have your recovery phrase saved before continuing.",
                 color = Color.White.copy(alpha = 0.7f),
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
 
-        AttoCapsLabel(stringResource(Res.string.logout_input_label))
+        AttoCapsLabel("Type WIPE to confirm")
         AttoTextField(
             value = confirmationText,
             onValueChange = { confirmationText = it },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             placeholder = {
                 Text(
-                    text = stringResource(Res.string.logout_input_hint),
+                    text = "WIPE",
                     color = Color.White.copy(alpha = 0.4f),
                 )
             },
         )
 
         AttoButton(
-            text = stringResource(Res.string.logout_confirm),
+            text = "Logout",
             variant = AttoButtonVariant.Danger,
             onClick = onConfirm,
             enabled = canConfirm,
@@ -83,7 +74,7 @@ fun LogoutDialog(
         )
 
         AttoButton(
-            text = stringResource(Res.string.logout_cancel),
+            text = "Cancel",
             variant = AttoButtonVariant.Outlined,
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth(),
