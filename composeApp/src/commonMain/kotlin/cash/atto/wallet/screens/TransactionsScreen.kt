@@ -9,21 +9,26 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +43,7 @@ import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTransactionCard
 import cash.atto.wallet.components.common.AttoTransactionDetailsDialog
 import cash.atto.wallet.platform.exportCsvFile
-import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.dark_bg
-import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_primary
@@ -48,163 +51,333 @@ import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
-import cash.atto.wallet.viewmodel.OverviewViewModel
+import cash.atto.wallet.uistate.transactions.TransactionsSummaryUiState
+import cash.atto.wallet.viewmodel.TransactionsViewModel
 import kotlinx.coroutines.launch
-import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 
 @Composable
 fun TransactionsScreen(onBackClick: () -> Unit) {
-    KoinContext {
-        val overviewViewModel = koinViewModel<OverviewViewModel>()
-        val overviewUiState = overviewViewModel.state.collectAsState()
+    val viewModel = koinViewModel<TransactionsViewModel>()
+    val uiState = viewModel.state.collectAsState()
 
-        TransactionsContent(
-            transactions =
-                overviewUiState.value.transactionListUiState.transactions
-                    .filterNotNull(),
-            onBackClick = onBackClick,
+    TransactionsContent(
+        loadedTransactions = uiState.value.loadedTransactions,
+        fullHistorySummary = uiState.value.fullHistorySummary,
+        isLoadingInitial = uiState.value.isLoadingInitial,
+        isLoadingMore = uiState.value.isLoadingMore,
+        hasMore = uiState.value.hasMore,
+        onLoadMore = viewModel::loadMore,
+        onBackClick = onBackClick,
+        onExport = { selectedTypes, sink ->
+            viewModel.exportTransactions(selectedTypes, sink)
+        },
+    )
+}
+
+@Composable
+fun TransactionsContent(
+    loadedTransactions: List<TransactionUiState>,
+    fullHistorySummary: TransactionsSummaryUiState,
+    isLoadingInitial: Boolean,
+    isLoadingMore: Boolean,
+    hasMore: Boolean,
+    onLoadMore: () -> Unit,
+    onBackClick: () -> Unit,
+    onExport: suspend (Set<TransactionType>, kotlinx.io.Sink) -> Unit,
+) {
+    val screenState = rememberTransactionsScreenState()
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+    val filteredTransactions =
+        remember(loadedTransactions, screenState.selectedTypes) {
+            loadedTransactions.filter { it.type in screenState.selectedTypes }
+        }
+
+    LaunchedEffect(listState, hasMore, isLoadingMore, loadedTransactions.size) {
+        snapshotFlow {
+            shouldLoadMoreTransactions(
+                hasMore = hasMore,
+                isLoadingMore = isLoadingMore,
+                loadedTransactionsCount = loadedTransactions.size,
+                lastVisibleItemIndex =
+                    listState.layoutInfo.visibleItemsInfo
+                        .lastOrNull()
+                        ?.index,
+                totalItemsCount = listState.layoutInfo.totalItemsCount,
+            )
+        }.collect { shouldLoadMore ->
+            if (shouldLoadMore) {
+                onLoadMore()
+            }
+        }
+    }
+
+    AttoPageFrame(
+        title = "Transaction History",
+        subtitle = "Recent first. Older entries load on demand.",
+        onBack = onBackClick,
+        scrollable = false,
+        actions = {
+            TransactionsTopActions(
+                onFilterClick = screenState::showFilterDialog,
+                onExportClick = {
+                    val fileName = "transactions-${Clock.System.now().toEpochMilliseconds()}.csv"
+                    scope.launch {
+                        val message =
+                            runCatching {
+                                val export =
+                                    exportCsvFile(fileName) { sink ->
+                                        onExport(screenState.selectedTypes, sink)
+                                    }
+                                "CSV exported to ${export.location}"
+                            }.getOrElse { error ->
+                                error.message ?: "Unable to export CSV."
+                            }
+                        screenState.showExportMessage(message)
+                    }
+                },
+            )
+        },
+    ) {
+        TransactionsDialogs(
+            screenState = screenState,
+        )
+
+        TransactionsHistoryList(
+            listState = listState,
+            loadedTransactions = loadedTransactions,
+            filteredTransactions = filteredTransactions,
+            summary = fullHistorySummary,
+            isLoadingInitial = isLoadingInitial,
+            isLoadingMore = isLoadingMore,
+            hasMore = hasMore,
+            isFilterActive = screenState.isFilterActive,
+            onLoadMore = onLoadMore,
+            onTransactionClick = screenState::selectTransaction,
         )
     }
 }
 
 @Composable
-fun TransactionsContent(
-    transactions: List<TransactionUiState>,
-    onBackClick: () -> Unit,
+private fun TransactionsTopActions(
+    onFilterClick: () -> Unit,
+    onExportClick: () -> Unit,
 ) {
-    var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
-    var showFilterDialog by remember { mutableStateOf(false) }
-    var selectedTypes by remember {
-        mutableStateOf(TransactionType.entries.toSet())
+    AttoButton(
+        text = "Filter",
+        onClick = onFilterClick,
+        icon = Icons.Outlined.FilterList,
+        variant = AttoButtonVariant.Outlined,
+    )
+    AttoButton(
+        text = "Export",
+        onClick = onExportClick,
+        icon = Icons.Outlined.Download,
+        variant = AttoButtonVariant.Outlined,
+    )
+}
+
+@Composable
+private fun TransactionsDialogs(screenState: TransactionsScreenState) {
+    screenState.selectedTransaction?.let { transaction ->
+        AttoTransactionDetailsDialog(
+            transaction = transaction,
+            onDismiss = screenState::dismissTransaction,
+        )
     }
-    var exportMessage by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
-    val compact = isCompactWidth()
-    val filteredTransactions =
-        remember(transactions, selectedTypes) {
-            transactions.filter { it.type in selectedTypes }
-        }
+    if (screenState.isFilterDialogVisible) {
+        TransactionFilterDialog(
+            selectedTypes = screenState.selectedTypes,
+            onDismiss = screenState::dismissFilterDialog,
+            onApply = screenState::applyFilter,
+        )
+    }
+    screenState.exportMessage?.let { message ->
+        TransactionsMessageDialog(
+            title = "Export",
+            message = message,
+            onDismiss = screenState::clearExportMessage,
+        )
+    }
+}
 
-    AttoPageFrame(
-        title = "Transaction History",
-        subtitle = "Complete record of all wallet transactions",
-        onBack = onBackClick,
-        scrollable = false,
-        actions = {
-            AttoButton(
-                text = "Filter",
-                onClick = { showFilterDialog = true },
-                icon = Icons.Outlined.FilterList,
-                variant = AttoButtonVariant.Outlined,
-            )
-            AttoButton(
-                text = "Export",
-                onClick = {
-                    val fileName = "transactions-${Clock.System.now().toEpochMilliseconds()}.csv"
-                    scope.launch {
-                        exportMessage =
-                            runCatching {
-                                val export = exportCsvFile(fileName, filteredTransactions)
-                                "CSV exported to ${export.location}"
-                            }.getOrElse { error ->
-                                error.message ?: "Unable to export CSV."
-                            }
-                    }
-                },
-                icon = Icons.Outlined.Download,
-                variant = AttoButtonVariant.Outlined,
-            )
-        },
+@Composable
+private fun TransactionsHistoryList(
+    listState: LazyListState,
+    loadedTransactions: List<TransactionUiState>,
+    filteredTransactions: List<TransactionUiState>,
+    summary: TransactionsSummaryUiState,
+    isLoadingInitial: Boolean,
+    isLoadingMore: Boolean,
+    hasMore: Boolean,
+    isFilterActive: Boolean,
+    onLoadMore: () -> Unit,
+    onTransactionClick: (TransactionUiState) -> Unit,
+) {
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        selectedTransaction?.let { transaction ->
-            AttoTransactionDetailsDialog(
-                transaction = transaction,
-                onDismiss = { selectedTransaction = null },
-            )
-        }
-        if (showFilterDialog) {
-            TransactionFilterDialog(
-                selectedTypes = selectedTypes,
-                onDismiss = { showFilterDialog = false },
-                onApply = {
-                    selectedTypes = it
-                    showFilterDialog = false
-                },
-            )
-        }
-        exportMessage?.let { message ->
-            TransactionsMessageDialog(
-                title = "Export",
-                message = message,
-                onDismiss = { exportMessage = null },
+        item {
+            TransactionsSummaryGrid(
+                summary = summary,
+                displayedTransactions = filteredTransactions,
+                isFilterActive = isFilterActive,
             )
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item {
-                TransactionsSummaryGrid(transactions = filteredTransactions)
+        when {
+            isLoadingInitial && loadedTransactions.isEmpty() -> {
+                item {
+                    TransactionsLoadingCard(
+                        message = "Loading recent transactions...",
+                    )
+                }
             }
 
-            if (filteredTransactions.isEmpty()) {
+            filteredTransactions.isEmpty() -> {
                 item {
-                    AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text =
-                                if (transactions.isEmpty()) {
-                                    "No transactions yet. Once your wallet starts moving ATTO, the full ledger will appear here."
-                                } else {
-                                    "No transactions match the current filter."
-                                },
-                            color = dark_text_secondary,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
+                    TransactionsInfoCard(
+                        message =
+                            if (loadedTransactions.isEmpty()) {
+                                "No transactions yet. Once your wallet starts moving ATTO, the history will appear here."
+                            } else if (hasMore) {
+                                "No loaded transactions match the current filter yet. Load older entries to keep searching."
+                            } else {
+                                "No transactions match the current filter."
+                            },
+                    )
                 }
-            } else {
+            }
+
+            else -> {
                 items(
                     items = filteredTransactions,
                     key = { transaction -> transaction.hash ?: transaction.height.value.toString() },
                 ) { transaction ->
                     AttoTransactionCard(
                         transaction = transaction,
-                        onClick = { selectedTransaction = transaction },
+                        onClick = { onTransactionClick(transaction) },
                     )
                 }
+            }
+        }
+
+        if (isLoadingMore) {
+            item {
+                TransactionsLoadingCard(
+                    message = "Loading older transactions...",
+                )
+            }
+        } else if (!isLoadingInitial && hasMore) {
+            item {
+                TransactionsLoadMoreCard(
+                    loadedTransactions = loadedTransactions,
+                    filteredTransactions = filteredTransactions,
+                    isFilterActive = isFilterActive,
+                    onLoadMore = onLoadMore,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
-    val (received, sent) =
-        remember(transactions) {
-            transactions.fold(0.0 to 0.0) { (receivedTotal, sentTotal), transaction ->
-                when (transaction.type) {
-                    TransactionType.RECEIVE -> (receivedTotal + parseAmount(transaction.amount)) to sentTotal
-                    TransactionType.SEND -> receivedTotal to (sentTotal + parseAmount(transaction.amount))
-                    else -> receivedTotal to sentTotal
-                }
-            }
+private fun TransactionsLoadingCard(message: String) {
+    AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CircularProgressIndicator()
+            Text(
+                text = message,
+                color = dark_text_secondary,
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
+    }
+}
 
+@Composable
+private fun TransactionsInfoCard(message: String) {
+    AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = message,
+            color = dark_text_secondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+private fun TransactionsLoadMoreCard(
+    loadedTransactions: List<TransactionUiState>,
+    filteredTransactions: List<TransactionUiState>,
+    isFilterActive: Boolean,
+    onLoadMore: () -> Unit,
+) {
+    AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text =
+                    if (isFilterActive) {
+                        "Showing ${filteredTransactions.size} matching transactions from ${loadedTransactions.size} loaded."
+                    } else {
+                        "Showing ${loadedTransactions.size} loaded transactions."
+                    },
+                color = dark_text_secondary,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            AttoButton(
+                text = "Load Older Transactions",
+                onClick = onLoadMore,
+                variant = AttoButtonVariant.Outlined,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TransactionsSummaryGrid(
+    summary: TransactionsSummaryUiState,
+    displayedTransactions: List<TransactionUiState>,
+    isFilterActive: Boolean,
+) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val compact = isCompactWidth()
         val rows =
             listOf(
-                Triple("Total Transactions", transactions.size.toString(), dark_text_primary),
-                Triple("Total Received", "+${formatAmount(received)}", dark_success),
-                Triple("Total Sent", "-${formatAmount(sent)}", dark_text_primary),
-                Triple("Net Change", formatSignedAmount(received - sent), dark_success),
+                Triple("Transactions", summary.totalTransactions.toString(), dark_text_primary),
+                Triple("Total Received", summary.totalReceivedText, dark_success),
+                Triple("Total Sent", summary.totalSentText, dark_text_primary),
+                Triple("Net Change", summary.netChangeText, dark_success),
             )
 
         if (compact) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (summary.isLoading) {
+                    Text(
+                        text = "Calculating full-history totals...",
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                if (isFilterActive) {
+                    Text(
+                        text = "Filter active: showing ${displayedTransactions.size} matching loaded transactions.",
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
                 rows.chunked(2).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -222,17 +395,36 @@ private fun TransactionsSummaryGrid(transactions: List<TransactionUiState>) {
                 }
             }
         } else {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                rows.forEach { (label, value, accent) ->
-                    TransactionsSummaryCard(
-                        modifier = Modifier.weight(1f),
-                        label = label,
-                        value = value,
-                        accent = accent,
+                if (summary.isLoading) {
+                    Text(
+                        text = "Calculating full-history totals...",
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.bodySmall,
                     )
+                }
+                if (isFilterActive) {
+                    Text(
+                        text = "Filter active: showing ${displayedTransactions.size} matching loaded transactions.",
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    rows.forEach { (label, value, accent) ->
+                        TransactionsSummaryCard(
+                            modifier = Modifier.weight(1f),
+                            label = label,
+                            value = value,
+                            accent = accent,
+                        )
+                    }
                 }
             }
         }
@@ -311,7 +503,15 @@ private fun TransactionFilterDialog(
                 )
                 AttoButton(
                     text = "Apply",
-                    onClick = { onApply(localSelection.ifEmpty { TransactionType.entries.toSet() }) },
+                    onClick = {
+                        onApply(
+                            if (localSelection.isEmpty()) {
+                                TransactionType.entries.toSet()
+                            } else {
+                                localSelection
+                            },
+                        )
+                    },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -367,9 +567,6 @@ private fun TransactionsSummaryCard(
     }
 }
 
-private fun formatSignedAmount(value: Double): String =
-    if (value >= 0) "+${formatAmount(value)}" else "-${formatAmount(kotlin.math.abs(value))}"
-
 private fun transactionTypeDescription(type: TransactionType): String =
     when (type) {
         TransactionType.SEND -> "Outgoing transfers"
@@ -377,16 +574,3 @@ private fun transactionTypeDescription(type: TransactionType): String =
         TransactionType.OPEN -> "Account opening entries"
         TransactionType.CHANGE -> "Representative change entries"
     }
-
-private fun parseAmount(amount: String?): Double {
-    val raw =
-        amount
-            .orEmpty()
-            .replace("+", "")
-            .replace("-", "")
-            .replace(",", "")
-            .trim()
-    return raw.toDoubleOrNull() ?: 0.0
-}
-
-private fun formatAmount(amount: Double): String = AttoFormatter.format(BigDecimal.fromDouble(amount))

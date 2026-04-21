@@ -8,15 +8,21 @@ data class CsvExportResult(
     val location: String,
 )
 
-expect fun exportCsvFile(
+expect suspend fun exportCsvFile(
     fileName: String,
-    transactions: List<TransactionUiState>,
+    writeCsv: suspend (Sink) -> Unit,
 ): CsvExportResult
 
 internal fun writeTransactionsCsv(
     sink: Sink,
     transactions: List<TransactionUiState>,
 ) {
+    writeTransactionsCsvHeader(sink)
+    appendTransactionsCsvRows(sink, transactions)
+    sink.flush()
+}
+
+internal fun writeTransactionsCsvHeader(sink: Sink) {
     sink.writeCsvRow(
         "type",
         "amount",
@@ -26,7 +32,12 @@ internal fun writeTransactionsCsv(
         "height",
         "hash",
     )
+}
 
+internal fun appendTransactionsCsvRows(
+    sink: Sink,
+    transactions: List<TransactionUiState>,
+) {
     transactions.forEach { transaction ->
         sink.writeCsvRow(
             transaction.type.name,
@@ -38,8 +49,6 @@ internal fun writeTransactionsCsv(
             transaction.hash.orEmpty(),
         )
     }
-
-    sink.flush()
 }
 
 private fun Sink.writeCsvRow(vararg values: String) {

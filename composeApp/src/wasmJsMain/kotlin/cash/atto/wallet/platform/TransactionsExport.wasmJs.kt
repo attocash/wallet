@@ -1,8 +1,8 @@
 package cash.atto.wallet.platform
 
-import cash.atto.wallet.uistate.overview.TransactionUiState
 import kotlinx.browser.document
 import kotlinx.io.Buffer
+import kotlinx.io.Sink
 import kotlinx.io.readString
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.url.URL
@@ -12,12 +12,12 @@ import kotlin.js.JsAny
 import kotlin.js.JsArray
 import kotlin.js.toJsString
 
-actual fun exportCsvFile(
+actual suspend fun exportCsvFile(
     fileName: String,
-    transactions: List<TransactionUiState>,
+    writeCsv: suspend (Sink) -> Unit,
 ): CsvExportResult {
     val buffer = Buffer()
-    writeTransactionsCsv(buffer, transactions)
+    writeCsv(buffer)
     val parts =
         JsArray<JsAny?>().also {
             it[0] = buffer.readString().toJsString()

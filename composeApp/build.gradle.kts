@@ -59,6 +59,7 @@ kotlin {
         val wasmJsMain by getting
         val androidInstrumentedTest by getting
         val commonMain by getting
+        val commonTest by getting
         val androidMain by getting
 
         val jvmMain by creating {
@@ -97,6 +98,10 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
 
             implementation(libs.room3.runtime)
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
 
         androidMain.dependencies {

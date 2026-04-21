@@ -3,8 +3,7 @@ package cash.atto.wallet.di
 import androidx.room3.Room
 import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
-import cash.atto.wallet.datasource.AppDatabaseWasmJs
-import cash.atto.wallet.datasource.AppDatabaseWasmJsConstructor
+import cash.atto.wallet.datasource.AppDatabaseConstructor
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
@@ -15,8 +14,8 @@ import org.w3c.dom.Worker
 
 private val database by lazy {
     Room
-        .inMemoryDatabaseBuilder<AppDatabaseWasmJs>(
-            factory = AppDatabaseWasmJsConstructor::initialize,
+        .inMemoryDatabaseBuilder<AppDatabase>(
+            factory = AppDatabaseConstructor::initialize,
         ).setDriver(WebWorkerSQLiteDriver(createWorker()))
         .build()
 }

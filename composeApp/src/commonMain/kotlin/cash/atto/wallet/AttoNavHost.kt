@@ -2,9 +2,11 @@ package cash.atto.wallet
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import cash.atto.wallet.components.common.AttoLoader
 import cash.atto.wallet.screens.*
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
@@ -26,6 +28,13 @@ fun AttoApp(
         ) -> Unit
     )? = null,
 ) {
+    val fontFamilyResolver = LocalFontFamilyResolver.current
+    val fontFamily = attoFontFamily()
+
+    LaunchedEffect(fontFamilyResolver, fontFamily) {
+        fontFamilyResolver.preload(fontFamily)
+    }
+
     AttoWalletTheme {
         val viewModel = koinViewModel<AppViewModel>()
         val uiState = viewModel.state.collectAsState()

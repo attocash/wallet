@@ -3,14 +3,14 @@ package cash.atto.wallet.platform
 import android.content.ContentValues
 import android.os.Environment
 import android.provider.MediaStore
-import cash.atto.wallet.uistate.overview.TransactionUiState
+import kotlinx.io.Sink
 import kotlinx.io.asSink
 import kotlinx.io.buffered
 import org.koin.core.context.GlobalContext
 
-actual fun exportCsvFile(
+actual suspend fun exportCsvFile(
     fileName: String,
-    transactions: List<TransactionUiState>,
+    writeCsv: suspend (Sink) -> Unit,
 ): CsvExportResult {
     val context = GlobalContext.get().get<android.content.Context>()
     val resolver = context.contentResolver
@@ -28,7 +28,7 @@ actual fun exportCsvFile(
     val outputStream = resolver.openOutputStream(uri) ?: error("Failed to open CSV export stream.")
     val sink = outputStream.asSink().buffered()
     try {
-        writeTransactionsCsv(sink, transactions)
+        writeCsv(sink)
     } finally {
         sink.close()
     }

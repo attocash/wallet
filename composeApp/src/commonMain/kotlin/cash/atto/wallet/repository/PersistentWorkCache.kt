@@ -3,7 +3,7 @@ package cash.atto.wallet.repository
 import cash.atto.commons.AttoWork
 import cash.atto.commons.wallet.AttoWorkCache
 import cash.atto.wallet.datasource.AppDatabase
-import cash.atto.wallet.datasource.createWork
+import cash.atto.wallet.datasource.Work
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +34,12 @@ class PersistentWorkCache(
 
     override suspend fun save(work: AttoWork) {
         dao.clear()
-        dao.set(createWork(ByteArray(32), work.value))
+        dao.set(
+            Work(
+                publicKey = ByteArray(32),
+                value = work.value,
+            ),
+        )
         _hasCachedWork.value = true
     }
 }

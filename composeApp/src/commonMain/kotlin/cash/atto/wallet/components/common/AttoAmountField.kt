@@ -136,7 +136,10 @@ private fun sanitizeAmountInput(value: String): String {
 
     value.forEach { character ->
         when {
-            character.isDigit() -> builder.append(character)
+            character.isDigit() -> {
+                builder.append(character)
+            }
+
             character == '.' && !hasDecimalSeparator -> {
                 hasDecimalSeparator = true
                 builder.append(character)

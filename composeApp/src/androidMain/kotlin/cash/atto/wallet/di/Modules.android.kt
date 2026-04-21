@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room3.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
-import cash.atto.wallet.datasource.AppDatabaseAndroid
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
@@ -16,7 +15,7 @@ import org.koin.dsl.module
 fun getDatabaseBuilder(ctx: Context): AppDatabase {
     val dbFile = ctx.getDatabasePath("atto-wallet.db")
     return Room
-        .databaseBuilder<AppDatabaseAndroid>(ctx, dbFile.absolutePath)
+        .databaseBuilder<AppDatabase>(ctx, dbFile.absolutePath)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()

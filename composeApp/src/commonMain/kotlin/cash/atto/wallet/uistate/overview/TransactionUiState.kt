@@ -33,11 +33,22 @@ data class TransactionUiState
             amount?.let { a ->
                 if (a.firstOrNull() == '+' || a.firstOrNull() == '-') {
                     val sign = a.split(' ').getOrNull(0)
-                    val number = try { a.split(' ').getOrNull(1)?.toBigDecimal() } catch (_: Exception) { null }
+                    val number =
+                        try {
+                            a.split(' ').getOrNull(1)?.toBigDecimal()
+                        } catch (_: Exception) {
+                            null
+                        }
 
                     "$sign ${AttoFormatter.format(number)}"
                 } else {
-                    AttoFormatter.format(try { a.toBigDecimal() } catch (_: Exception) { null })
+                    AttoFormatter.format(
+                        try {
+                            a.toBigDecimal()
+                        } catch (_: Exception) {
+                            null
+                        },
+                    )
                 }
             } ?: " "
 

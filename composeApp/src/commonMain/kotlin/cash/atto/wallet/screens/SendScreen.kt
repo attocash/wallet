@@ -20,13 +20,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.ui.*
-import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.uistate.send.SendFromUiState
 import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -347,7 +347,13 @@ private fun SendFormPanel(
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.W600),
                     )
                     Text(
-                        text = "${AttoFormatter.format(try { uiState.accountBalance?.toBigDecimal() } catch (_: Exception) { null })} ATTO",
+                        text = "${AttoFormatter.format(
+                            try {
+                                uiState.accountBalance?.toBigDecimal()
+                            } catch (_: Exception) {
+                                null
+                            },
+                        )} ATTO",
                         color = dark_text_primary,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
                     )

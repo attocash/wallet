@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.ui.*
-import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 

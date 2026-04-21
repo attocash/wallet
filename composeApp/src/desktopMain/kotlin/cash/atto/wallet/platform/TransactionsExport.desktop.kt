@@ -1,13 +1,13 @@
 package cash.atto.wallet.platform
 
-import cash.atto.wallet.uistate.overview.TransactionUiState
+import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 
-actual fun exportCsvFile(
+actual suspend fun exportCsvFile(
     fileName: String,
-    transactions: List<TransactionUiState>,
+    writeCsv: suspend (Sink) -> Unit,
 ): CsvExportResult {
     val home = System.getProperty("user.home")
     val downloads = Path(home, "Downloads")
@@ -22,7 +22,7 @@ actual fun exportCsvFile(
     val target = Path(targetDirectory, fileName)
     val sink = SystemFileSystem.sink(target).buffered()
     try {
-        writeTransactionsCsv(sink, transactions)
+        writeCsv(sink)
     } finally {
         sink.close()
     }

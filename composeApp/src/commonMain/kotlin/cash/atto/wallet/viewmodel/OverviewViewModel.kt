@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import cash.atto.commons.AttoAccountEntry
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
@@ -9,12 +10,14 @@ import cash.atto.wallet.model.getAddressLabel
 import cash.atto.wallet.model.getStakingApy
 import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.model.getVoterLabel
+import cash.atto.wallet.model.mergeAccountEntries
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
+import cash.atto.wallet.uistate.overview.buildTransactionListUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
@@ -24,7 +27,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class OverviewViewModel(
@@ -41,6 +43,7 @@ class OverviewViewModel(
     private var receivablesCollectorJob: Job? = null
     private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
     private var currentRepresentativeAddress: String? = null
+    private var recentEntries: List<AttoAccountEntry> = emptyList()
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -82,8 +85,11 @@ class OverviewViewModel(
                         scope.launch {
                             wallet.accountFlow.collect { account ->
                                 println("Account $account")
-                                val entries =
-                                    persistentAccountEntryRepository.stream(account.publicKey).toList()
+                                recentEntries =
+                                    persistentAccountEntryRepository.listRecent(
+                                        publicKey = account.publicKey,
+                                        limit = RECENT_TRANSACTION_LIMIT,
+                                    )
 
                                 currentRepresentativeAddress =
                                     AttoAddress(
@@ -99,13 +105,7 @@ class OverviewViewModel(
                                                 .toBigDecimal(),
                                         priceUsd = homeRepository.getPriceUsd(),
                                         apy = calculateApy(),
-                                        entries = entries,
-                                        addressLabelResolver = { address ->
-                                            homeRepository.homeResponse.value?.getAddressLabel(address)
-                                        },
-                                        voterLabelResolver = { address ->
-                                            homeRepository.homeResponse.value?.getVoterLabel(address)
-                                        },
+                                        transactionListUiState = buildRecentTransactionListUiState(),
                                         voterName =
                                             currentRepresentativeAddress?.let {
                                                 homeRepository.homeResponse.value?.getVoterLabel(it)
@@ -118,21 +118,18 @@ class OverviewViewModel(
                     accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob =
                         scope.launch {
-                            persistentAccountEntryRepository.flow(wallet.publicKey).collect { _ ->
+                            persistentAccountEntryRepository.flow(wallet.publicKey).collect { entry ->
+                                recentEntries =
+                                    mergeAccountEntries(
+                                        current = recentEntries,
+                                        incoming = entry,
+                                        limit = RECENT_TRANSACTION_LIMIT,
+                                    )
                                 _state.emit(
                                     state.value.copy(
                                         priceUsd = homeRepository.getPriceUsd(),
                                         apy = calculateApy(),
-                                        entries =
-                                            persistentAccountEntryRepository
-                                                .stream(wallet.publicKey)
-                                                .toList(),
-                                        addressLabelResolver = { address ->
-                                            homeRepository.homeResponse.value?.getAddressLabel(address)
-                                        },
-                                        voterLabelResolver = { address ->
-                                            homeRepository.homeResponse.value?.getVoterLabel(address)
-                                        },
+                                        transactionListUiState = buildRecentTransactionListUiState(),
                                         voterName =
                                             currentRepresentativeAddress?.let {
                                                 homeRepository.homeResponse.value?.getVoterLabel(it)
@@ -179,10 +176,29 @@ class OverviewViewModel(
         _state.emit(
             state.value.copy(
                 balance = null,
-                entries = emptyList(),
+                transactionListUiState =
+                    buildTransactionListUiState(
+                        entries = emptyList(),
+                    ),
                 pendingReceivableCount = pendingReceivablesState.count,
                 pendingReceivableAmount = pendingReceivablesState.totalAmount,
             ),
         )
+        recentEntries = emptyList()
+    }
+
+    private fun buildRecentTransactionListUiState() =
+        buildTransactionListUiState(
+            entries = recentEntries,
+            addressLabelResolver = { address ->
+                homeRepository.homeResponse.value?.getAddressLabel(address)
+            },
+            voterLabelResolver = { address ->
+                homeRepository.homeResponse.value?.getVoterLabel(address)
+            },
+        )
+
+    companion object {
+        private const val RECENT_TRANSACTION_LIMIT = 64
     }
 }

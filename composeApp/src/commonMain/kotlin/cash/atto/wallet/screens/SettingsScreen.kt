@@ -121,9 +121,7 @@ private fun SettingsActionsPanel(
 }
 
 @Composable
-private fun SettingsMetadataPanel(
-    modifier: Modifier,
-) {
+private fun SettingsMetadataPanel(modifier: Modifier) {
     AttoPanelCard(
         modifier = modifier.fillMaxWidth(),
     ) {
