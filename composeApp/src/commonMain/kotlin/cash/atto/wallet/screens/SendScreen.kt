@@ -18,10 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import attowallet.composeapp.generated.resources.Res
-import attowallet.composeapp.generated.resources.send_error_address
-import attowallet.composeapp.generated.resources.send_error_amount
-import attowallet.composeapp.generated.resources.send_scan_qr
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.ui.*
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
@@ -32,7 +28,6 @@ import cash.atto.wallet.uistate.send.SendTransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -387,7 +382,7 @@ private fun SendFormPanel(
                                 IconButton(onClick = onShowQr) {
                                     Icon(
                                         imageVector = Icons.Default.QrCodeScanner,
-                                        contentDescription = stringResource(Res.string.send_scan_qr),
+                                        contentDescription = "Scan QR",
                                         tint = dark_accent,
                                     )
                                 }
@@ -402,7 +397,7 @@ private fun SendFormPanel(
                     supportingText = {
                         val message =
                             when {
-                                uiState.showAddressError -> stringResource(Res.string.send_error_address)
+                                uiState.showAddressError -> "Enter a valid ATTO address."
                                 scannerError != null -> scannerError
                                 else -> null
                             }
@@ -430,7 +425,7 @@ private fun SendFormPanel(
                     priceUsd = uiState.priceUsd,
                     label = "Amount",
                     isError = uiState.showAmountError,
-                    errorText = if (uiState.showAmountError) stringResource(Res.string.send_error_amount) else null,
+                    errorText = if (uiState.showAmountError) "Enter a valid amount." else null,
                     imeAction = ImeAction.Done,
                     keyboardActions = KeyboardActions(onDone = { onSendClicked() }),
                     largeFontSize = true,
