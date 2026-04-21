@@ -57,6 +57,7 @@ kotlin {
     sourceSets {
         val desktopMain by getting
         val wasmJsMain by getting
+        val wasmJsTest by getting
         val androidInstrumentedTest by getting
         val commonMain by getting
         val commonTest by getting
@@ -163,6 +164,10 @@ kotlin {
                     "5.6.3",
                 ),
             )
+        }
+
+        wasmJsTest.dependencies {
+            implementation(devNpm("puppeteer", "latest"))
         }
     }
 
@@ -279,8 +284,8 @@ afterEvaluate {
                         (
                             t.name.contains("ResourceAccessors", ignoreCase = true) ||
                                 t.name.contains("ResourceCollectors", ignoreCase = true)
-                        )
-                )
+                            )
+                    )
         }
 
     kspAndroidTasks.configureEach {
