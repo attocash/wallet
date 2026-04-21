@@ -116,22 +116,27 @@ class PersistentAccountEntryRepository(
             val balance = AttoAmount(row.balanceRaw.toULong())
             val previousBalance = AttoAmount(row.previousBalanceRaw.toULong())
             when (blockType) {
-                AttoBlockType.SEND ->
+                AttoBlockType.SEND -> {
                     acc.copy(
                         totalTransactions = acc.totalTransactions + 1,
                         totalSent = acc.totalSent + (previousBalance - balance),
                     )
+                }
 
-                AttoBlockType.RECEIVE, AttoBlockType.OPEN ->
+                AttoBlockType.RECEIVE, AttoBlockType.OPEN -> {
                     acc.copy(
                         totalTransactions = acc.totalTransactions + 1,
                         totalReceived = acc.totalReceived + (balance - previousBalance),
                     )
+                }
 
-                AttoBlockType.CHANGE ->
+                AttoBlockType.CHANGE -> {
                     acc.copy(totalTransactions = acc.totalTransactions + 1)
+                }
 
-                else -> acc
+                else -> {
+                    acc
+                }
             }
         }
     }

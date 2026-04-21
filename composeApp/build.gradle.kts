@@ -284,8 +284,8 @@ afterEvaluate {
                         (
                             t.name.contains("ResourceAccessors", ignoreCase = true) ||
                                 t.name.contains("ResourceCollectors", ignoreCase = true)
-                            )
-                    )
+                        )
+                )
         }
 
     kspAndroidTasks.configureEach {

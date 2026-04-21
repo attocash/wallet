@@ -94,9 +94,10 @@ class OverviewViewModel(
                                         account.representativePublicKey,
                                     ).toString()
 
-                                currentBalance = account.balance
-                                    .toString(AttoUnit.ATTO)
-                                    .toBigDecimal()
+                                currentBalance =
+                                    account.balance
+                                        .toString(AttoUnit.ATTO)
+                                        .toBigDecimal()
 
                                 emitUpdatedState()
                             }

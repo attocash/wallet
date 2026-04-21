@@ -27,24 +27,25 @@ import org.w3c.dom.Worker
  * - Multiple OPFS connections (used with databaseBuilder + named DB) cause
  *   "createSyncAccessHandle" lock contention.
  */
-private class PersistentSingleConnectionDriver(worker: Worker) : SQLiteDriver {
+private class PersistentSingleConnectionDriver(
+    worker: Worker,
+) : SQLiteDriver {
     private val delegate = WebWorkerSQLiteDriver(worker)
 
-    override suspend fun open(fileName: String): SQLiteConnection =
-        delegate.open("atto-wallet.db")
+    override suspend fun open(fileName: String): SQLiteConnection = delegate.open("atto-wallet.db")
 }
 
 private val database by lazy {
-    Room.inMemoryDatabaseBuilder<AppDatabase>(
-        factory = AppDatabaseConstructor::initialize,
-    ).setDriver(PersistentSingleConnectionDriver(createWorker()))
+    Room
+        .inMemoryDatabaseBuilder<AppDatabase>(
+            factory = AppDatabaseConstructor::initialize,
+        ).setDriver(PersistentSingleConnectionDriver(createWorker()))
         .fallbackToDestructiveMigration(dropAllTables = true)
         .build()
 }
 
 @OptIn(ExperimentalWasmJsInterop::class)
-private fun createWorker(): Worker =
-    js("""new Worker(new URL("sqlite-web-worker/worker.js", import.meta.url))""")
+private fun createWorker(): Worker = js("""new Worker(new URL("sqlite-web-worker/worker.js", import.meta.url))""")
 
 actual val databaseModule =
     module {
