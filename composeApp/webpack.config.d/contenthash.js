@@ -1,6 +1,7 @@
 // contenthash.js
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+config.output = config.output || {};
 config.output.filename = "attoWallet.[contenthash].js";
 config.plugins.push(
   new HtmlWebpackPlugin({
