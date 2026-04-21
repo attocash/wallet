@@ -1,25 +1,26 @@
 package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoAccountEntry
+import cash.atto.commons.AttoAmount
+import cash.atto.commons.AttoBlockType
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.wallet.AttoAccountEntryRepository
 import cash.atto.wallet.datasource.AccountEntry
 import cash.atto.wallet.datasource.AppDatabase
-import cash.atto.wallet.model.AccountEntryHistorySnapshot
 import cash.atto.wallet.model.TransactionHistorySummary
-import cash.atto.wallet.model.mergeAccountEntries
-import cash.atto.wallet.model.toTransactionHistorySummary
 import cash.atto.wallet.platform.appendTransactionsCsvRows
 import cash.atto.wallet.platform.writeTransactionsCsvHeader
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.buildTransactionListUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
 import kotlinx.io.Sink
 import kotlinx.serialization.json.Json
 
@@ -30,38 +31,61 @@ class PersistentAccountEntryRepository(
 
     private val flow = MutableSharedFlow<AttoAccountEntry>()
     private val json = Json
-    private var cachedHistory: CachedHistory? = null
+
+    private val writeChannel = Channel<AccountEntry>(capacity = Channel.UNLIMITED)
+
+    init {
+        CoroutineScope(Dispatchers.Default).launch {
+            val batch = mutableListOf<AccountEntry>()
+            for (accountEntry in writeChannel) {
+                batch.add(accountEntry)
+                // Drain all currently buffered entries
+                while (true) {
+                    val next = writeChannel.tryReceive().getOrNull() ?: break
+                    batch.add(next)
+                }
+                try {
+                    dao.saveAll(batch)
+                } catch (e: Exception) {
+                    println("Failed to batch-save ${batch.size} entries: ${e.message}")
+                }
+                batch.clear()
+            }
+        }
+    }
 
     override suspend fun save(entry: AttoAccountEntry) {
-        val json = json.encodeToString(entry)
-        dao.save(
+        // Emit to the in-memory flow first so the UI updates instantly.
+        flow.emit(entry)
+
+        // Queue the DB write for background batched persistence.
+        val jsonStr = json.encodeToString(entry)
+        writeChannel.send(
             AccountEntry(
                 hash = entry.hash.value,
                 publicKey = entry.publicKey.value,
                 height = entry.height.value.toLong(),
-                entry = json,
+                entry = jsonStr,
+                blockType = entry.blockType.name,
+                balanceRaw = entry.balance.raw.toString(),
+                previousBalanceRaw = entry.previousBalance.raw.toString(),
             ),
         )
-        cachedHistory =
-            cachedHistory?.takeIf { it.matches(entry.publicKey) }?.withEntry(entry)
-        flow.emit(entry)
     }
 
     override suspend fun stream(publicKey: AttoPublicKey): Flow<AttoAccountEntry> {
-        val cachedFlow =
+        val lastEntryFlow =
             flow {
-                emitAll(historySnapshot(publicKey).entries.asFlow())
+                last(publicKey)?.let { emit(it) }
             }
 
-        return merge(cachedFlow, flow(publicKey))
+        return merge(lastEntryFlow, flow(publicKey))
     }
 
     override suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? =
         dao.last(publicKey.value)?.let { json.decodeFromString<AttoAccountEntry>(it) }
 
     fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> = flow.filter { it.publicKey == publicKey }
-
-    suspend fun list(publicKey: AttoPublicKey): List<AttoAccountEntry> = historySnapshot(publicKey).entries
 
     suspend fun listBefore(
         publicKey: AttoPublicKey,
@@ -80,23 +104,37 @@ class PersistentAccountEntryRepository(
             dao.listRecent(publicKey.value, limit),
         )
 
-    suspend fun historySnapshot(publicKey: AttoPublicKey): AccountEntryHistorySnapshot {
-        val cached = cachedHistory
-        if (cached != null && cached.matches(publicKey)) {
-            return cached.snapshot
+    suspend fun summary(publicKey: AttoPublicKey): TransactionHistorySummary {
+        val rows = dao.summaryRows(publicKey.value)
+        return rows.fold(TransactionHistorySummary()) { acc, row ->
+            val blockType =
+                try {
+                    AttoBlockType.valueOf(row.blockType)
+                } catch (_: Exception) {
+                    return@fold acc
+                }
+            val balance = AttoAmount(row.balanceRaw.toULong())
+            val previousBalance = AttoAmount(row.previousBalanceRaw.toULong())
+            when (blockType) {
+                AttoBlockType.SEND ->
+                    acc.copy(
+                        totalTransactions = acc.totalTransactions + 1,
+                        totalSent = acc.totalSent + (previousBalance - balance),
+                    )
+
+                AttoBlockType.RECEIVE, AttoBlockType.OPEN ->
+                    acc.copy(
+                        totalTransactions = acc.totalTransactions + 1,
+                        totalReceived = acc.totalReceived + (balance - previousBalance),
+                    )
+
+                AttoBlockType.CHANGE ->
+                    acc.copy(totalTransactions = acc.totalTransactions + 1)
+
+                else -> acc
+            }
         }
-
-        val snapshot =
-            buildHistorySnapshot(
-                decodeEntries(
-                    dao.list(publicKey.value),
-                ),
-            )
-        cachedHistory = CachedHistory(publicKey.value.copyOf(), snapshot)
-        return snapshot
     }
-
-    suspend fun summary(publicKey: AttoPublicKey): TransactionHistorySummary = historySnapshot(publicKey).summary
 
     suspend fun exportCsv(
         publicKey: AttoPublicKey,
@@ -152,37 +190,6 @@ class PersistentAccountEntryRepository(
     }
 
     private fun decodeEntries(entries: List<String>): List<AttoAccountEntry> = entries.map { json.decodeFromString<AttoAccountEntry>(it) }
-
-    private fun buildHistorySnapshot(entries: List<AttoAccountEntry>): AccountEntryHistorySnapshot =
-        AccountEntryHistorySnapshot(
-            entries = entries,
-            summary =
-                entries.fold(TransactionHistorySummary()) { summary, entry ->
-                    summary + entry.toTransactionHistorySummary()
-                },
-        )
-
-    private data class CachedHistory(
-        val publicKey: ByteArray,
-        val snapshot: AccountEntryHistorySnapshot,
-    ) {
-        fun matches(publicKey: AttoPublicKey): Boolean = this.publicKey.contentEquals(publicKey.value)
-
-        fun withEntry(entry: AttoAccountEntry): CachedHistory {
-            val mergedEntries = mergeAccountEntries(snapshot.entries, entry)
-            if (mergedEntries.size == snapshot.entries.size) {
-                return this
-            }
-
-            return copy(
-                snapshot =
-                    snapshot.copy(
-                        entries = mergedEntries,
-                        summary = snapshot.summary + entry.toTransactionHistorySummary(),
-                    ),
-            )
-        }
-    }
 
     private companion object {
         private const val EXPORT_PAGE_SIZE = 500

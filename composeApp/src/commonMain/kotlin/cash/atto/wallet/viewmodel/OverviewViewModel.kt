@@ -44,6 +44,7 @@ class OverviewViewModel(
     private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
     private var currentRepresentativeAddress: String? = null
     private var recentEntries: List<AttoAccountEntry> = emptyList()
+    private var currentBalance: BigDecimal? = null
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -80,16 +81,12 @@ class OverviewViewModel(
                             )
                         }",
                     )
+
                     accountCollectorJob?.cancel()
                     accountCollectorJob =
                         scope.launch {
                             wallet.accountFlow.collect { account ->
                                 println("Account $account")
-                                recentEntries =
-                                    persistentAccountEntryRepository.listRecent(
-                                        publicKey = account.publicKey,
-                                        limit = RECENT_TRANSACTION_LIMIT,
-                                    )
 
                                 currentRepresentativeAddress =
                                     AttoAddress(
@@ -97,27 +94,28 @@ class OverviewViewModel(
                                         account.representativePublicKey,
                                     ).toString()
 
-                                _state.emit(
-                                    state.value.copy(
-                                        balance =
-                                            account.balance
-                                                .toString(AttoUnit.ATTO)
-                                                .toBigDecimal(),
-                                        priceUsd = homeRepository.getPriceUsd(),
-                                        apy = calculateApy(),
-                                        transactionListUiState = buildRecentTransactionListUiState(),
-                                        voterName =
-                                            currentRepresentativeAddress?.let {
-                                                homeRepository.homeResponse.value?.getVoterLabel(it)
-                                            },
-                                    ),
-                                )
+                                currentBalance = account.balance
+                                    .toString(AttoUnit.ATTO)
+                                    .toBigDecimal()
+
+                                emitUpdatedState()
                             }
                         }
 
                     accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob =
                         scope.launch {
+                            // Load persisted entries from DB so they show after a page refresh.
+                            val persisted =
+                                persistentAccountEntryRepository.listRecent(
+                                    wallet.publicKey,
+                                    RECENT_TRANSACTION_LIMIT,
+                                )
+                            if (persisted.isNotEmpty()) {
+                                recentEntries = persisted
+                                emitUpdatedState()
+                            }
+
                             persistentAccountEntryRepository.flow(wallet.publicKey).collect { entry ->
                                 recentEntries =
                                     mergeAccountEntries(
@@ -125,17 +123,7 @@ class OverviewViewModel(
                                         incoming = entry,
                                         limit = RECENT_TRANSACTION_LIMIT,
                                     )
-                                _state.emit(
-                                    state.value.copy(
-                                        priceUsd = homeRepository.getPriceUsd(),
-                                        apy = calculateApy(),
-                                        transactionListUiState = buildRecentTransactionListUiState(),
-                                        voterName =
-                                            currentRepresentativeAddress?.let {
-                                                homeRepository.homeResponse.value?.getVoterLabel(it)
-                                            },
-                                    ),
-                                )
+                                emitUpdatedState()
                             }
                         }
                 }
@@ -172,7 +160,25 @@ class OverviewViewModel(
         )
     }
 
+    private suspend fun emitUpdatedState() {
+        _state.emit(
+            state.value.copy(
+                balance = currentBalance,
+                priceUsd = homeRepository.getPriceUsd(),
+                apy = calculateApy(),
+                transactionListUiState = buildRecentTransactionListUiState(),
+                voterName =
+                    currentRepresentativeAddress?.let {
+                        homeRepository.homeResponse.value?.getVoterLabel(it)
+                    },
+            ),
+        )
+    }
+
     private suspend fun clearAccountData() {
+        recentEntries = emptyList()
+        currentBalance = null
+        currentRepresentativeAddress = null
         _state.emit(
             state.value.copy(
                 balance = null,
@@ -184,7 +190,6 @@ class OverviewViewModel(
                 pendingReceivableAmount = pendingReceivablesState.totalAmount,
             ),
         )
-        recentEntries = emptyList()
     }
 
     private fun buildRecentTransactionListUiState() =

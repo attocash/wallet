@@ -152,7 +152,7 @@ class TransactionsViewModel(
     }
 
     private suspend fun loadSummary(publicKey: AttoPublicKey) {
-        val summary = persistentAccountEntryRepository.historySnapshot(publicKey).summary
+        val summary = persistentAccountEntryRepository.summary(publicKey)
 
         if (publicKey != currentPublicKey) {
             return

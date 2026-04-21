@@ -11,12 +11,11 @@ import androidx.room3.PrimaryKey
 import androidx.room3.Query
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomWarnings
-import cash.atto.wallet.Config
 
 @OptIn(ExperimentalRoomApi::class)
 @Database(
     entities = [AccountEntry::class, Work::class],
-    version = Config.DATABASE_VERSION,
+    version = 4,
 )
 @Suppress(RoomWarnings.NO_DATABASE_CONSTRUCTOR)
 abstract class AppDatabase : RoomDatabase() {
@@ -33,13 +32,6 @@ interface AccountEntryDao {
             "ORDER BY height DESC LIMIT 1",
     )
     suspend fun last(publicKey: ByteArray): String?
-
-    @Query(
-        "SELECT entry from accountEntries " +
-            "WHERE publicKey = :publicKey " +
-            "ORDER BY height DESC",
-    )
-    suspend fun list(publicKey: ByteArray): List<String>
 
     @Query(
         "SELECT entry from accountEntries " +
@@ -64,6 +56,21 @@ interface AccountEntryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(entry: AccountEntry)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveAll(entries: List<AccountEntry>)
+
+    @Query(
+        "SELECT blockType, balanceRaw, previousBalanceRaw FROM accountEntries " +
+            "WHERE publicKey = :publicKey AND blockType != ''",
+    )
+    suspend fun summaryRows(publicKey: ByteArray): List<SummaryRow>
+
+    data class SummaryRow(
+        val blockType: String,
+        val balanceRaw: String,
+        val previousBalanceRaw: String,
+    )
 }
 
 @Dao
@@ -88,6 +95,9 @@ data class AccountEntry(
     val publicKey: ByteArray,
     val height: Long,
     val entry: String,
+    val blockType: String = "",
+    val balanceRaw: String = "0",
+    val previousBalanceRaw: String = "0",
 )
 
 @Entity(tableName = "work")
