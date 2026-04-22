@@ -17,7 +17,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - run: ./gradlew allTests
+      - run: ./gradlew composeApp:desktopTest
 
       - run: ./gradlew packageDeb
 
@@ -98,7 +98,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - run: ./gradlew allTests
+      - run: ./gradlew :composeApp:wasmJsBrowserTest
 
       - run: ./gradlew wasmJsBrowserDistribution
 
