@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.common.AttoButton
@@ -20,6 +22,7 @@ import cash.atto.wallet.components.common.AttoCapsLabel
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoTextField
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.dark_text_secondary
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -60,9 +63,14 @@ fun LogoutDialog(
             placeholder = {
                 Text(
                     text = "WIPE",
-                    color = Color.White.copy(alpha = 0.4f),
+                    color = dark_text_secondary,
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.W500,
+                        ),
                 )
             },
+            errorLabel = {},
         )
 
         AttoButton(
@@ -70,13 +78,6 @@ fun LogoutDialog(
             variant = AttoButtonVariant.Danger,
             onClick = onConfirm,
             enabled = canConfirm,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        AttoButton(
-            text = "Cancel",
-            variant = AttoButtonVariant.Outlined,
-            onClick = onDismiss,
             modifier = Modifier.fillMaxWidth(),
         )
     }
