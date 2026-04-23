@@ -2,7 +2,6 @@ package cash.atto.wallet.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,10 +33,6 @@ fun MainScreen(
     val workCache = koinInject<PersistentWorkCache>()
     val uiState = viewModel.state.collectAsState()
     val hasCachedWork = workCache.hasCachedWork.collectAsState()
-
-    LaunchedEffect(workCache) {
-        workCache.get()
-    }
 
     val navState =
         rememberSaveable {

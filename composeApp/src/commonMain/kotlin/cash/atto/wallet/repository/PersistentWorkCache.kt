@@ -4,32 +4,37 @@ import cash.atto.commons.AttoWork
 import cash.atto.commons.wallet.AttoWorkCache
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.Work
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class PersistentWorkCache(
     appDatabase: AppDatabase,
 ) : AttoWorkCache {
     private val dao = appDatabase.workDao()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _hasCachedWork = MutableStateFlow(false)
 
     val hasCachedWork: StateFlow<Boolean> = _hasCachedWork.asStateFlow()
 
     init {
-        @OptIn(DelicateCoroutinesApi::class)
-        GlobalScope.launch {
-            _hasCachedWork.value = dao.get() != null
+        scope.launch {
+            while (isActive) {
+                _hasCachedWork.value = dao.get() != null
+                delay(1.seconds)
+            }
         }
     }
 
     override suspend fun get(): AttoWork? {
-        val cachedWork = dao.get()?.let { AttoWork(it.value) }
-        _hasCachedWork.value = false
-        return cachedWork
+        return dao.get()?.let { AttoWork(it.value) }
     }
 
     override suspend fun save(work: AttoWork) {
