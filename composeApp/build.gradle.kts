@@ -44,12 +44,10 @@ val releaseVersion = providers.gradleProperty("app.version").orNull
 val appVersion = releaseVersion ?: gitShortSha()
 val packageVersion = releaseVersion ?: "0.0.0"
 val generatedVersionKotlinDir = layout.buildDirectory.dir("generated/appVersion/commonMain/kotlin")
-val generatedVersionWebResourcesDir = layout.buildDirectory.dir("generated/appVersion/wasmJs/resources")
 
 val generateAppVersionArtifacts =
     tasks.register("generateAppVersionArtifacts") {
         outputs.dir(generatedVersionKotlinDir)
-        outputs.dir(generatedVersionWebResourcesDir)
 
         doLast {
             val kotlinFile =
@@ -67,10 +65,6 @@ val generateAppVersionArtifacts =
                 }
                 """.trimIndent(),
             )
-
-            val versionFile = generatedVersionWebResourcesDir.get().file("version.txt").asFile
-            versionFile.parentFile.mkdirs()
-            versionFile.writeText(appVersion)
         }
     }
 
@@ -114,7 +108,6 @@ kotlin {
         val androidMain by getting
 
         commonMain.kotlin.srcDir(generatedVersionKotlinDir)
-        wasmJsMain.resources.srcDir(generatedVersionWebResourcesDir)
 
         val jvmMain by creating {
             dependsOn(commonMain)
