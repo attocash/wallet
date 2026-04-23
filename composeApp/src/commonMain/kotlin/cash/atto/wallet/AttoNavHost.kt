@@ -20,6 +20,9 @@ fun AttoApp(
     debugScreen: String? = null,
     debugPassword: String? = null,
     initialNavOverride: MainScreenNavDestination? = null,
+    initialSendPaymentRequest: String? = null,
+    initialOpenSendConfirm: Boolean = false,
+    onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -45,6 +48,9 @@ fun AttoApp(
             debugScreen = debugScreen,
             debugPassword = debugPassword,
             initialNavOverride = initialNavOverride,
+            initialSendPaymentRequest = initialSendPaymentRequest,
+            initialOpenSendConfirm = initialOpenSendConfirm,
+            onAuthenticated = onAuthenticated,
             qrScannerContent = qrScannerContent,
             submitPassword = {
                 viewModel.enterPassword(it)
@@ -64,6 +70,9 @@ fun AttoNavHost(
     debugScreen: String? = null,
     debugPassword: String? = null,
     initialNavOverride: MainScreenNavDestination? = null,
+    initialSendPaymentRequest: String? = null,
+    initialOpenSendConfirm: Boolean = false,
+    onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -74,6 +83,19 @@ fun AttoNavHost(
     submitPassword: suspend (String?) -> Boolean,
     onLogout: () -> Unit,
 ) {
+    val authenticationCallbackConsumed = remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.shownScreen, onAuthenticated) {
+        if (
+            !authenticationCallbackConsumed.value &&
+            onAuthenticated != null &&
+            uiState.shownScreen == AppUiState.ShownScreen.OVERVIEW
+        ) {
+            authenticationCallbackConsumed.value = true
+            onAuthenticated()
+        }
+    }
+
     if (debugScreen == "login") {
         val passwordValid =
             remember {
@@ -184,6 +206,8 @@ fun AttoNavHost(
                                 component.navigation.popToFirst()
                             },
                             initialNavOverride = initialNavOverride,
+                            initialSendPaymentRequest = initialSendPaymentRequest,
+                            initialOpenSendConfirm = initialOpenSendConfirm,
                             qrScannerContent = qrScannerContent,
                         )
                     }

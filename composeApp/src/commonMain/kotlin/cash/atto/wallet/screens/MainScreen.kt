@@ -21,6 +21,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MainScreen(
     onLogoutNavigation: () -> Unit,
     initialNavOverride: MainScreenNavDestination? = null,
+    initialSendPaymentRequest: String? = null,
+    initialOpenSendConfirm: Boolean = false,
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -57,6 +59,8 @@ fun MainScreen(
             viewModel.hideLogoutDialog()
             onLogoutNavigation()
         },
+        initialSendPaymentRequest = initialSendPaymentRequest,
+        initialOpenSendConfirm = initialOpenSendConfirm,
         qrScannerContent = qrScannerContent,
     )
 }
@@ -74,6 +78,8 @@ fun MainScreenContent(
     onShowLogout: () -> Unit,
     onDismissLogout: () -> Unit,
     onConfirmLogout: () -> Unit,
+    initialSendPaymentRequest: String? = null,
+    initialOpenSendConfirm: Boolean = false,
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -127,6 +133,8 @@ fun MainScreenContent(
                 MainScreenNavDestination.SEND -> {
                     SendScreen(
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
+                        initialPaymentRequest = initialSendPaymentRequest,
+                        openConfirmOnLaunch = initialOpenSendConfirm,
                         qrScannerContent = qrScannerContent,
                     )
                 }

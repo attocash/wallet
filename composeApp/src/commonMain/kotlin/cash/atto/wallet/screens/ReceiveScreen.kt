@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.QrCode2
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.platform.shareText
 import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
@@ -32,6 +34,7 @@ import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.ReceiveViewModel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -80,6 +83,7 @@ fun ReceiveContent(
         } else {
             ""
         }
+    val walletDeepLink = AttoPaymentRequests.buildWalletDeepLinkFromPaymentRequest(paymentRequest).orEmpty()
 
     AttoPageFrame(
         title = "Receive Atto",
@@ -98,6 +102,7 @@ fun ReceiveContent(
                         modifier = Modifier.fillMaxWidth(),
                         address = address,
                         paymentRequest = paymentRequest,
+                        walletDeepLink = walletDeepLink,
                         requestedAmount = requestedAmount,
                         onRequestedAmountChange = { requestedAmount = it },
                         isUsdMode = isUsdMode,
@@ -122,6 +127,7 @@ fun ReceiveContent(
                         modifier = Modifier.width(480.dp),
                         address = address,
                         paymentRequest = paymentRequest,
+                        walletDeepLink = walletDeepLink,
                         requestedAmount = requestedAmount,
                         onRequestedAmountChange = { requestedAmount = it },
                         isUsdMode = isUsdMode,
@@ -154,6 +160,7 @@ private fun ReceiveQrColumn(
     modifier: Modifier,
     address: String,
     paymentRequest: String,
+    walletDeepLink: String,
     requestedAmount: String,
     onRequestedAmountChange: (String) -> Unit,
     isUsdMode: Boolean,
@@ -245,35 +252,87 @@ private fun ReceiveQrColumn(
         }
 
         val clipboardManager = LocalClipboardManager.current
-        var copied by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
+        var copiedWalletLink by remember { mutableStateOf(false) }
+        var copiedAttoRequest by remember { mutableStateOf(false) }
 
-        LaunchedEffect(copied) {
-            if (copied) {
+        LaunchedEffect(copiedWalletLink) {
+            if (copiedWalletLink) {
                 delay(1000L)
-                copied = false
+                copiedWalletLink = false
             }
         }
 
-        AttoButton(
-            onClick = {
-                if (paymentRequest.isNotBlank()) {
-                    clipboardManager.setText(AnnotatedString(paymentRequest))
-                    copied = true
-                }
-            },
-            variant = AttoButtonVariant.Outlined,
-            text =
-                if (copied) {
-                    "Copied!"
-                } else if (requestedAmount.isNotBlank()) {
-                    "Copy Address + Amount"
-                } else {
-                    "Copy Address"
+        LaunchedEffect(copiedAttoRequest) {
+            if (copiedAttoRequest) {
+                delay(1000L)
+                copiedAttoRequest = false
+            }
+        }
+
+        val compactActions = isCompactWidth()
+        val actionModifier = if (compactActions) Modifier.fillMaxWidth() else Modifier.weight(1f)
+
+        val actionContent: @Composable () -> Unit = {
+            AttoButton(
+                onClick = {
+                    if (walletDeepLink.isNotBlank()) {
+                        coroutineScope.launch {
+                            val shared = shareText(walletDeepLink)
+                            if (!shared) {
+                                clipboardManager.setText(AnnotatedString(walletDeepLink))
+                            }
+                            copiedWalletLink = true
+                        }
+                    }
                 },
-            icon = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = paymentRequest.isNotBlank(),
-        )
+                variant = AttoButtonVariant.Outlined,
+                text =
+                    if (copiedWalletLink) {
+                        ""
+                    } else {
+                        "Share URL"
+                    },
+                icon = if (copiedWalletLink) Icons.Outlined.Check else Icons.Outlined.Share,
+                modifier = actionModifier,
+                enabled = walletDeepLink.isNotBlank(),
+            )
+
+            AttoButton(
+                onClick = {
+                    if (paymentRequest.isNotBlank()) {
+                        clipboardManager.setText(AnnotatedString(paymentRequest))
+                        copiedAttoRequest = true
+                    }
+                },
+                variant = AttoButtonVariant.Outlined,
+                text =
+                    if (copiedAttoRequest) {
+                        ""
+                    } else {
+                        "Copy Address"
+                    },
+                icon = if (copiedAttoRequest) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
+                modifier = actionModifier,
+                enabled = paymentRequest.isNotBlank(),
+            )
+        }
+
+        if (compactActions) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                actionContent()
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                actionContent()
+            }
+        }
     }
 }
 

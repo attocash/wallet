@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SendScreen(
     onBackClick: () -> Unit,
+    initialPaymentRequest: String? = null,
+    openConfirmOnLaunch: Boolean = false,
     qrScannerContent: (@Composable (onResult: (String) -> Unit, onError: (String) -> Unit, onDismiss: () -> Unit) -> Unit)? = null,
 ) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
@@ -46,6 +49,20 @@ fun SendScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val sendNavState = remember { mutableStateOf(SendScreenState.SEND) }
+    val initialRequestConsumed = rememberSaveable(initialPaymentRequest, openConfirmOnLaunch) { mutableStateOf(false) }
+
+    LaunchedEffect(initialPaymentRequest, openConfirmOnLaunch, uiState.value.sendFromUiState.accountSeed) {
+        if (initialRequestConsumed.value) return@LaunchedEffect
+        if (initialPaymentRequest.isNullOrBlank()) return@LaunchedEffect
+        if (uiState.value.sendFromUiState.accountSeed == null) return@LaunchedEffect
+
+        initialRequestConsumed.value = true
+        viewModel.applyPaymentRequest(initialPaymentRequest)
+
+        if (openConfirmOnLaunch && viewModel.checkTransactionData()) {
+            sendNavState.value = SendScreenState.CONFIRM
+        }
+    }
 
     SendScreenContent(
         uiState = uiState.value,
@@ -72,7 +89,14 @@ fun SendScreen(
         },
         onAddressChanged = { address ->
             coroutineScope.launch {
-                if (address != null && address.contains("?amount=")) {
+                if (
+                    address != null &&
+                    (
+                        address.contains("?amount=") ||
+                            address.contains("&amount=") ||
+                            address.contains("receiverAddress=")
+                    )
+                ) {
                     viewModel.applyPaymentRequest(address)
                 } else {
                     viewModel.updateSendInfo(

@@ -31,7 +31,7 @@ data class SendFromUiState(
                 showAmountError = false,
                 showAddressError = false,
                 addressErrorMessage = null,
-                showLoader = true,
+                showLoader = false,
             )
     }
 }

@@ -88,7 +88,7 @@ class SendTransactionViewModel(
 
     suspend fun applyPaymentRequest(paymentRequest: String?) {
         val parsed = AttoPaymentRequests.parse(paymentRequest) ?: return
-        val addressErrorMessage = validateAddress(parsed.address)
+        val addressErrorMessage = validateAddress(parsed.receiverAddress)
         val amountAtto =
             parsed.amountRaw?.let { rawAmount ->
                 try {
@@ -104,7 +104,7 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amountString = amountAtto ?: state.value.sendFromUiState.amountString,
-                address = parsed.address,
+                address = parsed.receiverAddress,
                 priceUsd = homeRepository.getPriceUsd(),
                 isUsdMode = false,
                 showAmountError = false,
@@ -120,17 +120,16 @@ class SendTransactionViewModel(
                 state.value.sendConfirmUiState.amount
                     ?.let(::toAttoAmount)
                     ?: throw IllegalStateException("Invalid amount")
+            val receiverAddress =
+                parseAttoAddress(
+                    state.value.sendConfirmUiState.address,
+                ) ?: throw IllegalStateException("Invalid address")
 
             val block =
                 walletManagerRepository.state
                     .value!!
                     .send(
-                        receiverAddress =
-                            AttoAddress.parse(
-                                state.value
-                                    .sendConfirmUiState
-                                    .address!!,
-                            ),
+                        receiverAddress = receiverAddress,
                         amount = amount,
                     )
 
@@ -230,20 +229,34 @@ class SendTransactionViewModel(
     }
 
     private fun validateAddress(address: String?): String? {
-        val normalizedAddress = address?.trim().orEmpty()
-        if (normalizedAddress.isEmpty()) {
+        val parsedAddress = parseAttoAddress(address)
+        if (address?.trim().isNullOrEmpty()) {
             return null
         }
 
-        if (!AttoAddress.isValid(normalizedAddress)) {
+        if (parsedAddress == null) {
             return "Enter a valid ATTO address."
         }
 
         val currentAddress = state.value.sendFromUiState.accountSeed ?: return null
-        return if (AttoAddress.parse(currentAddress) == AttoAddress.parse(normalizedAddress)) {
+        return if (AttoAddress.parse(currentAddress) == parsedAddress) {
             "You cannot send ATTO to your own address."
         } else {
             null
+        }
+    }
+
+    private fun parseAttoAddress(address: String?): AttoAddress? {
+        val trimmed = address?.trim()?.takeIf { it.isNotBlank() } ?: return null
+        val candidates =
+            listOfNotNull(
+                trimmed,
+                AttoPaymentRequests.extractBareAddress(trimmed),
+                if (trimmed.startsWith("atto://")) null else "atto://$trimmed",
+            ).distinct()
+
+        return candidates.firstNotNullOfOrNull { candidate ->
+            runCatching { AttoAddress.parse(candidate) }.getOrNull()
         }
     }
 
