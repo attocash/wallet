@@ -2,10 +2,17 @@
 
 on:
   workflow_call:
+    inputs:
+      app_version:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ${{ inputs.app_version }}
     steps:
       - uses: actions/checkout@v6
 
@@ -17,9 +24,21 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - run: ./gradlew composeApp:desktopTest
+      - name: Desktop Test
+        run: |
+          if [ -n "$APP_VERSION" ]; then
+            ./gradlew -Papp.version="$APP_VERSION" composeApp:desktopTest
+          else
+            ./gradlew composeApp:desktopTest
+          fi
 
-      - run: ./gradlew packageDeb
+      - name: Package Deb
+        run: |
+          if [ -n "$APP_VERSION" ]; then
+            ./gradlew -Papp.version="$APP_VERSION" packageDeb
+          else
+            ./gradlew packageDeb
+          fi
 
       - name: Rename binary with platform suffix
         run: |
@@ -87,6 +106,8 @@ jobs:
 
   build-web:
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ${{ inputs.app_version }}
     steps:
       - uses: actions/checkout@v6
 
@@ -98,9 +119,21 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - run: ./gradlew :composeApp:wasmJsBrowserTest
+      - name: Wasm Browser Test
+        run: |
+          if [ -n "$APP_VERSION" ]; then
+            ./gradlew -Papp.version="$APP_VERSION" :composeApp:wasmJsBrowserTest
+          else
+            ./gradlew :composeApp:wasmJsBrowserTest
+          fi
 
-      - run: ./gradlew wasmJsBrowserDistribution
+      - name: Wasm Distribution
+        run: |
+          if [ -n "$APP_VERSION" ]; then
+            ./gradlew -Papp.version="$APP_VERSION" wasmJsBrowserDistribution
+          else
+            ./gradlew wasmJsBrowserDistribution
+          fi
 
       - uses: actions/upload-artifact@v7
         with:

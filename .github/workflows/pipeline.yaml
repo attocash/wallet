@@ -10,17 +10,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/build.yaml
-
   version:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-    needs:
-      - build
+      contents: write
     outputs:
       has_release: ${{ steps.version.outputs.has_release }}
       version: ${{ steps.version.outputs.version }}
@@ -40,58 +33,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx --yes -p semantic-release@24.2.7 -p @semantic-release/commit-analyzer@13.0.1 -p @semantic-release/release-notes-generator@14.1.0 node ./scripts/next-release-version.mjs
 
-  release-linux:
-    runs-on: ubuntu-latest
+  build:
+    permissions:
+      contents: read
     needs:
       - version
-    if: ${{ needs.version.outputs.has_release == 'true' }}
-    steps:
-      - uses: actions/checkout@v6
+    uses: ./.github/workflows/build.yaml
+    with:
+      app_version: ${{ needs.version.outputs.version }}
 
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - uses: gradle/actions/setup-gradle@v6
-
-      - name: Build Linux Release Asset
-        run: ./gradlew -Papp.version=${{ needs.version.outputs.version }} packageDeb
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: release-linux
-          path: composeApp/build/compose/binaries/main/deb/*.deb
-
-  release-web:
-    runs-on: ubuntu-latest
-    needs:
-      - version
-    if: ${{ needs.version.outputs.has_release == 'true' }}
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - uses: gradle/actions/setup-gradle@v6
-
-      - name: Build Web Release Asset
-        run: ./gradlew -Papp.version=${{ needs.version.outputs.version }} wasmJsBrowserDistribution
-
-      - name: Archive Web Distribution
-        run: |
-          mkdir -p build/release-assets
-          tar -C composeApp/build/dist/wasmJs/productionExecutable -czf "build/release-assets/AttoWallet-web-${{ needs.version.outputs.version }}.tar.gz" .
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: release-web
-          path: build/release-assets/*.tar.gz
   preview:
     concurrency:
       group: "live"
@@ -126,8 +76,7 @@ jobs:
       pull-requests: write
     needs:
       - version
-      - release-linux
-      - release-web
+      - build
       - preview
     if: ${{ needs.version.outputs.has_release == 'true' }}
     steps:
@@ -142,12 +91,12 @@ jobs:
       - name: Download Release Artifacts
         uses: actions/download-artifact@v8
         with:
-          path: build/release-assets
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v8
-        with:
           path: artifacts
+
+      - name: Archive Web Distribution
+        run: |
+          mkdir -p build/release-assets
+          tar -C artifacts/web -czf "build/release-assets/AttoWallet-web-${{ needs.version.outputs.version }}.tar.gz" .
 
       - name: Publish Release
         env:
@@ -157,7 +106,7 @@ jobs:
       - name: Upload Release Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ needs.version.outputs.tag }}" build/release-assets/release-linux/* build/release-assets/release-web/* --clobber
+        run: gh release upload "${{ needs.version.outputs.tag }}" artifacts/linux/*.deb build/release-assets/*.tar.gz --clobber
 
       - id: deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
