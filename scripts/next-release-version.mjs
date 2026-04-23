@@ -1,31 +1,43 @@
-import semanticRelease from "semantic-release";
+import { appendFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 
-const result = await semanticRelease(
-  {
-    branches: ["main"],
-    tagFormat: "${version}",
-    dryRun: true,
-    ci: false,
-    plugins: [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-    ],
-  },
-  {
-    cwd: process.cwd(),
-    env: process.env,
-    stdout: process.stdout,
-    stderr: process.stderr,
-  },
-);
+const command = [
+  "npx",
+  "--yes",
+  "-p",
+  "semantic-release@24.2.7",
+  "-p",
+  "@semantic-release/commit-analyzer@13.0.1",
+  "-p",
+  "@semantic-release/release-notes-generator@14.1.0",
+  "semantic-release",
+  "--dry-run",
+  "--no-ci",
+];
 
-const hasRelease = Boolean(result?.nextRelease?.version);
-const version = hasRelease ? result.nextRelease.version : "";
-const tag = hasRelease ? result.nextRelease.gitTag : "";
+const result = spawnSync(command[0], command.slice(1), {
+  cwd: process.cwd(),
+  env: process.env,
+  encoding: "utf8",
+});
+
+process.stdout.write(result.stdout ?? "");
+process.stderr.write(result.stderr ?? "");
+
+if (result.status !== 0) {
+  process.exit(result.status ?? 1);
+}
+
+const output = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
+const versionMatch = output.match(/The next release version is ([0-9A-Za-z.+-]+)/);
+const tagMatch = output.match(/Published release ([0-9A-Za-z.+-]+)/);
+
+const version = versionMatch?.[1] ?? "";
+const tag = tagMatch?.[1] ?? (version ? version : "");
+const hasRelease = Boolean(version);
 
 if (process.env.GITHUB_OUTPUT) {
-  const output = await import("node:fs/promises");
-  await output.appendFile(
+  await appendFile(
     process.env.GITHUB_OUTPUT,
     `has_release=${hasRelease}\nversion=${version}\ntag=${tag}\n`,
   );
