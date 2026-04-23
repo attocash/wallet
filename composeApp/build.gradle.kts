@@ -2,6 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
 plugins {
@@ -23,6 +24,55 @@ repositories {
         url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
 }
+
+fun gitShortSha(): String =
+    runCatching {
+        val output = ByteArrayOutputStream()
+        val process =
+            ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+                .directory(rootDir)
+                .redirectErrorStream(true)
+                .start()
+
+        process.inputStream.copyTo(output)
+        check(process.waitFor() == 0)
+
+        output.toString().trim().ifEmpty { "unknown" }
+    }.getOrElse { "unknown" }
+
+val releaseVersion = providers.gradleProperty("app.version").orNull
+val appVersion = releaseVersion ?: gitShortSha()
+val packageVersion = releaseVersion ?: "0.0.0"
+val generatedVersionKotlinDir = layout.buildDirectory.dir("generated/appVersion/commonMain/kotlin")
+val generatedVersionWebResourcesDir = layout.buildDirectory.dir("generated/appVersion/wasmJs/resources")
+
+val generateAppVersionArtifacts =
+    tasks.register("generateAppVersionArtifacts") {
+        outputs.dir(generatedVersionKotlinDir)
+        outputs.dir(generatedVersionWebResourcesDir)
+
+        doLast {
+            val kotlinFile =
+                generatedVersionKotlinDir
+                    .get()
+                    .file("cash/atto/wallet/config/AppVersion.kt")
+                    .asFile
+            kotlinFile.parentFile.mkdirs()
+            kotlinFile.writeText(
+                """
+                package cash.atto.wallet.config
+
+                object AppVersion {
+                    const val value = "$appVersion"
+                }
+                """.trimIndent(),
+            )
+
+            val versionFile = generatedVersionWebResourcesDir.get().file("version.txt").asFile
+            versionFile.parentFile.mkdirs()
+            versionFile.writeText(appVersion)
+        }
+    }
 
 kotlin {
     androidTarget {
@@ -62,6 +112,9 @@ kotlin {
         val commonMain by getting
         val commonTest by getting
         val androidMain by getting
+
+        commonMain.kotlin.srcDir(generatedVersionKotlinDir)
+        wasmJsMain.resources.srcDir(generatedVersionWebResourcesDir)
 
         val jvmMain by creating {
             dependsOn(commonMain)
@@ -176,6 +229,17 @@ kotlin {
     }
 }
 
+tasks.configureEach {
+    if (
+        name.startsWith("compile") ||
+        name.startsWith("ksp") ||
+        name.startsWith("runKtlint") ||
+        name.endsWith("ProcessResources")
+    ) {
+        dependsOn(generateAppVersionArtifacts)
+    }
+}
+
 android {
     namespace = "cash.atto.wallet"
     compileSdk =
@@ -198,7 +262,7 @@ android {
                 .get()
                 .toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = appVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -253,7 +317,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Deb, TargetFormat.Msi, TargetFormat.Dmg, TargetFormat.Rpm)
             packageName = "AttoWallet"
-            packageVersion = "1.0.14"
+            packageVersion = packageVersion
             modules("jdk.charsets")
 
             linux {

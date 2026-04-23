@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
+import cash.atto.wallet.config.AppVersion
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_danger
 import cash.atto.wallet.ui.dark_success
@@ -127,7 +128,7 @@ private fun SettingsMetadataPanel(modifier: Modifier) {
     ) {
         SettingsInfoRow(
             label = "Version",
-            value = "1.0.0",
+            value = AppVersion.value,
             valueColor = dark_text_primary,
         )
         HorizontalDivider(color = dark_border)
