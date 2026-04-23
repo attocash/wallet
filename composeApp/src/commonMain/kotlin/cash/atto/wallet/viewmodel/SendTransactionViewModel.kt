@@ -73,17 +73,22 @@ class SendTransactionViewModel(
         amount: String?,
         address: String?,
     ) {
+        val addressErrorMessage = validateAddress(address)
         _state.emit(
             state.value.copy(
                 amountString = amount,
                 address = address,
                 priceUsd = homeRepository.getPriceUsd(),
+                showAmountError = false,
+                showAddressError = addressErrorMessage != null,
+                addressErrorMessage = addressErrorMessage,
             ),
         )
     }
 
     suspend fun applyPaymentRequest(paymentRequest: String?) {
         val parsed = AttoPaymentRequests.parse(paymentRequest) ?: return
+        val addressErrorMessage = validateAddress(parsed.address)
         val amountAtto =
             parsed.amountRaw?.let { rawAmount ->
                 try {
@@ -103,7 +108,8 @@ class SendTransactionViewModel(
                 priceUsd = homeRepository.getPriceUsd(),
                 isUsdMode = false,
                 showAmountError = false,
-                showAddressError = false,
+                showAddressError = addressErrorMessage != null,
+                addressErrorMessage = addressErrorMessage,
             ),
         )
     }
@@ -166,6 +172,7 @@ class SendTransactionViewModel(
                 operationResult = SendTransactionUiState.SendOperationResult.UNKNOWN,
                 showAmountError = false,
                 showAddressError = false,
+                addressErrorMessage = null,
                 isUsdMode = false,
             ),
         )
@@ -199,13 +206,15 @@ class SendTransactionViewModel(
 
         val amountCheckResult = amount != null && (!state.value.isUsdMode || hasUsdPrice)
 
-        val addressCheckResult =
-            AttoAddress.isValid(
-                state.value
-                    .sendFromUiState
-                    .address
-                    .orEmpty(),
-            )
+        val destinationAddress = state.value.sendFromUiState.address.orEmpty()
+        val liveAddressErrorMessage = validateAddress(destinationAddress)
+        val addressErrorMessage =
+            if (destinationAddress.isBlank()) {
+                "Enter a valid ATTO address."
+            } else {
+                liveAddressErrorMessage
+            }
+        val addressCheckResult = addressErrorMessage == null
 
         _state.emit(
             state.value.copy(
@@ -213,10 +222,29 @@ class SendTransactionViewModel(
                 priceUsd = priceUsd,
                 showAmountError = !amountCheckResult,
                 showAddressError = !addressCheckResult,
+                addressErrorMessage = addressErrorMessage,
             ),
         )
 
         return amountCheckResult && addressCheckResult
+    }
+
+    private fun validateAddress(address: String?): String? {
+        val normalizedAddress = address?.trim().orEmpty()
+        if (normalizedAddress.isEmpty()) {
+            return null
+        }
+
+        if (!AttoAddress.isValid(normalizedAddress)) {
+            return "Enter a valid ATTO address."
+        }
+
+        val currentAddress = state.value.sendFromUiState.accountSeed ?: return null
+        return if (AttoAddress.parse(currentAddress) == AttoAddress.parse(normalizedAddress)) {
+            "You cannot send ATTO to your own address."
+        } else {
+            null
+        }
     }
 
     suspend fun setElapsedMs(ms: Long) {

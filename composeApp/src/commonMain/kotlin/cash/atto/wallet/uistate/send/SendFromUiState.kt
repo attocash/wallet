@@ -12,6 +12,7 @@ data class SendFromUiState(
     val address: String?,
     val showAmountError: Boolean,
     val showAddressError: Boolean,
+    val addressErrorMessage: String?,
     val showLoader: Boolean,
     val isUsdMode: Boolean = false,
     val equivalentDisplay: String = "",
@@ -29,6 +30,7 @@ data class SendFromUiState(
                 address = null,
                 showAmountError = false,
                 showAddressError = false,
+                addressErrorMessage = null,
                 showLoader = true,
             )
     }

@@ -403,7 +403,7 @@ private fun SendFormPanel(
                     supportingText = {
                         val message =
                             when {
-                                uiState.showAddressError -> "Enter a valid ATTO address."
+                                uiState.showAddressError -> uiState.addressErrorMessage ?: "Enter a valid ATTO address."
                                 scannerError != null -> scannerError
                                 else -> null
                             }
