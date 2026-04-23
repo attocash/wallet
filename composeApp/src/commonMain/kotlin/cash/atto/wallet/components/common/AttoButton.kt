@@ -95,7 +95,13 @@ fun AttoButton(
                     } else {
                         Modifier
                     },
-                ).pointerHoverIcon(PointerIcon.Hand)
+                ).then(
+                    if (enabled) {
+                        Modifier.pointerHoverIcon(PointerIcon.Hand)
+                    } else {
+                        Modifier
+                    },
+                )
                 .clickable(
                     enabled = enabled,
                     interactionSource = interactionSource,
