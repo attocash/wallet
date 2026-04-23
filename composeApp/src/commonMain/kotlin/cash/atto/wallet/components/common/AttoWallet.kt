@@ -670,36 +670,3 @@ fun AttoSettingsInfoCard(
         }
     }
 }
-
-@Composable
-fun AttoBackButton(onClick: () -> Unit) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val hovered by interactionSource.collectIsHoveredAsState()
-
-    Row(
-        modifier =
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(if (hovered) dark_surface_alt else dark_surface)
-                .border(
-                    1.dp,
-                    if (hovered) dark_border_subtle else dark_border,
-                    CircleShape,
-                ).pointerHoverIcon(PointerIcon.Hand)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                ) { onClick() }
-                .padding(10.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-            contentDescription = "Back",
-            tint = dark_text_primary,
-            modifier = Modifier.size(20.dp),
-        )
-    }
-}

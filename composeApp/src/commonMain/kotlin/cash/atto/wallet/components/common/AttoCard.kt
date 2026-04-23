@@ -33,6 +33,7 @@ fun AttoCard(
     background: Color = dark_surface,
     hoverBackground: Color = dark_surface_alt,
     border: Color = dark_border,
+    hoverBorder: Color = dark_border_muted,
     contentPadding: PaddingValues = PaddingValues(20.dp),
     interactionSource: MutableInteractionSource? = null,
     onClick: (() -> Unit)? = null,
@@ -51,7 +52,7 @@ fun AttoCard(
                     shape = RoundedCornerShape(cornerRadius),
                 ).border(
                     width = 1.dp,
-                    color = if (hovered) dark_border_muted else border,
+                    color = if (hovered) hoverBorder else border,
                     shape = RoundedCornerShape(cornerRadius),
                 ).let {
                     if (onClick == null) {

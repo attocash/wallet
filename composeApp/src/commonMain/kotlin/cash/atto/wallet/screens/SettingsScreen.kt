@@ -2,12 +2,11 @@ package cash.atto.wallet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,17 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cash.atto.wallet.components.common.AttoCard
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.config.AppVersion
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_danger
 import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_text_dim
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
@@ -174,59 +171,54 @@ private fun AttoSettingsActionRow(
     accent: Color = dark_text_primary,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(dark_surface)
-                .border(1.dp, dark_border, RoundedCornerShape(12.dp))
-                .pointerHoverIcon(PointerIcon.Hand)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) { onClick() }
-                .padding(horizontal = 18.dp, vertical = 18.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    AttoCard(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
+        onClick = onClick,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(accent.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(accent.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = accent,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = title,
+                    color = dark_text_primary,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
+                )
+                subtitle?.let {
+                    Text(
+                        text = it,
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
             Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = accent,
+                imageVector = Icons.Outlined.ChevronRight,
+                contentDescription = null,
+                tint = if (accent == dark_danger) dark_danger else dark_text_dim,
                 modifier = Modifier.size(20.dp),
             )
         }
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = title,
-                color = dark_text_primary,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
-            )
-            subtitle?.let {
-                Text(
-                    text = it,
-                    color = dark_text_secondary,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        }
-        Icon(
-            imageVector = Icons.Outlined.ChevronRight,
-            contentDescription = null,
-            tint = if (accent == dark_danger) dark_danger else dark_text_dim,
-            modifier = Modifier.size(20.dp),
-        )
     }
 }

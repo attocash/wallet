@@ -74,8 +74,7 @@ fun AttoModal(
                         ).background(
                             color = dark_surface,
                             shape = RoundedCornerShape(16.dp),
-                        ).pointerHoverIcon(PointerIcon.Hand)
-                        .clickable(
+                        ).clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {},

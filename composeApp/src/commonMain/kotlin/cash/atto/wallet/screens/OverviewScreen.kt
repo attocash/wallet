@@ -650,107 +650,101 @@ private fun AccountSwitcherRow(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(if (selected) OverviewSurfaceAlt else OverviewSurface)
-                .border(
-                    1.dp,
-                    if (selected) OverviewAccent else OverviewBorder,
-                    RoundedCornerShape(12.dp),
-                ).pointerHoverIcon(PointerIcon.Hand)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                ).padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top,
+    OverviewCard(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(16.dp),
+        background = if (selected) OverviewSurfaceAlt else OverviewSurface,
+        borderColor = if (selected) OverviewAccent else OverviewBorder,
+        onClick = onClick,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .padding(top = 5.dp)
-                    .size(12.dp)
-                    .clip(CircleShape)
-                    .background(account.color),
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            Box(
+                modifier =
+                    Modifier
+                        .padding(top = 5.dp)
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(account.color),
+            )
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = account.name,
+                        color = OverviewText,
+                        style =
+                            MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 15.sp,
+                            ),
+                    )
+                    Text(
+                        text = "#${account.id - 1}",
+                        color = OverviewTextMuted,
+                        style =
+                            MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.W500,
+                                fontSize = 11.sp,
+                            ),
+                    )
+                }
+
                 Text(
-                    text = account.name,
-                    color = OverviewText,
-                    style =
-                        MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 15.sp,
-                        ),
-                )
-                Text(
-                    text = "#${account.id - 1}",
+                    text = account.address,
                     color = OverviewTextMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style =
-                        MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.W500,
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.W400,
                             fontSize = 11.sp,
                         ),
                 )
-            }
 
-            Text(
-                text = account.address,
-                color = OverviewTextMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style =
-                    MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.W400,
-                        fontSize = 11.sp,
-                    ),
-            )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.Bottom,
+                ) {
+                    Text(
+                        text = formatAmount(account.balance),
+                        color = OverviewText,
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 20.sp,
+                            ),
+                    )
+                }
+            }
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = formatAmount(account.balance),
-                    color = OverviewText,
-                    style =
-                        MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 20.sp,
-                        ),
+                AttoCopyButton(
+                    text = account.address,
+                    size = 20.dp,
+                    tint = OverviewTextTertiary,
+                    contentDescription = "Copy address",
+                )
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = null,
+                    tint = OverviewTextTertiary,
+                    modifier = Modifier.size(16.dp),
                 )
             }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AttoCopyButton(
-                text = account.address,
-                size = 20.dp,
-                tint = OverviewTextTertiary,
-                contentDescription = "Copy address",
-            )
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = null,
-                tint = OverviewTextTertiary,
-                modifier = Modifier.size(16.dp),
-            )
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AppBar
+import cash.atto.wallet.components.common.AttoCard
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.settings.EnterVoterBottomSheet
 import cash.atto.wallet.model.Voter
@@ -608,27 +609,29 @@ fun VoterCard(
     // Warning color
     val warningColor = Color(0xFFFF9800) // Orange/Amber color for warnings
 
-    Card(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .pointerHoverIcon(PointerIcon.Hand)
-                .clickable { onClick() },
-        colors =
-            CardDefaults.cardColors(
-                containerColor =
-                    when {
-                        isSelected -> MaterialTheme.colorScheme.primaryContainer
-                        hasWarning -> warningColor.copy(alpha = 0.15f)
-                        else -> MaterialTheme.colorScheme.surfaceVariant
-                    },
-            ),
+    val background =
+        when {
+            isSelected -> MaterialTheme.colorScheme.primaryContainer
+            hasWarning -> warningColor.copy(alpha = 0.15f)
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        }
+    val border =
+        when {
+            isSelected -> MaterialTheme.colorScheme.primary
+            hasWarning -> warningColor.copy(alpha = 0.45f)
+            else -> Color.Transparent
+        }
+
+    AttoCard(
+        background = background,
+        hoverBackground = background,
+        border = border,
+        hoverBorder = border,
+        contentPadding = PaddingValues(16.dp),
+        onClick = onClick,
     ) {
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

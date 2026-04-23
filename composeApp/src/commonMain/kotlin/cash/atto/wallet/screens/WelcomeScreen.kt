@@ -3,8 +3,6 @@ package cash.atto.wallet.screens
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -35,8 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +54,7 @@ import attowallet.composeapp.generated.resources.welcome_stats_market_cap_descri
 import attowallet.composeapp.generated.resources.welcome_stats_price
 import attowallet.composeapp.generated.resources.welcome_stats_price_description
 import attowallet.composeapp.generated.resources.welcome_title
+import cash.atto.wallet.components.common.AttoCard
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_accent_soft
@@ -313,24 +311,15 @@ private fun WelcomeActionCard(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 216.dp)
-                .background(
-                    color = if (isHovered) WelcomeCardHoverBackground else WelcomeCardBackground,
-                    shape = RoundedCornerShape(12.dp),
-                ).border(
-                    width = 1.dp,
-                    color = WelcomeCardBorder,
-                    shape = RoundedCornerShape(12.dp),
-                ).pointerHoverIcon(PointerIcon.Hand)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = onClick,
-                ).padding(24.dp),
+    AttoCard(
+        modifier = modifier.fillMaxWidth().heightIn(min = 216.dp),
+        background = WelcomeCardBackground,
+        hoverBackground = WelcomeCardHoverBackground,
+        border = WelcomeCardBorder,
+        hoverBorder = WelcomeCardBorder,
+        contentPadding = PaddingValues(24.dp),
+        interactionSource = interactionSource,
+        onClick = onClick,
     ) {
         Column(
             modifier =
