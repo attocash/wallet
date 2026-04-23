@@ -15,7 +15,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/build.yaml
 
-  release_version:
+  version:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx --yes -p semantic-release@24.2.7 -p @semantic-release/commit-analyzer@13.0.1 -p @semantic-release/release-notes-generator@14.1.0 node ./scripts/next-release-version.mjs
 
-  release_linux:
+  release-linux:
     runs-on: ubuntu-latest
     needs:
       - release_version
@@ -64,7 +64,7 @@ jobs:
           name: release-linux
           path: composeApp/build/compose/binaries/main/deb/*.deb
 
-  release_web:
+  release-web:
     runs-on: ubuntu-latest
     needs:
       - release_version
