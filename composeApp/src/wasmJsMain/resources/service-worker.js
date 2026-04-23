@@ -1,4 +1,5 @@
-const CACHE_NAME = "atto-wallet-v1";
+const CACHE_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const CACHE_NAME = "atto-wallet-" + CACHE_VERSION;
 const APP_SHELL = [
   "./",
   "./index.html",

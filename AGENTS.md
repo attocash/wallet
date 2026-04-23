@@ -20,7 +20,7 @@
 - If Kotlin/Wasm incremental compilation flakes, rerun the failing Wasm task once with `--rerun-tasks`; `README.md` calls this out explicitly for `wasmJsBrowserDevelopmentRun` and `:composeApp:compileKotlinWasmJs`.
 - Web builds require Node/npm because `composeApp/sqlite-web-worker/package.json` provides the local `sqlite-web-worker` npm dependency used by `wasmJsMain`.
 - Firebase hosting serves `artifacts/web` (`firebase.json`), but Gradle outputs the web bundle to `composeApp/build/dist/wasmJs/productionExecutable`; CI bridges that mismatch by downloading the uploaded web artifact into `artifacts/` before deploy.
-- Releases derive the version by grepping `packageVersion = "..."` from `composeApp/build.gradle.kts`. If you change the desktop package version, keep that exact assignment format intact or the release workflow will miss it.
+- Builds use `app.version` when passed explicitly with `-Papp.version=...`; otherwise `composeApp/build.gradle.kts` falls back to `git rev-parse --short HEAD` for app-facing unreleased versioning. Desktop package metadata still needs a valid numeric version, so unreleased packaging falls back to `0.0.0`.
 - The app is hard-wired to `AttoNetwork.LIVE` in `composeApp/src/commonMain/kotlin/cash/atto/wallet/di/Modules.kt`.
 
 ## Architecture
