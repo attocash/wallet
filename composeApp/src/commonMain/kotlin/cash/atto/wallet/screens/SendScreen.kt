@@ -213,7 +213,7 @@ private fun SendFromContent(
 
     if (showFeeInfo.value) {
         AttoModal(
-            title = "Why Atto is Free?",
+            title = "Why is Atto free?",
             onDismiss = { showFeeInfo.value = false },
         ) {
             Text(
