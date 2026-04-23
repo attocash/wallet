@@ -55,6 +55,7 @@ Use existing Atto look. Keep screens dark, calm, premium, structured. Gold and v
 ## Interaction Rules
 
 - Hover subtle. Usually `dark_surface` -> `dark_surface_alt`, or soft accent fill -> slightly stronger soft accent fill.
+- Pair clickable hover states on web and desktop with `Modifier.pointerHoverIcon(PointerIcon.Hand)` so affordance is visual and cursor-based.
 - Buttons and icon containers feel firm, not glossy.
 - Accent color shows affordance. Not constant decoration.
 - Empty states stay calm, informative, inside same card language as populated state.

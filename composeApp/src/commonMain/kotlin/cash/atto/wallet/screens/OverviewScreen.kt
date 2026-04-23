@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -315,6 +317,7 @@ private fun OverviewLeftColumn(
                             .height(32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(if (switchHovered) OverviewSurfaceAlt else OverviewBorder)
+                            .pointerHoverIcon(PointerIcon.Hand)
                             .clickable(
                                 interactionSource = switchInteractionSource,
                                 indication = null,
@@ -539,7 +542,9 @@ private fun OverviewRightColumn(
             )
             Row(
                 modifier =
-                    Modifier.clickable(
+                    Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = onTransactionsClick,
@@ -655,7 +660,8 @@ private fun AccountSwitcherRow(
                     1.dp,
                     if (selected) OverviewAccent else OverviewBorder,
                     RoundedCornerShape(12.dp),
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = onClick,

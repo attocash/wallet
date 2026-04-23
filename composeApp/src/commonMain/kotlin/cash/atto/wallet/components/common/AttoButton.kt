@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,7 +95,8 @@ fun AttoButton(
                     } else {
                         Modifier
                     },
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     enabled = enabled,
                     interactionSource = interactionSource,
                     indication = null,

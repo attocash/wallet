@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AttoPageFrame
@@ -179,6 +181,7 @@ private fun AttoSettingsActionRow(
                 .clip(RoundedCornerShape(12.dp))
                 .background(dark_surface)
                 .border(1.dp, dark_border, RoundedCornerShape(12.dp))
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

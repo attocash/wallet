@@ -13,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -284,7 +286,8 @@ private fun RecoveryTabButton(
                 .background(
                     color = if (selected) RecoveryGold else Color.Transparent,
                     shape = RoundedCornerShape(8.dp),
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = onClick,
@@ -533,6 +536,7 @@ private fun RecoverySecondaryButton(
                 .height(44.dp)
                 .background(RecoverySurface, RoundedCornerShape(8.dp))
                 .border(1.dp, RecoveryBorder, RoundedCornerShape(8.dp))
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -568,6 +572,7 @@ private fun RecoveryPrimarySoftButton(
                 .height(44.dp)
                 .background(RecoveryGoldSoft, RoundedCornerShape(8.dp))
                 .border(1.dp, RecoveryBorderHover, RoundedCornerShape(8.dp))
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -600,6 +605,7 @@ private fun RecoveryChecklistCard(
                 .fillMaxWidth()
                 .background(RecoverySurface, RoundedCornerShape(8.dp))
                 .border(1.dp, RecoveryBorder, RoundedCornerShape(8.dp))
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -670,7 +676,8 @@ private fun RecoveryContinueButton(
                 .background(
                     color = RecoveryGold.copy(alpha = if (enabled) 1f else 0.4f),
                     shape = RoundedCornerShape(12.dp),
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     enabled = enabled,
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

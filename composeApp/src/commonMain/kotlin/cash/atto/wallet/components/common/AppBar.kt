@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.ic_atto_chevron_left
@@ -45,7 +47,8 @@ fun AppBar(onBackNavigation: () -> Unit) {
                         MaterialTheme.colorScheme
                             .onSurface
                             .copy(alpha = 0.05f),
-                ).clickable { onBackNavigation.invoke() },
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable { onBackNavigation.invoke() },
         ) {
             Icon(
                 modifier = Modifier.align(Alignment.Center),

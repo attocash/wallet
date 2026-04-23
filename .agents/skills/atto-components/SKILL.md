@@ -21,6 +21,7 @@ Use shared Compose components first. Match theme, spacing, typography, and inter
 - Prefer `AttoButton`, `AttoTextField`, `AttoCard`, `AttoModal`, and other shared wrappers over raw Material components when they cover the use case.
 - Prefer direct use of shared interactive components before adding screen-level wrappers.
 - When a shared component already supports `onClick`, `enabled`, hover, or other interaction behavior, use that API instead of wrapping it in extra `clickable` layers or custom containers.
+- For clickable UI on web and desktop, add `Modifier.pointerHoverIcon(PointerIcon.Hand)` on the actual interactive component layer. Prefer fixing shared `Atto*` components first so screens inherit the cursor behavior instead of repeating it locally.
 - If a shared component looks wrong in a valid screen usage, fix the shared component baseline first instead of patching one screen.
 - Avoid adding new customization parameters to shared components unless there is a repeated, real product need.
 - Shared reusable components should keep same look and behavior across screens. Do not create screen-specific variants when shared component should stay consistent.

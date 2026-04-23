@@ -24,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -102,6 +104,7 @@ fun AttoPasswordField(
                     modifier =
                         Modifier
                             .size(24.dp)
+                            .pointerHoverIcon(PointerIcon.Hand)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,

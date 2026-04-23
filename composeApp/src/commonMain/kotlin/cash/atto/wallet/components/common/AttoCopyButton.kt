@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
@@ -68,6 +70,7 @@ fun AttoCopyButton(
         modifier =
             modifier
                 .size(size)
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,

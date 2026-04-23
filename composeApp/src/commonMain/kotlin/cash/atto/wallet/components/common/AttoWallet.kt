@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -199,6 +201,7 @@ private fun AttoShellStatusIndicator(
         modifier =
             Modifier
                 .size(28.dp)
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -330,6 +333,7 @@ fun AttoShellNavRow(
                     Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .background(background)
+                        .pointerHoverIcon(PointerIcon.Hand)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -540,7 +544,8 @@ fun AttoCircleIconButton(
                                 shape = CircleShape,
                             )
                     },
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     interactionSource = interactionSource,
                     indication = null,
                 ) { onClick() },
@@ -681,7 +686,8 @@ fun AttoBackButton(onClick: () -> Unit) {
                     1.dp,
                     if (hovered) dark_border_subtle else dark_border,
                     CircleShape,
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     interactionSource = interactionSource,
                     indication = null,
                 ) { onClick() }

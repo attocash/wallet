@@ -12,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_border_muted
@@ -55,7 +57,7 @@ fun AttoCard(
                     if (onClick == null) {
                         it
                     } else {
-                        it.clickable(
+                        it.pointerHoverIcon(PointerIcon.Hand).clickable(
                             interactionSource = resolvedInteractionSource,
                             indication = null,
                             onClick = onClick,

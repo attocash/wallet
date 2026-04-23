@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
@@ -59,6 +61,7 @@ fun TransactionItem(uiState: TransactionUiState) {
         Modifier
             .clip(MaterialTheme.shapes.medium)
             .background(brush = uiState.cardGradient)
+            .pointerHoverIcon(PointerIcon.Hand)
             .clickable { showDetailDialog = true },
     ) {
         Row(
@@ -188,14 +191,20 @@ fun TransactionDetailDialog(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(uiState.hash.orEmpty()))
                         },
-                        modifier = Modifier.weight(1f),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .pointerHoverIcon(PointerIcon.Hand),
                     ) {
                         Text("Copy Hash")
                     }
 
                     TextButton(
                         onClick = { uriHandler.openUri(explorerUrl) },
-                        modifier = Modifier.weight(1f),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .pointerHoverIcon(PointerIcon.Hand),
                     ) {
                         Text("View in Explorer")
                     }
@@ -203,7 +212,10 @@ fun TransactionDetailDialog(
 
                 TextButton(
                     onClick = onDismiss,
-                    modifier = Modifier.align(Alignment.End),
+                    modifier =
+                        Modifier
+                            .align(Alignment.End)
+                            .pointerHoverIcon(PointerIcon.Hand),
                 ) {
                     Text("Close")
                 }

@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import attowallet.composeapp.generated.resources.Res
@@ -41,6 +43,7 @@ fun AttoReceiveButton(
     Surface(
         modifier =
             modifier
+                .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = ripple(bounded = true),

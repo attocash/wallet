@@ -53,6 +53,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -527,6 +529,7 @@ private fun ImportPasteCard(
             modifier =
                 Modifier
                     .background(ImportGold, RoundedCornerShape(10.dp))
+                    .pointerHoverIcon(PointerIcon.Hand)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,

@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -323,7 +325,8 @@ private fun WelcomeActionCard(
                     width = 1.dp,
                     color = WelcomeCardBorder,
                     shape = RoundedCornerShape(12.dp),
-                ).clickable(
+                ).pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
                     interactionSource = interactionSource,
                     indication = null,
                     onClick = onClick,

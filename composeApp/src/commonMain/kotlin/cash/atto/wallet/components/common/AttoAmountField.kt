@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,6 +74,7 @@ fun AttoAmountField(
                             .clip(RoundedCornerShape(6.dp))
                             .background(dark_accent.copy(alpha = 0.12f))
                             .border(1.dp, dark_accent.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                            .pointerHoverIcon(PointerIcon.Hand)
                             .clickable { onToggleCurrency() }
                             .padding(horizontal = 10.dp, vertical = 4.dp),
                 ) {

@@ -16,6 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -60,6 +62,7 @@ fun NavigationDrawerItem(
         onClick = { if (enabled) onClick() },
         modifier =
             modifier
+                .pointerHoverIcon(PointerIcon.Hand)
                 .semantics { role = Role.Tab }
                 .fillMaxWidth(),
         color = Color.Transparent,

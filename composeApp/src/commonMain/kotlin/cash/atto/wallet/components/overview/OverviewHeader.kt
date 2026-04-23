@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
@@ -41,7 +43,8 @@ fun OverviewHeader(
                             MaterialTheme.colorScheme
                                 .surface
                                 .copy(alpha = 0.5f),
-                    ).clickable { it.invoke() },
+                    ).pointerHoverIcon(PointerIcon.Hand)
+                    .clickable { it.invoke() },
             ) {
                 Icon(
                     modifier = Modifier.align(Alignment.Center),
