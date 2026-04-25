@@ -65,7 +65,7 @@ private fun StakingContent(
             StakingConfirmDialog(
                 voterLabel = voter.label,
                 voterAddress = voter.address,
-                voterApr = "${((voterApy * 100).toLong() / 100.0)}%",
+                voterApy = "${((voterApy * 100).toLong() / 100.0)}%",
                 voterUptime = formatLastVoted(voter.lastVotedAt),
                 onDismiss = { selectedVoter = null },
                 onConfirm = {
@@ -105,7 +105,7 @@ private fun StakingContent(
                             modifier = Modifier.fillMaxWidth(),
                             voterLabel = uiState.currentVoterLabel ?: "Unknown node",
                             voterAddress = uiState.currentVoter.orEmpty(),
-                            apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
+                            apy = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                             weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
                             entityWeight =
                                 uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
@@ -134,7 +134,7 @@ private fun StakingContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 voterLabel = uiState.currentVoterLabel ?: "Unknown node",
                                 voterAddress = uiState.currentVoter.orEmpty(),
-                                apr = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
+                                apy = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
                                 weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
                                 entityWeight =
                                     uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
@@ -162,7 +162,7 @@ private fun StakingCurrentCard(
     modifier: Modifier,
     voterLabel: String,
     voterAddress: String,
-    apr: String,
+    apy: String,
     weight: String,
     entityWeight: String,
     lastVoted: String,
@@ -190,7 +190,7 @@ private fun StakingCurrentCard(
             )
         }
 
-        StakingMetricRow("APR", apr, dark_success)
+        StakingMetricRow("APY", apy, dark_success)
         StakingMetricRow("Voting Weight", weight)
         StakingMetricRow("Entity Weight", entityWeight)
         StakingMetricRow("Last Voted", lastVoted, if (healthy) dark_success else dark_accent, showDivider = false)
@@ -375,7 +375,7 @@ private fun StakingVoterCard(
             ) {
                 StakingMiniStat(
                     Modifier.weight(1f),
-                    "APR",
+                    "APY",
                     "${kotlin.math.round(calculatedApy * 10) / 10.0}%",
                     if (apyIsZero) warningColor else dark_success,
                 )
@@ -400,7 +400,7 @@ private fun StakingVoterCard(
 private fun StakingConfirmDialog(
     voterLabel: String,
     voterAddress: String,
-    voterApr: String,
+    voterApy: String,
     voterUptime: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
@@ -425,8 +425,8 @@ private fun StakingConfirmDialog(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AttoDetailField(
-                label = "APR",
-                value = voterApr,
+                label = "APY",
+                value = voterApy,
                 modifier = Modifier.weight(1f),
             )
             AttoDetailField(
