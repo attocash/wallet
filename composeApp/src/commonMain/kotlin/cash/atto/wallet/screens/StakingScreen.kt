@@ -28,6 +28,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 private val warningColor = Color(0xFFFF9800)
 
@@ -509,7 +510,11 @@ private fun StakingMiniStat(
     }
 }
 
-private fun formatLastVoted(instant: kotlin.time.Instant): String {
+private fun formatLastVoted(instant: Instant): String {
+    if (instant.toEpochMilliseconds() <= 0L) {
+        return "Unknown"
+    }
+
     val now = Clock.System.now()
     val duration = now - instant
     return when {
