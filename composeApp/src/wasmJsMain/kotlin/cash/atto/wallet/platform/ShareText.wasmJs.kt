@@ -6,15 +6,21 @@ import kotlin.coroutines.suspendCoroutine
 @JsFun(
     """
     (text, onSuccess, onFailure) => {
-        const share = globalThis.navigator?.share;
-        if (!share) {
+        const navigator = globalThis.navigator;
+        if (!navigator?.share) {
+            console.log("Web Share unavailable: navigator.share missing");
             onFailure();
             return;
         }
 
-        share({ text })
+        navigator.share({ text })
             .then(() => onSuccess())
-            .catch(() => onFailure());
+            .catch((error) => {
+                const name = error?.name ?? "Error";
+                const message = error?.message ?? "Unknown share failure";
+                console.log("Web Share failed:", name + ": " + message);
+                onFailure();
+            });
     }
     """,
 )
@@ -24,6 +30,16 @@ private external fun shareTextJs(
     onFailure: () -> Unit,
 )
 
+@JsFun(
+    """
+    () => {
+        const navigator = globalThis.navigator;
+        return globalThis.isSecureContext === true && !!navigator && typeof navigator.share === "function";
+    }
+    """,
+)
+private external fun isShareAvailableJs(): Boolean
+
 actual suspend fun shareText(text: String): Boolean =
     suspendCoroutine { continuation ->
         shareTextJs(
@@ -32,3 +48,5 @@ actual suspend fun shareText(text: String): Boolean =
             onFailure = { continuation.resume(false) },
         )
     }
+
+actual fun isShareAvailable(): Boolean = isShareAvailableJs()

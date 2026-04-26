@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.platform.isShareAvailable
 import cash.atto.wallet.platform.setText
 import cash.atto.wallet.platform.shareText
 import cash.atto.wallet.ui.AttoPaymentRequests
@@ -33,6 +34,7 @@ import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.ReceiveViewModel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -253,6 +255,7 @@ private fun ReceiveQrColumn(
 
         val clipboard = LocalClipboard.current
         val coroutineScope = rememberCoroutineScope()
+        val shareAvailable = remember { isShareAvailable() }
         var copiedWalletLink by remember { mutableStateOf(false) }
         var copiedAttoRequest by remember { mutableStateOf(false) }
 
@@ -277,12 +280,19 @@ private fun ReceiveQrColumn(
             AttoButton(
                 onClick = {
                     if (walletDeepLink.isNotBlank()) {
-                        coroutineScope.launch {
-                            val shared = shareText(walletDeepLink)
-                            if (!shared) {
-                                clipboard.setText(walletDeepLink)
+                        if (shareAvailable) {
+                            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                                val shared = shareText(walletDeepLink)
+                                if (!shared) {
+                                    clipboard.setText(walletDeepLink)
+                                }
+                                copiedWalletLink = true
                             }
-                            copiedWalletLink = true
+                        } else {
+                            coroutineScope.launch {
+                                clipboard.setText(walletDeepLink)
+                                copiedWalletLink = true
+                            }
                         }
                     }
                 },
@@ -291,9 +301,14 @@ private fun ReceiveQrColumn(
                     if (copiedWalletLink) {
                         ""
                     } else {
-                        "Share URL"
+                        if (shareAvailable) "Share URL" else "Copy URL"
                     },
-                icon = if (copiedWalletLink) Icons.Outlined.Check else Icons.Outlined.Share,
+                icon =
+                    if (copiedWalletLink) {
+                        Icons.Outlined.Check
+                    } else {
+                        if (shareAvailable) Icons.Outlined.Share else Icons.Outlined.ContentCopy
+                    },
                 modifier = actionModifier,
                 enabled = walletDeepLink.isNotBlank(),
             )
