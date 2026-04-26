@@ -15,9 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,10 +25,12 @@ import cash.atto.wallet.components.common.AttoBackButton
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoRoundButton
 import cash.atto.wallet.components.common.AttoWordChip
+import cash.atto.wallet.platform.setText
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.secret.SecretPhraseUiState
 import cash.atto.wallet.viewmodel.SecretPhraseViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -60,7 +60,8 @@ fun RecoveryPhraseScreen(
     onBackupConfirmClicked: () -> Unit,
 ) {
     val viewModel = koinViewModel<SecretPhraseViewModel>()
-    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     val uiState = viewModel.state.collectAsState()
 
     RecoveryPhrase(
@@ -68,11 +69,9 @@ fun RecoveryPhraseScreen(
         onBackNavigation = onBackNavigation,
         onBackupConfirmClicked = onBackupConfirmClicked,
         onCopyClick = {
-            clipboardManager.setText(
-                AnnotatedString(
-                    uiState.value.words.joinToString(" "),
-                ),
-            )
+            coroutineScope.launch {
+                clipboard.setText(uiState.value.words.joinToString(" "))
+            }
         },
     )
 }

@@ -16,13 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.platform.setText
 import cash.atto.wallet.platform.shareText
 import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.ui.dark_text_primary
@@ -251,7 +251,7 @@ private fun ReceiveQrColumn(
             }
         }
 
-        val clipboardManager = LocalClipboardManager.current
+        val clipboard = LocalClipboard.current
         val coroutineScope = rememberCoroutineScope()
         var copiedWalletLink by remember { mutableStateOf(false) }
         var copiedAttoRequest by remember { mutableStateOf(false) }
@@ -280,7 +280,7 @@ private fun ReceiveQrColumn(
                         coroutineScope.launch {
                             val shared = shareText(walletDeepLink)
                             if (!shared) {
-                                clipboardManager.setText(AnnotatedString(walletDeepLink))
+                                clipboard.setText(walletDeepLink)
                             }
                             copiedWalletLink = true
                         }
@@ -301,8 +301,10 @@ private fun ReceiveQrColumn(
             AttoButton(
                 onClick = {
                     if (paymentRequest.isNotBlank()) {
-                        clipboardManager.setText(AnnotatedString(paymentRequest))
-                        copiedAttoRequest = true
+                        coroutineScope.launch {
+                            clipboard.setText(paymentRequest)
+                            copiedAttoRequest = true
+                        }
                     }
                 },
                 variant = AttoButtonVariant.Outlined,

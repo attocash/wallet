@@ -60,7 +60,6 @@ private fun StakingContent(
         selectedVoter?.let { voter ->
             val globalApy = uiState.globalApy?.toDoubleOrNull() ?: 0.0
             val voterApy = globalApy * voter.sharePercentage / 100.0
-            val compact = isCompactWidth()
 
             StakingConfirmDialog(
                 voterLabel = voter.label,

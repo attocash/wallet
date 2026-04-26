@@ -7,18 +7,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoWordChip
+import cash.atto.wallet.platform.setText
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -28,7 +30,8 @@ fun BackupSecretDialog(
 ) {
     val viewModel = koinViewModel<BackupSecretViewModel>()
     val uiState by viewModel.state.collectAsState()
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     var copied by remember { mutableStateOf(false) }
 
     LaunchedEffect(copied) {
@@ -69,10 +72,10 @@ fun BackupSecretDialog(
             AttoButton(
                 text = if (copied) "" else "Copy",
                 onClick = {
-                    clipboardManager.setText(
-                        AnnotatedString(uiState.words.joinToString(" ")),
-                    )
-                    copied = true
+                    coroutineScope.launch {
+                        clipboard.setText(uiState.words.joinToString(" "))
+                        copied = true
+                    }
                 },
                 modifier = Modifier.weight(1f),
             )
