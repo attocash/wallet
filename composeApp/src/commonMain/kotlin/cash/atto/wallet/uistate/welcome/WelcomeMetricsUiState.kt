@@ -1,7 +1,7 @@
 package cash.atto.wallet.uistate.welcome
 
 import cash.atto.wallet.model.MetricsResponse
-import cash.atto.wallet.model.getAverageConfirmationMs
+import cash.atto.wallet.model.getConfirmationMs
 import cash.atto.wallet.model.getCirculatingSupply
 import cash.atto.wallet.model.getPriceUsd
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -23,9 +23,9 @@ data class WelcomeMetricsUiState(
 }
 
 fun MetricsResponse.toWelcomeMetricsUiState(): WelcomeMetricsUiState {
-    val priceUsd = getPriceUsd()?.toBigDecimalOrNull()
-    val circulatingSupply = getCirculatingSupply()?.toBigDecimalOrNull()
-    val confirmation = getAverageConfirmationMs()?.toBigDecimalOrNull()
+    val priceUsd = metrics.getPriceUsd()?.toBigDecimalOrNull()
+    val circulatingSupply = metrics.getCirculatingSupply()?.toBigDecimalOrNull()
+    val confirmation = metrics.getConfirmationMs()?.toBigDecimalOrNull()
 
     return WelcomeMetricsUiState(
         marketCapValue =
