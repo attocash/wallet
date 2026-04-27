@@ -16,6 +16,8 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.send_confirm
 import cash.atto.commons.AttoHeight
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.model.LabeledPreferenceEntry
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_accent
@@ -29,6 +31,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -41,6 +44,8 @@ fun SendConfirmScreen(
 ) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
+    val preferencesRepository = koinInject<PreferencesRepository>()
+    val preferences by preferencesRepository.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val compact = isCompactWidth()
 
@@ -51,6 +56,7 @@ fun SendConfirmScreen(
 
         SendConfirmContent(
             uiState = uiState.value.sendConfirmUiState,
+            savedAddresses = preferences.addresses,
             isSending = uiState.value.sendConfirmUiState.showLoader,
             compact = compact,
             onConfirm = {
@@ -70,6 +76,7 @@ fun SendConfirmScreen(
 @Composable
 fun SendConfirmContent(
     uiState: SendConfirmUiState,
+    savedAddresses: List<LabeledPreferenceEntry> = emptyList(),
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     hasCachedWork: Boolean = true,
@@ -79,13 +86,17 @@ fun SendConfirmContent(
     val now = Clock.System.now()
     val previewHeight = uiState.accountHeight?.let { it + 1u } ?: 1uL
     val receiverAddress = uiState.address?.let { normalizeAttoUri(it) } ?: "Unavailable"
+    val selectedAddressLabel =
+        savedAddresses
+            .firstOrNull { it.value == uiState.address?.trim() }
+            ?.label
 
     val previewTransaction =
         TransactionUiState(
             type = TransactionType.SEND,
             amount = uiState.amount?.toStringExpanded(),
             source = receiverAddress,
-            sourceLabel = null,
+            sourceLabel = selectedAddressLabel,
             timestamp = now,
             height = AttoHeight(previewHeight),
             hash = null,
@@ -98,7 +109,11 @@ fun SendConfirmContent(
         AttoCopyField(
             label = "TO",
             value = receiverAddress,
-            maxLines = 2,
+            labelTrailingContent = {
+                selectedAddressLabel?.let { label ->
+                    AttoAccentInlineLabel(text = label)
+                }
+            },
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

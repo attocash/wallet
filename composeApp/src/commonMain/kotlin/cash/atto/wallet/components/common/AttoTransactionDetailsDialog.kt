@@ -237,12 +237,10 @@ private fun AttoEditableCopyField(
                         onValueChange = onValueChange,
                         modifier = Modifier.weight(1f),
                         placeholder = {
-                            Text(
+                            AttoFieldValueText(
                                 text = displayValueWhenEmpty,
-                                color = dark_text_secondary,
                                 modifier = Modifier.fillMaxWidth(),
-                                maxLines = 1,
-                                overflow = TextOverflow.MiddleEllipsis,
+                                color = dark_text_secondary,
                                 style = fieldTextStyle(displayValueIsRawValue),
                             )
                         },
@@ -269,21 +267,15 @@ private fun AttoEditableCopyField(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (value.isBlank()) {
-                        Text(
+                        AttoFieldValueText(
                             text = displayValueWhenEmpty,
                             modifier = Modifier.weight(1f),
-                            color = Color.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.MiddleEllipsis,
                             style = fieldTextStyle(displayValueIsRawValue),
                         )
                     } else {
-                        Text(
+                        AttoFieldValueText(
                             text = value,
                             modifier = Modifier.weight(1f),
-                            color = Color.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
                             style = fieldTextStyle(isRawValue = false),
                         )
                     }

@@ -1,7 +1,13 @@
 package cash.atto.wallet.components.common
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDownward
@@ -22,7 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cash.atto.wallet.ui.*
+import cash.atto.wallet.ui.attoFontFamily
+import cash.atto.wallet.ui.dark_accent
+import cash.atto.wallet.ui.dark_success
+import cash.atto.wallet.ui.dark_text_dim
+import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_tertiary
+import cash.atto.wallet.ui.dark_violet
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
 
@@ -119,10 +131,17 @@ fun AttoTransactionCard(
                             ),
                     )
                     if (hashLabel != null) {
-                        TransactionHashLabel(
+                        Text(
                             text = hashLabel,
+                            modifier = modifier,
                             color = dark_violet,
-                            modifier = Modifier.weight(1f, fill = false),
+                            maxLines = 1,
+                            overflow = TextOverflow.MiddleEllipsis,
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.W600,
+                                    fontSize = 12.sp,
+                                ),
                         )
                     }
                 }
@@ -144,7 +163,7 @@ fun AttoTransactionCard(
                         text = sourceText,
                         color = sourceColor,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.MiddleEllipsis,
                         style =
                             MaterialTheme.typography.bodySmall.copy(
                                 fontFamily = sourceFont,
@@ -183,24 +202,4 @@ fun AttoTransactionCard(
             }
         }
     }
-}
-
-@Composable
-private fun TransactionHashLabel(
-    text: String,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        color = color,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style =
-            MaterialTheme.typography.bodySmall.copy(
-                fontWeight = FontWeight.W600,
-                fontSize = 12.sp,
-            ),
-    )
 }

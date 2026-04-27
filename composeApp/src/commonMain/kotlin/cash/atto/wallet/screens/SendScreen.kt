@@ -198,6 +198,7 @@ private fun SendScreenContent(
         if (navState == SendScreenState.CONFIRM && !showResult) {
             SendConfirmContent(
                 uiState = uiState.sendConfirmUiState,
+                savedAddresses = savedAddresses,
                 onConfirm = onConfirmClicked,
                 onCancel = onCancelClicked,
                 hasCachedWork = hasCachedWork,
@@ -446,19 +447,7 @@ private fun SendFormPanel(
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
                     )
                     selectedAddressLabel?.let { label ->
-                        Text(
-                            text = label,
-                            modifier = Modifier.widthIn(max = 220.dp),
-                            color = dark_accent,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style =
-                                MaterialTheme.typography.bodySmall.copy(
-                                    fontFamily = attoFontFamily(),
-                                    fontWeight = FontWeight.W600,
-                                    fontSize = 12.sp,
-                                ),
-                        )
+                        AttoAccentInlineLabel(text = label)
                     }
                 }
                 OutlinedTextField(

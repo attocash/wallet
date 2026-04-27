@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,11 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cash.atto.wallet.ui.attoFontFamily
+import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_text_tertiary
 
 private val FieldBackground = Color(0xFF0F0F11)
@@ -30,27 +35,34 @@ fun AttoCopyField(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    maxLines: Int = 3,
     displayValue: String = value,
-    middleEllipsize: Boolean = false,
+    labelTrailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AttoCapsLabel(label)
+        if (labelTrailingContent == null) {
+            AttoCapsLabel(label)
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AttoCapsLabel(label)
+                labelTrailingContent()
+            }
+        }
         AttoFieldSurface {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                AttoFieldValueText(
                     text = displayValue,
                     modifier = Modifier.weight(1f),
-                    color = Color.White,
-                    maxLines = maxLines,
-                    overflow = if (middleEllipsize) TextOverflow.MiddleEllipsis else TextOverflow.Ellipsis,
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontFamily = FontFamily.Monospace,
@@ -105,6 +117,45 @@ fun AttoCapsLabel(text: String) {
                 fontSize = 11.sp,
                 letterSpacing = 0.8.sp,
             ),
+    )
+}
+
+@Composable
+fun AttoAccentInlineLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier.widthIn(max = 220.dp),
+        color = dark_accent,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style =
+            MaterialTheme.typography.bodySmall.copy(
+                fontFamily = attoFontFamily(),
+                fontWeight = FontWeight.W600,
+                fontSize = 12.sp,
+            ),
+    )
+}
+
+@Composable
+internal fun AttoFieldValueText(
+    text: String,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    color: Color = Color.White,
+    middleEllipsize: Boolean = true,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        color = color,
+        maxLines = 1,
+        softWrap = true,
+        overflow = if (middleEllipsize) TextOverflow.MiddleEllipsis else TextOverflow.Ellipsis,
+        style = style,
     )
 }
 

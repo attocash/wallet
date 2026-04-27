@@ -412,7 +412,6 @@ private fun StakingConfirmDialog(
         AttoCopyField(
             label = "VOTER",
             value = voterAddress,
-            maxLines = 2,
         )
 
         AttoDetailField(

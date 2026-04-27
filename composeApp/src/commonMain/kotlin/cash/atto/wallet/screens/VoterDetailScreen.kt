@@ -330,7 +330,7 @@ fun VoterDetailContent(
                     text = voter.address,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
                 )
             }
         }
