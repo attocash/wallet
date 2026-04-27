@@ -282,11 +282,7 @@ private fun ReceiveQrColumn(
                     if (walletDeepLink.isNotBlank()) {
                         if (shareAvailable) {
                             coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                                val shared = shareText(walletDeepLink)
-                                if (!shared) {
-                                    clipboard.setText(walletDeepLink)
-                                }
-                                copiedWalletLink = true
+                                shareText(walletDeepLink)
                             }
                         } else {
                             coroutineScope.launch {
