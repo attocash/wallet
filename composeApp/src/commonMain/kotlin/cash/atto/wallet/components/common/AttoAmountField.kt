@@ -1,10 +1,6 @@
 package cash.atto.wallet.components.common
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -13,9 +9,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -67,28 +60,16 @@ fun AttoAmountField(
             placeholder = { Text(placeholder) },
             isError = isError,
             trailingIcon = {
-                Box(
-                    modifier =
-                        Modifier
-                            .padding(end = 10.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(dark_accent.copy(alpha = 0.12f))
-                            .border(1.dp, dark_accent.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-                            .pointerHoverIcon(PointerIcon.Hand)
-                            .clickable { onToggleCurrency() }
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
-                ) {
-                    Text(
-                        text = if (isUsdMode) "USD" else "ATTO",
-                        color = dark_accent,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W700),
-                    )
-                }
+                AttoTag(
+                    text = if (isUsdMode) "USD" else "ATTO",
+                    modifier = Modifier.padding(end = 10.dp),
+                    onClick = onToggleCurrency,
+                )
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = imeAction),
             keyboardActions = keyboardActions,
-            shape = RoundedCornerShape(8.dp),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
             textStyle =
                 if (largeFontSize) {
                     MaterialTheme.typography.headlineMedium.copy(

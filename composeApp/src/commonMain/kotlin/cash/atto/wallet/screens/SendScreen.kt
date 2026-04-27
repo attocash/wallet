@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,8 +21,13 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.components.send.SavedAddressesDialog
+import cash.atto.wallet.model.LabeledPreferenceEntry
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -31,6 +37,7 @@ import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -44,6 +51,8 @@ fun SendScreen(
     val uiState = viewModel.state.collectAsState()
     val overviewViewModel = koinViewModel<OverviewViewModel>()
     val overviewUiState = overviewViewModel.state.collectAsState()
+    val preferencesRepository = koinInject<PreferencesRepository>()
+    val preferences by preferencesRepository.state.collectAsState()
     val workCache = org.koin.compose.koinInject<cash.atto.wallet.repository.PersistentWorkCache>()
     val hasCachedWork = workCache.hasCachedWork.collectAsState()
 
@@ -71,6 +80,7 @@ fun SendScreen(
                 .filterNotNull()
                 .filter { it.type == TransactionType.SEND }
                 .take(5),
+        savedAddresses = preferences.addresses,
         navState = sendNavState.value,
         hasCachedWork = hasCachedWork.value,
         onBackClick = onBackClick,
@@ -139,6 +149,7 @@ fun SendScreen(
 private fun SendScreenContent(
     uiState: SendTransactionUiState,
     recentTransactions: List<TransactionUiState>,
+    savedAddresses: List<LabeledPreferenceEntry>,
     navState: SendScreenState,
     hasCachedWork: Boolean,
     onBackClick: () -> Unit,
@@ -165,6 +176,7 @@ private fun SendScreenContent(
         SendFromContent(
             uiState = uiState.sendFromUiState,
             recentTransactions = recentTransactions,
+            savedAddresses = savedAddresses,
             onBackClick = onBackClick,
             qrScannerContent = qrScannerContent,
             onPaymentRequestScanned = onPaymentRequestScanned,
@@ -200,6 +212,7 @@ private fun SendScreenContent(
 private fun SendFromContent(
     uiState: SendFromUiState,
     recentTransactions: List<TransactionUiState>,
+    savedAddresses: List<LabeledPreferenceEntry>,
     onBackClick: () -> Unit,
     qrScannerContent: (@Composable (onResult: (String) -> Unit, onError: (String) -> Unit, onDismiss: () -> Unit) -> Unit)?,
     onPaymentRequestScanned: (String) -> Unit,
@@ -211,7 +224,12 @@ private fun SendFromContent(
     var showQrScanner = remember { mutableStateOf(false) }
     var scannerError = remember { mutableStateOf<String?>(null) }
     var showFeeInfo = remember { mutableStateOf(false) }
+    var showSavedAddresses = remember { mutableStateOf(false) }
     var selectedTransaction = remember { mutableStateOf<TransactionUiState?>(null) }
+    val selectedAddressLabel =
+        savedAddresses
+            .firstOrNull { it.value == uiState.address?.trim() }
+            ?.label
     val compact = isCompactWidth()
 
     if (showQrScanner.value && qrScannerContent != null) {
@@ -251,6 +269,17 @@ private fun SendFromContent(
         }
     }
 
+    if (showSavedAddresses.value && savedAddresses.isNotEmpty()) {
+        SavedAddressesDialog(
+            entries = savedAddresses,
+            onDismissRequest = { showSavedAddresses.value = false },
+            onSelectAddress = { address ->
+                onAddressChanged(address)
+                showSavedAddresses.value = false
+            },
+        )
+    }
+
     AttoPageFrame(
         title = "Send Atto",
         subtitle = "Instant, feeless transfers to any Atto address",
@@ -265,6 +294,8 @@ private fun SendFromContent(
                     SendFormPanel(
                         modifier = Modifier.fillMaxWidth(),
                         uiState = uiState,
+                        savedAddressCount = savedAddresses.size,
+                        selectedAddressLabel = selectedAddressLabel,
                         scannerError = scannerError.value,
                         hasQrScanner = qrScannerContent != null,
                         onToggleInputMode = onToggleInputMode,
@@ -274,6 +305,7 @@ private fun SendFromContent(
                             scannerError.value = null
                             showQrScanner.value = true
                         },
+                        onShowSavedAddresses = { showSavedAddresses.value = true },
                         onSendClicked = onSendClicked,
                         onFeeInfoClick = { showFeeInfo.value = true },
                     )
@@ -309,6 +341,8 @@ private fun SendFromContent(
                     SendFormPanel(
                         modifier = Modifier.width(500.dp),
                         uiState = uiState,
+                        savedAddressCount = savedAddresses.size,
+                        selectedAddressLabel = selectedAddressLabel,
                         scannerError = scannerError.value,
                         hasQrScanner = qrScannerContent != null,
                         onToggleInputMode = onToggleInputMode,
@@ -318,6 +352,7 @@ private fun SendFromContent(
                             scannerError.value = null
                             showQrScanner.value = true
                         },
+                        onShowSavedAddresses = { showSavedAddresses.value = true },
                         onSendClicked = onSendClicked,
                         onFeeInfoClick = { showFeeInfo.value = true },
                     )
@@ -343,12 +378,15 @@ private fun SendFromContent(
 private fun SendFormPanel(
     modifier: Modifier,
     uiState: SendFromUiState,
+    savedAddressCount: Int,
+    selectedAddressLabel: String?,
     scannerError: String?,
     hasQrScanner: Boolean,
     onToggleInputMode: () -> Unit,
     onAmountChanged: (String?) -> Unit,
     onAddressChanged: (String?) -> Unit,
     onShowQr: () -> Unit,
+    onShowSavedAddresses: () -> Unit,
     onSendClicked: () -> Unit,
     onFeeInfoClick: () -> Unit,
 ) {
@@ -397,34 +435,71 @@ private fun SendFormPanel(
             contentPadding = PaddingValues(20.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    text = "Send To",
-                    color = dark_text_secondary,
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Send To",
+                        color = dark_text_secondary,
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W600),
+                    )
+                    selectedAddressLabel?.let { label ->
+                        Text(
+                            text = label,
+                            modifier = Modifier.widthIn(max = 220.dp),
+                            color = dark_accent,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = attoFontFamily(),
+                                    fontWeight = FontWeight.W600,
+                                    fontSize = 12.sp,
+                                ),
+                        )
+                    }
+                }
                 OutlinedTextField(
                     value = uiState.address.orEmpty(),
                     onValueChange = { onAddressChanged(it) },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Enter Atto address") },
                     isError = uiState.showAddressError,
-                    trailingIcon =
-                        if (hasQrScanner) {
-                            {
-                                IconButton(
-                                    onClick = onShowQr,
-                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.QrCodeScanner,
-                                        contentDescription = "Scan QR",
-                                        tint = dark_accent,
-                                    )
+                    trailingIcon = {
+                        if (savedAddressCount > 0 || hasQrScanner) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                if (savedAddressCount > 0) {
+                                    IconButton(
+                                        onClick = onShowSavedAddresses,
+                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Bookmarks,
+                                            contentDescription = "Choose saved address",
+                                            tint = dark_accent,
+                                        )
+                                    }
+                                }
+                                if (hasQrScanner) {
+                                    IconButton(
+                                        onClick = onShowQr,
+                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.QrCodeScanner,
+                                            contentDescription = "Scan QR",
+                                            tint = dark_accent,
+                                        )
+                                    }
                                 }
                             }
-                        } else {
-                            null
-                        },
+                        }
+                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     colors = attoAmountFieldColors(uiState.showAddressError),
