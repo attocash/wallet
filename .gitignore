@@ -18,4 +18,5 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 TODO.md
-.cache/
+.cache
+.codex

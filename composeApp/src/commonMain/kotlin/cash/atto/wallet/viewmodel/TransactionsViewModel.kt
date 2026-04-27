@@ -9,6 +9,7 @@ import cash.atto.wallet.model.TransactionsHistoryState
 import cash.atto.wallet.model.getAddressLabel
 import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.repository.HomeRepository
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.AttoFormatter
@@ -31,6 +32,7 @@ class TransactionsViewModel(
     private val walletManagerRepository: WalletManagerRepository,
     private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
     private val homeRepository: HomeRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransactionsUiState())
     val state = _state.asStateFlow()
@@ -42,6 +44,16 @@ class TransactionsViewModel(
     private var historyState = TransactionsHistoryState()
 
     init {
+        scope.launch {
+            preferencesRepository.state.collect {
+                emitState(
+                    isLoadingInitial = state.value.isLoadingInitial,
+                    isLoadingMore = state.value.isLoadingMore,
+                    hasMore = state.value.hasMore,
+                )
+            }
+        }
+
         scope.launch {
             walletManagerRepository.state
                 .filterNotNull()
@@ -121,12 +133,9 @@ class TransactionsViewModel(
         persistentAccountEntryRepository.exportCsv(
             publicKey = publicKey,
             selectedTypes = selectedTypes,
-            addressLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getAddressLabel(address)
-            },
-            voterLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getVoterLabel(address)
-            },
+            addressLabelResolver = ::resolveAddressLabel,
+            voterLabelResolver = ::resolveChangeLabel,
+            hashLabelResolver = ::resolveHashLabel,
             sink = sink,
         )
     }
@@ -185,14 +194,21 @@ class TransactionsViewModel(
     private fun buildLoadedTransactions(): List<TransactionUiState> =
         buildTransactionListUiState(
             entries = historyState.loadedEntries,
-            addressLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getAddressLabel(address)
-            },
-            voterLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getVoterLabel(address)
-            },
+            addressLabelResolver = ::resolveAddressLabel,
+            voterLabelResolver = ::resolveChangeLabel,
+            hashLabelResolver = ::resolveHashLabel,
         ).transactions
             .filterNotNull()
+
+    private fun resolveAddressLabel(address: String): String? =
+        preferencesRepository.getAddressLabel(address)
+            ?: homeRepository.homeResponse.value?.getAddressLabel(address)
+
+    private fun resolveChangeLabel(address: String): String? =
+        preferencesRepository.getAddressLabel(address)
+            ?: homeRepository.homeResponse.value?.getVoterLabel(address)
+
+    private fun resolveHashLabel(hash: String): String? = preferencesRepository.getHashLabel(hash)
 
     private fun buildSummaryUiState() =
         historyState.fullHistorySummary.toUiState(

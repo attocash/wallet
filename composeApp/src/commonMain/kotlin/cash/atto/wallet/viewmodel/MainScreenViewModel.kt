@@ -103,6 +103,12 @@ class MainScreenViewModel(
 
     fun logout() = settingsViewModel.logout()
 
+    fun exportPreferences() = settingsViewModel.exportPreferences()
+
+    fun importPreferences() = settingsViewModel.importPreferences()
+
+    fun clearPreferencesMessage() = settingsViewModel.clearPreferencesMessage()
+
     private suspend fun handleAccount(account: AttoAccount) {
         println("Account $account")
 

@@ -54,6 +54,9 @@ fun MainScreen(
         onLock = { viewModel.lock() },
         onShowLogout = { viewModel.showLogoutDialog() },
         onDismissLogout = { viewModel.hideLogoutDialog() },
+        onExportPreferences = { viewModel.exportPreferences() },
+        onImportPreferences = { viewModel.importPreferences() },
+        onDismissPreferencesMessage = { viewModel.clearPreferencesMessage() },
         onConfirmLogout = {
             viewModel.logout()
             viewModel.hideLogoutDialog()
@@ -77,6 +80,9 @@ fun MainScreenContent(
     onLock: () -> Unit,
     onShowLogout: () -> Unit,
     onDismissLogout: () -> Unit,
+    onExportPreferences: () -> Unit,
+    onImportPreferences: () -> Unit,
+    onDismissPreferencesMessage: () -> Unit,
     onConfirmLogout: () -> Unit,
     initialSendPaymentRequest: String? = null,
     initialOpenSendConfirm: Boolean = false,
@@ -162,7 +168,9 @@ fun MainScreenContent(
                         uiState = uiState.settingsUiState,
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                         onBackupClick = onBackupClick,
-                        onLockClick = onLock,
+                        onExportClick = onExportPreferences,
+                        onImportClick = onImportPreferences,
+                        onDismissPreferencesMessage = onDismissPreferencesMessage,
                         onLogoutClick = onShowLogout,
                     )
                 }

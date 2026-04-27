@@ -13,6 +13,7 @@ import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.model.mergeAccountEntries
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.WalletManagerRepository
@@ -34,6 +35,7 @@ class OverviewViewModel(
     private val walletManagerRepository: WalletManagerRepository,
     private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
     private val homeRepository: HomeRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -66,6 +68,12 @@ class OverviewViewModel(
                 _state.emit(
                     state.value.copy(receiveAddress = receiveAddress),
                 )
+            }
+        }
+
+        scope.launch {
+            preferencesRepository.state.collect {
+                emitUpdatedState()
             }
         }
 
@@ -196,13 +204,20 @@ class OverviewViewModel(
     private fun buildRecentTransactionListUiState() =
         buildTransactionListUiState(
             entries = recentEntries,
-            addressLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getAddressLabel(address)
-            },
-            voterLabelResolver = { address ->
-                homeRepository.homeResponse.value?.getVoterLabel(address)
-            },
+            addressLabelResolver = ::resolveAddressLabel,
+            voterLabelResolver = ::resolveChangeLabel,
+            hashLabelResolver = ::resolveHashLabel,
         )
+
+    private fun resolveAddressLabel(address: String): String? =
+        preferencesRepository.getAddressLabel(address)
+            ?: homeRepository.homeResponse.value?.getAddressLabel(address)
+
+    private fun resolveChangeLabel(address: String): String? =
+        preferencesRepository.getAddressLabel(address)
+            ?: homeRepository.homeResponse.value?.getVoterLabel(address)
+
+    private fun resolveHashLabel(hash: String): String? = preferencesRepository.getHashLabel(hash)
 
     companion object {
         private const val RECENT_TRANSACTION_LIMIT = 64

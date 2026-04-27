@@ -154,7 +154,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
 
-            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.navigation.compose)
@@ -181,6 +181,7 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 
+            implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.jna)
             implementation(libs.jna.platform)
@@ -196,6 +197,8 @@ kotlin {
             implementation(libs.androidx.ext.junit)
         }
         wasmJsMain.dependencies {
+            implementation(libs.androidx.datastore.core.okio)
+            implementation(libs.androidx.datastore.preferences.core)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             implementation(libs.sqlite.web)
             implementation(

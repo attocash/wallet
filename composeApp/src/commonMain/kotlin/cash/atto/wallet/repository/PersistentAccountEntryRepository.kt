@@ -146,6 +146,7 @@ class PersistentAccountEntryRepository(
         selectedTypes: Set<TransactionType>,
         addressLabelResolver: (String) -> String? = { null },
         voterLabelResolver: (String) -> String? = { null },
+        hashLabelResolver: (String) -> String? = { null },
         sink: Sink,
     ) {
         writeTransactionsCsvHeader(sink)
@@ -174,6 +175,7 @@ class PersistentAccountEntryRepository(
                     entries = page,
                     addressLabelResolver = addressLabelResolver,
                     voterLabelResolver = voterLabelResolver,
+                    hashLabelResolver = hashLabelResolver,
                 ).transactions
                     .filterNotNull()
                     .filter { it.type in selectedTypes }

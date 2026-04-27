@@ -52,6 +52,7 @@ fun buildTransactionListUiState(
     entries: List<AttoAccountEntry>,
     addressLabelResolver: (String) -> String? = { null },
     voterLabelResolver: (String) -> String? = { null },
+    hashLabelResolver: (String) -> String? = { null },
 ): TransactionListUiState =
     TransactionListUiState(
         transactions =
@@ -59,6 +60,7 @@ fun buildTransactionListUiState(
                 entry.toTransactionUiState(
                     addressLabelResolver = addressLabelResolver,
                     voterLabelResolver = voterLabelResolver,
+                    hashLabelResolver = hashLabelResolver,
                 )
             },
         showHint = entries.isEmpty(),
@@ -68,12 +70,14 @@ fun buildTransactionListUiState(
 private fun AttoAccountEntry.toTransactionUiState(
     addressLabelResolver: (String) -> String?,
     voterLabelResolver: (String) -> String?,
+    hashLabelResolver: (String) -> String?,
 ): TransactionUiState? {
     val subjectAddress =
         AttoAddress(
             subjectAlgorithm,
             subjectPublicKey,
         ).toString()
+    val blockHash = hash.toString()
 
     return when (blockType) {
         AttoBlockType.SEND -> {
@@ -82,9 +86,10 @@ private fun AttoAccountEntry.toTransactionUiState(
                 amount = "- ${amount().toString(AttoUnit.ATTO)}",
                 source = subjectAddress,
                 sourceLabel = addressLabelResolver(subjectAddress),
+                transactionLabel = hashLabelResolver(blockHash),
                 timestamp = Instant.fromEpochMilliseconds(timestamp.toEpochMilliseconds()),
                 height = height,
-                hash = hash.toString(),
+                hash = blockHash,
             )
         }
 
@@ -94,9 +99,10 @@ private fun AttoAccountEntry.toTransactionUiState(
                 amount = "+ ${amount().toString(AttoUnit.ATTO)}",
                 source = subjectAddress,
                 sourceLabel = addressLabelResolver(subjectAddress),
+                transactionLabel = hashLabelResolver(blockHash),
                 timestamp = Instant.fromEpochMilliseconds(timestamp.toEpochMilliseconds()),
                 height = height,
-                hash = hash.toString(),
+                hash = blockHash,
             )
         }
 
@@ -106,9 +112,10 @@ private fun AttoAccountEntry.toTransactionUiState(
                 amount = "+ ${amount().toString(AttoUnit.ATTO)}",
                 source = subjectAddress,
                 sourceLabel = addressLabelResolver(subjectAddress),
+                transactionLabel = hashLabelResolver(blockHash),
                 timestamp = Instant.fromEpochMilliseconds(timestamp.toEpochMilliseconds()),
                 height = height,
-                hash = hash.toString(),
+                hash = blockHash,
             )
         }
 
@@ -118,9 +125,10 @@ private fun AttoAccountEntry.toTransactionUiState(
                 amount = null,
                 source = subjectAddress,
                 sourceLabel = voterLabelResolver(subjectAddress),
+                transactionLabel = hashLabelResolver(blockHash),
                 timestamp = Instant.fromEpochMilliseconds(timestamp.toEpochMilliseconds()),
                 height = height,
-                hash = hash.toString(),
+                hash = blockHash,
             )
         }
 

@@ -3,6 +3,7 @@ package cash.atto.wallet.components.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,40 +31,39 @@ fun AttoCopyField(
     value: String,
     modifier: Modifier = Modifier,
     maxLines: Int = 3,
+    displayValue: String = value,
+    middleEllipsize: Boolean = false,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AttoCapsLabel(label)
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(FieldBackground)
-                    .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = value,
-                modifier = Modifier.weight(1f),
-                color = Color.White,
-                maxLines = maxLines,
-                overflow = TextOverflow.Ellipsis,
-                style =
-                    MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.W600,
-                        fontSize = 13.sp,
-                    ),
-            )
-            AttoCopyButton(
-                text = value,
-                tint = dark_text_tertiary,
-                contentDescription = "Copy $label",
-            )
+        AttoFieldSurface {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = displayValue,
+                    modifier = Modifier.weight(1f),
+                    color = Color.White,
+                    maxLines = maxLines,
+                    overflow = if (middleEllipsize) TextOverflow.MiddleEllipsis else TextOverflow.Ellipsis,
+                    style =
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.W600,
+                            fontSize = 13.sp,
+                        ),
+                )
+                AttoCopyButton(
+                    text = value,
+                    tint = dark_text_tertiary,
+                    contentDescription = "Copy $label",
+                )
+            }
         }
     }
 }
@@ -79,14 +79,7 @@ fun AttoDetailField(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AttoCapsLabel(label)
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(FieldBackground)
-                    .padding(12.dp),
-        ) {
+        AttoFieldSurface {
             Text(
                 text = value,
                 color = Color.White,
@@ -112,5 +105,21 @@ fun AttoCapsLabel(text: String) {
                 fontSize = 11.sp,
                 letterSpacing = 0.8.sp,
             ),
+    )
+}
+
+@Composable
+internal fun AttoFieldSurface(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(FieldBackground)
+                .padding(12.dp),
+        content = content,
     )
 }

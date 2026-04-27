@@ -33,12 +33,14 @@ class AppStateRepository(
             seedDataSource.seed.collect { seed ->
                 if (getPlatform().type == PlatformType.WEB) {
                     if (seed != null) {
+                        setPassword(null)
                         setAuthState(AppState.AuthState.NO_PASSWORD)
                         setEncryptedSeed(seed)
                     } else {
                         setAuthState(AppState.AuthState.NO_SEED)
                         setEncryptedSeed(null)
                         setMnemonic(null)
+                        setPassword(null)
                     }
 
                     return@collect
@@ -109,6 +111,7 @@ class AppStateRepository(
                 try {
                     val mnemonic = AttoMnemonic(decrypted)
                     setMnemonic(mnemonic)
+                    setPassword(password)
                     startSession()
 
                     return true
@@ -156,6 +159,7 @@ class AppStateRepository(
 
     suspend fun deleteKeys() {
         seedDataSource.clearSeed()
+        setPassword(null)
     }
 
     suspend fun lock() {
@@ -166,6 +170,7 @@ class AppStateRepository(
             setMnemonic(null)
         }
 
+        setPassword(null)
         setAuthState(AppState.AuthState.SESSION_INVALID)
     }
 
@@ -215,6 +220,7 @@ class AppStateRepository(
 
                 _state.emit(
                     state.value.copy(
+                        password = null,
                         authState = AppState.AuthState.SESSION_INVALID,
                     ),
                 )

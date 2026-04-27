@@ -25,6 +25,7 @@ data class TransactionUiState
         val amount: String?,
         val source: String,
         val sourceLabel: String? = null,
+        val transactionLabel: String? = null,
         val timestamp: Instant,
         val height: AttoHeight,
         val hash: String? = null,

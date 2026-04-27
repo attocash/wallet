@@ -16,7 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.AttoCard
+import cash.atto.wallet.components.common.AttoButton
+import cash.atto.wallet.components.common.AttoButtonVariant
+import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.config.AppVersion
@@ -47,7 +52,9 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onBackupClick: () -> Unit,
-    onLockClick: () -> Unit,
+    onExportClick: () -> Unit,
+    onImportClick: () -> Unit,
+    onDismissPreferencesMessage: () -> Unit,
     onLogoutClick: () -> Unit,
 ) {
     AttoPageFrame(
@@ -65,9 +72,9 @@ fun SettingsScreen(
                 ) {
                     SettingsActionsPanel(
                         modifier = Modifier.fillMaxWidth(),
-                        uiState = uiState,
                         onBackupClick = onBackupClick,
-                        onLockClick = onLockClick,
+                        onExportClick = onExportClick,
+                        onImportClick = onImportClick,
                         onLogoutClick = onLogoutClick,
                     )
                     SettingsMetadataPanel(modifier = Modifier.fillMaxWidth())
@@ -79,13 +86,32 @@ fun SettingsScreen(
                 ) {
                     SettingsActionsPanel(
                         modifier = Modifier.weight(5f).fillMaxSize(),
-                        uiState = uiState,
                         onBackupClick = onBackupClick,
-                        onLockClick = onLockClick,
+                        onExportClick = onExportClick,
+                        onImportClick = onImportClick,
                         onLogoutClick = onLogoutClick,
                     )
                     SettingsMetadataPanel(modifier = Modifier.weight(7f))
                 }
+            }
+        }
+
+        uiState.preferencesMessage?.let { preferencesMessage ->
+            AttoModal(
+                title = "Preferences",
+                onDismiss = onDismissPreferencesMessage,
+            ) {
+                Text(
+                    text = preferencesMessage,
+                    color = dark_text_secondary,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                AttoButton(
+                    text = "Close",
+                    onClick = onDismissPreferencesMessage,
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = AttoButtonVariant.Outlined,
+                )
             }
         }
     }
@@ -94,9 +120,9 @@ fun SettingsScreen(
 @Composable
 private fun SettingsActionsPanel(
     modifier: Modifier,
-    uiState: SettingsUiState,
     onBackupClick: () -> Unit,
-    onLockClick: () -> Unit,
+    onExportClick: () -> Unit,
+    onImportClick: () -> Unit,
     onLogoutClick: () -> Unit,
 ) {
     Column(
@@ -108,6 +134,20 @@ private fun SettingsActionsPanel(
             title = "Recovery Phrase",
             subtitle = "View your 24-word recovery phrase",
             onClick = onBackupClick,
+        )
+
+        AttoSettingsActionRow(
+            icon = Icons.Outlined.Download,
+            title = "Export Preferences",
+            subtitle = "Download address and transaction labels as JSON",
+            onClick = onExportClick,
+        )
+
+        AttoSettingsActionRow(
+            icon = Icons.Outlined.SyncAlt,
+            title = "Import Preferences",
+            subtitle = "Replace saved address and transaction labels from JSON",
+            onClick = onImportClick,
         )
 
         AttoSettingsActionRow(

@@ -51,6 +51,14 @@ fun AttoTransactionCard(
     val sourceColor = if (transaction.sourceLabel != null) dark_accent else dark_text_muted
     val sourceFont = if (transaction.sourceLabel != null) attoFontFamily() else FontFamily.Monospace
     val sourceWeight = if (transaction.sourceLabel != null) FontWeight.W600 else FontWeight.W400
+    val typeLabel =
+        when (transaction.type) {
+            TransactionType.OPEN -> "Open"
+            TransactionType.SEND -> "Sent"
+            TransactionType.RECEIVE -> "Received"
+            TransactionType.CHANGE -> "Change"
+        }
+    val hashLabel = transaction.transactionLabel?.takeIf { it.isNotBlank() }
 
     AttoCard(
         modifier = modifier,
@@ -93,13 +101,7 @@ fun AttoTransactionCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text =
-                            when (transaction.type) {
-                                TransactionType.OPEN -> "Open"
-                                TransactionType.SEND -> "Sent"
-                                TransactionType.RECEIVE -> "Received"
-                                TransactionType.CHANGE -> "Change"
-                            },
+                        text = typeLabel,
                         color = Color.White,
                         style =
                             MaterialTheme.typography.titleSmall.copy(
@@ -116,6 +118,13 @@ fun AttoTransactionCard(
                                 fontSize = 11.sp,
                             ),
                     )
+                    if (hashLabel != null) {
+                        TransactionHashLabel(
+                            text = hashLabel,
+                            color = dark_violet,
+                            modifier = Modifier.weight(1f, fill = false),
+                        )
+                    }
                 }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -174,4 +183,24 @@ fun AttoTransactionCard(
             }
         }
     }
+}
+
+@Composable
+private fun TransactionHashLabel(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style =
+            MaterialTheme.typography.bodySmall.copy(
+                fontWeight = FontWeight.W600,
+                fontSize = 12.sp,
+            ),
+    )
 }

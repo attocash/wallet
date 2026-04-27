@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room3.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
+import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
@@ -29,6 +30,7 @@ actual val databaseModule =
 actual val dataSourceModule =
     module {
         includes(databaseModule)
+        singleOf(::PreferencesDataSource)
         singleOf(::PasswordDataSource)
         singleOf(::SeedAESInteractor)
         singleOf(::SaltDataSource)
