@@ -42,10 +42,8 @@ private val RecoveryBorderHover = dark_accent_border_hover
 private val RecoveryTextPrimary = Color.White
 private val RecoveryTextSecondary = dark_text_secondary
 private val RecoveryTextTertiary = dark_text_muted
-private val RecoveryTextMuted = Color(0xFF505050)
 private val RecoveryGold = dark_accent
 private val RecoveryGoldSoft = dark_accent_soft
-private val RecoveryGoldSoftHover = dark_accent_soft_hover
 private val RecoveryGoldDark = dark_bg
 private val RecoverySuccess = dark_success
 
