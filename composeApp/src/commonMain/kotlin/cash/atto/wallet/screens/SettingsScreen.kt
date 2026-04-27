@@ -139,14 +139,14 @@ private fun SettingsActionsPanel(
         AttoSettingsActionRow(
             icon = Icons.Outlined.Download,
             title = "Export Preferences",
-            subtitle = "Download address and transaction labels as JSON",
+            subtitle = "Download address and transaction labels",
             onClick = onExportClick,
         )
 
         AttoSettingsActionRow(
             icon = Icons.Outlined.SyncAlt,
             title = "Import Preferences",
-            subtitle = "Replace saved address and transaction labels from JSON",
+            subtitle = "Replace saved address and transaction labels",
             onClick = onImportClick,
         )
 
