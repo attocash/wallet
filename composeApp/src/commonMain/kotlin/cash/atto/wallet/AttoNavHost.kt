@@ -1,16 +1,30 @@
 package cash.atto.wallet
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import cash.atto.wallet.components.common.AttoLoader
-import cash.atto.wallet.screens.*
+import cash.atto.wallet.screens.CreatePasswordScreen
+import cash.atto.wallet.screens.ImportPhraseScreen
+import cash.atto.wallet.screens.LoginScreen
+import cash.atto.wallet.screens.MainScreen
+import cash.atto.wallet.screens.RecoveryPhraseScreen
+import cash.atto.wallet.screens.WelcomeScreen
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.viewmodel.AppViewModel
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.router.stack.*
+import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.decompose.router.stack.backStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.popToFirst
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -24,11 +38,11 @@ fun AttoApp(
     initialOpenSendConfirm: Boolean = false,
     onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
-        @Composable (
-            onResult: (String) -> Unit,
-            onError: (String) -> Unit,
-            onDismiss: () -> Unit,
-        ) -> Unit
+    @Composable (
+        onResult: (String) -> Unit,
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit,
+    ) -> Unit
     )? = null,
 ) {
     val fontFamilyResolver = LocalFontFamilyResolver.current
@@ -74,11 +88,11 @@ fun AttoNavHost(
     initialOpenSendConfirm: Boolean = false,
     onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
-        @Composable (
-            onResult: (String) -> Unit,
-            onError: (String) -> Unit,
-            onDismiss: () -> Unit,
-        ) -> Unit
+    @Composable (
+        onResult: (String) -> Unit,
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit,
+    ) -> Unit
     )? = null,
     submitPassword: suspend (String?) -> Boolean,
     onLogout: () -> Unit,
@@ -218,12 +232,6 @@ fun AttoNavHost(
                             onImportAccount = {
                                 component.navigation.push(AttoDestination.CreatePassword)
                             },
-                        )
-                    }
-
-                    is AttoDestination.Voter -> {
-                        VoterScreen(
-                            onBackNavigation = { component.navigation.pop() },
                         )
                     }
 
