@@ -1,12 +1,11 @@
 package cash.atto.wallet
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
-import cash.atto.wallet.components.common.qrScannerView
+import cash.atto.wallet.components.common.QrScannerView
+import cash.atto.wallet.components.common.isQrScannerSupported
 import cash.atto.wallet.di.viewModelModule
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -25,6 +24,8 @@ fun main() {
 
     startKoin { modules(viewModelModule) }
 
+    val qrScannerAvailable = isQrScannerSupported()
+
     ComposeViewport(viewportContainerId = "AttoWallet") {
         AttoApp(
             component = navComponent,
@@ -39,16 +40,20 @@ fun main() {
                     clearWebQueryParams()
                 }
             },
-            qrScannerContent = { onResult, onError, _ ->
-                qrScannerView(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(320.dp),
-                    onQrCodeScanned = onResult,
-                    onScanError = onError,
-                )
-            },
+            qrScannerContent =
+                if (qrScannerAvailable) {
+                    { onResult, onError, _ ->
+                        QrScannerView(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth(),
+                            onQrCodeScanned = onResult,
+                            onScanError = onError,
+                        )
+                    }
+                } else {
+                    null
+                },
         )
     }
 }
