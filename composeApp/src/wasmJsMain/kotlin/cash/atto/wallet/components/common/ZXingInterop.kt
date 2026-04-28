@@ -57,10 +57,9 @@ internal fun decodeQrFromCanvas(
             module = ZXingModule,
             bitmap = bitmap,
         )?.takeIf(String::isNotBlank)
-    } catch (error: Throwable) {
-        val message = error.message ?: error.toString()
-        onDecoderError("Decoder error: $message")
-        println("QR decode error: $message")
+    } catch (_: Throwable) {
+        onDecoderError("Decoder error")
+        println("QR decode error")
         null
     }
 }
@@ -153,16 +152,10 @@ internal fun drawVideoFrame(
     js(
         """
     {
-        if (video.readyState < video.HAVE_CURRENT_DATA) {
-            canvas.__attoLastDrawStatus = 'Waiting for frame data (readyState=' + video.readyState + ')';
-            return false;
-        }
+        if (video.readyState < video.HAVE_CURRENT_DATA) return false;
         var vw = video.videoWidth;
         var vh = video.videoHeight;
-        if (vw === 0 || vh === 0) {
-            canvas.__attoLastDrawStatus = 'Video dimensions not ready yet';
-            return false;
-        }
+        if (vw === 0 || vh === 0) return false;
         var maxDim = 720;
         if (vw > maxDim || vh > maxDim) {
             var scale = maxDim / Math.max(vw, vh);
@@ -171,57 +164,15 @@ internal fun drawVideoFrame(
         }
         canvas.width = vw;
         canvas.height = vh;
-        if (canvas.width === 0 || canvas.height === 0) {
-            canvas.__attoLastDrawStatus = 'Canvas dimensions collapsed to zero';
-            return false;
-        }
+        if (canvas.width === 0 || canvas.height === 0) return false;
         var ctx = canvas.__attoCtx;
         if (!ctx) {
             ctx = canvas.getContext('2d', { willReadFrequently: true }) || canvas.getContext('2d');
             canvas.__attoCtx = ctx;
         }
-        if (!ctx) {
-            canvas.__attoLastDrawStatus = '2D canvas context unavailable';
-            return false;
-        }
+        if (!ctx) return false;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.__attoLastDrawStatus =
-            'Frame captured video=' + video.videoWidth + 'x' + video.videoHeight +
-            ' canvas=' + canvas.width + 'x' + canvas.height +
-            ' readyState=' + video.readyState;
         return true;
-    }
-""",
-    )
-
-internal fun lastFrameDrawStatus(canvas: HTMLCanvasElement): String =
-    js(
-        """(canvas.__attoLastDrawStatus || "No frame status yet")""",
-    )
-
-internal fun describeActiveVideoTrack(video: HTMLVideoElement): String =
-    js(
-        """
-    {
-        if (!video.srcObject) return 'Camera stream attached, track details unavailable';
-        var tracks = video.srcObject.getVideoTracks ? video.srcObject.getVideoTracks() : [];
-        if (!tracks.length) return 'Camera stream has no video tracks';
-        var track = tracks[0];
-        var settings = track.getSettings ? track.getSettings() : {};
-        var label = track.label || 'unknown';
-        var facingMode = settings.facingMode || 'unknown';
-        var width = settings.width || '?';
-        var height = settings.height || '?';
-        return 'Track=' + label + ' facing=' + facingMode + ' size=' + width + 'x' + height;
-    }
-""",
-    )
-
-internal fun describeVideoState(video: HTMLVideoElement): String =
-    js(
-        """
-    {
-        return 'Video readyState=' + video.readyState + ' size=' + (video.videoWidth || 0) + 'x' + (video.videoHeight || 0);
     }
 """,
     )
@@ -297,7 +248,16 @@ private fun decodeBitmapOrNull(
             var result = reader.decode(bitmap, hints);
             return result ? result.getText() : null;
         } catch (error) {
-            if (error && error.name === 'NotFoundException') return null;
+            if (
+                error &&
+                (
+                    error.name === 'NotFoundException' ||
+                    error.name === 'ChecksumException' ||
+                    error.name === 'FormatException'
+                )
+            ) {
+                return null;
+            }
             throw error;
         }
     }
