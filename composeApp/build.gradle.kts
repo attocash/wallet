@@ -201,6 +201,7 @@ kotlin {
             implementation(libs.androidx.datastore.preferences.core)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             implementation(libs.sqlite.web)
+            implementation(npm("@zxing/library", "0.21.3"))
             implementation(
                 npm(
                     "sqlite-web-worker",
