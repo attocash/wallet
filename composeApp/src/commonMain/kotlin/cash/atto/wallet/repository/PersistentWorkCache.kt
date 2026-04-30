@@ -1,7 +1,6 @@
 package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoWork
-import cash.atto.commons.wallet.AttoWorkCache
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.Work
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class PersistentWorkCache(
     appDatabase: AppDatabase,
-) : AttoWorkCache {
+) {
     private val dao = appDatabase.workDao()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _hasCachedWork = MutableStateFlow(false)
@@ -33,11 +32,9 @@ class PersistentWorkCache(
         }
     }
 
-    override suspend fun get(): AttoWork? {
-        return dao.get()?.let { AttoWork(it.value) }
-    }
+    suspend fun get(): AttoWork? = dao.get()?.let { AttoWork(it.value) }
 
-    override suspend fun save(work: AttoWork) {
+    suspend fun save(work: AttoWork) {
         dao.clear()
         dao.set(
             Work(
@@ -46,5 +43,10 @@ class PersistentWorkCache(
             ),
         )
         _hasCachedWork.value = true
+    }
+
+    suspend fun clear() {
+        dao.clear()
+        _hasCachedWork.value = false
     }
 }

@@ -1,10 +1,10 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
-import cash.atto.commons.wallet.AttoWalletManager
 import cash.atto.wallet.model.Voter
 import cash.atto.wallet.model.calculateEntityWeightPercentage
 import cash.atto.wallet.repository.VotersRepository
@@ -32,8 +32,8 @@ class VoterViewModel(
             // Fetch voters data first
             votersRepository.fetchVoters()
 
-            // Then collect wallet state
-            walletManagerRepository.state
+            // Then collect wallet account state
+            walletManagerRepository.accountState
                 .collect { updateRepresentative(it) }
         }
     }
@@ -44,7 +44,7 @@ class VoterViewModel(
                 AttoAddress.parse(address),
             )
 
-            updateRepresentative(walletManagerRepository.state.value)
+            updateRepresentative(walletManagerRepository.accountState.value)
 
             return true
         }
@@ -62,13 +62,13 @@ class VoterViewModel(
         return result
     }
 
-    private suspend fun updateRepresentative(walletManager: AttoWalletManager?) {
-        if (walletManager?.account == null) {
+    private suspend fun updateRepresentative(account: AttoAccount?) {
+        if (account == null) {
             return
         }
 
         val representativeAddress =
-            walletManager.account!!
+            account
                 .representativePublicKey
                 .toAddress(AttoAlgorithm.V1)
                 .value

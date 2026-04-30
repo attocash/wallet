@@ -13,9 +13,9 @@ import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.model.mergeAccountEntries
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
-import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewUiState
 import cash.atto.wallet.uistate.overview.buildTransactionListUiState
@@ -40,7 +40,6 @@ class OverviewViewModel(
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private var accountCollectorJob: Job? = null
     private var accountEntriesCollectorJob: Job? = null
     private var receivablesCollectorJob: Job? = null
     private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
@@ -78,46 +77,37 @@ class OverviewViewModel(
         }
 
         scope.launch {
-            walletManagerRepository.state
+            walletManagerRepository.accountState
                 .filterNotNull()
-                .collect { wallet ->
-                    println(
-                        "OverviewViewModel is collecting account information from wallet ${
-                            AttoAddress(
-                                AttoAlgorithm.V1,
-                                wallet.publicKey,
-                            )
-                        }",
-                    )
+                .collect { account ->
+                    println("Account $account")
 
-                    accountCollectorJob?.cancel()
-                    accountCollectorJob =
-                        scope.launch {
-                            wallet.accountFlow.collect { account ->
-                                println("Account $account")
+                    currentRepresentativeAddress =
+                        AttoAddress(
+                            account.representativeAlgorithm,
+                            account.representativePublicKey,
+                        ).toString()
 
-                                currentRepresentativeAddress =
-                                    AttoAddress(
-                                        account.representativeAlgorithm,
-                                        account.representativePublicKey,
-                                    ).toString()
+                    currentBalance =
+                        account.balance
+                            .toString(AttoUnit.ATTO)
+                            .toBigDecimal()
 
-                                currentBalance =
-                                    account.balance
-                                        .toString(AttoUnit.ATTO)
-                                        .toBigDecimal()
+                    emitUpdatedState()
+                }
+        }
 
-                                emitUpdatedState()
-                            }
-                        }
-
+        scope.launch {
+            walletManagerRepository.publicKeyState
+                .filterNotNull()
+                .collect { publicKey ->
                     accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob =
                         scope.launch {
                             // Load persisted entries from DB so they show after a page refresh.
                             val persisted =
                                 persistentAccountEntryRepository.listRecent(
-                                    wallet.publicKey,
+                                    publicKey,
                                     RECENT_TRANSACTION_LIMIT,
                                 )
                             if (persisted.isNotEmpty()) {
@@ -125,7 +115,7 @@ class OverviewViewModel(
                                 emitUpdatedState()
                             }
 
-                            persistentAccountEntryRepository.flow(wallet.publicKey).collect { entry ->
+                            persistentAccountEntryRepository.flow(publicKey).collect { entry ->
                                 recentEntries =
                                     mergeAccountEntries(
                                         current = recentEntries,

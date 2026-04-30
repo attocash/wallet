@@ -46,25 +46,23 @@ class SendTransactionViewModel(
         }
 
         viewModelScope.launch {
-            walletManagerRepository.state
+            walletManagerRepository.accountState
                 .filterNotNull()
-                .collect { wallet ->
+                .collect { account ->
                     println(
                         "SendTransactionViewModel is collecting account information from wallet ${
                             AttoAddress(
                                 AttoAlgorithm.V1,
-                                wallet.publicKey,
+                                account.publicKey,
                             )
                         }",
                     )
-                    wallet.accountFlow.collect { account ->
-                        println("Account $account")
-                        _state.emit(
-                            state.value.copy(
-                                account = account,
-                            ),
-                        )
-                    }
+                    println("Account $account")
+                    _state.emit(
+                        state.value.copy(
+                            account = account,
+                        ),
+                    )
                 }
         }
     }
@@ -126,12 +124,10 @@ class SendTransactionViewModel(
                 ) ?: throw IllegalStateException("Invalid address")
 
             val block =
-                walletManagerRepository.state
-                    .value!!
-                    .send(
-                        receiverAddress = receiverAddress,
-                        amount = amount,
-                    )
+                walletManagerRepository.send(
+                    receiverAddress = receiverAddress,
+                    amount = amount,
+                )
 
             _state.emit(
                 state.value.copy(
@@ -198,14 +194,21 @@ class SendTransactionViewModel(
                     .divide(
                         priceUsd,
                         DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING),
-                    ).roundToDigitPositionAfterDecimalPoint(18, RoundingMode.ROUND_HALF_CEILING)
+                    ).roundToDigitPositionAfterDecimalPoint(
+                        18,
+                        RoundingMode.ROUND_HALF_CEILING,
+                    )
             } else {
                 rawAmount
             }
 
         val amountCheckResult = amount != null && (!state.value.isUsdMode || hasUsdPrice)
 
-        val destinationAddress = state.value.sendFromUiState.address.orEmpty()
+        val destinationAddress =
+            state.value
+                .sendFromUiState
+                .address
+                .orEmpty()
         val liveAddressErrorMessage = validateAddress(destinationAddress)
         val addressErrorMessage =
             if (destinationAddress.isBlank()) {
