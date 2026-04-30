@@ -4,6 +4,8 @@ import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoBlock
 import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoNetwork
+import cash.atto.commons.AttoPublicKey
+import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoWork
 import cash.atto.commons.AttoWorkTarget
 import cash.atto.commons.isValid
@@ -14,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal class PersistentWorkCachingWorker(
     private val network: AttoNetwork,
@@ -21,46 +25,28 @@ internal class PersistentWorkCachingWorker(
     private val delegate: AttoWorker,
 ) : AttoWorker {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val inFlightMutex = Mutex()
+    private val inFlightTargets = mutableMapOf<AttoPublicKey, AttoWorkTarget>()
 
     override suspend fun work(
         threshold: ULong,
         target: AttoWorkTarget,
-    ): AttoWork {
-        cachedWork(threshold, target)?.let {
-            workCache.clear()
-            return it
-        }
-
-        workCache.clear()
-        return delegate.work(threshold, target).also {
-            workCache.save(it)
-        }
-    }
+    ): AttoWork = delegate.work(threshold, target)
 
     override suspend fun work(
         network: AttoNetwork,
         timestamp: AttoInstant,
         target: AttoWorkTarget,
-    ): AttoWork {
-        cachedWork(network, timestamp, target)?.let {
-            workCache.clear()
-            return it
-        }
-
-        workCache.clear()
-        return delegate.work(network, timestamp, target).also {
-            workCache.save(it)
-        }
-    }
+    ): AttoWork = delegate.work(network, timestamp, target)
 
     override suspend fun work(block: AttoBlock): AttoWork {
-        val cachedWork = workCache.get()
+        val cachedWork = workCache.get(block.publicKey)
         val work =
             if (cachedWork?.isValid(block) == true) {
-                workCache.clear()
+                workCache.clear(block.publicKey)
                 cachedWork
             } else {
-                workCache.clear()
+                workCache.clear(block.publicKey)
                 delegate.work(block)
             }
 
@@ -75,53 +61,97 @@ internal class PersistentWorkCachingWorker(
 
     suspend fun cacheNextWork(account: AttoAccount) {
         cacheWork(
+            publicKey = account.publicKey,
             target = AttoWorkTarget(account.lastTransactionHash.value),
             description = account.lastTransactionHash.toString(),
         )
     }
 
-    private suspend fun cachedWork(
-        threshold: ULong,
-        target: AttoWorkTarget,
-    ): AttoWork? =
-        workCache
-            .get()
-            ?.takeIf { AttoWork.isValid(threshold, target, it.value) }
+    suspend fun prepareReceiveWork(
+        receivable: AttoReceivable,
+        account: AttoAccount?,
+    ): Boolean {
+        val target =
+            AttoWorkTarget(
+                account
+                    ?.lastTransactionHash
+                    ?.value
+                    ?: receivable.receiverPublicKey.value,
+            )
+
+        cacheWork(
+            publicKey = receivable.receiverPublicKey,
+            target = target,
+            description = receivable.hash.toString(),
+        )
+
+        return cachedWork(
+            publicKey = receivable.receiverPublicKey,
+            network = network,
+            timestamp = AttoInstant.now(),
+            target = target,
+        ) != null
+    }
 
     private suspend fun cachedWork(
+        publicKey: AttoPublicKey,
         network: AttoNetwork,
         timestamp: AttoInstant,
         target: AttoWorkTarget,
-    ): AttoWork? =
-        workCache
-            .get()
-            ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
+    ): AttoWork? = workCache.getValid(publicKey, network, timestamp, target)
 
     private suspend fun cacheNextWork(block: AttoBlock) {
         cacheWork(
+            publicKey = block.publicKey,
             target = AttoWorkTarget(block.hash.value),
             description = block.hash.toString(),
         )
     }
 
     private suspend fun cacheWork(
+        publicKey: AttoPublicKey,
         target: AttoWorkTarget,
         description: String,
     ) {
         val timestamp = AttoInstant.now()
-        if (cachedWork(network, timestamp, target) != null) {
+        if (cachedWork(publicKey, network, timestamp, target) != null) {
             return
         }
 
-        workCache.clear()
+        val shouldLaunch =
+            inFlightMutex.withLock {
+                if (inFlightTargets[publicKey] == target) {
+                    false
+                } else {
+                    inFlightTargets[publicKey] = target
+                    true
+                }
+            }
+        if (!shouldLaunch) {
+            return
+        }
+
+        workCache.clear(publicKey)
         scope.launch {
             try {
                 val work = delegate.work(network, timestamp, target)
-                workCache.save(work)
+                val isLatestTarget =
+                    inFlightMutex.withLock {
+                        inFlightTargets[publicKey] == target
+                    }
+                if (isLatestTarget) {
+                    workCache.save(publicKey, work)
+                }
             } catch (ex: CancellationException) {
                 throw ex
             } catch (ex: Exception) {
                 println("Failed to cache work for $description: ${ex.message}")
+            } finally {
+                inFlightMutex.withLock {
+                    if (inFlightTargets[publicKey] == target) {
+                        inFlightTargets.remove(publicKey)
+                    }
+                }
             }
         }
     }

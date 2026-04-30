@@ -14,6 +14,8 @@ data class OverviewUiState(
     val apy: BigDecimal? = null,
     val transactionListUiState: TransactionListUiState = TransactionListUiState.DEFAULT,
     val receiveAddress: String?,
+    val accounts: List<OverviewAccountUiState> = emptyList(),
+    val selectedAccountIndex: UInt = 0U,
     val pendingReceivableCount: Int = 0,
     val pendingReceivableAmount: BigDecimal = BigDecimal.ZERO,
     val voterName: String? = null,
@@ -46,6 +48,14 @@ data class OverviewUiState(
             )
     }
 }
+
+data class OverviewAccountUiState(
+    val index: UInt,
+    val name: String,
+    val address: String,
+    val balance: BigDecimal?,
+    val active: Boolean,
+)
 
 @OptIn(ExperimentalTime::class)
 fun buildTransactionListUiState(

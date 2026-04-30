@@ -4,6 +4,7 @@ import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.getPlatform
 import cash.atto.wallet.interactor.SeedAESInteractor
+import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.model.UserPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +70,36 @@ class PreferencesRepository(
         )
     }
 
+    suspend fun setAccountStatus(
+        index: UInt,
+        status: AccountPreferenceStatus,
+    ) {
+        val preferences = state.value
+        val isActivating = status == AccountPreferenceStatus.ACTIVATED
+        val alreadyActive = preferences.accountStatus(index) == AccountPreferenceStatus.ACTIVATED
+        if (isActivating && !alreadyActive && preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
+            error("Only ${UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT} active accounts are supported.")
+        }
+
+        savePreferences(
+            preferences.withAccountStatus(
+                index = index,
+                status = status,
+            ),
+        )
+    }
+
+    suspend fun addAccount(): UInt? {
+        val preferences = state.value
+        if (preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
+            return null
+        }
+
+        val nextIndex = preferences.nextAvailableAccountIndex() ?: return null
+        savePreferences(preferences.withAccountStatus(nextIndex, AccountPreferenceStatus.ACTIVATED))
+        return nextIndex
+    }
+
     fun getAddressLabel(address: String): String? = state.value.addressLabel(address)
 
     fun getHashLabel(hash: String): String? = state.value.hashLabel(hash)
@@ -87,7 +118,10 @@ class PreferencesRepository(
     }
 
     private suspend fun savePreferences(preferences: UserPreferences) {
-        val rawJson = json.encodeToString(UserPreferences.serializer(), preferences)
+        val normalizedPreferences = preferences.normalized()
+        _state.emit(normalizedPreferences)
+
+        val rawJson = json.encodeToString(UserPreferences.serializer(), normalizedPreferences)
         val storedJson =
             if (getPlatform().type == PlatformType.WEB) {
                 val password =
@@ -134,23 +168,29 @@ class PreferencesRepository(
             json.decodeFromString(UserPreferences.serializer(), rawJson)
         }.getOrElse {
             UserPreferences.EMPTY
-        }
+        }.normalized()
     }
 }
 
 private fun UserPreferences.normalized(): UserPreferences {
+    val emptyPreferences = UserPreferences(accounts = emptyMap())
     val normalizedAddresses =
-        addresses.fold(UserPreferences.EMPTY) { preferences, entry ->
+        addresses.fold(emptyPreferences) { preferences, entry ->
             preferences.withAddressLabel(
                 value = entry.value,
                 label = entry.label,
             )
         }
 
-    return hashes.fold(normalizedAddresses) { preferences, entry ->
-        preferences.withHashLabel(
-            value = entry.value,
-            label = entry.label,
-        )
-    }
+    val normalizedHashes =
+        hashes.fold(normalizedAddresses) { preferences, entry ->
+            preferences.withHashLabel(
+                value = entry.value,
+                label = entry.label,
+            )
+        }
+
+    return normalizedHashes.copy(
+        accounts = copy(accounts = accounts).normalizedAccounts(),
+    )
 }

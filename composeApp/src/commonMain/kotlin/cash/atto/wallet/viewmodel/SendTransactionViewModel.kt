@@ -5,7 +5,10 @@ import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
+import cash.atto.wallet.model.defaultAccountName
 import cash.atto.wallet.repository.HomeRepository
+import cash.atto.wallet.repository.PreferencesRepository
+import cash.atto.wallet.repository.WalletAccountState
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.AttoPaymentRequests
 import cash.atto.wallet.uistate.send.SendTransactionUiState
@@ -18,18 +21,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SendTransactionViewModel(
     private val walletManagerRepository: WalletManagerRepository,
     private val homeRepository: HomeRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SendTransactionUiState.DEFAULT)
     val state = _state.asStateFlow()
 
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
+    private var accounts: List<WalletAccountState> = emptyList()
+    private var selectedAccountIndex: UInt = 0U
 
     init {
         viewModelScope.launch {
@@ -46,25 +51,63 @@ class SendTransactionViewModel(
         }
 
         viewModelScope.launch {
-            walletManagerRepository.accountState
-                .filterNotNull()
-                .collect { account ->
-                    println(
-                        "SendTransactionViewModel is collecting account information from wallet ${
-                            AttoAddress(
-                                AttoAlgorithm.V1,
-                                account.publicKey,
-                            )
-                        }",
-                    )
-                    println("Account $account")
-                    _state.emit(
-                        state.value.copy(
-                            account = account,
-                        ),
-                    )
-                }
+            walletManagerRepository.accountsState.collect {
+                accounts = it
+                emitSelectedAccountName()
+            }
         }
+
+        viewModelScope.launch {
+            walletManagerRepository.selectedAccountIndexState.collect {
+                selectedAccountIndex = it.value
+                emitSelectedAccountName()
+            }
+        }
+
+        viewModelScope.launch {
+            preferencesRepository.state.collect {
+                emitSelectedAccountName()
+            }
+        }
+
+        viewModelScope.launch {
+            walletManagerRepository.accountState.collect { account ->
+                if (account == null) {
+                    _state.emit(state.value.copy(account = null))
+                    return@collect
+                }
+
+                println(
+                    "SendTransactionViewModel is collecting account information from wallet ${
+                        AttoAddress(
+                            AttoAlgorithm.V1,
+                            account.publicKey,
+                        )
+                    }",
+                )
+                println("Account $account")
+                _state.emit(
+                    state.value.copy(
+                        account = account,
+                    ),
+                )
+            }
+        }
+    }
+
+    private suspend fun emitSelectedAccountName() {
+        val selectedAccount = accounts.firstOrNull { it.index.value == selectedAccountIndex }
+        val accountName =
+            selectedAccount?.let {
+                preferencesRepository.getAddressLabel(it.address.toString())
+                    ?: defaultAccountName(it.index.value)
+            }
+
+        _state.emit(
+            state.value.copy(
+                accountName = accountName,
+            ),
+        )
     }
 
     suspend fun updateSendInfo(

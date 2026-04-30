@@ -78,11 +78,14 @@ interface WorkDao {
     @Query("SELECT * FROM work ORDER BY value LIMIT 1")
     suspend fun get(): Work?
 
+    @Query("SELECT * FROM work WHERE publicKey = :publicKey LIMIT 1")
+    suspend fun get(publicKey: ByteArray): Work?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun set(work: Work)
 
-    @Query("DELETE FROM work")
-    suspend fun clear()
+    @Query("DELETE FROM work WHERE publicKey = :publicKey")
+    suspend fun clear(publicKey: ByteArray)
 }
 
 @Entity(
