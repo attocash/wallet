@@ -39,7 +39,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,13 +75,15 @@ fun AttoTransactionDetailsDialog(
     var editingAddressLabel by remember(transaction.source) { mutableStateOf(false) }
     val resolvedAddressLabel =
         when (transaction.type) {
-            TransactionType.CHANGE ->
+            TransactionType.CHANGE -> {
                 preferencesRepository.getAddressLabel(transaction.source)
                     ?: homeRepository.homeResponse.value?.getVoterLabel(transaction.source)
+            }
 
-            else ->
+            else -> {
                 preferencesRepository.getAddressLabel(transaction.source)
                     ?: homeRepository.homeResponse.value?.getAddressLabel(transaction.source)
+            }
         }
 
     LaunchedEffect(savedAddressLabel, transaction.source) {

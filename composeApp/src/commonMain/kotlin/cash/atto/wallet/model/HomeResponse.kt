@@ -13,7 +13,6 @@ data class HomeResponse(
     val voterMap = voters.associateBy { it.address }
 }
 
-
 fun HomeResponse.getPriceUsd(): String? = metrics.getPriceUsd()
 
 fun HomeResponse.getStakingApy(): String? = metrics.getStakingApy()

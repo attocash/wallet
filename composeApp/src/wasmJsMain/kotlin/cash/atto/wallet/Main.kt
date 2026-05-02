@@ -60,8 +60,11 @@ fun main() {
 
 private fun initialWebDestination(launchRequest: WebSendLaunchRequest?): AttoDestination =
     when {
-        launchRequest != null -> AttoDestination.DesktopMain
-        else ->
+        launchRequest != null -> {
+            AttoDestination.DesktopMain
+        }
+
+        else -> {
             when (webQueryParam("screen")) {
                 "welcome" -> AttoDestination.Welcome
 
@@ -71,7 +74,7 @@ private fun initialWebDestination(launchRequest: WebSendLaunchRequest?): AttoDes
                 "transactions",
                 "settings",
                 "staking",
-                    -> AttoDestination.DesktopMain
+                -> AttoDestination.DesktopMain
 
                 "secretPhrase", "recovery-phrase" -> AttoDestination.RecoveryPhrase
 
@@ -81,6 +84,7 @@ private fun initialWebDestination(launchRequest: WebSendLaunchRequest?): AttoDes
 
                 else -> AttoDestination.Welcome
             }
+        }
     }
 
 internal fun webDebugScreen(): String? = webQueryParam("screen")

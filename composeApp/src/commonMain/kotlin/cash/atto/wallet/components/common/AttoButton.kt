@@ -101,8 +101,7 @@ fun AttoButton(
                     } else {
                         Modifier
                     },
-                )
-                .clickable(
+                ).clickable(
                     enabled = enabled,
                     interactionSource = interactionSource,
                     indication = null,

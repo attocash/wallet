@@ -38,11 +38,11 @@ fun AttoApp(
     initialOpenSendConfirm: Boolean = false,
     onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
-    @Composable (
-        onResult: (String) -> Unit,
-        onError: (String) -> Unit,
-        onDismiss: () -> Unit,
-    ) -> Unit
+        @Composable (
+            onResult: (String) -> Unit,
+            onError: (String) -> Unit,
+            onDismiss: () -> Unit,
+        ) -> Unit
     )? = null,
 ) {
     val fontFamilyResolver = LocalFontFamilyResolver.current
@@ -88,11 +88,11 @@ fun AttoNavHost(
     initialOpenSendConfirm: Boolean = false,
     onAuthenticated: (() -> Unit)? = null,
     qrScannerContent: (
-    @Composable (
-        onResult: (String) -> Unit,
-        onError: (String) -> Unit,
-        onDismiss: () -> Unit,
-    ) -> Unit
+        @Composable (
+            onResult: (String) -> Unit,
+            onError: (String) -> Unit,
+            onDismiss: () -> Unit,
+        ) -> Unit
     )? = null,
     submitPassword: suspend (String?) -> Boolean,
     onLogout: () -> Unit,

@@ -6,8 +6,8 @@ import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.AppDatabaseConstructor
-import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.PasswordDataSource
+import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.SaltDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.interactor.SeedAESInteractor

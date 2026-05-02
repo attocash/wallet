@@ -1,8 +1,8 @@
 package cash.atto.wallet.uistate.welcome
 
 import cash.atto.wallet.model.MetricsResponse
-import cash.atto.wallet.model.getConfirmationMs
 import cash.atto.wallet.model.getCirculatingSupply
+import cash.atto.wallet.model.getConfirmationMs
 import cash.atto.wallet.model.getPriceUsd
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode

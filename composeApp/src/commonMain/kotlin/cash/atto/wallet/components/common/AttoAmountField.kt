@@ -69,7 +69,9 @@ fun AttoAmountField(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = imeAction),
             keyboardActions = keyboardActions,
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+            shape =
+                androidx.compose.foundation.shape
+                    .RoundedCornerShape(8.dp),
             textStyle =
                 if (largeFontSize) {
                     MaterialTheme.typography.headlineMedium.copy(

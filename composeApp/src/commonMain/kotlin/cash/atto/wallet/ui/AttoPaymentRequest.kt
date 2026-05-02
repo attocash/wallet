@@ -63,7 +63,7 @@ object AttoPaymentRequests {
         val query =
             buildList {
                 add("receiverAddress=${receiverAddress.encodeURLParameter()}")
-                sanitizedAmount?.let { add("amount=${it}") }
+                sanitizedAmount?.let { add("amount=$it") }
             }.joinToString("&")
 
         return "$WALLET_BASE_URL?$query"

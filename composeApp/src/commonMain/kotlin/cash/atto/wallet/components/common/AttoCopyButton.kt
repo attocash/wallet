@@ -29,12 +29,14 @@ import cash.atto.wallet.ui.attoHoverTint
 import cash.atto.wallet.ui.dark_text_tertiary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A reusable copy-to-clipboard icon button with visual confirmation.
  *
  * Shows a ContentCopy icon by default. When clicked, copies [text] to the clipboard
- * and briefly shows a Check icon for [confirmationDurationMs] before reverting.
+ * and briefly shows a Check icon for [confirmationDuration] before reverting.
  *
  * @param text The string to copy to the clipboard.
  * @param modifier Modifier for the outer container.
@@ -42,7 +44,7 @@ import kotlinx.coroutines.launch
  * @param tint The icon tint color.
  * @param confirmTint The tint for the check icon shown after copying.
  * @param contentDescription Accessibility description.
- * @param confirmationDurationMs How long the check icon is shown (default 1000ms).
+ * @param confirmationDuration How long the check icon is shown (default 1000ms).
  * @param onCopied Optional callback invoked after the text is copied.
  */
 @Composable
@@ -53,7 +55,7 @@ fun AttoCopyButton(
     tint: Color = dark_text_tertiary,
     confirmTint: Color = Color(0xFF4CAF50),
     contentDescription: String? = "Copy",
-    confirmationDurationMs: Long = 1000L,
+    confirmationDuration: Duration = 1.seconds,
     onCopied: (() -> Unit)? = null,
 ) {
     val clipboard = LocalClipboard.current
@@ -64,7 +66,7 @@ fun AttoCopyButton(
 
     LaunchedEffect(copied) {
         if (copied) {
-            delay(confirmationDurationMs)
+            delay(confirmationDuration)
             copied = false
         }
     }

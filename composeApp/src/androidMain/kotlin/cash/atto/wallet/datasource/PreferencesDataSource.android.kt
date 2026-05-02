@@ -12,7 +12,12 @@ actual class PreferencesDataSource(
 ) {
     private val dataStore =
         PreferenceDataStoreFactory.createWithPath(
-            produceFile = { context.filesDir.resolve("user-preferences.preferences_pb").absolutePath.toPath() },
+            produceFile = {
+                context.filesDir
+                    .resolve("user-preferences.preferences_pb")
+                    .absolutePath
+                    .toPath()
+            },
         )
 
     actual val blob =
