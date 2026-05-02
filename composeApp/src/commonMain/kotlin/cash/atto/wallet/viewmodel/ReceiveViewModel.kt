@@ -3,8 +3,8 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
-import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.HomeRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ReceiveViewModel(
-    private val appStateRepository: AppStateRepository,
+    private val walletManagerRepository: WalletManagerRepository,
     private val homeRepository: HomeRepository,
 ) : ViewModel() {
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
@@ -25,10 +25,9 @@ class ReceiveViewModel(
 
     init {
         viewModelScope.launch {
-            appStateRepository.state.collect { appState ->
+            walletManagerRepository.publicKeyState.collect { publicKey ->
                 _address.emit(
-                    appState
-                        .getPublicKey()
+                    publicKey
                         ?.toAddress(AttoAlgorithm.V1)
                         ?.value,
                 )

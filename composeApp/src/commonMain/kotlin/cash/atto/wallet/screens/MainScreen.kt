@@ -10,7 +10,7 @@ import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.common.AttoWallet
 import cash.atto.wallet.components.settings.BackupSecretDialog
 import cash.atto.wallet.components.settings.LogoutDialog
-import cash.atto.wallet.repository.PersistentWorkCache
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
@@ -32,9 +32,9 @@ fun MainScreen(
     )? = null,
 ) {
     val viewModel = koinViewModel<MainScreenViewModel>()
-    val workCache = koinInject<PersistentWorkCache>()
+    val walletManagerRepository = koinInject<WalletManagerRepository>()
     val uiState = viewModel.state.collectAsState()
-    val hasCachedWork = workCache.hasCachedWork.collectAsState()
+    val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
 
     val navState =
         rememberSaveable {

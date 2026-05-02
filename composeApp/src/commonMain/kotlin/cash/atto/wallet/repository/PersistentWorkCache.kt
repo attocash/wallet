@@ -1,50 +1,65 @@
 package cash.atto.wallet.repository
 
+import cash.atto.commons.AttoInstant
+import cash.atto.commons.AttoNetwork
+import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoWork
-import cash.atto.commons.wallet.AttoWorkCache
+import cash.atto.commons.AttoWorkTarget
+import cash.atto.commons.isValid
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.Work
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class PersistentWorkCache(
     appDatabase: AppDatabase,
-) : AttoWorkCache {
+) {
     private val dao = appDatabase.workDao()
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val _hasCachedWork = MutableStateFlow(false)
+    private val _version = MutableStateFlow(0L)
 
-    val hasCachedWork: StateFlow<Boolean> = _hasCachedWork.asStateFlow()
+    val version: StateFlow<Long> = _version.asStateFlow()
 
-    init {
-        scope.launch {
-            while (isActive) {
-                _hasCachedWork.value = dao.get() != null
-                delay(1.seconds)
-            }
-        }
-    }
+    suspend fun get(): AttoWork? = dao.get()?.let { AttoWork(it.value) }
 
-    override suspend fun get(): AttoWork? {
-        return dao.get()?.let { AttoWork(it.value) }
-    }
+    suspend fun get(publicKey: AttoPublicKey): AttoWork? = dao.get(publicKey.value)?.let { AttoWork(it.value) }
 
-    override suspend fun save(work: AttoWork) {
-        dao.clear()
+    suspend fun getValid(
+        publicKey: AttoPublicKey,
+        network: AttoNetwork,
+        timestamp: AttoInstant,
+        target: AttoWorkTarget,
+    ): AttoWork? =
+        get(publicKey)
+            ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
+
+    suspend fun hasValid(
+        publicKey: AttoPublicKey,
+        network: AttoNetwork,
+        timestamp: AttoInstant,
+        target: AttoWorkTarget,
+    ): Boolean = getValid(publicKey, network, timestamp, target) != null
+
+    suspend fun save(
+        publicKey: AttoPublicKey,
+        work: AttoWork,
+    ) {
+        dao.clear(publicKey.value)
         dao.set(
             Work(
-                publicKey = ByteArray(32),
+                publicKey = publicKey.value,
                 value = work.value,
             ),
         )
-        _hasCachedWork.value = true
+        markChanged()
+    }
+
+    suspend fun clear(publicKey: AttoPublicKey) {
+        dao.clear(publicKey.value)
+        markChanged()
+    }
+
+    private fun markChanged() {
+        _version.value += 1
     }
 }

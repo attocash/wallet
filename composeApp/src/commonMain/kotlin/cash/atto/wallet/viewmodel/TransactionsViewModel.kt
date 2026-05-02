@@ -9,8 +9,8 @@ import cash.atto.wallet.model.TransactionsHistoryState
 import cash.atto.wallet.model.getAddressLabel
 import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.repository.HomeRepository
-import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -55,10 +55,10 @@ class TransactionsViewModel(
         }
 
         scope.launch {
-            walletManagerRepository.state
+            walletManagerRepository.publicKeyState
                 .filterNotNull()
-                .collect { wallet ->
-                    currentPublicKey = wallet.publicKey
+                .collect { publicKey ->
+                    currentPublicKey = publicKey
                     historyState = TransactionsHistoryState()
                     _state.emit(
                         TransactionsUiState(
@@ -66,18 +66,18 @@ class TransactionsViewModel(
                         ),
                     )
 
-                    loadInitialPage(wallet.publicKey)
+                    loadInitialPage(publicKey)
 
                     summaryCollectorJob?.cancel()
                     summaryCollectorJob =
                         scope.launch {
-                            loadSummary(wallet.publicKey)
+                            loadSummary(publicKey)
                         }
 
                     accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob =
                         scope.launch {
-                            persistentAccountEntryRepository.flow(wallet.publicKey).collect { entry ->
+                            persistentAccountEntryRepository.flow(publicKey).collect { entry ->
                                 if (entry.publicKey != currentPublicKey) return@collect
 
                                 historyState = historyState.withLiveEntry(entry)

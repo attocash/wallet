@@ -17,6 +17,7 @@ data class SendTransactionUiState(
     private val amount: BigDecimal?,
     private val address: String?,
     private val operationResult: SendOperationResult,
+    private val accountName: String? = null,
     private val showAmountError: Boolean = false,
     private val showAddressError: Boolean = false,
     private val addressErrorMessage: String? = null,
@@ -60,7 +61,7 @@ data class SendTransactionUiState(
             account?.let {
                 val accountBalance = it.balance.toString(AttoUnit.ATTO)
                 SendFromUiState(
-                    accountName = "Main Account",
+                    accountName = accountName,
                     accountSeed =
                         it.publicKey
                             .toAddress(AttoAlgorithm.V1)
@@ -115,6 +116,7 @@ data class SendTransactionUiState(
                 amount = null,
                 address = null,
                 operationResult = SendOperationResult.UNKNOWN,
+                accountName = null,
                 elapsedMs = null,
                 isUsdMode = false,
             )

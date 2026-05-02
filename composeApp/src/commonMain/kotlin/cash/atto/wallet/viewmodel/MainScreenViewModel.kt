@@ -3,7 +3,6 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
-import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoUnit
 import cash.atto.wallet.model.getStakingApy
 import cash.atto.wallet.model.getVoter
@@ -31,7 +30,6 @@ class MainScreenViewModel(
     private val _state = MutableStateFlow(MainScreenUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private var accountCollectorJob: Job? = null
     private var settingsCollectorJob: Job? = null
     private var homeCollectorJob: Job? = null
     private var receivablesCollectorJob: Job? = null
@@ -43,25 +41,10 @@ class MainScreenViewModel(
 
     init {
         scope.launch {
-            walletManagerRepository.state
+            walletManagerRepository.accountState
                 .filterNotNull()
-                .collect { wallet ->
-                    println(
-                        "MainViewModel is collecting account information from wallet ${
-                            AttoAddress(
-                                AttoAlgorithm.V1,
-                                wallet.publicKey,
-                            )
-                        }",
-                    )
-
-                    accountCollectorJob?.cancel()
-                    accountCollectorJob =
-                        scope.launch {
-                            wallet.accountFlow.collect { account ->
-                                handleAccount(account)
-                            }
-                        }
+                .collect { account ->
+                    handleAccount(account)
                 }
         }
 

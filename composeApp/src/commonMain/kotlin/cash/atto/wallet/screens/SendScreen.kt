@@ -21,13 +21,12 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.components.send.SavedAddressesDialog
 import cash.atto.wallet.model.LabeledPreferenceEntry
 import cash.atto.wallet.repository.PreferencesRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -53,8 +52,8 @@ fun SendScreen(
     val overviewUiState = overviewViewModel.state.collectAsState()
     val preferencesRepository = koinInject<PreferencesRepository>()
     val preferences by preferencesRepository.state.collectAsState()
-    val workCache = org.koin.compose.koinInject<cash.atto.wallet.repository.PersistentWorkCache>()
-    val hasCachedWork = workCache.hasCachedWork.collectAsState()
+    val walletManagerRepository = koinInject<WalletManagerRepository>()
+    val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val sendNavState = remember { mutableStateOf(SendScreenState.SEND) }

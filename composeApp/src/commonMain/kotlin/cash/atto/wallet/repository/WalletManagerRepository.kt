@@ -1,16 +1,35 @@
 package cash.atto.wallet.repository
 
-import cash.atto.commons.*
-import cash.atto.commons.gatekeeper.AttoAuthenticator
-import cash.atto.commons.gatekeeper.attoBackend
-import cash.atto.commons.node.AttoNodeClient
-import cash.atto.commons.wallet.AttoWalletManager
-import cash.atto.commons.wallet.AttoWalletViewer
-import cash.atto.commons.worker.AttoWorker
+import cash.atto.commons.AttoAccount
+import cash.atto.commons.AttoAddress
+import cash.atto.commons.AttoAlgorithm
+import cash.atto.commons.AttoAmount
+import cash.atto.commons.AttoHeight
+import cash.atto.commons.AttoInstant
+import cash.atto.commons.AttoKeyIndex
+import cash.atto.commons.AttoNetwork
+import cash.atto.commons.AttoPublicKey
+import cash.atto.commons.AttoReceivable
+import cash.atto.commons.AttoSendBlock
+import cash.atto.commons.AttoWorkTarget
+import cash.atto.commons.fromHexToByteArray
+import cash.atto.commons.toAttoIndex
+import cash.atto.commons.toSigner
+import cash.atto.wallet.model.AccountPreference
+import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.state.AppState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 private val defaultRepresentatives =
@@ -67,116 +86,277 @@ private val defaultRepresentatives =
 
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
+    private val preferencesRepository: PreferencesRepository,
     private val persistentAccountEntryRepository: PersistentAccountEntryRepository,
     private val workCache: PersistentWorkCache,
     private val network: AttoNetwork,
 ) {
     private val receiveInterval = 10.seconds
+    private val retryDelay = 10.seconds
+    private val sessionFactory = WalletSessionFactory(network, workCache, retryDelay)
 
-    private val _state = MutableStateFlow<AttoWalletManager?>(null)
-    val state = _state.asStateFlow()
+    private val _accountState = MutableStateFlow<AttoAccount?>(null)
+    val accountState = _accountState.asStateFlow()
+    private val _publicKeyState = MutableStateFlow<AttoPublicKey?>(null)
+    val publicKeyState = _publicKeyState.asStateFlow()
+    private val _accountsState = MutableStateFlow<List<WalletAccountState>>(emptyList())
+    val accountsState = _accountsState.asStateFlow()
+    private val _selectedAccountIndexState = MutableStateFlow(MAIN_ACCOUNT_INDEX)
+    val selectedAccountIndexState = _selectedAccountIndexState.asStateFlow()
+    private val _workReadyState = MutableStateFlow(false)
+    val workReadyState = _workReadyState.asStateFlow()
     private val _pendingReceivablesState = MutableStateFlow(PendingReceivablesState.EMPTY)
     val pendingReceivablesState = _pendingReceivablesState.asStateFlow()
 
-    private val appStateCollectorScope = CoroutineScope(Dispatchers.Default)
-    private var appStateCollectorJob: Job? = null
-    private val receivableCollectorScope = CoroutineScope(Dispatchers.Default)
-    private var receivableCollectorJob: Job? = null
-    private val receiverScope = CoroutineScope(Dispatchers.Default)
-    private var receiverJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private var walletSession: WalletSession? = null
+    private var selectedAccountIndex: AttoKeyIndex = MAIN_ACCOUNT_INDEX
 
     init {
-        appStateCollectorJob =
-            appStateCollectorScope.launch {
-                appStateRepository.state.collect {
-                    try {
-                        state.value?.close()
-                    } catch (_: CancellationException) {
-                    }
-
-                    receivableCollectorJob?.cancel()
-                    receiverJob?.cancel()
-                    _pendingReceivablesState.emit(PendingReceivablesState.EMPTY)
-
-                    val walletManager = createWalletManager(it)
-                    _state.emit(walletManager)
-
-                    if (walletManager != null) {
-                        startReceivableCollector(walletManager)
-                        startBackgroundReceiver(walletManager)
-                    }
-                }
+        scope.launch {
+            combine(
+                appStateRepository.state,
+                preferencesRepository.state
+                    .map { it.normalizedAccounts() }
+                    .distinctUntilChanged(),
+            ) { appState, accounts ->
+                appState to accounts
+            }.collectLatest { (appState, accounts) ->
+                replaceWalletSession(
+                    appState = appState,
+                    accountPreferences = accounts,
+                )
             }
+        }
+
+        scope.launch {
+            combine(
+                accountState,
+                workCache.version,
+            ) { account, _ ->
+                hasReadyWork(account)
+            }.collect {
+                _workReadyState.emit(it)
+            }
+        }
+    }
+
+    suspend fun send(
+        receiverAddress: AttoAddress,
+        amount: AttoAmount,
+    ): AttoSendBlock {
+        val session = walletSession ?: throw IllegalStateException("Wallet is not ready yet")
+        val block =
+            session.send(
+                index = selectedAccountIndex,
+                receiverAddress = receiverAddress,
+                amount = amount,
+            )
+        emitSelectedAccount(session)
+
+        return block
     }
 
     suspend fun changeRepresentative(representative: AttoAddress) {
         try {
-            state.value?.change(representative)
+            val session = walletSession ?: return
+            session.changeRepresentative(selectedAccountIndex, representative)
+            emitSelectedAccount(session)
         } catch (ex: Exception) {
             println(ex.message)
         }
     }
 
-    private suspend fun createWalletManager(appState: AppState): AttoWalletManager? {
-        val privateKey = appState.getPrivateKey() ?: return null
-        val signer = privateKey.toSigner()
-        val authenticator = AttoAuthenticator.attoBackend(network, signer)
-        val client = AttoNodeClient.attoBackend(network, authenticator)
+    suspend fun selectAccount(index: UInt) {
+        val accountIndex = index.toAttoIndex()
+        val session = walletSession
+        val activeInPreferences = preferencesRepository.state.value.accountStatus(index) == AccountPreferenceStatus.ACTIVATED
+        if (session != null && !session.isActive(accountIndex) && !activeInPreferences) {
+            return
+        }
 
-        val walletManager =
-            AttoWalletManager(
-                network,
-                viewer =
-                    AttoWalletViewer(
-                        publicKey = signer.publicKey,
-                        client = client,
-                        accountEntryRepository = persistentAccountEntryRepository,
-                    ),
-                signer = signer,
-                client = client,
-                worker = AttoWorker.attoBackend(network, authenticator),
-                workCache = workCache,
-            ) {
-                defaultRepresentatives.random()
-            }
-
-        walletManager.start(autoReceive = false)
-
-        return walletManager
+        selectedAccountIndex = accountIndex
+        _selectedAccountIndexState.emit(accountIndex)
+        if (session != null && session.address(accountIndex) != null) {
+            emitSelectedAccount(session)
+        }
     }
 
-    private fun startReceivableCollector(walletManager: AttoWalletManager) {
-        receivableCollectorJob?.cancel()
-        receivableCollectorJob =
-            receivableCollectorScope.launch {
-                walletManager.receivableFlow.collect { receivable ->
+    suspend fun addAccount(name: String?) {
+        val index = preferencesRepository.addAccount() ?: return
+        nameAccount(index, name.orEmpty())
+        selectAccount(index)
+    }
+
+    suspend fun setAccountActive(
+        index: UInt,
+        active: Boolean,
+    ) {
+        val status =
+            if (active) {
+                AccountPreferenceStatus.ACTIVATED
+            } else {
+                AccountPreferenceStatus.DEACTIVATED
+            }
+        val session = walletSession
+        if (!active && selectedAccountIndex.value == index && session != null) {
+            session
+                .activeIndexes()
+                .firstOrNull { it.value != index }
+                ?.let {
+                    selectedAccountIndex = it
+                    _selectedAccountIndexState.emit(it)
+                }
+        }
+
+        preferencesRepository.setAccountStatus(index, status)
+    }
+
+    suspend fun nameAccount(
+        index: UInt,
+        name: String,
+    ) {
+        val address = addressForIndex(index) ?: return
+        preferencesRepository.saveAddressLabel(
+            address = address.toString(),
+            label = name,
+        )
+    }
+
+    private suspend fun replaceWalletSession(
+        appState: AppState,
+        accountPreferences: Map<String, AccountPreference>,
+    ) {
+        walletSession?.close()
+        walletSession = null
+        _accountState.emit(null)
+        _publicKeyState.emit(null)
+        _accountsState.emit(emptyList())
+        _workReadyState.emit(false)
+        _pendingReceivablesState.emit(PendingReceivablesState.EMPTY)
+
+        val session =
+            sessionFactory.create(
+                appState = appState,
+                accountPreferences = accountPreferences,
+                signerIndex = MAIN_ACCOUNT_INDEX,
+            ) ?: return
+        walletSession = session
+
+        if (!session.isActive(selectedAccountIndex)) {
+            selectedAccountIndex = session.activeIndexes().firstOrNull() ?: MAIN_ACCOUNT_INDEX
+        }
+
+        _selectedAccountIndexState.emit(selectedAccountIndex)
+        session.cacheNextWorkForOpenedAccounts()
+        emitAccounts(session)
+        emitSelectedAccount(session)
+
+        startAccountCollector(session)
+        startAccountEntrySaver(session)
+        startReceivableCollector(session)
+        startBackgroundReceiver(session)
+    }
+
+    private fun startAccountCollector(session: WalletSession) {
+        session.launch {
+            session.accountStream().collect { account ->
+                session.updateAccount(account)
+                session.cacheNextWork(account)
+                emitAccounts(session)
+                if (session.isAccount(selectedAccountIndex, account)) {
+                    emitSelectedAccount(session)
+                }
+            }
+        }
+    }
+
+    private fun startAccountEntrySaver(session: WalletSession) {
+        session.launch {
+            val entries =
+                session.accountEntryStream { address ->
+                    persistentAccountEntryRepository.last(address.publicKey)?.height?.next()
+                        ?: AttoHeight.MIN
+                }
+
+            entries.collect { message ->
+                retryWalletOperation("save account entry ${message.value.hash}", retryDelay) {
+                    persistentAccountEntryRepository.save(message.value)
+                    message.acknowledge()
+                }
+            }
+        }
+    }
+
+    private fun startReceivableCollector(session: WalletSession) {
+        session.launch {
+            retryWalletOperation("stream receivables", retryDelay) {
+                session.receivableStream().collect { receivable ->
                     enqueueReceivable(receivable)
                 }
             }
+        }
     }
 
-    private fun startBackgroundReceiver(walletManager: AttoWalletManager) {
-        receiverJob?.cancel()
-        receiverJob =
-            receiverScope.launch {
-                while (isActive) {
-                    val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
+    private fun startBackgroundReceiver(session: WalletSession) {
+        session.launch {
+            while (isActive) {
+                val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
 
-                    if (nextReceivable == null) {
+                if (nextReceivable == null) {
+                    delay(1_000)
+                    continue
+                }
+
+                try {
+                    if (!session.prepareReceiveWork(nextReceivable)) {
                         delay(1_000)
                         continue
                     }
 
-                    try {
-                        walletManager.receive(nextReceivable)
-                        dequeueReceivable(nextReceivable.hash.toString())
-                        delay(receiveInterval)
-                    } catch (ex: Exception) {
-                        println("Failed to receive ${nextReceivable.hash}: ${ex.message}")
-                        delay(10_000)
-                    }
+                    session.receive(nextReceivable, defaultRepresentatives.random())
+                    emitAccounts(session)
+                    emitSelectedAccount(session)
+                    dequeueReceivable(nextReceivable.hash.toString())
+                    delay(receiveInterval)
+                } catch (ex: Exception) {
+                    println("Failed to receive ${nextReceivable.hash}: ${ex.message}")
+                    delay(retryDelay)
                 }
             }
+        }
+    }
+
+    private suspend fun emitAccounts(session: WalletSession) {
+        _accountsState.emit(session.accountStates())
+    }
+
+    private suspend fun emitSelectedAccount(session: WalletSession) {
+        val publicKey = session.publicKey(selectedAccountIndex)
+        val account = session.account(selectedAccountIndex)
+
+        _publicKeyState.emit(publicKey)
+        _accountState.emit(account)
+        _workReadyState.emit(hasReadyWork(account))
+    }
+
+    private suspend fun hasReadyWork(account: AttoAccount?): Boolean {
+        account ?: return false
+        return workCache.hasValid(
+            publicKey = account.publicKey,
+            network = network,
+            timestamp = AttoInstant.now(),
+            target = AttoWorkTarget(account.lastTransactionHash.value),
+        )
+    }
+
+    private suspend fun addressForIndex(index: UInt): AttoAddress? {
+        val accountIndex = index.toAttoIndex()
+        walletSession?.address(accountIndex)?.let { return it }
+        return appStateRepository.state.value
+            .getSeed()
+            ?.toSigner(accountIndex)
+            ?.address
     }
 
     private suspend fun enqueueReceivable(receivable: AttoReceivable) {
@@ -198,5 +378,9 @@ class WalletManagerRepository(
                 _pendingReceivablesState.value.receivables.filterNot { it.hash.toString() == hash },
             ),
         )
+    }
+
+    private companion object {
+        val MAIN_ACCOUNT_INDEX: AttoKeyIndex = 0U.toAttoIndex()
     }
 }
