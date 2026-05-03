@@ -25,13 +25,31 @@ actual class PreferencesDataSource(
             preferences[blobKey]
         }
 
+    actual val termsAndConditionsDate =
+        dataStore.data.map { preferences ->
+            preferences[termsAndConditionsDateKey]
+        }
+
     actual suspend fun setBlob(blob: String) {
         dataStore.edit { preferences ->
             preferences[blobKey] = blob
         }
     }
 
+    actual suspend fun setTermsAndConditionsDate(date: String) {
+        dataStore.edit { preferences ->
+            preferences[termsAndConditionsDateKey] = date
+        }
+    }
+
+    actual suspend fun clearTermsAndConditionsDate() {
+        dataStore.edit { preferences ->
+            preferences.remove(termsAndConditionsDateKey)
+        }
+    }
+
     private companion object {
         val blobKey = stringPreferencesKey("user_preferences_blob")
+        val termsAndConditionsDateKey = stringPreferencesKey("terms_and_conditions_date")
     }
 }

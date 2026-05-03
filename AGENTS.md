@@ -8,7 +8,7 @@
 ## Commands
 
 - Run the main CI-equivalent verification with `./gradlew allTests`.
-- Run formatting/lint with `./gradlew ktlintCheck` and `./gradlew ktlintFormat`. CI does not run ktlint for you.
+- Run formatting with `./gradlew ktlintFormat`. Do not run `./gradlew ktlintCheck` unless explicitly requested; CI does not run ktlint for you.
 - Start the main dev target with `./gradlew wasmJsBrowserDevelopmentRun`.
 - Build the production web artifact with `./gradlew wasmJsBrowserDistribution`.
 - Run the desktop app with `./gradlew composeApp:run`.

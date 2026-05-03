@@ -69,6 +69,9 @@ fun AttoApp(
             submitPassword = {
                 viewModel.enterPassword(it)
             },
+            onTermsAndConditionsAcceptedChange = {
+                viewModel.setTermsAndConditionsAccepted(it)
+            },
             onLogout = {
                 viewModel.logout()
             },
@@ -95,6 +98,7 @@ fun AttoNavHost(
         ) -> Unit
     )? = null,
     submitPassword: suspend (String?) -> Boolean,
+    onTermsAndConditionsAcceptedChange: suspend (Boolean) -> Unit,
     onLogout: () -> Unit,
 ) {
     val authenticationCallbackConsumed = remember { mutableStateOf(false) }
@@ -121,10 +125,19 @@ fun AttoNavHost(
         LoginScreen(
             onSubmitPassword = {
                 coroutineScope.launch {
-                    passwordValid.value = (submitPassword.invoke(it))
+                    if (uiState.termsAndConditionsAccepted) {
+                        passwordValid.value = submitPassword.invoke(it)
+                    }
                 }
             },
             passwordValid = passwordValid.value,
+            termsAndConditionsAccepted = uiState.termsAndConditionsAccepted,
+            termsAndConditionsDate = uiState.termsAndConditionsDate,
+            onTermsAndConditionsAcceptedChange = { accepted ->
+                coroutineScope.launch {
+                    onTermsAndConditionsAcceptedChange(accepted)
+                }
+            },
             onLogout = {
                 onLogout()
                 component.navigation.popToFirst()
@@ -150,9 +163,10 @@ fun AttoNavHost(
 
             val coroutineScope = rememberCoroutineScope()
 
-            LaunchedEffect(debugPassword) {
+            LaunchedEffect(debugPassword, uiState.termsAndConditionsAccepted) {
                 if (
                     !debugPassword.isNullOrBlank() &&
+                    uiState.termsAndConditionsAccepted &&
                     attemptedDebugPassword.value != debugPassword
                 ) {
                     attemptedDebugPassword.value = debugPassword
@@ -163,10 +177,19 @@ fun AttoNavHost(
             LoginScreen(
                 onSubmitPassword = {
                     coroutineScope.launch {
-                        passwordValid.value = (submitPassword.invoke(it))
+                        if (uiState.termsAndConditionsAccepted) {
+                            passwordValid.value = submitPassword.invoke(it)
+                        }
                     }
                 },
                 passwordValid = passwordValid.value,
+                termsAndConditionsAccepted = uiState.termsAndConditionsAccepted,
+                termsAndConditionsDate = uiState.termsAndConditionsDate,
+                onTermsAndConditionsAcceptedChange = { accepted ->
+                    coroutineScope.launch {
+                        onTermsAndConditionsAcceptedChange(accepted)
+                    }
+                },
                 onLogout = {
                     onLogout()
                     component.navigation.popToFirst()

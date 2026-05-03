@@ -9,6 +9,7 @@ import cash.atto.wallet.repository.MetricsRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PersistentWorkCache
 import cash.atto.wallet.repository.PreferencesRepository
+import cash.atto.wallet.repository.TermsAndConditionsRepository
 import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
@@ -52,6 +53,7 @@ val repositoryModule =
         singleOf(::HomeRepository)
         singleOf(::MetricsRepository)
         singleOf(::PreferencesRepository)
+        singleOf(::TermsAndConditionsRepository)
         singleOf(::VotersRepository)
         singleOf(::WalletManagerRepository)
     }
