@@ -7,4 +7,4 @@ fun attoHoverTint(
     baseTint: Color,
     hovered: Boolean,
     highlight: Float = 0.4f,
-): Color = if (hovered) lerp(baseTint, Color.White, highlight) else baseTint
+): Color = if (hovered) lerp(baseTint, dark_text_primary, highlight) else baseTint

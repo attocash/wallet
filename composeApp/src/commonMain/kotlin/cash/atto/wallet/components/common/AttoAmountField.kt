@@ -148,8 +148,8 @@ fun attoAmountFieldColors(isError: Boolean) =
         focusedTextColor = dark_text_primary,
         unfocusedTextColor = dark_text_primary,
         errorTextColor = dark_text_primary,
-        focusedPlaceholderColor = dark_text_secondary,
-        unfocusedPlaceholderColor = dark_text_secondary,
-        errorPlaceholderColor = dark_text_secondary,
+        focusedPlaceholderColor = dark_placeholder,
+        unfocusedPlaceholderColor = dark_placeholder,
+        errorPlaceholderColor = dark_placeholder,
         cursorColor = dark_accent,
     )

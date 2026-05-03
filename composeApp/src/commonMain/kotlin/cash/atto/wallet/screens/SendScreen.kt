@@ -17,8 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -164,10 +162,7 @@ private fun SendScreenContent(
 ) {
     val compact = isCompactWidth()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.Transparent,
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (navState == SendScreenState.SEND && uiState.sendFromUiState.showLoader) {
             AttoLoader(alpha = 0.7f)
         }
@@ -449,63 +444,60 @@ private fun SendFormPanel(
                         AttoAccentInlineLabel(text = label)
                     }
                 }
-                OutlinedTextField(
+                val addressFeedback =
+                    when {
+                        uiState.showAddressError -> uiState.addressErrorMessage ?: "Enter a valid ATTO address."
+                        scannerError != null -> scannerError
+                        else -> null
+                    }
+                AttoTextField(
                     value = uiState.address.orEmpty(),
                     onValueChange = { onAddressChanged(it) },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Enter Atto address") },
                     isError = uiState.showAddressError,
-                    trailingIcon = {
+                    singleLine = true,
+                    submitOnEnterOrTab = false,
+                    trailingIcon =
                         if (savedAddressCount > 0 || hasQrScanner) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                if (savedAddressCount > 0) {
-                                    IconButton(
-                                        onClick = onShowSavedAddresses,
-                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Bookmarks,
+                            {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    if (savedAddressCount > 0) {
+                                        AttoCircleIconButton(
+                                            icon = Icons.Outlined.Bookmarks,
                                             contentDescription = "Choose saved address",
                                             tint = dark_accent,
+                                            background = Color.Transparent,
+                                            onClick = onShowSavedAddresses,
                                         )
                                     }
-                                }
-                                if (hasQrScanner) {
-                                    IconButton(
-                                        onClick = onShowQr,
-                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.QrCodeScanner,
+                                    if (hasQrScanner) {
+                                        AttoCircleIconButton(
+                                            icon = Icons.Default.QrCodeScanner,
                                             contentDescription = "Scan QR",
                                             tint = dark_accent,
+                                            background = Color.Transparent,
+                                            onClick = onShowQr,
                                         )
                                     }
                                 }
                             }
-                        }
-                    },
-                    singleLine = true,
+                        } else {
+                            null
+                        },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = attoAmountFieldColors(uiState.showAddressError),
-                    shape = RoundedCornerShape(8.dp),
-                    supportingText = {
-                        val message =
-                            when {
-                                uiState.showAddressError -> uiState.addressErrorMessage ?: "Enter a valid ATTO address."
-                                scannerError != null -> scannerError
-                                else -> null
+                    supportingLabel =
+                        addressFeedback?.let { message ->
+                            {
+                                Text(
+                                    text = message,
+                                    color = if (uiState.showAddressError) dark_danger else dark_text_secondary,
+                                )
                             }
-                        message?.let {
-                            Text(
-                                text = it,
-                                color = if (uiState.showAddressError) dark_danger else dark_text_secondary,
-                            )
-                        }
-                    },
+                        },
                 )
             }
         }
@@ -572,16 +564,13 @@ private fun SendFormPanel(
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W700),
                 )
             }
-            IconButton(
+            AttoCircleIconButton(
+                icon = Icons.Outlined.Info,
+                contentDescription = "Why is it free?",
+                tint = dark_text_secondary,
+                background = Color.Transparent,
                 onClick = onFeeInfoClick,
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = "Why is it free?",
-                    tint = dark_text_secondary,
-                )
-            }
+            )
         }
 
         AttoButton(

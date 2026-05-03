@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,9 +36,10 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoButtonVariant
+import cash.atto.wallet.components.common.AttoCheckbox
+import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTransactionCard
@@ -441,83 +441,80 @@ private fun TransactionFilterDialog(
 ) {
     var localSelection by remember(selectedTypes) { mutableStateOf(selectedTypes) }
 
-    Dialog(onDismissRequest = onDismiss) {
-        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Filter Transactions",
-                color = dark_text_primary,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                TransactionType.entries.forEach { type ->
-                    val checked = type in localSelection
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(dark_bg)
-                                .pointerHoverIcon(PointerIcon.Hand)
-                                .clickable {
-                                    localSelection =
-                                        if (checked) {
-                                            localSelection - type
-                                        } else {
-                                            localSelection + type
-                                        }
-                                }.padding(horizontal = 12.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Checkbox(
-                            checked = checked,
-                            onCheckedChange = { isChecked ->
+    AttoModal(
+        title = "Filter Transactions",
+        onDismiss = onDismiss,
+        scrollable = false,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TransactionType.entries.forEach { type ->
+                val checked = type in localSelection
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(dark_bg)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                            .clickable {
                                 localSelection =
-                                    if (isChecked) {
-                                        localSelection + type
-                                    } else {
+                                    if (checked) {
                                         localSelection - type
+                                    } else {
+                                        localSelection + type
                                     }
-                            },
+                            }.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    AttoCheckbox(
+                        checked = checked,
+                        onCheckedChange = { isChecked ->
+                            localSelection =
+                                if (isChecked) {
+                                    localSelection + type
+                                } else {
+                                    localSelection - type
+                                }
+                        },
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(
+                            text = type.name,
+                            color = dark_text_primary,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.W600),
                         )
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(
-                                text = type.name,
-                                color = dark_text_primary,
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.W600),
-                            )
-                            Text(
-                                text = transactionTypeDescription(type),
-                                color = dark_text_muted,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
+                        Text(
+                            text = transactionTypeDescription(type),
+                            color = dark_text_muted,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
                     }
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                AttoButton(
-                    text = "Reset",
-                    onClick = { localSelection = TransactionType.entries.toSet() },
-                    modifier = Modifier.weight(1f),
-                )
-                AttoButton(
-                    text = "Apply",
-                    onClick = {
-                        onApply(
-                            if (localSelection.isEmpty()) {
-                                TransactionType.entries.toSet()
-                            } else {
-                                localSelection
-                            },
-                        )
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            AttoButton(
+                text = "Reset",
+                onClick = { localSelection = TransactionType.entries.toSet() },
+                modifier = Modifier.weight(1f),
+            )
+            AttoButton(
+                text = "Apply",
+                onClick = {
+                    onApply(
+                        if (localSelection.isEmpty()) {
+                            TransactionType.entries.toSet()
+                        } else {
+                            localSelection
+                        },
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
@@ -528,24 +525,21 @@ private fun TransactionsMessageDialog(
     message: String,
     onDismiss: () -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismiss) {
-        AttoPanelCard(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = title,
-                color = dark_text_primary,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
-            )
-            Text(
-                text = message,
-                color = dark_text_secondary,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            AttoButton(
-                text = "Close",
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+    AttoModal(
+        title = title,
+        onDismiss = onDismiss,
+        scrollable = false,
+    ) {
+        Text(
+            text = message,
+            color = dark_text_secondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        AttoButton(
+            text = "Close",
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

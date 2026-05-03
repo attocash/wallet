@@ -66,6 +66,7 @@ import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_surface_alt
 import cash.atto.wallet.ui.dark_text_dim
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.ui.dark_violet
@@ -75,22 +76,6 @@ import cash.atto.wallet.viewmodel.WelcomeViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-private val WelcomePageBackground = dark_bg
-private val WelcomeCardBackground = dark_surface
-private val WelcomeCardBorder = dark_border
-private val WelcomeCardHoverBackground = dark_surface_alt
-private val WelcomeTitleColor = Color.White
-private val WelcomeBodyColor = dark_text_secondary
-private val WelcomeMutedColor = dark_text_tertiary
-private val WelcomeStatCopyColor = dark_text_dim
-private val WelcomeGold = dark_accent
-private val WelcomeGoldSoft = dark_accent_soft
-private val WelcomeGoldSoftHover = dark_accent_soft_hover
-private val WelcomeViolet = dark_violet
-private val WelcomeVioletSoft = dark_violet_soft
-private val WelcomeVioletSoftHover = dark_violet_soft_hover
-private val WelcomeGreen = dark_success
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -108,7 +93,7 @@ fun WelcomeScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(WelcomePageBackground)
+                .background(dark_bg)
                 .verticalScroll(scrollState)
                 .padding(
                     start = 24.dp,
@@ -138,18 +123,18 @@ fun WelcomeScreen(
                     WelcomeActionCard(
                         title = stringResource(Res.string.welcome_create_wallet),
                         description = stringResource(Res.string.welcome_create_wallet_description),
-                        iconBackground = WelcomeGoldSoft,
-                        iconBackgroundHover = WelcomeGoldSoftHover,
+                        iconBackground = dark_accent_soft,
+                        iconBackgroundHover = dark_accent_soft_hover,
                         onClick = onCreateSecretClicked,
-                        icon = { WelcomeCreateIcon(WelcomeGold) },
+                        icon = { WelcomeCreateIcon(dark_accent) },
                     )
                     WelcomeActionCard(
                         title = stringResource(Res.string.welcome_import_wallet),
                         description = stringResource(Res.string.welcome_import_wallet_description),
-                        iconBackground = WelcomeVioletSoft,
-                        iconBackgroundHover = WelcomeVioletSoftHover,
+                        iconBackground = dark_violet_soft,
+                        iconBackgroundHover = dark_violet_soft_hover,
                         onClick = onImportSecretClicked,
-                        icon = { WelcomeImportIcon(WelcomeViolet) },
+                        icon = { WelcomeImportIcon(dark_violet) },
                     )
                 }
 
@@ -164,7 +149,7 @@ fun WelcomeScreen(
                         label = stringResource(Res.string.welcome_stats_market_cap),
                         value = metrics.marketCapValue,
                         description = stringResource(Res.string.welcome_stats_market_cap_description),
-                        labelColor = WelcomeGold,
+                        labelColor = dark_accent,
                         textAlign = TextAlign.Center,
                     )
                     WelcomeStatCard(
@@ -172,7 +157,7 @@ fun WelcomeScreen(
                         value = metrics.confirmationValue,
                         valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
                         description = stringResource(Res.string.welcome_stats_confirmation_description),
-                        labelColor = WelcomeViolet,
+                        labelColor = dark_violet,
                         textAlign = TextAlign.Center,
                         monoValue = true,
                     )
@@ -180,7 +165,7 @@ fun WelcomeScreen(
                         label = stringResource(Res.string.welcome_stats_price),
                         value = metrics.priceUsdValue,
                         description = stringResource(Res.string.welcome_stats_price_description),
-                        labelColor = WelcomeGreen,
+                        labelColor = dark_success,
                         textAlign = TextAlign.Center,
                         monoValue = true,
                     )
@@ -197,19 +182,19 @@ fun WelcomeScreen(
                         modifier = Modifier.weight(1f),
                         title = stringResource(Res.string.welcome_create_wallet),
                         description = stringResource(Res.string.welcome_create_wallet_description),
-                        iconBackground = WelcomeGoldSoft,
-                        iconBackgroundHover = WelcomeGoldSoftHover,
+                        iconBackground = dark_accent_soft,
+                        iconBackgroundHover = dark_accent_soft_hover,
                         onClick = onCreateSecretClicked,
-                        icon = { WelcomeCreateIcon(WelcomeGold) },
+                        icon = { WelcomeCreateIcon(dark_accent) },
                     )
                     WelcomeActionCard(
                         modifier = Modifier.weight(1f),
                         title = stringResource(Res.string.welcome_import_wallet),
                         description = stringResource(Res.string.welcome_import_wallet_description),
-                        iconBackground = WelcomeVioletSoft,
-                        iconBackgroundHover = WelcomeVioletSoftHover,
+                        iconBackground = dark_violet_soft,
+                        iconBackgroundHover = dark_violet_soft_hover,
                         onClick = onImportSecretClicked,
-                        icon = { WelcomeImportIcon(WelcomeViolet) },
+                        icon = { WelcomeImportIcon(dark_violet) },
                     )
                 }
 
@@ -226,7 +211,7 @@ fun WelcomeScreen(
                         label = stringResource(Res.string.welcome_stats_market_cap),
                         value = metrics.marketCapValue,
                         description = stringResource(Res.string.welcome_stats_market_cap_description),
-                        labelColor = WelcomeGold,
+                        labelColor = dark_accent,
                         textAlign = TextAlign.Start,
                     )
                     WelcomeStatCard(
@@ -235,7 +220,7 @@ fun WelcomeScreen(
                         value = metrics.confirmationValue,
                         valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
                         description = stringResource(Res.string.welcome_stats_confirmation_description),
-                        labelColor = WelcomeViolet,
+                        labelColor = dark_violet,
                         textAlign = TextAlign.Center,
                         monoValue = true,
                     )
@@ -244,7 +229,7 @@ fun WelcomeScreen(
                         label = stringResource(Res.string.welcome_stats_price),
                         value = metrics.priceUsdValue,
                         description = stringResource(Res.string.welcome_stats_price_description),
-                        labelColor = WelcomeGreen,
+                        labelColor = dark_success,
                         textAlign = TextAlign.End,
                         monoValue = true,
                     )
@@ -269,7 +254,7 @@ private fun WelcomeHeader(compact: Boolean) {
         Text(
             modifier = Modifier.padding(top = 24.dp),
             text = stringResource(Res.string.welcome_title),
-            color = WelcomeTitleColor,
+            color = dark_text_primary,
             textAlign = TextAlign.Center,
             style =
                 MaterialTheme.typography.bodyLarge.copy(
@@ -287,7 +272,7 @@ private fun WelcomeHeader(compact: Boolean) {
                     .padding(horizontal = 16.dp)
                     .widthIn(max = 672.dp),
             text = stringResource(Res.string.welcome_message),
-            color = WelcomeBodyColor,
+            color = dark_text_secondary,
             textAlign = TextAlign.Center,
             style =
                 MaterialTheme.typography.bodyLarge.copy(
@@ -314,10 +299,10 @@ private fun WelcomeActionCard(
 
     AttoCard(
         modifier = modifier.fillMaxWidth().heightIn(min = 216.dp),
-        background = WelcomeCardBackground,
-        hoverBackground = WelcomeCardHoverBackground,
-        border = WelcomeCardBorder,
-        hoverBorder = WelcomeCardBorder,
+        background = dark_surface,
+        hoverBackground = dark_surface_alt,
+        border = dark_border,
+        hoverBorder = dark_border,
         contentPadding = PaddingValues(24.dp),
         interactionSource = interactionSource,
         onClick = onClick,
@@ -350,7 +335,7 @@ private fun WelcomeActionCard(
 
             Text(
                 text = title,
-                color = if (isHovered) WelcomeGold else WelcomeTitleColor,
+                color = if (isHovered) dark_accent else dark_text_primary,
                 style =
                     MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.W600,
@@ -362,7 +347,7 @@ private fun WelcomeActionCard(
             Text(
                 modifier = Modifier.padding(top = 8.dp),
                 text = description,
-                color = WelcomeMutedColor,
+                color = dark_text_tertiary,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.W400,
@@ -426,7 +411,7 @@ private fun WelcomeStatCard(
         ) {
             Text(
                 text = value,
-                color = WelcomeTitleColor,
+                color = dark_text_primary,
                 textAlign = textAlign,
                 modifier = Modifier.alignByBaseline(),
                 style =
@@ -445,7 +430,7 @@ private fun WelcomeStatCard(
                             .padding(start = 4.dp)
                             .alignByBaseline(),
                     text = valueSuffix,
-                    color = WelcomeMutedColor,
+                    color = dark_text_tertiary,
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.W400,
@@ -462,7 +447,7 @@ private fun WelcomeStatCard(
                     .fillMaxWidth()
                     .padding(top = 4.dp),
             text = description,
-            color = WelcomeStatCopyColor,
+            color = dark_text_dim,
             textAlign = textAlign,
             style =
                 MaterialTheme.typography.labelSmall.copy(

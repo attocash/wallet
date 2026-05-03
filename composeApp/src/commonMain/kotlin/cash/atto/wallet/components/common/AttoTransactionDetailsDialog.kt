@@ -48,6 +48,8 @@ import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.attoHoverTint
+import cash.atto.wallet.ui.dark_accent
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -251,7 +253,7 @@ private fun AttoEditableCopyField(
                         imageVector = Icons.Outlined.Check,
                         onClick = onConfirm,
                         contentDescription = "Save $fieldLabel",
-                        tint = Color.White,
+                        tint = dark_text_primary,
                     )
                     AttoInlineIconButton(
                         imageVector = Icons.AutoMirrored.Outlined.Backspace,
@@ -318,8 +320,8 @@ private fun InlineEditorField(
         onValueChange = onValueChange,
         modifier = modifier,
         singleLine = true,
-        textStyle = fieldTextStyle(isRawValue = false).copy(color = Color.White),
-        cursorBrush = SolidColor(Color.White),
+        textStyle = fieldTextStyle(isRawValue = false).copy(color = dark_text_primary),
+        cursorBrush = SolidColor(dark_accent),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions =
             KeyboardActions(

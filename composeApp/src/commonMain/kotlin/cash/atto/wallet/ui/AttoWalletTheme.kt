@@ -1,77 +1,41 @@
 package cash.atto.wallet.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 val attoColors =
-    lightColorScheme(
-        primary = gold_600,
-        secondary = gold_100,
-        secondaryContainer = gold_900,
-        tertiary = yellow_100,
-        background = Color.Black,
-        surface = Color.White,
-        error = red_900,
-        onPrimary = gray_800,
-        onSecondary = Color.White,
-        onBackground = Color.White,
-        onSurface = gray_800,
-        onError = Color.White,
+    darkColorScheme(
+        primary = dark_accent,
+        onPrimary = dark_accent_on,
+        primaryContainer = dark_accent_soft,
+        onPrimaryContainer = dark_text_primary,
+        secondary = dark_accent,
+        onSecondary = dark_accent_on,
+        secondaryContainer = dark_surface_alt,
+        onSecondaryContainer = dark_text_primary,
+        tertiary = dark_violet,
+        onTertiary = dark_text_primary,
+        background = dark_bg,
+        onBackground = dark_text_primary,
+        surface = dark_surface,
+        onSurface = dark_text_primary,
+        surfaceVariant = dark_surface_alt,
+        onSurfaceVariant = dark_text_secondary,
+        error = dark_danger,
+        onError = dark_bg,
+        outline = dark_border,
+        outlineVariant = dark_border_muted,
     )
-
-val ColorScheme.back: Color
-    get() = gray_700
-
-val ColorScheme.divider: Color
-    get() = gray_800
-
-val ColorScheme.setting: Color
-    get() = ochre_600
-
-val ColorScheme.success: Color
-    get() = green_700
-
-val ColorScheme.primaryGradient: List<Color>
-    get() =
-        listOf(
-            Color(0xffFFE249),
-            Color(0xffFFD11F),
-            Color(0xffFF9C05),
-        )
-
-val ColorScheme.secondaryGradient: List<Color>
-    get() =
-        listOf(
-            Color(0xffFF9B36),
-            Color(0xffEC6C00),
-            Color(0xffFC8704),
-        )
-
-val ColorScheme.errorGradient: List<Color>
-    get() =
-        listOf(
-            Color(0xffDA0004),
-            Color(0xffFF0004),
-            Color(0xffDA0004),
-        )
 
 val attoShapes =
     Shapes(
-        small = RoundedCornerShape(24.dp),
-        medium = RoundedCornerShape(20.dp),
-        large = RoundedCornerShape(8.dp),
-    )
-
-val BottomSheetShape =
-    RoundedCornerShape(
-        topStart = 50.dp,
-        topEnd = 50.dp,
+        small = RoundedCornerShape(8.dp),
+        medium = RoundedCornerShape(12.dp),
+        large = RoundedCornerShape(16.dp),
     )
 
 @Composable

@@ -4,12 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.password_wrong
 import cash.atto.wallet.components.common.AttoButton
+import cash.atto.wallet.components.common.AttoCheckbox
 import cash.atto.wallet.components.common.AttoPasswordField
 import cash.atto.wallet.components.common.AttoRoundButton
 import cash.atto.wallet.components.login.TermsAndConditionsDialog
@@ -38,13 +36,6 @@ import cash.atto.wallet.model.TermsAndConditions
 import cash.atto.wallet.ui.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-private val UnlockBackground = dark_bg
-private val UnlockIconBackground = dark_surface
-private val UnlockBorder = dark_border_subtle
-private val UnlockTextPrimary = dark_text_primary
-private val UnlockTextSecondary = dark_text_secondary
-private val UnlockDanger = Color(0xFFE56A6A)
 
 @Composable
 fun LoginScreen(
@@ -65,7 +56,7 @@ fun LoginScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(UnlockBackground),
+                .background(dark_bg),
     ) {
         AttoRoundButton(
             onClick = { showLogoutDialog = true },
@@ -80,7 +71,7 @@ fun LoginScreen(
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.Logout,
                 contentDescription = "Logout",
-                tint = UnlockTextPrimary,
+                tint = dark_text_primary,
                 modifier = Modifier.size(18.dp),
             )
         }
@@ -103,14 +94,14 @@ fun LoginScreen(
                     modifier =
                         Modifier
                             .size(68.dp)
-                            .background(UnlockIconBackground, RoundedCornerShape(16.dp))
-                            .border(1.dp, UnlockBorder, RoundedCornerShape(16.dp)),
+                            .background(dark_surface, RoundedCornerShape(16.dp))
+                            .border(1.dp, dark_border_subtle, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Lock,
                         contentDescription = null,
-                        tint = Color(0xFFF4B620),
+                        tint = dark_accent,
                         modifier = Modifier.size(29.dp),
                     )
                 }
@@ -118,7 +109,7 @@ fun LoginScreen(
                 Text(
                     text = "Unlock Wallet",
                     modifier = Modifier.padding(top = 24.dp),
-                    color = UnlockTextPrimary,
+                    color = dark_text_primary,
                     style =
                         MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.W600,
@@ -131,7 +122,7 @@ fun LoginScreen(
                 Text(
                     text = "Your wallet is locked. Enter your password to continue.",
                     modifier = Modifier.padding(top = 9.dp),
-                    color = UnlockTextSecondary,
+                    color = dark_text_secondary,
                     textAlign = TextAlign.Center,
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
@@ -167,7 +158,7 @@ fun LoginScreen(
                     if (!passwordValid) {
                         Text(
                             text = stringResource(Res.string.password_wrong),
-                            color = UnlockDanger,
+                            color = dark_danger,
                             style =
                                 MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 11.sp,
@@ -197,13 +188,13 @@ fun LoginScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(top = 10.dp),
-                    color = UnlockBorder,
+                    color = dark_border_subtle,
                 )
 
                 Text(
                     text = "Forgot your password? Log out and re-import your recovery phrase",
                     modifier = Modifier.padding(top = 11.dp),
-                    color = UnlockTextSecondary,
+                    color = dark_text_secondary,
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 11.sp,
@@ -242,9 +233,6 @@ private fun TermsAndConditionsAcceptanceRow(
     onAcceptedChange: (Boolean) -> Unit,
     onOpenTerms: () -> Unit,
 ) {
-    val checkboxShape = RoundedCornerShape(5.dp)
-    val checkboxInteractionSource = remember { MutableInteractionSource() }
-    val checkboxHovered by checkboxInteractionSource.collectIsHoveredAsState()
     val nextAccepted = !accepted
 
     Row(
@@ -255,41 +243,11 @@ private fun TermsAndConditionsAcceptanceRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .padding(top = 1.dp)
-                    .size(18.dp)
-                    .clip(checkboxShape)
-                    .background(
-                        color = if (accepted) dark_accent else Color.Transparent,
-                        shape = checkboxShape,
-                    ).border(
-                        width = 1.dp,
-                        color =
-                            when {
-                                accepted -> dark_accent
-                                checkboxHovered -> dark_border_muted
-                                else -> dark_border
-                            },
-                        shape = checkboxShape,
-                    ).pointerHoverIcon(PointerIcon.Hand)
-                    .clickable(
-                        interactionSource = checkboxInteractionSource,
-                        indication = null,
-                        onClick = { onAcceptedChange(nextAccepted) },
-                    ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (accepted) {
-                Icon(
-                    imageVector = Icons.Outlined.Check,
-                    contentDescription = null,
-                    tint = dark_accent_on,
-                    modifier = Modifier.size(13.dp),
-                )
-            }
-        }
+        AttoCheckbox(
+            checked = accepted,
+            onCheckedChange = onAcceptedChange,
+            modifier = Modifier.padding(top = 1.dp),
+        )
 
         Column(
             modifier = Modifier.weight(1f),
@@ -299,10 +257,10 @@ private fun TermsAndConditionsAcceptanceRow(
             ) {
                 Text(
                     text = "I accept the ",
-                    color = UnlockTextSecondary,
+                    color = dark_text_secondary,
                     modifier =
                         Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(6.dp))
                             .pointerHoverIcon(PointerIcon.Hand)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },

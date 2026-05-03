@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
+import cash.atto.wallet.ui.dark_danger
 import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_text_dim
 import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.ui.dark_violet
 import cash.atto.wallet.uistate.overview.TransactionType
@@ -47,7 +48,7 @@ fun AttoTransactionCard(
     val accent =
         when (transaction.type) {
             TransactionType.OPEN -> dark_accent
-            TransactionType.SEND -> Color(0xFFEF4444)
+            TransactionType.SEND -> dark_danger
             TransactionType.RECEIVE -> dark_success
             TransactionType.CHANGE -> dark_violet
         }
@@ -114,7 +115,7 @@ fun AttoTransactionCard(
                 ) {
                     Text(
                         text = typeLabel,
-                        color = Color.White,
+                        color = dark_text_primary,
                         style =
                             MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.W600,
@@ -181,7 +182,7 @@ fun AttoTransactionCard(
                 transaction.amount?.let {
                     Text(
                         text = amountText,
-                        color = if (transaction.type == TransactionType.RECEIVE) dark_success else Color.White,
+                        color = if (transaction.type == TransactionType.RECEIVE) dark_success else dark_text_primary,
                         style =
                             MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.W600,

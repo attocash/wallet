@@ -41,10 +41,10 @@ Use shared Compose components first. Match theme, spacing, typography, and inter
 
 - Need a primary action, destructive action, or outlined action: start with `AttoButton`.
 - Need text entry or password entry: start with `AttoTextField` or `AttoPasswordField`.
-- Need amount entry or amount display: start with `AttoAmountInputField` or `AttoAmountField`.
+- Need amount entry or amount display: start with `AttoAmountField`.
 - Need wallet transaction presentation: start with `AttoTransactionCard` and `AttoTransactionDetailsDialog`.
 - Need framed content or tappable container: start with `AttoCard`.
-- Need onboarding or modal structure: start with `AttoOnboardingContainer` or `AttoModal`.
+- Need page, panel, onboarding, or modal structure: start with `AttoPageFrame`, `AttoPanelCard`, `AttoCard`, or `AttoModal`.
 
 ## Reference
 

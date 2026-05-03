@@ -277,8 +277,6 @@ fun AttoNavHost(
                             },
                         )
                     }
-
-                    else -> {}
                 }
             }
         }

@@ -2,24 +2,6 @@ package cash.atto.wallet.ui
 
 import androidx.compose.ui.graphics.Color
 
-val gold_100 = Color(0xFFFFF8C6)
-val gold_600 = Color(0xFFFAB005)
-val gold_900 = Color(0xFFB85F05)
-
-val gray_100 = Color(0xFFF5F5F5)
-val gray_700 = Color(0xFF54595E)
-val gray_800 = Color(0xFF373B3E)
-
-val green_700 = Color(0xFF11D102)
-
-val lime_500 = Color(0xFF8CFD01)
-
-val ochre_600 = Color(0xFFDE8601)
-
-val red_900 = Color(0xFFDA0004)
-
-val yellow_100 = Color(0xFFFFFF89)
-
 // ── Dark-theme design system palette ─────────────────────────────────────────
 // Shared across WelcomeScreen, OverviewScreen, LoginScreen,
 // RecoveryPhraseScreen, ImportPhraseScreen, CreatePasswordScreen, etc.
@@ -38,6 +20,9 @@ val dark_surface_raised = Color(0xFF1C1C21)
 
 /** Deeply raised surface (word input fields) */
 val dark_surface_deep = Color(0xFF161618)
+
+/** Deep field surface used for copy/detail values */
+val dark_field_deep = Color(0xFF0F0F11)
 
 /** Subtle border between surface elements */
 val dark_border = Color(0xFF2C2C2F)
@@ -63,6 +48,9 @@ val dark_text_muted = Color(0xFF707070)
 /** Dimmed text (least prominent) */
 val dark_text_dim = Color(0xFF606060)
 
+/** Placeholder text */
+val dark_placeholder = Color(0xFF505050)
+
 /** Accent gold – primary brand colour */
 val dark_accent = Color(0xFFFAB005)
 
@@ -75,8 +63,8 @@ val dark_accent_soft_hover = Color(0x30FAB005)
 /** Stronger gold overlay – active border (25 % opacity) */
 val dark_accent_border_hover = Color(0x40FAB005)
 
-/** Dark gold text on gold button backgrounds */
-val dark_accent_on = Color(0xFF151107)
+/** Dark content on solid accent backgrounds */
+val dark_accent_on = Color(0xFF111827)
 
 /** Violet / purple accent */
 val dark_violet = Color(0xFF7C3AED)
@@ -92,3 +80,15 @@ val dark_success = Color(0xFF10B981)
 
 /** Danger / error (soft red) */
 val dark_danger = Color(0xFFF87171)
+
+/** Warning / risk amber */
+val dark_warning = Color(0xFFFF9800)
+
+/** Account identity dot color */
+val dark_account_sky = Color(0xFF38BDF8)
+
+/** Account identity dot color */
+val dark_account_amber = Color(0xFFF59E0B)
+
+/** QR code backing surface */
+val qr_background = Color(0xFFFFFFFF)

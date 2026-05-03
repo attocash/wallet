@@ -35,7 +35,7 @@ enum class AttoButtonVariant(
 ) {
     Accent(
         backgroundColor = dark_accent,
-        textColor = Color(0xFF111827),
+        textColor = dark_accent_on,
         fontWeight = FontWeight.W700,
         borderColor = null,
     ),
@@ -43,17 +43,17 @@ enum class AttoButtonVariant(
         backgroundColor = dark_accent_soft,
         textColor = dark_text_primary,
         fontWeight = FontWeight.W600,
-        borderColor = Color(0x33F7B500),
+        borderColor = dark_accent.copy(alpha = 0.2f),
     ),
     Outlined(
         backgroundColor = dark_surface,
-        textColor = Color.White,
+        textColor = dark_text_primary,
         fontWeight = FontWeight.W600,
         borderColor = dark_border,
     ),
     Danger(
-        backgroundColor = Color(0xFFDA0004),
-        textColor = Color.White,
+        backgroundColor = dark_danger,
+        textColor = dark_bg,
         fontWeight = FontWeight.W700,
         borderColor = null,
     ),
@@ -151,10 +151,10 @@ fun AttoButton(
 
 private fun AttoButtonVariant.hoverBackgroundColor(): Color =
     when (this) {
-        AttoButtonVariant.Accent -> lerp(backgroundColor, gold_100, 0.16f)
+        AttoButtonVariant.Accent -> lerp(backgroundColor, dark_text_primary, 0.16f)
         AttoButtonVariant.Secondary -> dark_accent_soft_hover
         AttoButtonVariant.Outlined -> dark_surface_alt
-        AttoButtonVariant.Danger -> lerp(backgroundColor, Color.White, 0.08f)
+        AttoButtonVariant.Danger -> lerp(backgroundColor, dark_text_primary, 0.08f)
     }
 
 private fun AttoButtonVariant.hoverBorderColor(): Color? =

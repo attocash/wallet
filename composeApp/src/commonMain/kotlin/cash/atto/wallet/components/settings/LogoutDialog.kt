@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,13 +42,13 @@ fun LogoutDialog(
         ) {
             Text(
                 text = "Logging out clears the wallet keys stored on this device.",
-                color = Color.White.copy(alpha = 0.7f),
+                color = dark_text_secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
                 text = "Make sure you have your recovery phrase saved before continuing.",
-                color = Color.White.copy(alpha = 0.7f),
+                color = dark_text_secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
             )
