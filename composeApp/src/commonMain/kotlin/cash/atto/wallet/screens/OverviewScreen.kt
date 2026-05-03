@@ -55,21 +55,6 @@ private data class OverviewAccount(
     val active: Boolean,
 )
 
-private val OverviewBg = dark_bg
-private val OverviewSurface = dark_surface
-private val OverviewSurfaceAlt = dark_surface_alt
-private val OverviewBorder = dark_border
-private val OverviewText = Color.White
-private val OverviewTextSecondary = dark_text_secondary
-private val OverviewTextTertiary = dark_text_tertiary
-private val OverviewTextMuted = dark_text_muted
-private val OverviewTextDim = dark_text_dim
-private val OverviewAccent = dark_accent
-private val OverviewAccentSoft = dark_accent_soft
-private val OverviewSuccess = dark_success
-private val OverviewDanger = Color(0xFFEF4444)
-private val OverviewPurple = dark_violet
-
 @Composable
 fun OverviewScreen(
     isWalletInitialized: Boolean,
@@ -139,7 +124,7 @@ private fun OverviewContent(
                             name = defaultAccountName(0U),
                             address = currentAddress,
                             balance = currentBalance,
-                            color = OverviewAccent,
+                            color = dark_accent,
                             active = true,
                         ),
                     )
@@ -160,7 +145,7 @@ private fun OverviewContent(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(OverviewBg),
+                .background(dark_bg),
     ) {
         val compact = isCompactWidth()
         val contentScroll = rememberScrollState()
@@ -293,7 +278,7 @@ private fun OverviewLeftColumn(
                 }
                 Text(
                     text = formatAmount(globalBalance),
-                    color = OverviewText,
+                    color = dark_text_primary,
                     modifier = Modifier.padding(top = 16.dp),
                     style =
                         MaterialTheme.typography.headlineLarge.copy(
@@ -311,7 +296,7 @@ private fun OverviewLeftColumn(
                         }
                     Text(
                         text = "~ $$usdFormatted USD",
-                        color = OverviewTextMuted,
+                        color = dark_text_muted,
                         modifier = Modifier.padding(top = 4.dp),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
@@ -350,7 +335,7 @@ private fun OverviewLeftColumn(
                         Modifier
                             .height(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (switchHovered) OverviewSurfaceAlt else OverviewBorder)
+                            .background(if (switchHovered) dark_surface_alt else dark_border)
                             .pointerHoverIcon(PointerIcon.Hand)
                             .clickable(
                                 interactionSource = switchInteractionSource,
@@ -362,7 +347,7 @@ private fun OverviewLeftColumn(
                 ) {
                     Text(
                         text = "SWITCH",
-                        color = OverviewText,
+                        color = dark_text_primary,
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.W600,
@@ -373,7 +358,7 @@ private fun OverviewLeftColumn(
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowDown,
                         contentDescription = "Switch account",
-                        tint = OverviewTextTertiary,
+                        tint = dark_text_tertiary,
                         modifier = Modifier.size(14.dp),
                     )
                 }
@@ -381,7 +366,7 @@ private fun OverviewLeftColumn(
 
             Text(
                 text = formatAmount(selectedAccount.balance),
-                color = OverviewText,
+                color = dark_text_primary,
                 modifier = Modifier.padding(top = 16.dp),
                 style =
                     MaterialTheme.typography.headlineLarge.copy(
@@ -399,7 +384,7 @@ private fun OverviewLeftColumn(
                     }
                 Text(
                     text = "~ $$usdFormatted USD",
-                    color = OverviewTextMuted,
+                    color = dark_text_muted,
                     modifier = Modifier.padding(top = 4.dp),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
@@ -420,7 +405,7 @@ private fun OverviewLeftColumn(
                 OverviewCapsLabel("Incoming")
                 Text(
                     text = "+${AttoFormatter.format(incomingAmount)}",
-                    color = OverviewSuccess,
+                    color = dark_success,
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.W700,
@@ -430,7 +415,7 @@ private fun OverviewLeftColumn(
                 )
             }
 
-            HorizontalDivider(color = OverviewBorder)
+            HorizontalDivider(color = dark_border)
 
             Row(
                 modifier =
@@ -443,7 +428,7 @@ private fun OverviewLeftColumn(
                 Text(
                     text = selectedAccount.address,
                     modifier = Modifier.weight(1f),
-                    color = OverviewTextMuted,
+                    color = dark_text_muted,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style =
@@ -455,7 +440,7 @@ private fun OverviewLeftColumn(
                 )
                 AttoCopyButton(
                     text = selectedAccount.address,
-                    tint = OverviewTextMuted,
+                    tint = dark_text_muted,
                     contentDescription = "Copy address",
                 )
             }
@@ -484,20 +469,20 @@ private fun OverviewLeftColumn(
                             Modifier
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(OverviewAccentSoft),
+                                .background(dark_accent_soft),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.TrendingUp,
                             contentDescription = null,
-                            tint = OverviewAccent,
+                            tint = dark_accent,
                             modifier = Modifier.size(18.dp),
                         )
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
                             text = stakingApy?.let { "Earning $it% APY" } ?: "APY unavailable",
-                            color = OverviewSuccess,
+                            color = dark_success,
                             style =
                                 MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.W600,
@@ -506,7 +491,7 @@ private fun OverviewLeftColumn(
                         )
                         Text(
                             text = voterName ?: "Unknown node",
-                            color = OverviewTextTertiary,
+                            color = dark_text_tertiary,
                             style =
                                 MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.W500,
@@ -518,7 +503,7 @@ private fun OverviewLeftColumn(
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                     contentDescription = null,
-                    tint = attoHoverTint(OverviewTextDim, stakingHovered),
+                    tint = attoHoverTint(dark_text_dim, stakingHovered),
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -567,7 +552,7 @@ private fun OverviewRightColumn(
         ) {
             Text(
                 text = "Recent Activity",
-                color = OverviewText,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.W600,
@@ -588,7 +573,7 @@ private fun OverviewRightColumn(
             ) {
                 Text(
                     text = "View all",
-                    color = OverviewAccent,
+                    color = dark_accent,
                     style =
                         MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.W500,
@@ -598,7 +583,7 @@ private fun OverviewRightColumn(
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                     contentDescription = null,
-                    tint = OverviewAccent,
+                    tint = dark_accent,
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -610,14 +595,14 @@ private fun OverviewRightColumn(
                     Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(OverviewSurface)
-                        .border(1.dp, OverviewBorder, RoundedCornerShape(12.dp))
+                        .background(dark_surface)
+                        .border(1.dp, dark_border, RoundedCornerShape(12.dp))
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = "Transactions will appear here once the wallet starts receiving or sending ATTO.",
-                    color = OverviewTextSecondary,
+                    color = dark_text_secondary,
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.W400,
@@ -718,8 +703,8 @@ private fun AccountSwitcherRow(
                 .fillMaxWidth()
                 .alpha(if (account.active) 1f else 0.55f),
         contentPadding = PaddingValues(16.dp),
-        background = if (selected) OverviewSurfaceAlt else OverviewSurface,
-        borderColor = if (selected) OverviewAccent else OverviewBorder,
+        background = if (selected) dark_surface_alt else dark_surface,
+        borderColor = if (selected) dark_accent else dark_border,
         onClick = if (account.active && !editingName) onClick else null,
     ) {
         Row(
@@ -746,7 +731,7 @@ private fun AccountSwitcherRow(
                 ) {
                     Text(
                         text = "#${account.id}",
-                        color = OverviewTextMuted,
+                        color = dark_text_muted,
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.W500,
@@ -776,7 +761,7 @@ private fun AccountSwitcherRow(
 
                 Text(
                     text = account.address,
-                    color = OverviewTextMuted,
+                    color = dark_text_muted,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style =
@@ -793,7 +778,7 @@ private fun AccountSwitcherRow(
                 ) {
                     Text(
                         text = formatAmount(account.balance),
-                        color = OverviewText,
+                        color = dark_text_primary,
                         style =
                             MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.W600,
@@ -810,7 +795,7 @@ private fun AccountSwitcherRow(
                 AttoCopyButton(
                     text = account.address,
                     size = 20.dp,
-                    tint = OverviewTextTertiary,
+                    tint = dark_text_tertiary,
                     contentDescription = "Copy address",
                 )
                 AccountVisibilityButton(
@@ -833,8 +818,8 @@ private fun AccountVisibilityButton(
         imageVector = if (active) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
         contentDescription = if (active) "Deactivate account" else "Activate account",
         enabled = enabled,
-        tint = OverviewTextTertiary,
-        disabledTint = OverviewTextDim,
+        tint = dark_text_tertiary,
+        disabledTint = dark_text_dim,
         onClick = onClick,
     )
 }
@@ -861,8 +846,8 @@ private fun AccountNameEditor(
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f),
                 singleLine = true,
-                textStyle = accountNameTextStyle(OverviewText),
-                cursorBrush = SolidColor(OverviewText),
+                textStyle = accountNameTextStyle(dark_text_primary),
+                cursorBrush = SolidColor(dark_text_primary),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { onConfirm() }),
                 decorationBox = { innerTextField ->
@@ -873,10 +858,10 @@ private fun AccountNameEditor(
                         if (value.isBlank()) {
                             Text(
                                 text = name,
-                                color = OverviewTextMuted,
+                                color = dark_text_muted,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = accountNameTextStyle(OverviewTextMuted),
+                                style = accountNameTextStyle(dark_text_muted),
                             )
                         }
                         innerTextField()
@@ -886,7 +871,7 @@ private fun AccountNameEditor(
             AccountIconButton(
                 imageVector = Icons.Outlined.Check,
                 contentDescription = "Save account name",
-                tint = OverviewText,
+                tint = dark_text_primary,
                 onClick = onConfirm,
             )
             AccountIconButton(
@@ -904,10 +889,10 @@ private fun AccountNameEditor(
             Text(
                 text = name,
                 modifier = Modifier.weight(1f),
-                color = OverviewText,
+                color = dark_text_primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = accountNameTextStyle(OverviewText),
+                style = accountNameTextStyle(dark_text_primary),
             )
             AccountIconButton(
                 imageVector = Icons.Outlined.Edit,
@@ -925,8 +910,8 @@ private fun AccountIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    tint: Color = OverviewTextTertiary,
-    disabledTint: Color = OverviewTextDim,
+    tint: Color = dark_text_tertiary,
+    disabledTint: Color = dark_text_dim,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
@@ -968,8 +953,8 @@ private fun AccountIconButton(
 private fun OverviewCard(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(20.dp),
-    background: Color = OverviewSurface,
-    borderColor: Color = OverviewBorder,
+    background: Color = dark_surface,
+    borderColor: Color = dark_border,
     interactionSource: MutableInteractionSource? = null,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -994,7 +979,7 @@ private fun OverviewCard(
 private fun OverviewCapsLabel(text: String) {
     Text(
         text = text,
-        color = OverviewTextTertiary,
+        color = dark_text_tertiary,
         style =
             MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.W500,
@@ -1008,7 +993,7 @@ private fun OverviewCapsLabel(text: String) {
 private fun OverviewSmallMeta(text: String) {
     Text(
         text = text,
-        color = OverviewTextDim,
+        color = dark_text_dim,
         style =
             MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.W500,
@@ -1029,11 +1014,11 @@ private fun formatAmount(amount: Double): String = AttoFormatter.format(BigDecim
 
 private fun accountColor(index: UInt): Color =
     when (index % 5U) {
-        0U -> OverviewAccent
-        1U -> OverviewPurple
-        2U -> OverviewSuccess
-        3U -> Color(0xFF38BDF8)
-        else -> Color(0xFFF59E0B)
+        0U -> dark_accent
+        1U -> dark_violet
+        2U -> dark_success
+        3U -> dark_account_sky
+        else -> dark_account_amber
     }
 
 private fun normalizeAttoUri(address: String): String =

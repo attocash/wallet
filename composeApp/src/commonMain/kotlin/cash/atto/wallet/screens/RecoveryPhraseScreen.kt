@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoBackButton
+import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoRoundButton
 import cash.atto.wallet.components.common.AttoWordChip
@@ -34,18 +35,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-
-private val RecoveryPageBackground = dark_bg
-private val RecoverySurface = dark_surface
-private val RecoveryBorder = dark_border
-private val RecoveryBorderHover = dark_accent_border_hover
-private val RecoveryTextPrimary = Color.White
-private val RecoveryTextSecondary = dark_text_secondary
-private val RecoveryTextTertiary = dark_text_muted
-private val RecoveryGold = dark_accent
-private val RecoveryGoldSoft = dark_accent_soft
-private val RecoveryGoldDark = dark_bg
-private val RecoverySuccess = dark_success
 
 private enum class RecoveryPhraseTab {
     View,
@@ -100,7 +89,7 @@ fun RecoveryPhrase(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(RecoveryPageBackground),
+                .background(dark_bg),
     ) {
         Column(
             modifier =
@@ -133,7 +122,7 @@ fun RecoveryPhrase(
 
                     Text(
                         text = stringResource(Res.string.secret_recovery_title),
-                        color = RecoveryTextPrimary,
+                        color = dark_text_primary,
                         textAlign = TextAlign.Center,
                         style =
                             MaterialTheme.typography.bodyLarge.copy(
@@ -211,7 +200,7 @@ private fun RecoveryPhraseHeader(
         ) {
             Text(
                 text = "?",
-                color = RecoveryTextPrimary,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.W600,
@@ -231,8 +220,8 @@ private fun RecoveryPhraseTabs(
     Row(
         modifier =
             modifier
-                .background(RecoverySurface, RoundedCornerShape(12.dp))
-                .border(1.dp, RecoveryBorder, RoundedCornerShape(12.dp))
+                .background(dark_surface, RoundedCornerShape(12.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(12.dp))
                 .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -245,7 +234,7 @@ private fun RecoveryPhraseTabs(
                     imageVector = Icons.Outlined.Description,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (selected == RecoveryPhraseTab.View) RecoveryGoldDark else RecoveryTextTertiary,
+                    tint = if (selected == RecoveryPhraseTab.View) dark_bg else dark_text_muted,
                 )
             },
             onClick = { onSelected(RecoveryPhraseTab.View) },
@@ -260,7 +249,7 @@ private fun RecoveryPhraseTabs(
                     imageVector = Icons.Outlined.VerifiedUser,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (selected == RecoveryPhraseTab.Confirm) RecoveryGoldDark else RecoveryTextTertiary,
+                    tint = if (selected == RecoveryPhraseTab.Confirm) dark_bg else dark_text_muted,
                 )
             },
             onClick = { onSelected(RecoveryPhraseTab.Confirm) },
@@ -281,7 +270,7 @@ private fun RecoveryTabButton(
             modifier
                 .height(44.dp)
                 .background(
-                    color = if (selected) RecoveryGold else Color.Transparent,
+                    color = if (selected) dark_accent else Color.Transparent,
                     shape = RoundedCornerShape(8.dp),
                 ).pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
@@ -296,7 +285,7 @@ private fun RecoveryTabButton(
         Text(
             text = text,
             modifier = Modifier.padding(start = 8.dp),
-            color = if (selected) RecoveryGoldDark else RecoveryTextTertiary,
+            color = if (selected) dark_bg else dark_text_muted,
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.W600,
@@ -341,13 +330,13 @@ private fun RecoveryPhraseViewContent(
                 } else {
                     stringResource(Res.string.secret_copy)
                 },
-            accent = if (copied) RecoverySuccess else RecoveryTextSecondary,
+            accent = if (copied) dark_success else dark_text_secondary,
             icon = {
                 Icon(
                     imageVector = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (copied) RecoverySuccess else RecoveryTextSecondary,
+                    tint = if (copied) dark_success else dark_text_secondary,
                 )
             },
             onClick = onCopyClick,
@@ -401,13 +390,18 @@ private fun RecoveryPhraseConfirmContent(
         )
     }
 
-    RecoveryContinueButton(
+    AttoButton(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp),
+        text =
+            if (allChecked) {
+                stringResource(Res.string.secret_continue_create_password)
+            } else {
+                stringResource(Res.string.secret_check_all_items, checkedItems.size)
+            },
         enabled = allChecked,
-        checkedCount = checkedItems.size,
         onClick = onContinueClick,
     )
 }
@@ -423,7 +417,7 @@ private fun RecoverySectionIntro(
     ) {
         Text(
             text = label,
-            color = RecoveryGold,
+            color = dark_accent,
             textAlign = TextAlign.Center,
             style =
                 MaterialTheme.typography.labelMedium.copy(
@@ -436,7 +430,7 @@ private fun RecoverySectionIntro(
         Text(
             text = description,
             modifier = Modifier.padding(top = 8.dp),
-            color = RecoveryTextSecondary,
+            color = dark_text_secondary,
             textAlign = TextAlign.Center,
             style =
                 MaterialTheme.typography.bodyMedium.copy(
@@ -524,15 +518,15 @@ private fun RecoverySecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    accent: Color = RecoveryTextSecondary,
+    accent: Color = dark_text_secondary,
     icon: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier =
             modifier
                 .height(44.dp)
-                .background(RecoverySurface, RoundedCornerShape(8.dp))
-                .border(1.dp, RecoveryBorder, RoundedCornerShape(8.dp))
+                .background(dark_surface, RoundedCornerShape(8.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -567,8 +561,8 @@ private fun RecoveryPrimarySoftButton(
         modifier =
             modifier
                 .height(44.dp)
-                .background(RecoveryGoldSoft, RoundedCornerShape(8.dp))
-                .border(1.dp, RecoveryBorderHover, RoundedCornerShape(8.dp))
+                .background(dark_accent_soft, RoundedCornerShape(8.dp))
+                .border(1.dp, dark_accent_border_hover, RoundedCornerShape(8.dp))
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -579,7 +573,7 @@ private fun RecoveryPrimarySoftButton(
     ) {
         Text(
             text = text,
-            color = RecoveryGold,
+            color = dark_accent,
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.W600,
@@ -600,8 +594,8 @@ private fun RecoveryChecklistCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .background(RecoverySurface, RoundedCornerShape(8.dp))
-                .border(1.dp, RecoveryBorder, RoundedCornerShape(8.dp))
+                .background(dark_surface, RoundedCornerShape(8.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -616,11 +610,11 @@ private fun RecoveryChecklistCard(
                 Modifier
                     .size(20.dp)
                     .background(
-                        if (checked) RecoveryGold else Color.Transparent,
+                        if (checked) dark_accent else Color.Transparent,
                         RoundedCornerShape(6.dp),
                     ).border(
                         2.dp,
-                        if (checked) RecoveryGold else RecoveryBorder,
+                        if (checked) dark_accent else dark_border,
                         RoundedCornerShape(6.dp),
                     ),
             contentAlignment = Alignment.Center,
@@ -629,7 +623,7 @@ private fun RecoveryChecklistCard(
                 Icon(
                     imageVector = Icons.Outlined.CheckCircle,
                     contentDescription = null,
-                    tint = RecoveryGoldDark,
+                    tint = dark_bg,
                     modifier = Modifier.size(14.dp),
                 )
             }
@@ -638,7 +632,7 @@ private fun RecoveryChecklistCard(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = title,
-                color = RecoveryTextPrimary,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.W500,
@@ -647,7 +641,7 @@ private fun RecoveryChecklistCard(
             )
             Text(
                 text = description,
-                color = RecoveryTextTertiary,
+                color = dark_text_muted,
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.W400,
@@ -656,46 +650,6 @@ private fun RecoveryChecklistCard(
                     ),
             )
         }
-    }
-}
-
-@Composable
-private fun RecoveryContinueButton(
-    enabled: Boolean,
-    checkedCount: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .height(56.dp)
-                .background(
-                    color = RecoveryGold.copy(alpha = if (enabled) 1f else 0.4f),
-                    shape = RoundedCornerShape(12.dp),
-                ).pointerHoverIcon(PointerIcon.Hand)
-                .clickable(
-                    enabled = enabled,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text =
-                if (enabled) {
-                    stringResource(Res.string.secret_continue_create_password)
-                } else {
-                    stringResource(Res.string.secret_check_all_items, checkedCount)
-                },
-            color = RecoveryGoldDark,
-            style =
-                MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 15.sp,
-                ),
-        )
     }
 }
 
@@ -710,7 +664,7 @@ private fun RecoveryPhraseHelpDialog(
     ) {
         Text(
             text = stringResource(Res.string.secret_help_body_one),
-            color = RecoveryTextSecondary,
+            color = dark_text_secondary,
             style =
                 MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 14.sp,
@@ -720,7 +674,7 @@ private fun RecoveryPhraseHelpDialog(
 
         Text(
             text = stringResource(Res.string.secret_help_body_two),
-            color = RecoveryTextSecondary,
+            color = dark_text_secondary,
             style =
                 MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 14.sp,
@@ -732,13 +686,13 @@ private fun RecoveryPhraseHelpDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(RecoveryGoldSoft, RoundedCornerShape(12.dp))
-                    .border(1.dp, RecoveryBorderHover, RoundedCornerShape(12.dp))
+                    .background(dark_accent_soft, RoundedCornerShape(12.dp))
+                    .border(1.dp, dark_accent_border_hover, RoundedCornerShape(12.dp))
                     .padding(16.dp),
         ) {
             Text(
                 text = stringResource(Res.string.secret_help_warning),
-                color = RecoveryGold,
+                color = dark_accent,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.W500,

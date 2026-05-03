@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,7 +20,9 @@ import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_accent
+import cash.atto.wallet.ui.dark_accent_on
 import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
@@ -124,7 +125,7 @@ fun SendConfirmContent(
             ) {
                 Text(
                     text = uiState.amount?.let { "${AttoFormatter.format(it)} ATTO" } ?: "Unavailable",
-                    color = Color.White,
+                    color = dark_text_primary,
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.W700,
@@ -177,7 +178,7 @@ fun SendConfirmContent(
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
-                    color = Color(0xFF111827),
+                    color = dark_accent_on,
                     strokeWidth = 2.dp,
                 )
             }

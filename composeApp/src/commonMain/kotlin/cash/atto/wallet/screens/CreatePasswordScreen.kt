@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -23,14 +22,13 @@ import cash.atto.wallet.components.common.AttoPasswordField
 import cash.atto.wallet.components.common.AttoScreenSubtitle
 import cash.atto.wallet.components.common.AttoScreenTitle
 import cash.atto.wallet.ui.AttoWalletTheme
-import cash.atto.wallet.ui.dark_accent
-import cash.atto.wallet.ui.dark_accent_border_hover
 import cash.atto.wallet.ui.dark_bg
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_danger
 import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
@@ -38,17 +36,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-
-private val PasswordPageBackground = dark_bg
-private val PasswordSurface = dark_surface
-private val PasswordBorder = dark_border
-private val PasswordBorderHover = dark_accent_border_hover
-private val PasswordTextPrimary = Color.White
-private val PasswordTextSecondary = dark_text_secondary
-private val PasswordTextTertiary = dark_text_muted
-private val PasswordGold = dark_accent
-private val PasswordSuccess = dark_success
-private val PasswordDanger = dark_danger
 
 @Composable
 fun CreatePasswordScreen(
@@ -111,7 +98,7 @@ fun CreatePassword(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(PasswordPageBackground),
+                .background(dark_bg),
     ) {
         Column(
             modifier =
@@ -260,7 +247,7 @@ private fun PasswordMatchState(
             imageVector = if (matches) Icons.Outlined.Check else Icons.Outlined.Close,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            tint = if (matches) PasswordSuccess else PasswordDanger,
+            tint = if (matches) dark_success else dark_danger,
         )
 
         Text(
@@ -270,7 +257,7 @@ private fun PasswordMatchState(
                 } else {
                     stringResource(Res.string.password_no_match)
                 },
-            color = if (matches) PasswordSuccess else PasswordDanger,
+            color = if (matches) dark_success else dark_danger,
             style =
                 MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.W400,
@@ -292,14 +279,14 @@ private fun PasswordRequirementsCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .background(PasswordSurface, RoundedCornerShape(8.dp))
-                .border(1.dp, PasswordBorder, RoundedCornerShape(8.dp))
+                .background(dark_surface, RoundedCornerShape(8.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = stringResource(Res.string.password_requirements_title),
-            color = PasswordTextSecondary,
+            color = dark_text_secondary,
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.W500,
@@ -331,7 +318,7 @@ private fun PasswordRequirement(
                 Modifier
                     .size(16.dp)
                     .background(
-                        color = if (satisfied) PasswordSuccess else PasswordBorder,
+                        color = if (satisfied) dark_success else dark_border,
                         shape = CircleShape,
                     ),
             contentAlignment = Alignment.Center,
@@ -341,14 +328,14 @@ private fun PasswordRequirement(
                     imageVector = Icons.Outlined.Check,
                     contentDescription = null,
                     modifier = Modifier.size(10.dp),
-                    tint = PasswordTextPrimary,
+                    tint = dark_text_primary,
                 )
             }
         }
 
         Text(
             text = text,
-            color = if (satisfied) PasswordSuccess else PasswordTextTertiary,
+            color = if (satisfied) dark_success else dark_text_muted,
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.W400,

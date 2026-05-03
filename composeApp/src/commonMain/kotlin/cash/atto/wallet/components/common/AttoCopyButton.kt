@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cash.atto.wallet.platform.setText
 import cash.atto.wallet.ui.attoHoverTint
+import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_text_tertiary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ fun AttoCopyButton(
     modifier: Modifier = Modifier,
     size: Dp = 24.dp,
     tint: Color = dark_text_tertiary,
-    confirmTint: Color = Color(0xFF4CAF50),
+    confirmTint: Color = dark_success,
     contentDescription: String? = "Copy",
     confirmationDuration: Duration = 1.seconds,
     onCopied: (() -> Unit)? = null,

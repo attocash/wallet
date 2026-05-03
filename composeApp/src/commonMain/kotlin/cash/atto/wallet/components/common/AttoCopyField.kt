@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
+import cash.atto.wallet.ui.dark_field_deep
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_tertiary
-
-private val FieldBackground = Color(0xFF0F0F11)
 
 @Composable
 fun AttoCopyField(
@@ -94,7 +94,7 @@ fun AttoDetailField(
         AttoFieldSurface {
             Text(
                 text = value,
-                color = Color.White,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.bodySmall.copy(
                         fontFamily = FontFamily.Monospace,
@@ -145,7 +145,7 @@ internal fun AttoFieldValueText(
     text: String,
     style: TextStyle,
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
+    color: Color = dark_text_primary,
     middleEllipsize: Boolean = true,
 ) {
     Text(
@@ -169,7 +169,7 @@ internal fun AttoFieldSurface(
             modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(FieldBackground)
+                .background(dark_field_deep)
                 .padding(12.dp),
         content = content,
     )

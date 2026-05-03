@@ -33,17 +33,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_danger
+import cash.atto.wallet.ui.dark_placeholder
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
-
-private val FieldContainer = dark_surface
-private val FieldBorder = dark_border
-private val FieldTextPrimary = Color.White
-private val FieldTextSecondary = dark_text_secondary
-private val FieldTextMuted = dark_text_muted
-private val FieldCursor = Color(0xFFFAB005)
 
 @Composable
 fun AttoPasswordField(
@@ -62,7 +59,7 @@ fun AttoPasswordField(
         if (label != null) {
             Text(
                 text = label,
-                color = FieldTextSecondary,
+                color = dark_text_secondary,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.W500,
@@ -77,7 +74,11 @@ fun AttoPasswordField(
                 Modifier
                     .fillMaxWidth()
                     .padding(top = if (label != null) 8.dp else 0.dp)
-                    .border(1.dp, FieldBorder, RoundedCornerShape(8.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = if (isError) dark_danger else dark_border,
+                        shape = RoundedCornerShape(8.dp),
+                    ),
             singleLine = true,
             isError = isError,
             shape = RoundedCornerShape(8.dp),
@@ -85,12 +86,12 @@ fun AttoPasswordField(
                 MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.W400,
                     fontSize = 14.sp,
-                    color = FieldTextPrimary,
+                    color = dark_text_primary,
                 ),
             placeholder = {
                 Text(
                     text = placeholder,
-                    color = Color(0xFF505050),
+                    color = dark_placeholder,
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.W400,
@@ -115,7 +116,7 @@ fun AttoPasswordField(
                     Icon(
                         imageVector = if (revealed) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                         contentDescription = null,
-                        tint = FieldTextMuted,
+                        tint = dark_text_muted,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -131,18 +132,18 @@ fun AttoPasswordField(
                 ),
             colors =
                 TextFieldDefaults.colors(
-                    focusedContainerColor = FieldContainer,
-                    unfocusedContainerColor = FieldContainer,
-                    disabledContainerColor = FieldContainer,
-                    errorContainerColor = FieldContainer,
+                    focusedContainerColor = dark_surface,
+                    unfocusedContainerColor = dark_surface,
+                    disabledContainerColor = dark_surface,
+                    errorContainerColor = dark_surface,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     errorIndicatorColor = Color.Transparent,
-                    focusedTextColor = FieldTextPrimary,
-                    unfocusedTextColor = FieldTextPrimary,
-                    errorTextColor = FieldTextPrimary,
-                    cursorColor = FieldCursor,
+                    focusedTextColor = dark_text_primary,
+                    unfocusedTextColor = dark_text_primary,
+                    errorTextColor = dark_text_primary,
+                    cursorColor = dark_accent,
                 ),
         )
     }

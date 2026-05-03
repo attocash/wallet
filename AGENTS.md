@@ -32,8 +32,9 @@
 
 ## UI Conventions
 
+- Treat `DESIGN.md` as the canonical product design system for colors, typography, spacing, shape scale, component tokens, and resolved design conflicts. `evidence-matrix.md` records the evidence and conflict decisions behind that system.
 - Reuse shared Compose primitives under `composeApp/src/commonMain/kotlin/cash/atto/wallet/components/common` before adding new screen-local widgets. The repo already ships wallet-specific wrappers such as `AttoButton`, `AttoTextField`, `AttoCard`, `AttoModal`, and `AttoTransactionCard`.
-- For Compose UI changes, check the repo-local skills in `.agents/skills/atto-components` and `.agents/skills/atto-style`; they capture the existing component reuse rules and visual style for this codebase.
+- For Compose UI changes, use `.agents/skills/atto-components` for component reuse workflow and `.agents/skills/atto-style` for implementation workflow. If either skill conflicts with `DESIGN.md`, `DESIGN.md` wins and the skill should be updated.
 
 ## Testing Reality
 

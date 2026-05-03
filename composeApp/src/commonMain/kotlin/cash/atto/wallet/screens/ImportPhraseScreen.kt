@@ -50,8 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -91,6 +89,7 @@ import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_surface
 import cash.atto.wallet.ui.dark_surface_deep
 import cash.atto.wallet.ui.dark_text_muted
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
@@ -99,20 +98,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-
-private val ImportPageBackground = dark_bg
-private val ImportSurface = dark_surface
-private val ImportSurfaceRaised = dark_surface_deep
-private val ImportBorder = dark_border
-private val ImportBorderMuted = dark_border_muted
-private val ImportTextPrimary = Color.White
-private val ImportTextSecondary = dark_text_secondary
-private val ImportTextTertiary = dark_text_muted
-private val ImportGold = dark_accent
-private val ImportGoldDark = dark_bg
-private val ImportGoldSoft = dark_accent_soft
-private val ImportDanger = dark_danger
-private val ImportSuccess = dark_success
 
 private const val IMPORT_WORD_COUNT = 24
 private val IMPORT_DICTIONARY_WORDS = AttoMnemonicDictionary.list
@@ -235,7 +220,7 @@ fun ImportPhrase(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(ImportPageBackground),
+                .background(dark_bg),
     ) {
         Column(
             modifier =
@@ -274,7 +259,7 @@ fun ImportPhrase(
 
                     Text(
                         text = stringResource(Res.string.secret_import_title),
-                        color = ImportTextPrimary,
+                        color = dark_text_primary,
                         textAlign = TextAlign.Center,
                         style =
                             MaterialTheme.typography.bodyLarge.copy(
@@ -291,7 +276,7 @@ fun ImportPhrase(
                             Modifier
                                 .padding(top = 12.dp)
                                 .padding(horizontal = 18.dp),
-                        color = ImportTextSecondary,
+                        color = dark_text_secondary,
                         textAlign = TextAlign.Center,
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
@@ -473,8 +458,8 @@ private fun ImportPasteCard(
     Row(
         modifier =
             modifier
-                .background(ImportSurface, RoundedCornerShape(16.dp))
-                .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
+                .background(dark_surface, RoundedCornerShape(16.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(16.dp))
                 .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -483,13 +468,13 @@ private fun ImportPasteCard(
             modifier =
                 Modifier
                     .size(44.dp)
-                    .background(ImportGoldSoft, RoundedCornerShape(12.dp)),
+                    .background(dark_accent_soft, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = if (pasted) Icons.Outlined.Check else Icons.Outlined.ContentPaste,
                 contentDescription = null,
-                tint = if (pasted) ImportSuccess else ImportGold,
+                tint = if (pasted) dark_success else dark_accent,
                 modifier = Modifier.size(20.dp),
             )
         }
@@ -505,7 +490,7 @@ private fun ImportPasteCard(
                     } else {
                         stringResource(Res.string.secret_import_paste_title)
                     },
-                color = ImportTextPrimary,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.W600,
@@ -515,7 +500,7 @@ private fun ImportPasteCard(
 
             Text(
                 text = stringResource(Res.string.secret_import_paste_hint),
-                color = if (pasted) ImportSuccess else ImportTextSecondary,
+                color = if (pasted) dark_success else dark_text_secondary,
                 style =
                     MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.W400,
@@ -528,7 +513,7 @@ private fun ImportPasteCard(
         Box(
             modifier =
                 Modifier
-                    .background(ImportGold, RoundedCornerShape(10.dp))
+                    .background(dark_accent, RoundedCornerShape(10.dp))
                     .pointerHoverIcon(PointerIcon.Hand)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -539,7 +524,7 @@ private fun ImportPasteCard(
         ) {
             Text(
                 text = stringResource(Res.string.secret_import_paste),
-                color = ImportGoldDark,
+                color = dark_bg,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.W600,
@@ -559,8 +544,8 @@ private fun ImportProgressCard(
     Column(
         modifier =
             modifier
-                .background(ImportSurface, RoundedCornerShape(16.dp))
-                .border(1.dp, ImportBorder, RoundedCornerShape(16.dp))
+                .background(dark_surface, RoundedCornerShape(16.dp))
+                .border(1.dp, dark_border, RoundedCornerShape(16.dp))
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -571,7 +556,7 @@ private fun ImportProgressCard(
         ) {
             Text(
                 text = stringResource(Res.string.secret_import_progress),
-                color = ImportTextSecondary,
+                color = dark_text_secondary,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.W500,
@@ -581,7 +566,7 @@ private fun ImportProgressCard(
 
             Text(
                 text = "$filledCount/$IMPORT_WORD_COUNT",
-                color = ImportTextPrimary,
+                color = dark_text_primary,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.W600,
@@ -595,7 +580,7 @@ private fun ImportProgressCard(
                 Modifier
                     .fillMaxWidth()
                     .height(8.dp)
-                    .background(ImportBorderMuted, RoundedCornerShape(999.dp)),
+                    .background(dark_border_muted, RoundedCornerShape(999.dp)),
         ) {
             Box(
                 modifier =
@@ -603,10 +588,7 @@ private fun ImportProgressCard(
                         .fillMaxWidth(progress.coerceIn(0f, 1f))
                         .height(8.dp)
                         .background(
-                            brush =
-                                Brush.horizontalGradient(
-                                    colors = listOf(Color(0xFFFFD666), ImportGold),
-                                ),
+                            color = dark_accent,
                             shape = RoundedCornerShape(999.dp),
                         ),
             )
@@ -622,8 +604,8 @@ private fun ImportInvalidCard(
     Row(
         modifier =
             modifier
-                .background(Color(0xFF211719), RoundedCornerShape(16.dp))
-                .border(1.dp, Color(0xFF503033), RoundedCornerShape(16.dp))
+                .background(dark_danger.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                .border(1.dp, dark_danger.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
                 .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -631,13 +613,13 @@ private fun ImportInvalidCard(
         Icon(
             imageVector = Icons.Outlined.ErrorOutline,
             contentDescription = null,
-            tint = ImportDanger,
+            tint = dark_danger,
             modifier = Modifier.size(18.dp),
         )
 
         Text(
             text = message ?: IMPORT_MNEMONIC_INVALID_MESSAGE,
-            color = Color(0xFFF2B8BC),
+            color = dark_danger,
             style =
                 MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.W500,
@@ -682,11 +664,11 @@ private fun ImportWordField(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(ImportSurfaceRaised, RoundedCornerShape(14.dp))
+                    .background(dark_surface_deep, RoundedCornerShape(12.dp))
                     .border(
                         width = 1.dp,
-                        color = if (isInvalid || showFieldInvalid) ImportDanger else ImportBorder,
-                        shape = RoundedCornerShape(14.dp),
+                        color = if (isInvalid || showFieldInvalid) dark_danger else dark_border,
+                        shape = RoundedCornerShape(12.dp),
                     ).height(44.dp)
                     .padding(horizontal = 14.dp)
                     .onGloballyPositioned { coordinates ->
@@ -700,7 +682,7 @@ private fun ImportWordField(
                     Modifier
                         .width(28.dp)
                         .paddingFromBaseline(top = 16.dp),
-                color = if (isInvalid || showFieldInvalid) ImportDanger else ImportTextSecondary,
+                color = if (isInvalid || showFieldInvalid) dark_danger else dark_text_secondary,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.W500,
@@ -724,13 +706,13 @@ private fun ImportWordField(
                             .fillMaxWidth()
                             .onFocusChanged { onFocusChange(it.isFocused) },
                     singleLine = true,
-                    cursorBrush = SolidColor(ImportGold),
+                    cursorBrush = SolidColor(dark_accent),
                     textStyle =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.W500,
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
-                            color = ImportTextPrimary,
+                            color = dark_text_primary,
                         ),
                     keyboardOptions =
                         KeyboardOptions(
@@ -746,7 +728,7 @@ private fun ImportWordField(
                             if (value.isBlank()) {
                                 Text(
                                     text = stringResource(Res.string.secret_import_word_placeholder),
-                                    color = ImportTextTertiary,
+                                    color = dark_text_muted,
                                     style =
                                         MaterialTheme.typography.bodyMedium.copy(
                                             fontWeight = FontWeight.W400,
@@ -771,12 +753,12 @@ private fun ImportWordField(
                         modifier =
                             Modifier
                                 .size(16.dp)
-                                .background(ImportDanger, CircleShape),
+                                .background(dark_danger, CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "!",
-                            color = Color.White,
+                            color = dark_bg,
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.W700,
@@ -795,17 +777,17 @@ private fun ImportWordField(
                 modifier =
                     Modifier
                         .width(fieldWidth + 2.dp)
-                        .background(ImportSurface, RoundedCornerShape(12.dp))
-                        .border(1.dp, ImportBorder, RoundedCornerShape(12.dp))
+                        .background(dark_surface, RoundedCornerShape(12.dp))
+                        .border(1.dp, dark_border, RoundedCornerShape(12.dp))
                         .heightIn(max = 184.dp),
-                containerColor = ImportSurface,
+                containerColor = dark_surface,
             ) {
                 suggestions.forEach { suggestion ->
                     DropdownMenuItem(
                         text = {
                             Text(
                                 text = suggestion,
-                                color = ImportTextPrimary,
+                                color = dark_text_primary,
                                 style =
                                     MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = FontWeight.W500,

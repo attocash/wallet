@@ -12,7 +12,7 @@ import kotlinx.browser.document
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 
-private const val qrScannerVideoHeightPx = 320
+private const val QR_SCANNER_VIDEO_HEIGHT_PX = 320
 
 @Composable
 fun QrScannerView(
@@ -29,7 +29,7 @@ fun QrScannerView(
         container.style.top = "calc(50% + 36px)"
         container.style.transform = "translate(-50%, -50%)"
         container.style.width = "min(480px, calc(100vw - 64px))"
-        container.style.height = "${qrScannerVideoHeightPx}px"
+        container.style.height = "${QR_SCANNER_VIDEO_HEIGHT_PX}px"
         container.style.maxHeight = "calc(100vh - 220px)"
         container.style.zIndex = "9999"
         container.style.backgroundColor = "black"
@@ -68,6 +68,6 @@ fun QrScannerView(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(qrScannerVideoHeightPx.dp),
+                .height(QR_SCANNER_VIDEO_HEIGHT_PX.dp),
     )
 }

@@ -1,5 +1,7 @@
 # Atto Style Guide
 
+This is a quick implementation reference. `DESIGN.md` is canonical for tokens, typography, spacing, shapes, and conflict decisions. If this file conflicts with `DESIGN.md`, follow `DESIGN.md` and update this file.
+
 Source screens reviewed:
 
 - `composeApp/src/commonMain/kotlin/cash/atto/wallet/screens/OverviewScreen.kt`

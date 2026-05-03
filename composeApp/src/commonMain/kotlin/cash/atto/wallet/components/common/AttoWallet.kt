@@ -28,13 +28,13 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import attowallet.composeapp.generated.resources.*
+import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.logo
 import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 
 val LogoutShellIcon: ImageVector
     get() = Icons.AutoMirrored.Outlined.Logout
@@ -282,82 +282,6 @@ private fun CachedWorkInfoDialog(
 }
 
 @Composable
-fun AttoShellNavRow(
-    navState: MainScreenNavDestination,
-    onNavStateChanged: (MainScreenNavDestination) -> Unit,
-) {
-    val scrollState = rememberScrollState()
-    val items =
-        listOf(
-            MainScreenNavDestination.OVERVIEW to
-                Pair(
-                    Icons.Outlined.AccountBalanceWallet,
-                    stringResource(Res.string.main_nav_overview),
-                ),
-            MainScreenNavDestination.SEND to Pair(Icons.Outlined.ArrowUpward, stringResource(Res.string.main_nav_send)),
-            MainScreenNavDestination.RECEIVE to
-                Pair(
-                    Icons.Outlined.ArrowDownward,
-                    stringResource(Res.string.main_nav_receive),
-                ),
-            MainScreenNavDestination.TRANSACTIONS to
-                Pair(
-                    Icons.Outlined.History,
-                    stringResource(Res.string.main_nav_transactions),
-                ),
-            MainScreenNavDestination.SETTINGS to
-                Pair(
-                    Icons.Outlined.Settings,
-                    stringResource(Res.string.main_nav_settings),
-                ),
-        )
-
-    Row(
-        modifier =
-            Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(dark_surface)
-                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
-                .horizontalScroll(scrollState)
-                .padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items.forEach { (destination, presentation) ->
-            val selected = destination == navState
-            val background = if (selected) dark_accent else Color.Transparent
-            val contentColor = if (selected) Color(0xFF111827) else dark_text_primary
-
-            Row(
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(background)
-                        .pointerHoverIcon(PointerIcon.Hand)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                        ) { onNavStateChanged(destination) }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = presentation.first,
-                    contentDescription = presentation.second,
-                    tint = contentColor,
-                    modifier = Modifier.size(18.dp),
-                )
-                Text(
-                    text = presentation.second,
-                    color = contentColor,
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun AttoPageFrame(
     title: String,
     subtitle: String,
@@ -518,7 +442,7 @@ fun AttoCircleIconButton(
     contentDescription: String,
     onClick: () -> Unit,
     tint: Color = dark_text_primary,
-    background: Color = Color(0x40192639),
+    background: Color = dark_surface_alt.copy(alpha = 0.4f),
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
@@ -539,7 +463,7 @@ fun AttoCircleIconButton(
                             .background(background)
                             .border(
                                 width = 1.dp,
-                                color = Color(0x1FFFFFFF),
+                                color = dark_border,
                                 shape = CircleShape,
                             )
                     },

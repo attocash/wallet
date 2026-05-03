@@ -1,20 +1,8 @@
 package cash.atto.wallet.uistate.overview
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.vector.ImageVector
-import attowallet.composeapp.generated.resources.*
 import cash.atto.commons.AttoHeight
 import cash.atto.wallet.ui.AttoFormatter
-import cash.atto.wallet.ui.errorGradient
-import cash.atto.wallet.ui.primaryGradient
-import cash.atto.wallet.ui.secondaryGradient
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -52,108 +40,6 @@ data class TransactionUiState
                     )
                 }
             } ?: " "
-
-        val icon: ImageVector
-            @Composable
-            get() =
-                when (type) {
-                    TransactionType.OPEN -> vectorResource(Res.drawable.ic_arrow_down)
-                    TransactionType.SEND -> vectorResource(Res.drawable.ic_arrow_up)
-                    TransactionType.RECEIVE -> vectorResource(Res.drawable.ic_arrow_down)
-                    TransactionType.CHANGE -> Icons.Outlined.Refresh
-                }
-
-        val typeString
-            @Composable
-            get() =
-                when (type) {
-                    TransactionType.OPEN -> {
-                        val label = sourceLabel ?: ""
-                        if (label.isNotEmpty()) {
-                            "${stringResource(Res.string.overview_hint_type_from)} $label"
-                        } else {
-                            stringResource(Res.string.overview_hint_type_from)
-                        }
-                    }
-
-                    TransactionType.SEND -> {
-                        val label = sourceLabel ?: ""
-                        if (label.isNotEmpty()) {
-                            "${stringResource(Res.string.overview_hint_type_to)} $label"
-                        } else {
-                            stringResource(Res.string.overview_hint_type_to)
-                        }
-                    }
-
-                    TransactionType.RECEIVE -> {
-                        val label = sourceLabel ?: ""
-                        if (label.isNotEmpty()) {
-                            "${stringResource(Res.string.overview_hint_type_from)} $label"
-                        } else {
-                            stringResource(Res.string.overview_hint_type_from)
-                        }
-                    }
-
-                    TransactionType.CHANGE -> {
-                        val label = sourceLabel ?: ""
-                        if (label.isNotEmpty()) {
-                            "${stringResource(Res.string.overview_hint_type_change)} $label"
-                        } else {
-                            stringResource(Res.string.overview_hint_type_change)
-                        }
-                    }
-                }
-
-        val shownSource
-            @Composable
-            get() =
-                when (type) {
-                    TransactionType.OPEN -> {
-                        "${stringResource(Res.string.overview_transaction_from)} $source"
-                    }
-
-                    TransactionType.SEND -> {
-                        "${stringResource(Res.string.overview_transaction_to)} $source"
-                    }
-
-                    TransactionType.RECEIVE -> {
-                        "${stringResource(Res.string.overview_transaction_from)} $source"
-                    }
-
-                    TransactionType.CHANGE -> {
-                        "${stringResource(Res.string.overview_transaction_from)} $source"
-                    }
-                }
-
-        val cardGradient: Brush
-            @Composable
-            get() {
-                val colors =
-                    when (type) {
-                        TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
-                        TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
-                        else -> MaterialTheme.colorScheme.errorGradient
-                    }
-
-                return Brush.horizontalGradient(
-                    colors.map { it.copy(alpha = 0.2f) },
-                )
-            }
-
-        val iconGradient: Brush
-            @Composable
-            get() {
-                val colors =
-                    when (type) {
-                        TransactionType.SEND -> MaterialTheme.colorScheme.primaryGradient
-                        TransactionType.RECEIVE -> MaterialTheme.colorScheme.secondaryGradient
-                        else -> MaterialTheme.colorScheme.errorGradient
-                    }
-
-                return Brush.horizontalGradient(
-                    colors.map { it.copy(alpha = 0.45f) },
-                )
-            }
 
         val shownHeight: String
             get() = AttoFormatter.format(height.value)

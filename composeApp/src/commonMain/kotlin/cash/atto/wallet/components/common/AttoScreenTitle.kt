@@ -4,10 +4,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 
 @Composable
@@ -19,7 +19,7 @@ fun AttoScreenTitle(
     Text(
         text = text,
         modifier = modifier,
-        color = Color.White,
+        color = dark_text_primary,
         textAlign = textAlign,
         style =
             MaterialTheme.typography.bodyLarge.copy(

@@ -5,36 +5,34 @@ description: Match this wallet project's Atto visual style for Jetpack Compose s
 
 # Atto Style
 
-Use existing Atto look. Keep screens dark, calm, premium, structured. Gold and violet accent only. Not whole-screen fill.
+Use this as an implementation checklist, not as the source of truth for design tokens. `DESIGN.md` is canonical for visual style, tokens, typography, spacing, shapes, and conflict decisions. `evidence-matrix.md` records why those decisions were made.
+
+Keep screens dark, calm, premium, and structured. Use gold and semantic accents sparingly.
+
+## Canonical Sources
+
+1. Read `DESIGN.md` for product style and resolved conflicts.
+2. Check `evidence-matrix.md` only when you need to understand why a choice was made.
+3. Check `composeApp/src/commonMain/kotlin/cash/atto/wallet/ui` for the implemented Compose tokens.
+4. If this skill or `references/style-guide.md` conflicts with `DESIGN.md`, follow `DESIGN.md` and update the skill/reference.
 
 ## Workflow
 
 1. Check target screen first.
 2. Check nearby shared components.
-3. Check `composeApp/src/commonMain/kotlin/cash/atto/wallet/ui` for colors, type, responsive helpers.
+3. Check `DESIGN.md`, then `composeApp/src/commonMain/kotlin/cash/atto/wallet/ui` for colors, type, shapes, and responsive helpers.
 4. Use `AttoPageFrame`, `AttoPanelCard`, `AttoButton`, `AttoCard`, other shared wrappers before custom containers.
 5. Keep one strong header, few panels, clear spacing.
 6. Adapt same screen for compact and wide layouts. Do not make two unrelated designs.
 
 ## Style Rules
 
-- Use `dark_bg` for page background.
-- Use `dark_surface` for cards and panels.
-- Use `dark_surface_alt` for hover or raised backgrounds on cards, outlined buttons, and other dark controls.
-- Use `dark_border` for default outlines on cards, panels, and outlined buttons.
-- Use `dark_border_subtle` for secondary-button hover borders.
-- Use `dark_border_muted` for hover borders on outlined buttons and hoverable cards, including transaction cards.
-- Use `dark_text_primary` for main content.
-- Use `dark_text_secondary` for supporting copy.
-- Use dimmer text tokens for metadata.
-- Use `dark_accent` as main brand accent.
-- Use `gold_100` only for primary / accent button hover fill. Not for normal borders.
-- Use `dark_accent_soft` for soft accent secondary fill and `dark_accent_soft_hover` for its hover fill.
-- Avoid `dark_accent_border_hover` for normal hover feedback. Use only for selected, highlighted, or special-emphasis states.
-- Use `dark_violet` or `dark_success` only for secondary emphasis, status, or category split.
-- Keep corners rounded, not soft-heavy. Most panels use `RoundedCornerShape(12.dp)`. Small icon chips use `8.dp`.
+- Use the dark tokens from `Color.kt`; do not reintroduce light Material surfaces or gradient backgrounds for normal app screens.
+- Use `dark_accent` as the brand and primary-action accent.
+- Use semantic colors only for status, transaction direction, destructive actions, or selected/highlighted states.
+- Keep corners rounded, not soft-heavy. Prefer the active 8/12/16dp shape scale from `DESIGN.md`.
 - Keep panels airy. Common inner padding: `20.dp` or `24.dp`.
-- Keep layout restrained. No heavy gradients, big shadows, or large illustration unless existing screen already does that.
+- Keep layout restrained. No heavy gradients, big shadows, or decorative full-screen image backgrounds for routine wallet pages.
 
 ## Layout Rules
 

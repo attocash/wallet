@@ -14,12 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cash.atto.wallet.ui.AttoWalletTheme
+import cash.atto.wallet.ui.dark_border
+import cash.atto.wallet.ui.dark_placeholder
+import cash.atto.wallet.ui.dark_surface
+import cash.atto.wallet.ui.dark_text_primary
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -33,8 +36,8 @@ fun AttoWordChip(
         modifier =
             modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(color = Color(0xFF1A1A1D))
-                .border(1.dp, Color(0xFF2C2C2F), RoundedCornerShape(8.dp))
+                .background(color = dark_surface)
+                .border(1.dp, dark_border, RoundedCornerShape(8.dp))
                 .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -45,7 +48,7 @@ fun AttoWordChip(
                 Modifier
                     .width(24.dp)
                     .alignByBaseline(),
-            color = Color(0xFF505050),
+            color = dark_placeholder,
             style =
                 MaterialTheme.typography.labelSmall.copy(
                     fontFamily = FontFamily.Monospace,
@@ -60,7 +63,7 @@ fun AttoWordChip(
                 Modifier
                     .fillMaxWidth()
                     .alignByBaseline(),
-            color = Color.White,
+            color = dark_text_primary,
             style =
                 MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.W500,

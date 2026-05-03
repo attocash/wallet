@@ -30,8 +30,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
-private val warningColor = Color(0xFFFF9800)
-
 @Composable
 fun StakingScreen(onBackClick: () -> Unit) {
     val viewModel = koinViewModel<VoterViewModel>()
@@ -345,19 +343,7 @@ private fun StakingVoterCard(
                         modifier = Modifier.size(16.dp),
                     )
                     if (selected) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(dark_accent_soft)
-                                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                        ) {
-                            Text(
-                                text = "Current",
-                                color = dark_accent,
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.W700),
-                            )
-                        }
+                        AttoTag(text = "Current")
                     }
                 }
                 Text(
@@ -377,19 +363,19 @@ private fun StakingVoterCard(
                     Modifier.weight(1f),
                     "APY",
                     "${kotlin.math.round(calculatedApy * 10) / 10.0}%",
-                    if (apyIsZero) warningColor else dark_success,
+                    if (apyIsZero) dark_warning else dark_success,
                 )
                 StakingMiniStat(
                     Modifier.weight(1f),
                     "Weight",
                     "${voter.voteWeightPercentage.toPlainString()}%",
-                    if (weightAbove1Percent) warningColor else dark_text_primary,
+                    if (weightAbove1Percent) dark_warning else dark_text_primary,
                 )
                 StakingMiniStat(
                     Modifier.weight(1f),
                     "Last Voted",
                     formatLastVoted(voter.lastVotedAt),
-                    if (hasNotVotedIn24H) warningColor else dark_text_primary,
+                    if (hasNotVotedIn24H) dark_warning else dark_text_primary,
                 )
             }
         }
