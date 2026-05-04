@@ -53,6 +53,7 @@ internal class WalletSessionFactory(
         accountMonitor.monitor(activeIndexes.mapNotNull(addresses::get))
 
         return WalletSession(
+            client = client,
             wallet = wallet,
             walletAccounts = walletAccounts,
             addresses = addresses,

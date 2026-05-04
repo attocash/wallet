@@ -52,10 +52,25 @@ fun SendScreen(
     val preferences by preferencesRepository.state.collectAsState()
     val walletManagerRepository = koinInject<WalletManagerRepository>()
     val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
+    val nodeTimeDifference = viewModel.nodeTimeDifferenceState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val sendNavState = remember { mutableStateOf(SendScreenState.SEND) }
     val initialRequestConsumed = rememberSaveable(initialPaymentRequest, openConfirmOnLaunch) { mutableStateOf(false) }
+
+    LaunchedEffect(sendNavState.value) {
+        if (sendNavState.value == SendScreenState.CONFIRM) {
+            viewModel.startNodeTimestampPolling()
+        } else {
+            viewModel.stopNodeTimestampPolling()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopNodeTimestampPolling()
+        }
+    }
 
     LaunchedEffect(initialPaymentRequest, openConfirmOnLaunch, uiState.value.sendFromUiState.accountSeed) {
         if (initialRequestConsumed.value) return@LaunchedEffect
@@ -80,6 +95,7 @@ fun SendScreen(
         savedAddresses = preferences.addresses,
         navState = sendNavState.value,
         hasCachedWork = hasCachedWork.value,
+        hasNodeTimestamp = nodeTimeDifference.value != null,
         onBackClick = onBackClick,
         qrScannerContent = qrScannerContent,
         onPaymentRequestScanned = { paymentRequest ->
@@ -122,14 +138,18 @@ fun SendScreen(
         },
         onConfirmClicked = {
             coroutineScope.launch {
-                viewModel.showLoader()
-                val startTime =
-                    kotlin.time.TimeSource.Monotonic
-                        .markNow()
-                viewModel.send()
-                val elapsedMs = startTime.elapsedNow().inWholeMilliseconds
-                viewModel.setElapsedMs(elapsedMs)
-                viewModel.hideLoader()
+                try {
+                    viewModel.showLoader()
+                    val startTime =
+                        kotlin.time.TimeSource.Monotonic
+                            .markNow()
+                    viewModel.send()
+                    val elapsedMs = startTime.elapsedNow().inWholeMilliseconds
+                    viewModel.setElapsedMs(elapsedMs)
+                } finally {
+                    viewModel.stopNodeTimestampPolling()
+                    viewModel.hideLoader()
+                }
             }
         },
         onCancelClicked = { sendNavState.value = SendScreenState.SEND },
@@ -149,6 +169,7 @@ private fun SendScreenContent(
     savedAddresses: List<LabeledPreferenceEntry>,
     navState: SendScreenState,
     hasCachedWork: Boolean,
+    hasNodeTimestamp: Boolean,
     onBackClick: () -> Unit,
     qrScannerContent: (@Composable (onResult: (String) -> Unit, onError: (String) -> Unit, onDismiss: () -> Unit) -> Unit)?,
     onPaymentRequestScanned: (String) -> Unit,
@@ -196,6 +217,7 @@ private fun SendScreenContent(
                 onConfirm = onConfirmClicked,
                 onCancel = onCancelClicked,
                 hasCachedWork = hasCachedWork,
+                hasNodeTimestamp = hasNodeTimestamp,
                 isSending = uiState.sendConfirmUiState.showLoader,
                 compact = compact,
             )

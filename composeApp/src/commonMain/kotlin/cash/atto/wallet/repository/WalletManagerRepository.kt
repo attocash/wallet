@@ -144,6 +144,7 @@ class WalletManagerRepository(
     suspend fun send(
         receiverAddress: AttoAddress,
         amount: AttoAmount,
+        timestampProvider: suspend () -> AttoInstant,
     ): AttoSendBlock {
         val session = walletSession ?: throw IllegalStateException("Wallet is not ready yet")
         val block =
@@ -151,11 +152,14 @@ class WalletManagerRepository(
                 index = selectedAccountIndex,
                 receiverAddress = receiverAddress,
                 amount = amount,
+                timestampProvider = timestampProvider,
             )
         emitSelectedAccount(session)
 
         return block
     }
+
+    suspend fun nodeTimeDifference(currentTime: AttoInstant): Long? = walletSession?.nodeTimeDifference(currentTime)
 
     suspend fun changeRepresentative(representative: AttoAddress) {
         try {

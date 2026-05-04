@@ -1,9 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
+import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoUnit
 import cash.atto.wallet.model.defaultAccountName
 import cash.atto.wallet.repository.HomeRepository
@@ -16,13 +19,25 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.DecimalMode
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class SendTransactionViewModel(
     private val walletManagerRepository: WalletManagerRepository,
@@ -32,9 +47,12 @@ class SendTransactionViewModel(
     private val _state = MutableStateFlow(SendTransactionUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val viewModelScope = CoroutineScope(Dispatchers.Default)
+    private val viewModelScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var accounts: List<WalletAccountState> = emptyList()
     private var selectedAccountIndex: UInt = 0U
+    private var nodeTimestampPollingJob: Job? = null
+    private val nodeTimeDifference = MutableStateFlow<Long?>(null)
+    val nodeTimeDifferenceState = nodeTimeDifference.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -170,6 +188,7 @@ class SendTransactionViewModel(
                 walletManagerRepository.send(
                     receiverAddress = receiverAddress,
                     amount = amount,
+                    timestampProvider = currentNodeTimestampProvider(),
                 )
 
             _state.emit(
@@ -189,6 +208,44 @@ class SendTransactionViewModel(
             )
 
             return false
+        }
+    }
+
+    fun startNodeTimestampPolling() {
+        if (nodeTimestampPollingJob?.isActive == true) return
+
+        nodeTimestampPollingJob =
+            viewModelScope.launch {
+                while (true) {
+                    try {
+                        nodeTimeDifference.value =
+                            walletManagerRepository.nodeTimeDifference(
+                                Clock.System.now().toAttoInstant(),
+                            )
+                    } catch (ex: CancellationException) {
+                        throw ex
+                    } catch (ex: Exception) {
+                        println("Failed to prefetch node timestamp: ${ex.message}")
+                    }
+
+                    delay(NODE_TIMESTAMP_POLL_INTERVAL)
+                }
+            }
+    }
+
+    fun stopNodeTimestampPolling() {
+        nodeTimestampPollingJob?.cancel()
+        nodeTimestampPollingJob = null
+        nodeTimeDifference.value = null
+    }
+
+    private suspend fun currentNodeTimestampProvider(): suspend () -> AttoInstant {
+        val diff = nodeTimeDifference.filterNotNull().first()
+        return {
+            Clock.System
+                .now()
+                .plus(diff.milliseconds)
+                .toAttoInstant()
         }
     }
 
@@ -335,4 +392,15 @@ class SendTransactionViewModel(
             unit = AttoUnit.ATTO,
             string = amount.toStringExpanded(),
         )
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
+    }
+
+    private companion object {
+        val NODE_TIMESTAMP_POLL_INTERVAL = 1.seconds
+    }
 }
+
+private fun Instant.toAttoInstant(): AttoInstant = AttoInstant.fromEpochMilliseconds(toEpochMilliseconds())

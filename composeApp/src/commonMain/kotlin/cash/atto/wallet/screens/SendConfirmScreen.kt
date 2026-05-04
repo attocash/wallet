@@ -17,6 +17,7 @@ import cash.atto.commons.AttoHeight
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.model.LabeledPreferenceEntry
 import cash.atto.wallet.repository.PreferencesRepository
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_accent
@@ -45,8 +46,11 @@ fun SendConfirmScreen(
 ) {
     val viewModel = koinViewModel<SendTransactionViewModel>()
     val uiState = viewModel.state.collectAsState()
+    val nodeTimeDifference = viewModel.nodeTimeDifferenceState.collectAsState()
     val preferencesRepository = koinInject<PreferencesRepository>()
     val preferences by preferencesRepository.state.collectAsState()
+    val walletManagerRepository = koinInject<WalletManagerRepository>()
+    val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val compact = isCompactWidth()
 
@@ -58,6 +62,8 @@ fun SendConfirmScreen(
         SendConfirmContent(
             uiState = uiState.value.sendConfirmUiState,
             savedAddresses = preferences.addresses,
+            hasCachedWork = hasCachedWork.value,
+            hasNodeTimestamp = nodeTimeDifference.value != null,
             isSending = uiState.value.sendConfirmUiState.showLoader,
             compact = compact,
             onConfirm = {
@@ -81,6 +87,7 @@ fun SendConfirmContent(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     hasCachedWork: Boolean = true,
+    hasNodeTimestamp: Boolean = false,
     isSending: Boolean = false,
     compact: Boolean = false,
 ) {
@@ -152,6 +159,7 @@ fun SendConfirmContent(
         )
 
         HorizontalDivider(color = dark_border)
+        val isReadyToSend = hasCachedWork && hasNodeTimestamp
 
         if (isSending) {
             var elapsedMs by remember { mutableStateOf(0L) }
@@ -170,7 +178,7 @@ fun SendConfirmContent(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false,
             )
-        } else if (!hasCachedWork) {
+        } else if (!isReadyToSend) {
             AttoButton(
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
@@ -220,6 +228,8 @@ fun SendConfirmPreview() {
                 ),
             onConfirm = {},
             onCancel = {},
+            hasCachedWork = true,
+            hasNodeTimestamp = true,
         )
     }
 }

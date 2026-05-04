@@ -4,10 +4,12 @@ import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoHeight
+import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoKeyIndex
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoSendBlock
+import cash.atto.commons.node.AttoNodeClient
 import cash.atto.commons.node.monitor.AttoAccountMonitor
 import cash.atto.commons.node.monitor.toAccountEntryMonitor
 import cash.atto.commons.toAttoAmount
@@ -24,6 +26,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 internal class WalletSession(
+    private val client: AttoNodeClient,
     private val wallet: AttoWallet,
     private val walletAccounts: Map<AttoKeyIndex, AttoWalletAccount>,
     private val addresses: Map<AttoKeyIndex, AttoAddress>,
@@ -43,6 +46,8 @@ internal class WalletSession(
     fun publicKey(index: AttoKeyIndex): AttoPublicKey? = address(index)?.publicKey
 
     fun account(index: AttoKeyIndex): AttoAccount? = walletAccount(index)?.account
+
+    suspend fun nodeTimeDifference(currentTime: AttoInstant): Long = client.now(currentTime).differenceMillis
 
     fun isActive(index: AttoKeyIndex): Boolean = accountPreferences[index.value.toString()]?.status == AccountPreferenceStatus.ACTIVATED
 
@@ -80,6 +85,7 @@ internal class WalletSession(
         index: AttoKeyIndex,
         receiverAddress: AttoAddress,
         amount: AttoAmount,
+        timestampProvider: suspend () -> AttoInstant,
     ): AttoSendBlock {
         val walletAccount = walletAccount(index) ?: throw IllegalStateException("Wallet is not ready yet")
         val account = walletAccount.account ?: throw IllegalStateException("Account is not open yet")
@@ -89,11 +95,13 @@ internal class WalletSession(
             throw IllegalStateException("${account.balance} balance is not enough to send $amount")
         }
 
+        val timestamp = timestampProvider()
         val transaction =
             wallet.send(
                 index = index,
                 receiverAddress = receiverAddress,
                 amount = amount,
+                timestamp = timestamp,
             )
 
         return transaction.block as? AttoSendBlock
