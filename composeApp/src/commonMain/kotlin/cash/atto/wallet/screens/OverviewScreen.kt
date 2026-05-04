@@ -83,7 +83,7 @@ fun OverviewScreen(
 }
 
 @Composable
-private fun OverviewContent(
+internal fun OverviewContent(
     uiState: OverviewUiState,
     isWalletInitialized: Boolean,
     onSendClick: () -> Unit,

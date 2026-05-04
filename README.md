@@ -137,6 +137,7 @@ Useful screen deep-links for UI work:
 - `?screen=recovery-phrase`
 - `?screen=import-phrase`
 - `?screen=create-password`
+- `?screen=og-image`
 
 ### Desktop
 
@@ -252,6 +253,13 @@ Repository deployment shape:
 - Firebase Hosting is configured to serve a prepared artifact directory at `artifacts/web`
 
 If you are wiring up manual deployment outside CI, keep that artifact path mismatch in mind.
+
+The social preview image is generated from a hidden Compose route so it stays in the same design system as the wallet. Start the web dev server, open or capture `?screen=og-image` at `1200x630`, then write the result to `composeApp/src/wasmJsMain/resources/og-image.png`:
+
+```bash
+./gradlew wasmJsBrowserDevelopmentRun
+node scripts/generate-og-image.mjs
+```
 
 That workspace is useful for UI iteration, but it is not the shipping wallet runtime.
 

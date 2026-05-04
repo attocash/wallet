@@ -9,6 +9,7 @@ const APP_SHELL = [
   "./logo-180.png",
   "./logo-192.png",
   "./logo-512.png",
+  "./og-image.png",
   "./logo.svg",
   "./logo.ico",
   "./composeResources/attowallet.composeapp.generated.resources/font/noto_sans_variable.ttf"

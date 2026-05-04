@@ -7,6 +7,8 @@ import androidx.compose.ui.window.ComposeViewport
 import cash.atto.wallet.components.common.QrScannerView
 import cash.atto.wallet.components.common.isQrScannerSupported
 import cash.atto.wallet.di.viewModelModule
+import cash.atto.wallet.screens.OgImageScreen
+import cash.atto.wallet.ui.AttoWalletTheme
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import kotlinx.browser.window
@@ -14,6 +16,15 @@ import org.koin.core.context.startKoin
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    if (isOgImagePreview()) {
+        ComposeViewport(viewportContainerId = "AttoWallet") {
+            AttoWalletTheme {
+                OgImageScreen()
+            }
+        }
+        return
+    }
+
     val lifecycle = LifecycleRegistry()
     val launchRequest = initialWebSendRequest()
     val navComponent =
@@ -103,6 +114,12 @@ internal fun webDebugMainScreen(): MainScreenNavDestination? =
     }
 
 private fun webQueryParam(key: String): String? = webQueryParams()[key]
+
+private fun isOgImagePreview(): Boolean =
+    webQueryParam("screen") == "og-image" ||
+        window.location.pathname
+            .trim('/')
+            .equals("og-image", ignoreCase = true)
 
 private data class WebSendLaunchRequest(
     val paymentRequest: String,
