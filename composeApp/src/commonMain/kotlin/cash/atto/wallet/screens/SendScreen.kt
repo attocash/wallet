@@ -484,7 +484,8 @@ private fun SendFormPanel(
                         if (savedAddressCount > 0 || hasQrScanner) {
                             {
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     if (savedAddressCount > 0) {
@@ -540,7 +541,6 @@ private fun SendFormPanel(
                     errorText = if (uiState.showAmountError) "Enter a valid amount." else null,
                     imeAction = ImeAction.Done,
                     keyboardActions = KeyboardActions(onDone = { onSendClicked() }),
-                    largeFontSize = true,
                 )
 
                 Row(

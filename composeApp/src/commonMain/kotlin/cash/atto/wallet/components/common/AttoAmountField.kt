@@ -79,7 +79,10 @@ fun AttoAmountField(
                         fontSize = 32.sp,
                     )
                 } else {
-                    MaterialTheme.typography.bodyLarge
+                    MaterialTheme.typography.bodyLarge.copy(
+                        color = dark_text_primary,
+                        fontWeight = FontWeight.W500,
+                    )
                 },
             colors = attoAmountFieldColors(isError),
             supportingText =
@@ -141,8 +144,9 @@ fun attoAmountFieldColors(isError: Boolean) =
     OutlinedTextFieldDefaults.colors(
         focusedContainerColor = dark_bg,
         unfocusedContainerColor = dark_bg,
+        disabledContainerColor = dark_bg,
         errorContainerColor = dark_bg,
-        focusedBorderColor = if (isError) dark_danger else dark_accent,
+        focusedBorderColor = if (isError) dark_danger else dark_border,
         unfocusedBorderColor = if (isError) dark_danger else dark_border,
         errorBorderColor = dark_danger,
         focusedTextColor = dark_text_primary,

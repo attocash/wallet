@@ -205,7 +205,7 @@ components:
     width: "{spacing.modalWidth}"
     padding: "{spacing.xl}"
   text-field:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.background}"
     textColor: "{colors.textPrimary}"
     typography: "{typography.field-input}"
     rounded: "{rounded.md}"
