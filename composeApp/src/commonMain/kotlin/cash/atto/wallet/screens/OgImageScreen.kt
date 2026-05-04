@@ -154,6 +154,7 @@ private fun OgImageOverview() {
             BalanceChipUiState(
                 attoCoins = BigDecimal.parseString("124.50"),
                 usdValue = BigDecimal.parseString("24.37"),
+                priceUsd = BigDecimal.parseString("0.196"),
                 apy = BigDecimal.parseString("8.4"),
                 pendingReceivableCount = 2,
                 pendingReceivableAmount = BigDecimal.parseString("32.00"),

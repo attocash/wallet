@@ -15,6 +15,11 @@
 - Install the Android debug build with `./gradlew composeApp:installDebug`.
 - For a focused Wasm compile check, use `./gradlew :composeApp:compileKotlinWasmJs`.
 
+## Commit Messages
+
+- Use Conventional Commit-style SemVer prefixes for commit subjects, such as `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, or `build:`.
+- Use the prefix that matches the user-facing version impact or maintenance category.
+
 ## Verified Gotchas
 
 - If Kotlin/Wasm incremental compilation flakes, rerun the failing Wasm task once with `--rerun-tasks`; `README.md` calls this out explicitly for `wasmJsBrowserDevelopmentRun` and `:composeApp:compileKotlinWasmJs`.

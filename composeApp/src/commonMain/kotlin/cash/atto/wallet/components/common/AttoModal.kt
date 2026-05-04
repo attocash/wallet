@@ -69,9 +69,10 @@ fun AttoModal(
             Column(
                 modifier =
                     modifier
-                        .then(
-                            Modifier.width(attoModalWidth),
-                        ).background(
+                        .padding(horizontal = 20.dp)
+                        .widthIn(max = attoModalWidth)
+                        .fillMaxWidth()
+                        .background(
                             color = dark_surface,
                             shape = RoundedCornerShape(16.dp),
                         ).clickable(

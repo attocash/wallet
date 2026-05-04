@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +36,7 @@ import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.desktop.BalanceChipUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import org.jetbrains.compose.resources.painterResource
 
 val LogoutShellIcon: ImageVector
@@ -73,11 +76,12 @@ fun AttoWallet(
                     onNavStateChanged = onNavStateChanged,
                     isWalletInitialized = isWalletInitialized,
                     hasCachedWork = hasCachedWork,
+                    priceUsd = balanceUiState.priceUsd,
                     onLock = onLock,
                 )
                 HorizontalDivider(color = dark_border)
 
-                BoxWithConstraints(
+                Box(
                     modifier =
                         Modifier
                             .fillMaxSize(),
@@ -107,9 +111,12 @@ private fun AttoTopBar(
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     isWalletInitialized: Boolean,
     hasCachedWork: Boolean,
+    priceUsd: BigDecimal?,
     onLock: () -> Unit,
 ) {
     val showCachedWorkInfo = rememberSaveable { mutableStateOf(false) }
+    val showTradeDialog = rememberSaveable { mutableStateOf(false) }
+    val availablePriceUsd = priceUsd?.takeIf { it > BigDecimal.ZERO }
 
     Row(
         modifier =
@@ -125,16 +132,18 @@ private fun AttoTopBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AttoShellBrandMark()
-            Text(
-                text = "Atto Wallet",
-                color = dark_text_primary,
-                maxLines = 1,
-                style =
-                    MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 20.sp,
-                    ),
-            )
+            if (!compact) {
+                Text(
+                    text = "Atto Wallet",
+                    color = dark_text_primary,
+                    maxLines = 1,
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.W600,
+                            fontSize = 20.sp,
+                        ),
+                )
+            }
         }
 
         Row(
@@ -142,11 +151,23 @@ private fun AttoTopBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isWalletInitialized) {
-                AttoShellStatusIndicator(
-                    compact = compact,
-                    hasCachedWork = hasCachedWork,
-                    onClick = { showCachedWorkInfo.value = true },
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    availablePriceUsd?.let {
+                        AttoShellPriceChip(
+                            priceUsd = it,
+                            compact = compact,
+                            onClick = { showTradeDialog.value = true },
+                        )
+                    }
+                    AttoShellStatusIndicator(
+                        compact = compact,
+                        hasCachedWork = hasCachedWork,
+                        onClick = { showCachedWorkInfo.value = true },
+                    )
+                }
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -174,6 +195,13 @@ private fun AttoTopBar(
         CachedWorkInfoDialog(
             hasCachedWork = hasCachedWork,
             onDismiss = { showCachedWorkInfo.value = false },
+        )
+    }
+
+    if (showTradeDialog.value && availablePriceUsd != null) {
+        AttoTradeDialog(
+            priceUsd = availablePriceUsd,
+            onDismiss = { showTradeDialog.value = false },
         )
     }
 }
@@ -215,6 +243,207 @@ private fun AttoShellStatusIndicator(
                     .clip(CircleShape)
                     .background(statusColor),
         )
+    }
+}
+
+@Composable
+private fun AttoShellPriceChip(
+    priceUsd: BigDecimal,
+    compact: Boolean,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(8.dp)
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+
+    Row(
+        modifier =
+            Modifier
+                .height(28.dp)
+                .clip(shape)
+                .background(if (hovered) dark_surface_alt else dark_surface)
+                .border(1.dp, dark_border, shape)
+                .pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                ).padding(horizontal = if (compact) 8.dp else 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.TrendingUp,
+            contentDescription = null,
+            tint = attoHoverTint(dark_success, hovered, highlight = 0.18f),
+            modifier = Modifier.size(14.dp),
+        )
+        if (!compact) {
+            Text(
+                text = "ATTO",
+                color = dark_text_tertiary,
+                maxLines = 1,
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.W700,
+                        fontSize = 11.sp,
+                    ),
+            )
+        }
+        Text(
+            text = "$${AttoFormatter.format(priceUsd)}",
+            color = dark_text_primary,
+            maxLines = 1,
+            style =
+                MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.W700,
+                    fontSize = 12.sp,
+                ),
+        )
+    }
+}
+
+@Composable
+private fun AttoTradeDialog(
+    priceUsd: BigDecimal,
+    onDismiss: () -> Unit,
+) {
+    val uriHandler = LocalUriHandler.current
+
+    AttoModal(
+        title = "Buy or sell ATTO",
+        onDismiss = onDismiss,
+    ) {
+        Text(
+            text =
+                "Want to buy or sell? These links open third-party exchanges. Atto Wallet " +
+                    "does not operate these markets, provide trading advice, or control pricing, " +
+                    "fees, liquidity, or regional availability. Review the exchange details and " +
+                    "risks before trading.",
+            color = dark_text_secondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(dark_success.copy(alpha = 0.04f))
+                    .border(1.dp, dark_success.copy(alpha = 0.18f), RoundedCornerShape(8.dp))
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.TrendingUp,
+                contentDescription = null,
+                tint = dark_success,
+                modifier = Modifier.size(18.dp),
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = "Current ATTO price",
+                    color = dark_text_secondary,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+                Text(
+                    text = "$${AttoFormatter.format(priceUsd)} USD",
+                    color = dark_text_primary,
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.W700,
+                        ),
+                )
+            }
+        }
+
+        AttoTradeExchangeOption(
+            title = "XT",
+            pair = "ATTO/USDT",
+            description =
+                "Global digital asset exchange with spot, margin, derivatives, and OTC trading across a large range of markets.",
+            onClick = { uriHandler.openUri("https://www.xt.com/en/trade/atto_usdt") },
+        )
+
+        AttoTradeExchangeOption(
+            title = "LCX",
+            pair = "ATTO/EUR",
+            description =
+                "Liechtenstein-regulated digital asset exchange focused on compliant trading and tokenization.",
+            onClick = { uriHandler.openUri("https://lcx.com/en/trade/ATTO-EUR") },
+        )
+    }
+}
+
+@Composable
+private fun AttoTradeExchangeOption(
+    title: String,
+    pair: String,
+    description: String,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(8.dp)
+    val interactionSource = remember { MutableInteractionSource() }
+    val hovered by interactionSource.collectIsHoveredAsState()
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(shape)
+                .background(if (hovered) dark_surface_alt else dark_surface_alt.copy(alpha = 0.42f))
+                .border(1.dp, dark_border, shape)
+                .pointerHoverIcon(PointerIcon.Hand)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                ).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = title,
+                    color = dark_text_primary,
+                    style =
+                        MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.W700,
+                        ),
+                )
+                Text(
+                    text = description,
+                    color = dark_text_secondary,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            Text(
+                text = pair,
+                color = dark_accent,
+                maxLines = 1,
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(dark_accent_soft)
+                        .border(1.dp, dark_accent.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.W700,
+                    ),
+            )
+        }
     }
 }
 

@@ -133,6 +133,7 @@ class MainScreenViewModel(
                     BalanceChipUiState(
                         attoCoins = balance,
                         usdValue = usdValue,
+                        priceUsd = priceUsd,
                         apy = apy,
                         pendingReceivableCount = pendingReceivablesState.count,
                         pendingReceivableAmount = pendingReceivablesState.totalAmount,
