@@ -20,18 +20,12 @@ class PersistentWorkCache(
 
     val version: StateFlow<Long> = _version.asStateFlow()
 
-    suspend fun get(): AttoWork? = dao.get()?.let { AttoWork(it.value) }
-
-    suspend fun get(publicKey: AttoPublicKey): AttoWork? = dao.get(publicKey.value)?.let { AttoWork(it.value) }
-
     suspend fun getValid(
         publicKey: AttoPublicKey,
         network: AttoNetwork,
         timestamp: AttoInstant,
         target: AttoWorkTarget,
-    ): AttoWork? =
-        get(publicKey)
-            ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
+    ): AttoWork? = getValid(publicKey.value, network, timestamp, target)
 
     suspend fun hasValid(
         publicKey: AttoPublicKey,
@@ -44,7 +38,6 @@ class PersistentWorkCache(
         publicKey: AttoPublicKey,
         work: AttoWork,
     ) {
-        dao.clear(publicKey.value)
         dao.set(
             Work(
                 publicKey = publicKey.value,
@@ -58,6 +51,16 @@ class PersistentWorkCache(
         dao.clear(publicKey.value)
         markChanged()
     }
+
+    private suspend fun getValid(
+        key: ByteArray,
+        network: AttoNetwork,
+        timestamp: AttoInstant,
+        target: AttoWorkTarget,
+    ): AttoWork? =
+        dao.get(key)
+            ?.let { AttoWork(it.value) }
+            ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
 
     private fun markChanged() {
         _version.value += 1

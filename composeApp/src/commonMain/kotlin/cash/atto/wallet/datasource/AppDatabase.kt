@@ -75,9 +75,6 @@ interface AccountEntryDao {
 
 @Dao
 interface WorkDao {
-    @Query("SELECT * FROM work ORDER BY value LIMIT 1")
-    suspend fun get(): Work?
-
     @Query("SELECT * FROM work WHERE publicKey = :publicKey LIMIT 1")
     suspend fun get(publicKey: ByteArray): Work?
 

@@ -8,7 +8,7 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoWork
 import cash.atto.commons.AttoWorkTarget
-import cash.atto.commons.isValid
+import cash.atto.commons.getTarget
 import cash.atto.commons.worker.AttoWorker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -40,9 +40,16 @@ internal class PersistentWorkCachingWorker(
     ): AttoWork = delegate.work(network, timestamp, target)
 
     override suspend fun work(block: AttoBlock): AttoWork {
-        val cachedWork = workCache.get(block.publicKey)
+        val target = block.getTarget()
+        val cachedWork =
+            workCache.getValid(
+                publicKey = block.publicKey,
+                network = block.network,
+                timestamp = block.timestamp,
+                target = target,
+            )
         val work =
-            if (cachedWork?.isValid(block) == true) {
+            if (cachedWork != null) {
                 workCache.clear(block.publicKey)
                 cachedWork
             } else {
@@ -117,6 +124,7 @@ internal class PersistentWorkCachingWorker(
         if (cachedWork(publicKey, network, timestamp, target) != null) {
             return
         }
+        workCache.clear(publicKey)
 
         val shouldLaunch =
             inFlightMutex.withLock {
@@ -131,7 +139,6 @@ internal class PersistentWorkCachingWorker(
             return
         }
 
-        workCache.clear(publicKey)
         scope.launch {
             try {
                 val work = delegate.work(network, timestamp, target)
@@ -140,7 +147,10 @@ internal class PersistentWorkCachingWorker(
                         inFlightTargets[publicKey] == target
                     }
                 if (isLatestTarget) {
-                    workCache.save(publicKey, work)
+                    workCache.save(
+                        publicKey = publicKey,
+                        work = work,
+                    )
                 }
             } catch (ex: CancellationException) {
                 throw ex
