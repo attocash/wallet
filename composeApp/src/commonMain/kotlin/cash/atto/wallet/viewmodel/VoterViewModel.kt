@@ -98,6 +98,7 @@ class VoterViewModel(
                 currentVoterWeightPercentage = currentVoterWeightPercentage,
                 currentVoterEntityWeightPercentage = currentVoterEntityWeightPercentage,
                 currentVoterLastVotedAt = currentVoterLastVotedAt,
+                currentAccountHeight = account.height.value,
                 globalApy = votersResponse?.apy,
                 voters = votersSorted,
                 entities = votersResponse?.entities ?: emptyList(),

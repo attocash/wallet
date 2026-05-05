@@ -12,6 +12,7 @@ data class VoterUIState(
     val currentVoterWeightPercentage: BigDecimal? = null,
     val currentVoterEntityWeightPercentage: BigDecimal? = null,
     val currentVoterLastVotedAt: Instant? = null,
+    val currentAccountHeight: ULong? = null,
     val globalApy: String? = null,
     val voters: List<Voter> = emptyList(),
     val entities: List<Entity> = emptyList(),

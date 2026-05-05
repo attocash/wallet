@@ -19,10 +19,12 @@ import androidx.compose.ui.unit.dp
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.model.Voter
 import cash.atto.wallet.model.calculateEntityWeightPercentage
+import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.*
 import cash.atto.wallet.uistate.settings.VoterUIState
 import cash.atto.wallet.viewmodel.VoterViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -34,9 +36,12 @@ import kotlin.time.Instant
 fun StakingScreen(onBackClick: () -> Unit) {
     val viewModel = koinViewModel<VoterViewModel>()
     val uiState by viewModel.state.collectAsState()
+    val walletManagerRepository = koinInject<WalletManagerRepository>()
+    val hasCachedWork by walletManagerRepository.workReadyState.collectAsState()
 
     StakingContent(
         uiState = uiState,
+        hasCachedWork = hasCachedWork,
         onBackClick = onBackClick,
         onChangeVoter = { address -> viewModel.setVoter(address) },
     )
@@ -45,11 +50,13 @@ fun StakingScreen(onBackClick: () -> Unit) {
 @Composable
 private fun StakingContent(
     uiState: VoterUIState,
+    hasCachedWork: Boolean,
     onBackClick: () -> Unit,
     onChangeVoter: suspend (String) -> Boolean,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var selectedVoter by remember { mutableStateOf<Voter?>(null) }
+    var changingVoterAddress by remember { mutableStateOf<String?>(null) }
 
     AttoPageFrame(
         title = "Staking",
@@ -60,16 +67,26 @@ private fun StakingContent(
             val globalApy = uiState.globalApy?.toDoubleOrNull() ?: 0.0
             val voterApy = globalApy * voter.sharePercentage / 100.0
 
-            StakingConfirmDialog(
+            StakingConfirmContent(
                 voterLabel = voter.label,
                 voterAddress = voter.address,
                 voterApy = "${((voterApy * 100).toLong() / 100.0)}%",
                 voterUptime = formatLastVoted(voter.lastVotedAt),
-                onDismiss = { selectedVoter = null },
+                accountHeight = uiState.currentAccountHeight,
+                hasCachedWork = hasCachedWork,
+                isChangingVoter = changingVoterAddress != null,
+                onCancel = { selectedVoter = null },
                 onConfirm = {
-                    coroutineScope.launch {
-                        if (onChangeVoter(voter.address)) {
-                            selectedVoter = null
+                    if (changingVoterAddress == null) {
+                        coroutineScope.launch {
+                            changingVoterAddress = voter.address
+                            try {
+                                if (onChangeVoter(voter.address)) {
+                                    selectedVoter = null
+                                }
+                            } finally {
+                                changingVoterAddress = null
+                            }
                         }
                     }
                 },
@@ -378,66 +395,6 @@ private fun StakingVoterCard(
                     if (hasNotVotedIn24H) dark_warning else dark_text_primary,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun StakingConfirmDialog(
-    voterLabel: String,
-    voterAddress: String,
-    voterApy: String,
-    voterUptime: String,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    AttoModal(
-        title = "Change Voter",
-        onDismiss = onDismiss,
-    ) {
-        AttoCopyField(
-            label = "VOTER",
-            value = voterAddress,
-        )
-
-        AttoDetailField(
-            label = "LABEL",
-            value = voterLabel,
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            AttoDetailField(
-                label = "APY",
-                value = voterApy,
-                modifier = Modifier.weight(1f),
-            )
-            AttoDetailField(
-                label = "LAST VOTED",
-                value = voterUptime,
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        HorizontalDivider(color = dark_border)
-
-        Text(
-            text = "A change transaction will be created. You can change your voter at any time.",
-            color = dark_text_secondary,
-            style = MaterialTheme.typography.bodyMedium,
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            AttoButton(
-                text = "Confirm",
-                onClick = onConfirm,
-                modifier = Modifier.weight(1f),
-            )
         }
     }
 }

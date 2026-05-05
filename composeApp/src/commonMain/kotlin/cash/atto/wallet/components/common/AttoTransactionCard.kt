@@ -176,6 +176,7 @@ fun AttoTransactionCard(
             }
 
             Column(
+                modifier = Modifier.align(Alignment.Bottom),
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
