@@ -11,7 +11,6 @@ import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoSendBlock
-import cash.atto.commons.AttoWorkTarget
 import cash.atto.commons.fromHexToByteArray
 import cash.atto.commons.toAttoIndex
 import cash.atto.commons.toSigner
@@ -132,9 +131,10 @@ class WalletManagerRepository(
         scope.launch {
             combine(
                 accountState,
+                publicKeyState,
                 workCache.version,
-            ) { account, _ ->
-                hasReadyWork(account)
+            ) { account, publicKey, _ ->
+                hasReadyWork(publicKey, account)
             }.collect {
                 _workReadyState.emit(it)
             }
@@ -341,16 +341,19 @@ class WalletManagerRepository(
 
         _publicKeyState.emit(publicKey)
         _accountState.emit(account)
-        _workReadyState.emit(hasReadyWork(account))
+        _workReadyState.emit(hasReadyWork(publicKey, account))
     }
 
-    private suspend fun hasReadyWork(account: AttoAccount?): Boolean {
-        account ?: return false
+    private suspend fun hasReadyWork(
+        publicKey: AttoPublicKey?,
+        account: AttoAccount?,
+    ): Boolean {
+        publicKey ?: return false
         return workCache.hasValid(
-            publicKey = account.publicKey,
+            publicKey = publicKey,
             network = network,
             timestamp = AttoInstant.now(),
-            target = AttoWorkTarget(account.lastTransactionHash.value),
+            target = nextWorkTarget(account = account, publicKey = publicKey),
         )
     }
 

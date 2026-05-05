@@ -69,7 +69,7 @@ internal class PersistentWorkCachingWorker(
     suspend fun cacheNextWork(account: AttoAccount) {
         cacheWork(
             publicKey = account.publicKey,
-            target = AttoWorkTarget(account.lastTransactionHash.value),
+            target = nextWorkTarget(account = account, publicKey = account.publicKey),
             description = account.lastTransactionHash.toString(),
         )
     }
@@ -78,13 +78,7 @@ internal class PersistentWorkCachingWorker(
         receivable: AttoReceivable,
         account: AttoAccount?,
     ): Boolean {
-        val target =
-            AttoWorkTarget(
-                account
-                    ?.lastTransactionHash
-                    ?.value
-                    ?: receivable.receiverPublicKey.value,
-            )
+        val target = nextWorkTarget(account = account, publicKey = receivable.receiverPublicKey)
 
         cacheWork(
             publicKey = receivable.receiverPublicKey,
