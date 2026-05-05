@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -147,6 +148,7 @@ fun LoginScreen(
                         revealed = showPassword,
                         onRevealToggle = { showPassword = !showPassword },
                         isError = !passwordValid,
+                        contentType = ContentType.Password,
                         imeAction = ImeAction.Done,
                         onDone = {
                             if (canSubmit) {

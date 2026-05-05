@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -159,6 +160,7 @@ fun CreatePassword(
                             revealed = showPassword,
                             onRevealToggle = { showPassword = !showPassword },
                             onValueChange = onPasswordChanged,
+                            contentType = ContentType.NewPassword,
                             imeAction = ImeAction.Next,
                         )
 
@@ -170,6 +172,7 @@ fun CreatePassword(
                                 revealed = showPasswordConfirm,
                                 onRevealToggle = { showPasswordConfirm = !showPasswordConfirm },
                                 onValueChange = onPasswordConfirmChanged,
+                                contentType = ContentType.NewPassword,
                                 imeAction = ImeAction.Done,
                                 onDone = {
                                     if (canProceed) {
@@ -218,6 +221,7 @@ private fun PasswordField(
     revealed: Boolean,
     onRevealToggle: () -> Unit,
     onValueChange: (String) -> Unit,
+    contentType: ContentType,
     imeAction: ImeAction,
     onDone: () -> Unit = {},
 ) {
@@ -228,6 +232,7 @@ private fun PasswordField(
         placeholder = placeholder,
         revealed = revealed,
         onRevealToggle = onRevealToggle,
+        contentType = contentType,
         imeAction = imeAction,
         onDone = onDone,
     )
