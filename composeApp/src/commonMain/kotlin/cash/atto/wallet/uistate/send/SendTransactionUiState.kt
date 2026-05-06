@@ -15,6 +15,7 @@ data class SendTransactionUiState(
     private val account: AttoAccount?,
     private val amountString: String?,
     private val amount: BigDecimal?,
+    private val confirmedAmountUsd: BigDecimal? = null,
     private val address: String?,
     private val operationResult: SendOperationResult,
     private val accountName: String? = null,
@@ -85,7 +86,7 @@ data class SendTransactionUiState(
         get() =
             SendConfirmUiState(
                 amount = amount,
-                amountUsd = amountUsd(amount),
+                amountUsd = confirmedAmountUsd ?: amountUsd(amount),
                 address = address,
                 showLoader = showLoader,
                 accountHeight = account?.height?.value,
@@ -96,7 +97,7 @@ data class SendTransactionUiState(
             SendResultUiState(
                 result = operationResult,
                 amount = amount,
-                amountUsd = amountUsd(amount),
+                amountUsd = confirmedAmountUsd ?: amountUsd(amount),
                 address = address,
                 elapsedMs = elapsedMs,
                 sendBlock = sendBlock,

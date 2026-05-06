@@ -136,6 +136,8 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amountString = amount,
+                amount = null,
+                confirmedAmountUsd = null,
                 address = address,
                 priceUsd = homeRepository.getPriceUsd(),
                 showAmountError = false,
@@ -163,6 +165,8 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amountString = amountAtto ?: state.value.sendFromUiState.amountString,
+                amount = null,
+                confirmedAmountUsd = null,
                 address = parsed.receiverAddress,
                 priceUsd = homeRepository.getPriceUsd(),
                 isUsdMode = false,
@@ -254,6 +258,8 @@ class SendTransactionViewModel(
             state.value.copy(
                 isUsdMode = !state.value.isUsdMode,
                 amountString = null,
+                amount = null,
+                confirmedAmountUsd = null,
             ),
         )
     }
@@ -263,6 +269,7 @@ class SendTransactionViewModel(
             state.value.copy(
                 amount = null,
                 amountString = null,
+                confirmedAmountUsd = null,
                 address = null,
                 operationResult = SendTransactionUiState.SendOperationResult.UNKNOWN,
                 showAmountError = false,
@@ -295,7 +302,7 @@ class SendTransactionViewModel(
                         priceUsd,
                         DecimalMode(decimalPrecision = 30, roundingMode = RoundingMode.ROUND_HALF_CEILING),
                     ).roundToDigitPositionAfterDecimalPoint(
-                        18,
+                        9,
                         RoundingMode.ROUND_HALF_CEILING,
                     )
             } else {
@@ -303,6 +310,16 @@ class SendTransactionViewModel(
             }
 
         val amountCheckResult = amount != null && (!state.value.isUsdMode || hasUsdPrice)
+        val confirmedAmountUsd =
+            if (amountCheckResult && priceUsd != null) {
+                if (state.value.isUsdMode) {
+                    rawAmount
+                } else {
+                    amount.multiply(priceUsd)
+                }
+            } else {
+                null
+            }
 
         val destinationAddress =
             state.value
@@ -321,6 +338,7 @@ class SendTransactionViewModel(
         _state.emit(
             state.value.copy(
                 amount = amount,
+                confirmedAmountUsd = confirmedAmountUsd,
                 priceUsd = priceUsd,
                 showAmountError = !amountCheckResult,
                 showAddressError = !addressCheckResult,
