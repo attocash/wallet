@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
@@ -25,6 +24,8 @@ import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_accent_on
 import cash.atto.wallet.ui.dark_border
 import cash.atto.wallet.ui.dark_border_muted
+import cash.atto.wallet.ui.dark_surface_alt
+import cash.atto.wallet.ui.dark_surface_raised
 import cash.atto.wallet.ui.dark_text_dim
 
 @Composable
@@ -44,6 +45,12 @@ fun AttoCheckbox(
             enabled -> dark_border
             else -> dark_text_dim
         }
+    val backgroundColor =
+        when {
+            checked -> dark_accent
+            hovered && enabled -> dark_surface_alt
+            else -> dark_surface_raised
+        }
 
     Box(
         modifier =
@@ -51,7 +58,7 @@ fun AttoCheckbox(
                 .size(18.dp)
                 .clip(shape)
                 .background(
-                    color = if (checked) dark_accent else Color.Transparent,
+                    color = backgroundColor,
                     shape = shape,
                 ).border(
                     width = 1.dp,

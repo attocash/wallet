@@ -3,6 +3,7 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
+import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.platform.exportTextFile
 import cash.atto.wallet.platform.importTextFile
 import cash.atto.wallet.repository.AppStateRepository
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -24,6 +26,7 @@ class SettingsViewModel(
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     private var appStateCollectorJob: Job? = null
+    private var preferencesCollectorJob: Job? = null
 
     private val _state = MutableStateFlow(SettingsUiState.PREVIEW)
     val state = _state.asStateFlow()
@@ -42,14 +45,26 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     appStateRepository.state.collect { appState ->
                         appState.getPublicKey()?.let {
-                            _state.emit(
-                                state.value.copy(
+                            _state.update { settingsUiState ->
+                                settingsUiState.copy(
                                     profileUiState =
                                         ProfileUiState(
                                             name = "Main Account",
                                             hash = it.toAddress(AttoAlgorithm.V1).value,
                                         ),
-                                ),
+                                )
+                            }
+                        }
+                    }
+                }
+
+            preferencesCollectorJob?.cancel()
+            preferencesCollectorJob =
+                viewModelScope.launch {
+                    preferencesRepository.workSource.collect { workSource ->
+                        _state.update { settingsUiState ->
+                            settingsUiState.copy(
+                                workSource = workSource,
                             )
                         }
                     }
@@ -59,7 +74,7 @@ class SettingsViewModel(
 
     fun hideLogoutDialog() =
         viewModelScope.launch {
-            _state.emit(state.value.copy(showLogoutDialog = false))
+            _state.update { it.copy(showLogoutDialog = false) }
         }
 
     fun exportPreferences() =
@@ -104,9 +119,14 @@ class SettingsViewModel(
             showPreferencesMessage(message)
         }
 
+    fun setWorkSource(workSource: WorkSourcePreference) =
+        viewModelScope.launch {
+            preferencesRepository.setWorkSource(workSource)
+        }
+
     fun clearPreferencesMessage() =
         viewModelScope.launch {
-            _state.emit(state.value.copy(preferencesMessage = null))
+            _state.update { it.copy(preferencesMessage = null) }
         }
 
     fun lock() =
@@ -121,10 +141,10 @@ class SettingsViewModel(
 
     fun showLogoutDialog() =
         viewModelScope.launch {
-            _state.emit(state.value.copy(showLogoutDialog = true))
+            _state.update { it.copy(showLogoutDialog = true) }
         }
 
     private suspend fun showPreferencesMessage(message: String) {
-        _state.emit(state.value.copy(preferencesMessage = message))
+        _state.update { it.copy(preferencesMessage = message) }
     }
 }

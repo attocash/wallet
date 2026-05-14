@@ -197,6 +197,7 @@ kotlin {
             implementation(libs.androidx.ext.junit)
         }
         wasmJsMain.dependencies {
+            implementation(libs.atto.commons.worker.web)
             implementation(libs.androidx.datastore.core.okio)
             implementation(libs.androidx.datastore.preferences.core)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")

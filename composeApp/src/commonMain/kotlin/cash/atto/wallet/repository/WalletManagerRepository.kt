@@ -16,7 +16,10 @@ import cash.atto.commons.toAttoIndex
 import cash.atto.commons.toSigner
 import cash.atto.wallet.model.AccountPreference
 import cash.atto.wallet.model.AccountPreferenceStatus
+import cash.atto.wallet.model.WorkPreference
+import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.state.AppState
+import cash.atto.wallet.worker.isLocalWorkerSupported
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -83,6 +86,12 @@ private val defaultRepresentatives =
         ),
     )
 
+private data class WalletPreferencesSnapshot(
+    val appState: AppState,
+    val accounts: Map<String, AccountPreference>,
+    val work: WorkPreference,
+)
+
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
     private val preferencesRepository: PreferencesRepository,
@@ -90,7 +99,6 @@ class WalletManagerRepository(
     private val workCache: PersistentWorkCache,
     private val network: AttoNetwork,
 ) {
-    private val receiveInterval = 10.seconds
     private val retryDelay = 10.seconds
     private val sessionFactory = WalletSessionFactory(network, workCache, retryDelay)
 
@@ -116,14 +124,21 @@ class WalletManagerRepository(
             combine(
                 appStateRepository.state,
                 preferencesRepository.state
-                    .map { it.normalizedAccounts() }
-                    .distinctUntilChanged(),
-            ) { appState, accounts ->
-                appState to accounts
-            }.collectLatest { (appState, accounts) ->
-                replaceWalletSession(
+                    .map { preferences ->
+                        preferences.normalizedAccounts()
+                    }.distinctUntilChanged(),
+                preferencesRepository.work,
+            ) { appState, accountPreferences, work ->
+                WalletPreferencesSnapshot(
                     appState = appState,
-                    accountPreferences = accounts,
+                    accounts = accountPreferences,
+                    work = work,
+                )
+            }.collectLatest { preferences ->
+                replaceWalletSession(
+                    appState = preferences.appState,
+                    accountPreferences = preferences.accounts,
+                    work = preferences.work,
                 )
             }
         }
@@ -230,7 +245,10 @@ class WalletManagerRepository(
     private suspend fun replaceWalletSession(
         appState: AppState,
         accountPreferences: Map<String, AccountPreference>,
+        work: WorkPreference,
     ) {
+        val effectiveWork = work.supportedOnCurrentPlatform()
+
         walletSession?.close()
         walletSession = null
         _accountState.emit(null)
@@ -243,6 +261,7 @@ class WalletManagerRepository(
             sessionFactory.create(
                 appState = appState,
                 accountPreferences = accountPreferences,
+                workSource = effectiveWork.source,
                 signerIndex = MAIN_ACCOUNT_INDEX,
             ) ?: return
         walletSession = session
@@ -259,7 +278,7 @@ class WalletManagerRepository(
         startAccountCollector(session)
         startAccountEntrySaver(session)
         startReceivableCollector(session)
-        startBackgroundReceiver(session)
+        startBackgroundReceiver(session, effectiveWork)
     }
 
     private fun startAccountCollector(session: WalletSession) {
@@ -302,7 +321,10 @@ class WalletManagerRepository(
         }
     }
 
-    private fun startBackgroundReceiver(session: WalletSession) {
+    private fun startBackgroundReceiver(
+        session: WalletSession,
+        work: WorkPreference,
+    ) {
         session.launch {
             while (isActive) {
                 val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
@@ -322,7 +344,7 @@ class WalletManagerRepository(
                     emitAccounts(session)
                     emitSelectedAccount(session)
                     dequeueReceivable(nextReceivable.hash.toString())
-                    delay(receiveInterval)
+                    delay(work.rateLimit)
                 } catch (ex: Exception) {
                     println("Failed to receive ${nextReceivable.hash}: ${ex.message}")
                     delay(retryDelay)
@@ -391,3 +413,10 @@ class WalletManagerRepository(
         val MAIN_ACCOUNT_INDEX: AttoKeyIndex = 0U.toAttoIndex()
     }
 }
+
+private suspend fun WorkPreference.supportedOnCurrentPlatform(): WorkPreference =
+    if (source == WorkSourcePreference.LOCAL && !isLocalWorkerSupported()) {
+        WorkPreference.forSource(WorkSourcePreference.REMOTE)
+    } else {
+        normalized()
+    }

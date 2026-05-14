@@ -30,6 +30,11 @@ actual class PreferencesDataSource(
             preferences[termsAndConditionsDateKey]
         }
 
+    actual val work =
+        dataStore.data.map { preferences ->
+            preferences[workKey]
+        }
+
     actual suspend fun setBlob(blob: String) {
         dataStore.edit { preferences ->
             preferences[blobKey] = blob
@@ -48,8 +53,15 @@ actual class PreferencesDataSource(
         }
     }
 
+    actual suspend fun setWork(work: String) {
+        dataStore.edit { preferences ->
+            preferences[workKey] = work
+        }
+    }
+
     private companion object {
         val blobKey = stringPreferencesKey("user_preferences_blob")
         val termsAndConditionsDateKey = stringPreferencesKey("terms_and_conditions_date")
+        val workKey = stringPreferencesKey("work")
     }
 }

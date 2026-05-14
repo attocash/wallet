@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoUnit
+import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.model.getStakingApy
 import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.repository.HomeRepository
@@ -89,6 +90,8 @@ class MainScreenViewModel(
     fun exportPreferences() = settingsViewModel.exportPreferences()
 
     fun importPreferences() = settingsViewModel.importPreferences()
+
+    fun setWorkSource(workSource: WorkSourcePreference) = settingsViewModel.setWorkSource(workSource)
 
     fun clearPreferencesMessage() = settingsViewModel.clearPreferencesMessage()
 

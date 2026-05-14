@@ -10,6 +10,7 @@ import cash.atto.wallet.MainScreenNavDestination
 import cash.atto.wallet.components.common.AttoWallet
 import cash.atto.wallet.components.settings.BackupSecretDialog
 import cash.atto.wallet.components.settings.LogoutDialog
+import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
@@ -56,6 +57,7 @@ fun MainScreen(
         onDismissLogout = { viewModel.hideLogoutDialog() },
         onExportPreferences = { viewModel.exportPreferences() },
         onImportPreferences = { viewModel.importPreferences() },
+        onWorkSourceSelected = { viewModel.setWorkSource(it) },
         onDismissPreferencesMessage = { viewModel.clearPreferencesMessage() },
         onConfirmLogout = {
             viewModel.logout()
@@ -82,6 +84,7 @@ fun MainScreenContent(
     onDismissLogout: () -> Unit,
     onExportPreferences: () -> Unit,
     onImportPreferences: () -> Unit,
+    onWorkSourceSelected: (WorkSourcePreference) -> Unit,
     onDismissPreferencesMessage: () -> Unit,
     onConfirmLogout: () -> Unit,
     initialSendPaymentRequest: String? = null,
@@ -170,6 +173,7 @@ fun MainScreenContent(
                         onBackupClick = onBackupClick,
                         onExportClick = onExportPreferences,
                         onImportClick = onImportPreferences,
+                        onWorkSourceSelected = onWorkSourceSelected,
                         onDismissPreferencesMessage = onDismissPreferencesMessage,
                         onLogoutClick = onShowLogout,
                     )

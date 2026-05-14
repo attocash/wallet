@@ -6,6 +6,8 @@ import cash.atto.wallet.getPlatform
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.model.UserPreferences
+import cash.atto.wallet.model.WorkPreference
+import cash.atto.wallet.model.WorkSourcePreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +23,20 @@ class PreferencesRepository(
 ) {
     private val _state = MutableStateFlow(UserPreferences.EMPTY)
     val state = _state.asStateFlow()
+    private val _work = MutableStateFlow(WorkPreference())
+    val work = _work.asStateFlow()
+    private val _workSource = MutableStateFlow(_work.value.source)
+    val workSource = _workSource.asStateFlow()
 
     private val json =
         Json {
             ignoreUnknownKeys = true
             prettyPrint = true
+        }
+    private val workJson =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
         }
 
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -42,6 +53,14 @@ class PreferencesRepository(
                 )
             }.collect { preferences ->
                 _state.emit(preferences)
+            }
+        }
+
+        scope.launch {
+            preferencesDataSource.work.collect { storedWork ->
+                val work = decodeWorkPreference(storedWork).normalized()
+                _work.emit(work)
+                _workSource.emit(work.source)
             }
         }
     }
@@ -98,6 +117,18 @@ class PreferencesRepository(
         val nextIndex = preferences.nextAvailableAccountIndex() ?: return null
         savePreferences(preferences.withAccountStatus(nextIndex, AccountPreferenceStatus.ACTIVATED))
         return nextIndex
+    }
+
+    suspend fun setWorkSource(workSource: WorkSourcePreference) {
+        val work = WorkPreference.forSource(workSource)
+        _work.emit(work)
+        _workSource.emit(work.source)
+        val storedWork =
+            workJson.encodeToString(
+                WorkPreference.serializer(),
+                work,
+            )
+        preferencesDataSource.setWork(storedWork)
     }
 
     fun getAddressLabel(address: String): String? = state.value.addressLabel(address)
@@ -169,6 +200,18 @@ class PreferencesRepository(
         }.getOrElse {
             UserPreferences.EMPTY
         }.normalized()
+    }
+
+    private fun decodeWorkPreference(storedWork: String?): WorkPreference {
+        if (storedWork.isNullOrBlank()) {
+            return WorkPreference()
+        }
+
+        return runCatching {
+            workJson.decodeFromString(WorkPreference.serializer(), storedWork)
+        }.getOrElse {
+            WorkPreference()
+        }
     }
 }
 
