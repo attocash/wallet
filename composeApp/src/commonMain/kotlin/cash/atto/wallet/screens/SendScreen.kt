@@ -54,6 +54,14 @@ fun SendScreen(
     val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
     val nodeTimeDifference = viewModel.nodeTimeDifferenceState.collectAsState()
 
+    DisposableEffect(walletManagerRepository) {
+        val resumeReceiveJob = walletManagerRepository.pauseReceiveJob()
+
+        onDispose {
+            resumeReceiveJob()
+        }
+    }
+
     val coroutineScope = rememberCoroutineScope()
     val sendNavState = remember { mutableStateOf(SendScreenState.SEND) }
     val initialRequestConsumed = rememberSaveable(initialPaymentRequest, openConfirmOnLaunch) { mutableStateOf(false) }

@@ -39,6 +39,14 @@ fun StakingScreen(onBackClick: () -> Unit) {
     val walletManagerRepository = koinInject<WalletManagerRepository>()
     val hasCachedWork by walletManagerRepository.workReadyState.collectAsState()
 
+    DisposableEffect(walletManagerRepository) {
+        val resumeReceiveJob = walletManagerRepository.pauseReceiveJob()
+
+        onDispose {
+            resumeReceiveJob()
+        }
+    }
+
     StakingContent(
         uiState = uiState,
         hasCachedWork = hasCachedWork,

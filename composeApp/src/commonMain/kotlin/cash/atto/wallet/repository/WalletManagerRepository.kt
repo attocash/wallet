@@ -29,7 +29,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -114,6 +116,7 @@ class WalletManagerRepository(
     val workReadyState = _workReadyState.asStateFlow()
     private val _pendingReceivablesState = MutableStateFlow(PendingReceivablesState.EMPTY)
     val pendingReceivablesState = _pendingReceivablesState.asStateFlow()
+    private val receiveJobPauseCount = MutableStateFlow(0)
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var walletSession: WalletSession? = null
@@ -172,6 +175,18 @@ class WalletManagerRepository(
         emitSelectedAccount(session)
 
         return block
+    }
+
+    fun pauseReceiveJob(): () -> Unit {
+        receiveJobPauseCount.update { it + 1 }
+        var resumed = false
+
+        return resume@{
+            if (resumed) return@resume
+
+            resumed = true
+            receiveJobPauseCount.update { (it - 1).coerceAtLeast(0) }
+        }
     }
 
     suspend fun nodeTimeDifference(currentTime: AttoInstant): Long? = walletSession?.nodeTimeDifference(currentTime)
@@ -327,6 +342,8 @@ class WalletManagerRepository(
     ) {
         session.launch {
             while (isActive) {
+                receiveJobPauseCount.first { it == 0 }
+
                 val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
 
                 if (nextReceivable == null) {
@@ -340,6 +357,7 @@ class WalletManagerRepository(
                         continue
                     }
 
+                    receiveJobPauseCount.first { it == 0 }
                     session.receive(nextReceivable, defaultRepresentatives.random())
                     emitAccounts(session)
                     emitSelectedAccount(session)
