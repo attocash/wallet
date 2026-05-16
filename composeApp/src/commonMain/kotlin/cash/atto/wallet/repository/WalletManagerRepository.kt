@@ -20,6 +20,7 @@ import cash.atto.wallet.model.WorkPreference
 import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.worker.isLocalWorkerSupported
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -148,11 +149,10 @@ class WalletManagerRepository(
 
         scope.launch {
             combine(
-                accountState,
-                publicKeyState,
+                selectedAccountIndexState,
                 workCache.version,
-            ) { account, publicKey, _ ->
-                hasReadyWork(publicKey, account)
+            ) { index, _ ->
+                walletSession?.hasReadyWork(index) ?: false
             }.collect {
                 _workReadyState.emit(it)
             }
@@ -196,6 +196,8 @@ class WalletManagerRepository(
             val session = walletSession ?: return
             session.changeRepresentative(selectedAccountIndex, representative)
             emitSelectedAccount(session)
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Exception) {
             println(ex.message)
         }
@@ -276,7 +278,7 @@ class WalletManagerRepository(
             sessionFactory.create(
                 appState = appState,
                 accountPreferences = accountPreferences,
-                workSource = effectiveWork.source,
+                work = effectiveWork,
                 signerIndex = MAIN_ACCOUNT_INDEX,
             ) ?: return
         walletSession = session
@@ -286,7 +288,7 @@ class WalletManagerRepository(
         }
 
         _selectedAccountIndexState.emit(selectedAccountIndex)
-        session.cacheNextWorkForOpenedAccounts()
+        session.cacheNextWorkForActiveAccounts()
         emitAccounts(session)
         emitSelectedAccount(session)
 
@@ -342,8 +344,6 @@ class WalletManagerRepository(
     ) {
         session.launch {
             while (isActive) {
-                receiveJobPauseCount.first { it == 0 }
-
                 val nextReceivable = pendingReceivablesState.value.receivables.firstOrNull()
 
                 if (nextReceivable == null) {
@@ -352,17 +352,14 @@ class WalletManagerRepository(
                 }
 
                 try {
-                    if (!session.prepareReceiveWork(nextReceivable)) {
-                        delay(1_000)
-                        continue
-                    }
-
                     receiveJobPauseCount.first { it == 0 }
                     session.receive(nextReceivable, defaultRepresentatives.random())
                     emitAccounts(session)
                     emitSelectedAccount(session)
                     dequeueReceivable(nextReceivable.hash.toString())
-                    delay(work.rateLimit)
+                    delay(work.receiverRateLimit)
+                } catch (ex: CancellationException) {
+                    throw ex
                 } catch (ex: Exception) {
                     println("Failed to receive ${nextReceivable.hash}: ${ex.message}")
                     delay(retryDelay)
@@ -381,20 +378,7 @@ class WalletManagerRepository(
 
         _publicKeyState.emit(publicKey)
         _accountState.emit(account)
-        _workReadyState.emit(hasReadyWork(publicKey, account))
-    }
-
-    private suspend fun hasReadyWork(
-        publicKey: AttoPublicKey?,
-        account: AttoAccount?,
-    ): Boolean {
-        publicKey ?: return false
-        return workCache.hasValid(
-            publicKey = publicKey,
-            network = network,
-            timestamp = AttoInstant.now(),
-            target = nextWorkTarget(account = account, publicKey = publicKey),
-        )
+        _workReadyState.emit(session.hasReadyWork(selectedAccountIndex))
     }
 
     private suspend fun addressForIndex(index: UInt): AttoAddress? {
@@ -406,25 +390,23 @@ class WalletManagerRepository(
             ?.address
     }
 
-    private suspend fun enqueueReceivable(receivable: AttoReceivable) {
+    private fun enqueueReceivable(receivable: AttoReceivable) {
         val hash = receivable.hash.toString()
-        if (_pendingReceivablesState.value.receivables.any { it.hash.toString() == hash }) {
-            return
+        _pendingReceivablesState.update { state ->
+            if (state.receivables.any { it.hash.toString() == hash }) {
+                state
+            } else {
+                PendingReceivablesState(state.receivables + receivable)
+            }
         }
-
-        _pendingReceivablesState.emit(
-            PendingReceivablesState(
-                _pendingReceivablesState.value.receivables + receivable,
-            ),
-        )
     }
 
-    private suspend fun dequeueReceivable(hash: String) {
-        _pendingReceivablesState.emit(
+    private fun dequeueReceivable(hash: String) {
+        _pendingReceivablesState.update { state ->
             PendingReceivablesState(
-                _pendingReceivablesState.value.receivables.filterNot { it.hash.toString() == hash },
-            ),
-        )
+                state.receivables.filterNot { it.hash.toString() == hash },
+            )
+        }
     }
 
     private companion object {

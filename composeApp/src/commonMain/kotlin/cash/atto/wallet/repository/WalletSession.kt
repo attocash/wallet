@@ -122,19 +122,38 @@ internal class WalletSession(
         wallet.receive(receivable, representative)
     }
 
-    suspend fun prepareReceiveWork(receivable: AttoReceivable): Boolean {
-        val walletAccount = walletAccountsByPublicKey[receivable.receiverPublicKey] ?: return false
-        return worker.prepareReceiveWork(receivable, walletAccount.account)
-    }
-
-    suspend fun cacheNextWorkForOpenedAccounts() {
-        walletAccounts.values.mapNotNull { it.account }.forEach { account ->
-            cacheNextWork(account)
+    fun cacheNextWorkForActiveAccounts() {
+        walletAccounts.values.forEach { walletAccount ->
+            cacheNextWork(
+                publicKey = walletAccount.address.publicKey,
+                account = walletAccount.account,
+            )
         }
     }
 
-    suspend fun cacheNextWork(account: AttoAccount) {
-        worker.cacheNextWork(account)
+    fun cacheNextWork(account: AttoAccount) {
+        cacheNextWork(
+            publicKey = account.publicKey,
+            account = account,
+        )
+    }
+
+    suspend fun hasReadyWork(index: AttoKeyIndex): Boolean {
+        val publicKey = publicKey(index) ?: return false
+        return worker.hasValidWork(
+            publicKey = publicKey,
+            account = account(index),
+        )
+    }
+
+    private fun cacheNextWork(
+        publicKey: AttoPublicKey,
+        account: AttoAccount?,
+    ) {
+        worker.cacheNextWork(
+            publicKey = publicKey,
+            account = account,
+        )
     }
 
     fun accountStream() = accountMonitor.accountStream()

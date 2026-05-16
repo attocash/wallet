@@ -5,7 +5,6 @@ import cash.atto.commons.AttoBlock
 import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoPublicKey
-import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoWork
 import cash.atto.commons.AttoWorkTarget
 import cash.atto.commons.getTarget
@@ -66,33 +65,28 @@ internal class PersistentWorkCachingWorker(
         delegate.close()
     }
 
-    suspend fun cacheNextWork(account: AttoAccount) {
+    fun cacheNextWork(
+        publicKey: AttoPublicKey,
+        account: AttoAccount?,
+    ) {
+        val target = nextWorkTarget(account = account, publicKey = publicKey)
         cacheWork(
-            publicKey = account.publicKey,
-            target = nextWorkTarget(account = account, publicKey = account.publicKey),
-            description = account.lastTransactionHash.toString(),
+            publicKey = publicKey,
+            target = target,
+            description = target.toString(),
         )
     }
 
-    suspend fun prepareReceiveWork(
-        receivable: AttoReceivable,
+    suspend fun hasValidWork(
+        publicKey: AttoPublicKey,
         account: AttoAccount?,
-    ): Boolean {
-        val target = nextWorkTarget(account = account, publicKey = receivable.receiverPublicKey)
-
-        cacheWork(
-            publicKey = receivable.receiverPublicKey,
-            target = target,
-            description = receivable.hash.toString(),
-        )
-
-        return cachedWork(
-            publicKey = receivable.receiverPublicKey,
+    ): Boolean =
+        workCache.hasValid(
+            publicKey = publicKey,
             network = network,
             timestamp = AttoInstant.now(),
-            target = target,
-        ) != null
-    }
+            target = nextWorkTarget(account = account, publicKey = publicKey),
+        )
 
     private suspend fun cachedWork(
         publicKey: AttoPublicKey,
@@ -101,7 +95,7 @@ internal class PersistentWorkCachingWorker(
         target: AttoWorkTarget,
     ): AttoWork? = workCache.getValid(publicKey, network, timestamp, target)
 
-    private suspend fun cacheNextWork(block: AttoBlock) {
+    private fun cacheNextWork(block: AttoBlock) {
         cacheWork(
             publicKey = block.publicKey,
             target = AttoWorkTarget(block.hash.value),
@@ -109,31 +103,30 @@ internal class PersistentWorkCachingWorker(
         )
     }
 
-    private suspend fun cacheWork(
+    private fun cacheWork(
         publicKey: AttoPublicKey,
         target: AttoWorkTarget,
         description: String,
     ) {
-        val timestamp = AttoInstant.now()
-        if (cachedWork(publicKey, network, timestamp, target) != null) {
-            return
-        }
-        workCache.clear(publicKey)
-
-        val shouldLaunch =
-            inFlightMutex.withLock {
-                if (inFlightTargets[publicKey] == target) {
-                    false
-                } else {
-                    inFlightTargets[publicKey] = target
-                    true
-                }
-            }
-        if (!shouldLaunch) {
-            return
-        }
-
         scope.launch {
+            val timestamp = AttoInstant.now()
+            if (cachedWork(publicKey, network, timestamp, target) != null) {
+                return@launch
+            }
+
+            val shouldLaunch =
+                inFlightMutex.withLock {
+                    if (inFlightTargets[publicKey] == target) {
+                        false
+                    } else {
+                        inFlightTargets[publicKey] = target
+                        true
+                    }
+                }
+            if (!shouldLaunch) {
+                return@launch
+            }
+
             try {
                 val work = delegate.work(network, timestamp, target)
                 val isLatestTarget =

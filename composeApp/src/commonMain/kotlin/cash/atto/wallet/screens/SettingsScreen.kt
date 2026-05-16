@@ -279,7 +279,7 @@ private fun WorkerSourceSection(
 
                 WorkerSourceOptionCard(
                     icon = Icons.Outlined.Computer,
-                    title = "Local",
+                    title = "Local (Preview)",
                     subtitle =
                         when (localWorkerSupported) {
                             true -> "Uses this browser for work after a hardware fit check."

@@ -13,33 +13,33 @@ class WorkPreferenceTest {
         }
 
     @Test
-    fun `remote preference stores remote rate limit`() {
+    fun `remote preference stores receiver rate limit`() {
         val preference = WorkPreference.forSource(WorkSourcePreference.REMOTE)
 
         assertEquals(WorkSourcePreference.REMOTE, preference.source)
-        assertEquals(10, preference.rateLimitSeconds)
-        assertEquals(10.seconds, preference.rateLimit)
+        assertEquals(10, preference.receiverRateLimitSeconds)
+        assertEquals(10.seconds, preference.receiverRateLimit)
         assertEquals(
-            """{"source":"REMOTE","rateLimitSeconds":10}""",
+            """{"source":"REMOTE","receiverRateLimitSeconds":10}""",
             json.encodeToString(WorkPreference.serializer(), preference),
         )
     }
 
     @Test
-    fun `local preference stores no rate limit`() {
+    fun `local preference stores no receiver rate limit`() {
         val preference = WorkPreference.forSource(WorkSourcePreference.LOCAL)
 
         assertEquals(WorkSourcePreference.LOCAL, preference.source)
-        assertEquals(0, preference.rateLimitSeconds)
-        assertEquals(0.seconds, preference.rateLimit)
+        assertEquals(0, preference.receiverRateLimitSeconds)
+        assertEquals(0.seconds, preference.receiverRateLimit)
         assertEquals(
-            """{"source":"LOCAL","rateLimitSeconds":0}""",
+            """{"source":"LOCAL","receiverRateLimitSeconds":0}""",
             json.encodeToString(WorkPreference.serializer(), preference),
         )
     }
 
     @Test
-    fun `normalization applies rate limit from source`() {
+    fun `normalization applies receiver rate limit from source`() {
         val preference =
             json
                 .decodeFromString(
@@ -48,6 +48,6 @@ class WorkPreferenceTest {
                 ).normalized()
 
         assertEquals(WorkSourcePreference.LOCAL, preference.source)
-        assertEquals(0, preference.rateLimitSeconds)
+        assertEquals(0, preference.receiverRateLimitSeconds)
     }
 }

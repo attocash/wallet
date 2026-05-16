@@ -4,16 +4,16 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-private const val REMOTE_RATE_LIMIT_SECONDS = 10
-private const val LOCAL_RATE_LIMIT_SECONDS = 0
+private const val REMOTE_RECEIVER_RATE_LIMIT_SECONDS = 10
+private const val LOCAL_RECEIVER_RATE_LIMIT_SECONDS = 0
 
 @Serializable
 data class WorkPreference(
     val source: WorkSourcePreference = WorkSourcePreference.REMOTE,
-    val rateLimitSeconds: Int = source.rateLimitSeconds,
+    val receiverRateLimitSeconds: Int = source.receiverRateLimitSeconds,
 ) {
-    val rateLimit: Duration
-        get() = rateLimitSeconds.seconds
+    val receiverRateLimit: Duration
+        get() = receiverRateLimitSeconds.seconds
 
     fun normalized(): WorkPreference = forSource(source)
 
@@ -21,7 +21,7 @@ data class WorkPreference(
         fun forSource(source: WorkSourcePreference): WorkPreference =
             WorkPreference(
                 source = source,
-                rateLimitSeconds = source.rateLimitSeconds,
+                receiverRateLimitSeconds = source.receiverRateLimitSeconds,
             )
     }
 }
@@ -32,9 +32,9 @@ enum class WorkSourcePreference {
     LOCAL,
 }
 
-private val WorkSourcePreference.rateLimitSeconds: Int
+private val WorkSourcePreference.receiverRateLimitSeconds: Int
     get() =
         when (this) {
-            WorkSourcePreference.REMOTE -> REMOTE_RATE_LIMIT_SECONDS
-            WorkSourcePreference.LOCAL -> LOCAL_RATE_LIMIT_SECONDS
+            WorkSourcePreference.REMOTE -> REMOTE_RECEIVER_RATE_LIMIT_SECONDS
+            WorkSourcePreference.LOCAL -> LOCAL_RECEIVER_RATE_LIMIT_SECONDS
         }

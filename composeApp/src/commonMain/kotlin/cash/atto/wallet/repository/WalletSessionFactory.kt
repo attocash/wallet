@@ -15,6 +15,7 @@ import cash.atto.commons.worker.cached
 import cash.atto.commons.worker.retry
 import cash.atto.wallet.model.AccountPreference
 import cash.atto.wallet.model.AccountPreferenceStatus
+import cash.atto.wallet.model.WorkPreference
 import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.worker.createLocalWorker
@@ -29,7 +30,7 @@ internal class WalletSessionFactory(
     suspend fun create(
         appState: AppState,
         accountPreferences: Map<String, AccountPreference>,
-        workSource: WorkSourcePreference,
+        work: WorkPreference,
         signerIndex: AttoKeyIndex,
     ): WalletSession? {
         val seed = appState.getSeed() ?: return null
@@ -40,7 +41,7 @@ internal class WalletSessionFactory(
         val client = AttoNodeClient.attoBackend(network, authenticator)
         val workerDelegate =
             when {
-                workSource == WorkSourcePreference.LOCAL && isLocalWorkerSupported() -> createLocalWorker()
+                work.source == WorkSourcePreference.LOCAL && isLocalWorkerSupported() -> createLocalWorker()
                 else -> AttoWorker.attoBackend(network, authenticator)
             }
         val worker =
