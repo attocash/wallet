@@ -1085,4 +1085,4 @@ private fun Double.formatDecimal(decimalPlaces: Int): String {
 private const val GREEN_WORKS_PER_SECOND = 0.2
 private const val YELLOW_WORKS_PER_SECOND = 0.1
 private const val WPS_INTERPOLATION_MILLIS = 1_000.0
-private val LOCAL_WORKER_EVALUATION_DURATION = 2.minutes
+private val LOCAL_WORKER_EVALUATION_DURATION = 40.minutes
