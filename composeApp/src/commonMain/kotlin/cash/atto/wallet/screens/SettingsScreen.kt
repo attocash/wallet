@@ -600,15 +600,6 @@ private fun LocalWorkerStatusCard(
                         color = dark_text_primary,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W700),
                     )
-                    AttoTag(
-                        text =
-                            when (status) {
-                                WorkerEvaluationStatus.IDLE -> "Idle"
-                                WorkerEvaluationStatus.EVALUATING -> "Live"
-                                WorkerEvaluationStatus.COMPLETE -> "Done"
-                            },
-                        color = if (status == WorkerEvaluationStatus.COMPLETE) color else dark_accent,
-                    )
                 }
                 Text(
                     text = description,
