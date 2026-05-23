@@ -15,6 +15,6 @@ fun List<Metric>.getPriceUsd(): String? = getMetricValue("price.usd")
 
 fun List<Metric>.getCirculatingSupply(): String? = getMetricValue("supply.circulating")
 
-fun List<Metric>.getConfirmationMs(): String? = getMetricValue("network.confirmation-time.ms.p95")
+fun List<Metric>.getConfirmationMs(): String? = getMetricValue("network.confirmation-time.ms.p50")
 
 fun List<Metric>.getStakingApy(): String? = getMetricValue("distribution.staking.annual-percentage-yield.effective")
