@@ -1,6 +1,9 @@
 package cash.atto.wallet.components.settings
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,6 +74,7 @@ fun BackupSecretDialog(
 
             AttoButton(
                 text = if (copied) "" else "Copy",
+                icon = if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy,
                 onClick = {
                     coroutineScope.launch {
                         clipboard.setText(uiState.words.joinToString(" "))
