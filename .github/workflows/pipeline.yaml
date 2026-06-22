@@ -23,7 +23,7 @@ jobs:
       version: ${{ steps.semantic.outputs.new_release_version }}
       tag: ${{ steps.semantic.outputs.new_release_git_tag || steps.semantic.outputs.new_release_version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           fetch-depth: 0
@@ -68,7 +68,7 @@ jobs:
       - build
     if: ${{ github.event_name == 'push' || github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Download Artifacts
         uses: actions/download-artifact@v8
@@ -95,7 +95,7 @@ jobs:
       - preview
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.version.outputs.has_release == 'true' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
