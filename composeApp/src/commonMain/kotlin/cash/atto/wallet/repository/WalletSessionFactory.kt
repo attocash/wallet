@@ -2,16 +2,16 @@ package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoKeyIndex
 import cash.atto.commons.AttoNetwork
-import cash.atto.commons.gatekeeper.AttoAuthenticator
-import cash.atto.commons.gatekeeper.attoBackend
 import cash.atto.commons.node.AttoNodeClient
 import cash.atto.commons.node.monitor.createAccountMonitor
+import cash.atto.commons.node.remote
 import cash.atto.commons.toAttoIndex
 import cash.atto.commons.toSigner
 import cash.atto.commons.wallet.AttoWallet
 import cash.atto.commons.wallet.create
 import cash.atto.commons.worker.AttoWorker
 import cash.atto.commons.worker.cached
+import cash.atto.commons.worker.remote
 import cash.atto.commons.worker.retry
 import cash.atto.wallet.model.AccountPreference
 import cash.atto.wallet.model.AccountPreferenceStatus
@@ -31,18 +31,16 @@ internal class WalletSessionFactory(
         appState: AppState,
         accountPreferences: Map<String, AccountPreference>,
         work: WorkPreference,
-        signerIndex: AttoKeyIndex,
     ): WalletSession? {
         val seed = appState.getSeed() ?: return null
         val accountIndexes = accountPreferences.accountIndexes()
         val activeIndexes = accountPreferences.activeAccountIndexes()
-        val signer = seed.toSigner(signerIndex)
-        val authenticator = AttoAuthenticator.attoBackend(network, signer)
-        val client = AttoNodeClient.attoBackend(network, authenticator)
+        val gatekeeper = "https://gatekeeper.${network.name.lowercase()}.application.atto.cash"
+        val client = AttoNodeClient.remote(gatekeeper)
         val workerDelegate =
             when {
                 work.source == WorkSourcePreference.LOCAL && isLocalWorkerSupported() -> createLocalWorker()
-                else -> AttoWorker.attoBackend(network, authenticator)
+                else -> AttoWorker.remote(gatekeeper)
             }
         val worker =
             PersistentWorkCachingWorker(

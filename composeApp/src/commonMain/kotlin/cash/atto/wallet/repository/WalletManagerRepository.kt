@@ -279,7 +279,6 @@ class WalletManagerRepository(
                 appState = appState,
                 accountPreferences = accountPreferences,
                 work = effectiveWork,
-                signerIndex = MAIN_ACCOUNT_INDEX,
             ) ?: return
         walletSession = session
 
