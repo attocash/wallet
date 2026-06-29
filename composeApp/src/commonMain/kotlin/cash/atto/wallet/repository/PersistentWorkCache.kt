@@ -11,11 +11,15 @@ import cash.atto.wallet.datasource.Work
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class PersistentWorkCache(
     appDatabase: AppDatabase,
 ) {
     private val dao = appDatabase.workDao()
+    private val mutex = Mutex()
+    private val memoryCache = mutableMapOf<AttoPublicKey, AttoWork>()
     private val _version = MutableStateFlow(0L)
 
     val version: StateFlow<Long> = _version.asStateFlow()
@@ -44,10 +48,16 @@ class PersistentWorkCache(
                 value = work.value,
             ),
         )
+        mutex.withLock {
+            memoryCache[publicKey] = work
+        }
         markChanged()
     }
 
     suspend fun clear(publicKey: AttoPublicKey) {
+        mutex.withLock {
+            memoryCache.remove(publicKey)
+        }
         dao.clear(publicKey.value)
         markChanged()
     }
@@ -57,10 +67,35 @@ class PersistentWorkCache(
         network: AttoNetwork,
         timestamp: AttoInstant,
         target: AttoWorkTarget,
-    ): AttoWork? =
-        dao.get(key)
-            ?.let { AttoWork(it.value) }
-            ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
+    ): AttoWork? {
+        val publicKey = AttoPublicKey(key)
+        val cached =
+            mutex.withLock {
+                memoryCache[publicKey]
+            }
+        if (cached != null) {
+            if (AttoWork.isValid(network, timestamp, target, cached.value)) {
+                return cached
+            }
+            mutex.withLock {
+                memoryCache.remove(publicKey)
+            }
+        }
+
+        val stored =
+            dao
+                .get(key)
+                ?.let { AttoWork(it.value) }
+                ?.takeIf { AttoWork.isValid(network, timestamp, target, it.value) }
+
+        if (stored != null) {
+            mutex.withLock {
+                memoryCache[publicKey] = stored
+            }
+        }
+
+        return stored
+    }
 
     private fun markChanged() {
         _version.value += 1

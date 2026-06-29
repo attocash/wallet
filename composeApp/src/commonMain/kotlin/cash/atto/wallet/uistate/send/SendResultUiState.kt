@@ -8,6 +8,6 @@ class SendResultUiState(
     val amount: BigDecimal?,
     val amountUsd: BigDecimal?,
     val address: String?,
-    val elapsedMs: Long? = null,
+    val sentMs: Long? = null,
     val sendBlock: AttoSendBlock? = null,
 )

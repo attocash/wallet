@@ -149,13 +149,13 @@ fun SendResult(
             )
         }
 
-        if (isSuccess && uiState.elapsedMs != null) {
+        if (isSuccess && uiState.sentMs != null) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 Text(
-                    text = "Confirmed in ${uiState.elapsedMs}ms",
+                    text = "Sent in ${uiState.sentMs}ms",
                     style =
                         MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.W600,
@@ -186,7 +186,7 @@ fun SendResultPreview() {
                     amount = BigDecimal.TEN,
                     amountUsd = null,
                     address = "atto://address",
-                    elapsedMs = 342,
+                    sentMs = 342,
                 ),
             onClose = {},
         )

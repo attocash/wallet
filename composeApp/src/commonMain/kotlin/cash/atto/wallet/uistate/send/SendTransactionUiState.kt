@@ -25,7 +25,7 @@ data class SendTransactionUiState(
     private val showLoader: Boolean = false,
     val priceUsd: BigDecimal? = null,
     val isUsdMode: Boolean = false,
-    val elapsedMs: Long? = null,
+    val sentMs: Long? = null,
     val sendBlock: AttoSendBlock? = null,
 ) {
     private fun parseDecimal(value: String?): BigDecimal? =
@@ -99,7 +99,7 @@ data class SendTransactionUiState(
                 amount = amount,
                 amountUsd = confirmedAmountUsd ?: amountUsd(amount),
                 address = address,
-                elapsedMs = elapsedMs,
+                sentMs = sentMs,
                 sendBlock = sendBlock,
             )
 
@@ -118,7 +118,7 @@ data class SendTransactionUiState(
                 address = null,
                 operationResult = SendOperationResult.UNKNOWN,
                 accountName = null,
-                elapsedMs = null,
+                sentMs = null,
                 isUsdMode = false,
             )
     }

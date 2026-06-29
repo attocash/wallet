@@ -148,12 +148,7 @@ fun SendScreen(
             coroutineScope.launch {
                 try {
                     viewModel.showLoader()
-                    val startTime =
-                        kotlin.time.TimeSource.Monotonic
-                            .markNow()
                     viewModel.send()
-                    val elapsedMs = startTime.elapsedNow().inWholeMilliseconds
-                    viewModel.setElapsedMs(elapsedMs)
                 } finally {
                     viewModel.stopNodeTimestampPolling()
                     viewModel.hideLoader()

@@ -10,7 +10,6 @@ import cash.atto.commons.AttoKeyIndex
 import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoReceivable
-import cash.atto.commons.AttoSendBlock
 import cash.atto.commons.fromHexToByteArray
 import cash.atto.commons.toAttoIndex
 import cash.atto.commons.toSigner
@@ -95,6 +94,11 @@ private data class WalletPreferencesSnapshot(
     val work: WorkPreference,
 )
 
+private data class SelectedAccountSnapshot(
+    val publicKey: AttoPublicKey?,
+    val account: AttoAccount?,
+)
+
 class WalletManagerRepository(
     private val appStateRepository: AppStateRepository,
     private val preferencesRepository: PreferencesRepository,
@@ -115,6 +119,7 @@ class WalletManagerRepository(
     val selectedAccountIndexState = _selectedAccountIndexState.asStateFlow()
     private val _workReadyState = MutableStateFlow(false)
     val workReadyState = _workReadyState.asStateFlow()
+    private val selectedAccountSnapshot = MutableStateFlow<SelectedAccountSnapshot?>(null)
     private val _pendingReceivablesState = MutableStateFlow(PendingReceivablesState.EMPTY)
     val pendingReceivablesState = _pendingReceivablesState.asStateFlow()
     private val receiveJobPauseCount = MutableStateFlow(0)
@@ -149,10 +154,20 @@ class WalletManagerRepository(
 
         scope.launch {
             combine(
-                selectedAccountIndexState,
+                selectedAccountSnapshot,
                 workCache.version,
-            ) { index, _ ->
-                walletSession?.hasReadyWork(index) ?: false
+            ) { snapshot, _ ->
+                val publicKey = snapshot?.publicKey ?: return@combine false
+                workCache.hasValid(
+                    publicKey = publicKey,
+                    network = network,
+                    timestamp = AttoInstant.now(),
+                    target =
+                        nextWorkTarget(
+                            publicKey = publicKey,
+                            account = snapshot.account,
+                        ),
+                )
             }.collect {
                 _workReadyState.emit(it)
             }
@@ -163,9 +178,9 @@ class WalletManagerRepository(
         receiverAddress: AttoAddress,
         amount: AttoAmount,
         timestampProvider: suspend () -> AttoInstant,
-    ): AttoSendBlock {
+    ): WalletSendResult {
         val session = walletSession ?: throw IllegalStateException("Wallet is not ready yet")
-        val block =
+        val result =
             session.send(
                 index = selectedAccountIndex,
                 receiverAddress = receiverAddress,
@@ -174,7 +189,7 @@ class WalletManagerRepository(
             )
         emitSelectedAccount(session)
 
-        return block
+        return result
     }
 
     fun pauseReceiveJob(): () -> Unit {
@@ -272,6 +287,7 @@ class WalletManagerRepository(
         _publicKeyState.emit(null)
         _accountsState.emit(emptyList())
         _workReadyState.emit(false)
+        selectedAccountSnapshot.emit(null)
         _pendingReceivablesState.emit(PendingReceivablesState.EMPTY)
 
         val session =
@@ -377,7 +393,12 @@ class WalletManagerRepository(
 
         _publicKeyState.emit(publicKey)
         _accountState.emit(account)
-        _workReadyState.emit(session.hasReadyWork(selectedAccountIndex))
+        selectedAccountSnapshot.emit(
+            SelectedAccountSnapshot(
+                publicKey = publicKey,
+                account = account,
+            ),
+        )
     }
 
     private suspend fun addressForIndex(index: UInt): AttoAddress? {

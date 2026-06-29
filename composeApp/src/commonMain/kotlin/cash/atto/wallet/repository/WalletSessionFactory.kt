@@ -36,7 +36,7 @@ internal class WalletSessionFactory(
         val accountIndexes = accountPreferences.accountIndexes()
         val activeIndexes = accountPreferences.activeAccountIndexes()
         val gatekeeper = "https://gatekeeper.${network.name.lowercase()}.application.atto.cash"
-        val client = AttoNodeClient.remote(gatekeeper)
+        val client = TimedAttoNodeClient(AttoNodeClient.remote(gatekeeper))
         val workerDelegate =
             when {
                 work.source == WorkSourcePreference.LOCAL && isLocalWorkerSupported() -> createLocalWorker()

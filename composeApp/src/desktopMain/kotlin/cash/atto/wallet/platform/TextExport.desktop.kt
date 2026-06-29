@@ -1,8 +1,8 @@
 package cash.atto.wallet.platform
 
+import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.buffered
 import kotlinx.io.writeString
 
 actual suspend fun exportTextFile(

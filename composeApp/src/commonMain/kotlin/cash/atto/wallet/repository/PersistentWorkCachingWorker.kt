@@ -77,17 +77,6 @@ internal class PersistentWorkCachingWorker(
         )
     }
 
-    suspend fun hasValidWork(
-        publicKey: AttoPublicKey,
-        account: AttoAccount?,
-    ): Boolean =
-        workCache.hasValid(
-            publicKey = publicKey,
-            network = network,
-            timestamp = AttoInstant.now(),
-            target = nextWorkTarget(account = account, publicKey = publicKey),
-        )
-
     private suspend fun cachedWork(
         publicKey: AttoPublicKey,
         network: AttoNetwork,

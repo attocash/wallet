@@ -9,7 +9,6 @@ import cash.atto.commons.AttoKeyIndex
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoReceivable
 import cash.atto.commons.AttoSendBlock
-import cash.atto.commons.node.AttoNodeClient
 import cash.atto.commons.node.monitor.AttoAccountMonitor
 import cash.atto.commons.node.monitor.toAccountEntryMonitor
 import cash.atto.commons.toAttoAmount
@@ -26,7 +25,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 internal class WalletSession(
-    private val client: AttoNodeClient,
+    private val client: TimedAttoNodeClient,
     private val wallet: AttoWallet,
     private val walletAccounts: Map<AttoKeyIndex, AttoWalletAccount>,
     private val addresses: Map<AttoKeyIndex, AttoAddress>,
@@ -86,7 +85,7 @@ internal class WalletSession(
         receiverAddress: AttoAddress,
         amount: AttoAmount,
         timestampProvider: suspend () -> AttoInstant,
-    ): AttoSendBlock {
+    ): WalletSendResult {
         val walletAccount = walletAccount(index) ?: throw IllegalStateException("Wallet is not ready yet")
         val account = walletAccount.account ?: throw IllegalStateException("Account is not open yet")
 
@@ -96,6 +95,7 @@ internal class WalletSession(
         }
 
         val timestamp = timestampProvider()
+        client.resetLastPublishMs()
         val transaction =
             wallet.send(
                 index = index,
@@ -104,8 +104,14 @@ internal class WalletSession(
                 timestamp = timestamp,
             )
 
-        return transaction.block as? AttoSendBlock
-            ?: throw IllegalStateException("Expected send block but received ${transaction.block::class}")
+        val block =
+            transaction.block as? AttoSendBlock
+                ?: throw IllegalStateException("Expected send block but received ${transaction.block::class}")
+
+        return WalletSendResult(
+            block = block,
+            publishMs = client.lastPublishMs,
+        )
     }
 
     suspend fun changeRepresentative(
@@ -135,14 +141,6 @@ internal class WalletSession(
         cacheNextWork(
             publicKey = account.publicKey,
             account = account,
-        )
-    }
-
-    suspend fun hasReadyWork(index: AttoKeyIndex): Boolean {
-        val publicKey = publicKey(index) ?: return false
-        return worker.hasValidWork(
-            publicKey = publicKey,
-            account = account(index),
         )
     }
 

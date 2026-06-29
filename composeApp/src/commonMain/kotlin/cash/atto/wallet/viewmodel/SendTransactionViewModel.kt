@@ -188,7 +188,7 @@ class SendTransactionViewModel(
                     state.value.sendConfirmUiState.address,
                 ) ?: throw IllegalStateException("Invalid address")
 
-            val block =
+            val result =
                 walletManagerRepository.send(
                     receiverAddress = receiverAddress,
                     amount = amount,
@@ -198,7 +198,8 @@ class SendTransactionViewModel(
             _state.emit(
                 state.value.copy(
                     operationResult = SendTransactionUiState.SendOperationResult.SUCCESS,
-                    sendBlock = block,
+                    sendBlock = result.block,
+                    sentMs = result.publishMs,
                 ),
             )
 
@@ -379,14 +380,6 @@ class SendTransactionViewModel(
         return candidates.firstNotNullOfOrNull { candidate ->
             runCatching { AttoAddress.parse(candidate) }.getOrNull()
         }
-    }
-
-    suspend fun setElapsedMs(ms: Long) {
-        _state.emit(
-            state.value.copy(
-                elapsedMs = ms,
-            ),
-        )
     }
 
     suspend fun showLoader() {
