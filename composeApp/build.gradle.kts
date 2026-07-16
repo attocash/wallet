@@ -154,6 +154,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
 
+            implementation(libs.androidx.datastore.preferences)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
@@ -202,7 +203,7 @@ kotlin {
             implementation(libs.androidx.datastore.preferences.core)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             implementation(libs.sqlite.web)
-            implementation(npm("@zxing/library", "0.21.3"))
+            implementation(npm("@zxing/library", "0.23.0"))
             implementation(
                 npm(
                     "sqlite-web-worker",
@@ -212,7 +213,7 @@ kotlin {
             implementation(
                 devNpm(
                     "html-webpack-plugin",
-                    "5.6.3",
+                    "5.6.7",
                 ),
             )
         }
@@ -281,7 +282,6 @@ android {
     buildFeatures {
         compose = true
     }
-    buildToolsVersion = "35.0.0"
     dependencies {
         debugImplementation(compose.uiTooling)
     }

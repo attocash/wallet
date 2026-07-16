@@ -1,55 +1,55 @@
 [versions]
-accompanistPermissions = "0.37.3"
-agp = "8.13.0"
-android-compileSdk = "36"
+accompanist-permissions = "0.37.3"
+agp = "9.3.0"
+android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "36"
-androidx-activityCompose = "1.11.0"
+androidx-activity = "1.13.0"
+androidx-camera = "1.6.1"
 androidx-core-splashscreen = "1.2.0"
-androidx-lifecycle = "2.11.0"
 androidx-datastore = "1.3.0-alpha09"
-barcodeScanning = "17.3.0"
-bignum = "0.3.10"
-camera2 = "1.5.1"
+androidx-lifecycle = "2.11.0"
+androidx-navigation = "2.9.8"
+androidx-room3 = "3.0.0"
+androidx-sqlite = "2.7.0"
+androidx-test = "1.7.0"
+androidx-test-ext-junit = "1.3.0"
+alexzhirkevich-qrose = "1.1.2"
+arkivanov-decompose = "3.5.0"
+atto-commons = "6.8.1"
 compose-plugin = "1.11.1"
-decompose = "3.5.0"
-extJunit = "1.3.0"
+chrisbanes-material3-window-size = "0.5.0"
+google-datatransport = "4.1.1"
+google-mlkit-barcode-scanning = "17.3.0"
+ionspin-bignum = "0.3.10"
+jna = "5.19.1"
+junit-jupiter = "6.1.2"
+koin = "4.2.2"
 kotlin = "2.4.10"
 kotlinx-coroutines = "1.11.0"
-kotlinx-io = "0.9.0"
+kotlinx-io = "0.9.1"
 kotlinx-serialization = "1.11.0"
-atto-commons = "6.8.0"
-jna = "5.19.1"
-junitJupiter = "6.1.2"
-navigationCompose = "2.9.6"
-koin = "4.2.2"
-qrose = "1.1.2"
-rules = "1.7.0"
-transportRuntime = "4.0.0"
-material3WindowSize = "0.5.0"
-activityKtx = "1.11.0"
-slf4j = "2.0.18"
-room3 = "3.0.0"
-ksp = "2.3.8"
-sqlite = "2.7.0"
+ksp = "2.3.10"
 ktor = "3.5.1"
 ktlint = "14.2.0"
+slf4j = "2.0.18"
 
 [libraries]
-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
-androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera2" }
-androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera2" }
-androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camera2" }
-androidx-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "extJunit" }
-androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
-androidx-runner = { module = "androidx.test:runner", version.ref = "rules" }
-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
-bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx-camera" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx-camera" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "androidx-camera" }
+androidx-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-ext-junit" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-test" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
+barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "google-mlkit-barcode-scanning" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "ionspin-bignum" }
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "arkivanov-decompose" }
+decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "arkivanov-decompose" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "androidx-datastore" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -60,20 +60,20 @@ atto-commons-wallet = { module = "cash.atto:commons-wallet", version.ref = "atto
 atto-commons-worker-web = { module = "cash.atto:commons-worker-web", version.ref = "atto-commons" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
 # Koin dependencies
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
-material3-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "material3WindowSize" }
-qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
-transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
-androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+material3-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "chrisbanes-material3-window-size" }
+qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "alexzhirkevich-qrose" }
+transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "google-datatransport" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
-room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3" }
-room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3" }
-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-sqlite-web = { module = "androidx.sqlite:sqlite-web", version.ref = "sqlite" }
+room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "androidx-room3" }
+room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "androidx-room3" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite" }
+sqlite-web = { module = "androidx.sqlite:sqlite-web", version.ref = "androidx-sqlite" }
 
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -88,5 +88,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kspCompose = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-room3 = { id = "androidx.room3", version.ref = "room3" }
+room3 = { id = "androidx.room3", version.ref = "androidx-room3" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
