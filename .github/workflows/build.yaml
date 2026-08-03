@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Desktop Test
         run: |
@@ -61,7 +61,7 @@ jobs:
 #          java-version: '17'
 #          cache: 'gradle'
 #
-#      - uses: gradle/actions/setup-gradle@v6
+#      - uses: gradle/actions/setup-gradle@v6.2.0
 #
 #      - run: ./gradlew allTests
 #
@@ -88,7 +88,7 @@ jobs:
 #          java-version: '17'
 #          cache: 'gradle'
 #
-#      - uses: gradle/actions/setup-gradle@v6
+#      - uses: gradle/actions/setup-gradle@v6.2.0
 #
 #      - run: ./gradlew allTests
 #
@@ -117,7 +117,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Wasm Browser Test
         run: |
