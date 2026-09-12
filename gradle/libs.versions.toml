@@ -44,10 +44,10 @@ androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-test"
 androidx-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "google-mlkit-barcode-scanning" }
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "ionspin-bignum" }
-    decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "arkivanov-decompose" }
-    decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "arkivanov-decompose" }
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "arkivanov-decompose" }
+decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "arkivanov-decompose" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
-androidx-activity-compose = { module = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "androidx-datastore" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
