@@ -7,15 +7,21 @@ config.output.filename = "attoWallet.[contenthash].js";
 config.plugins.push(
   new HtmlWebpackPlugin({
     template: path.resolve(__dirname, "../../../../composeApp/src/wasmJsMain/htmlTemplate/index.html"),
-    templateParameters: (compilation, assets, assetTags, options) => ({
-      compilation,
-      webpackConfig: compilation.options,
-      htmlWebpackPlugin: {
-        tags: assetTags,
-        files: assets,
-        options
-      },
-      serviceWorkerVersion: compilation.fullHash || compilation.hash || "dev"
-    })
+    templateParameters: (compilation, assets, assetTags, options) => {
+      const buildHash = compilation.fullHash;
+      if (!buildHash) {
+        throw new Error("Webpack build hash is unavailable");
+      }
+      return {
+        compilation,
+        webpackConfig: compilation.options,
+        htmlWebpackPlugin: {
+          tags: assetTags,
+          files: assets,
+          options
+        },
+        serviceWorkerVersion: buildHash
+      };
+    }
   })
 );

@@ -1,6 +1,7 @@
-const CACHE_VERSION =
-  new URL(self.location.href).searchParams.get("hash") ||
-  "dev";
+const CACHE_VERSION = new URL(self.location.href).searchParams.get("hash");
+if (!CACHE_VERSION) {
+  throw new Error("Missing service-worker build hash");
+}
 const CACHE_NAME = "atto-wallet-" + CACHE_VERSION;
 const APP_SHELL = [
   "./",
