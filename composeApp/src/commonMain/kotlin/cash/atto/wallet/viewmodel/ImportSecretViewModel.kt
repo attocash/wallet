@@ -7,6 +7,7 @@ import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.uistate.secret.ImportSecretUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class ImportSecretViewModel(
     private val appStateRepository: AppStateRepository,
@@ -20,41 +21,37 @@ class ImportSecretViewModel(
                 .copy(input = value),
         )
 
-        checkWallet()
+        checkWallet(value)
     }
 
     suspend fun importWallet(): Boolean {
-        if (!checkWallet()) {
+        val input = state.value.input.orEmpty()
+        if (!checkWallet(input)) {
             return false
         }
 
-        state.value
-            .input
-            ?.let {
-                appStateRepository.importSecret(
-                    it.split(' '),
-                )
-            }
+        appStateRepository.importSecret(input.split(' '))
 
         return true
     }
 
-    private suspend fun checkWallet(): Boolean {
-        try {
-            val mnemonic = AttoMnemonic(state.value.input.orEmpty())
-            _state.emit(
-                state.value
-                    .copy(errorMessage = null),
-            )
-        } catch (ex: AttoMnemonicException) {
-            _state.emit(
-                state.value
-                    .copy(errorMessage = ex.message),
-            )
+    private suspend fun checkWallet(input: String): Boolean {
+        val (isValid, errorMessage) =
+            try {
+                AttoMnemonic.fromPhrase(input)
+                true to null
+            } catch (ex: AttoMnemonicException) {
+                false to ex.message
+            }
 
-            return false
+        _state.update { current ->
+            if (current.input == input) {
+                current.copy(errorMessage = errorMessage)
+            } else {
+                current
+            }
         }
 
-        return true
+        return isValid && state.value.input == input
     }
 }

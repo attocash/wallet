@@ -167,6 +167,8 @@ fun ImportPhrase(
     var pasted by remember { mutableStateOf(false) }
     var focusedIndex by remember { mutableStateOf<Int?>(null) }
     var didLoadInitialInput by remember { mutableStateOf(false) }
+    var mnemonicError by remember { mutableStateOf<String?>(null) }
+    var validatedWords by remember { mutableStateOf<List<String>?>(null) }
 
     LaunchedEffect(uiState.input) {
         if (!didLoadInitialInput) {
@@ -197,22 +199,22 @@ fun ImportPhrase(
         } else {
             emptySet()
         }
-    val mnemonicError =
-        remember(normalizedWords) {
-            if (!hasCompletePhrase || invalidWordIndices.isNotEmpty()) {
-                null
-            } else {
-                try {
-                    AttoMnemonic(normalizedWords)
-                    null
-                } catch (exception: AttoMnemonicException) {
-                    exception.message ?: "Invalid mnemonic"
-                }
+    LaunchedEffect(normalizedWords) {
+        mnemonicError = null
+        validatedWords = null
+
+        if (hasCompletePhrase && invalidWordIndices.isEmpty()) {
+            try {
+                AttoMnemonic.fromWords(normalizedWords)
+                validatedWords = normalizedWords
+            } catch (exception: AttoMnemonicException) {
+                mnemonicError = exception.message ?: "Invalid mnemonic"
             }
         }
+    }
     val showInvalidState = mnemonicError != null
     val progress = filledCount / IMPORT_WORD_COUNT.toFloat()
-    val canSubmit = hasCompletePhrase && invalidWordIndices.isEmpty() && mnemonicError == null
+    val canSubmit = hasCompletePhrase && invalidWordIndices.isEmpty() && validatedWords == normalizedWords
 
     fun syncWords(nextWords: List<String>) = onInputChanged(joinMnemonicWords(nextWords))
 

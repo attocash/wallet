@@ -46,7 +46,7 @@ class AppStateRepository(
                     return@collect
                 }
 
-                val mnemonic = seed?.let { AttoMnemonic(it) }
+                val mnemonic = seed?.let { AttoMnemonic.fromPhrase(it) }
                 setMnemonic(mnemonic)
 
                 seed?.let {
@@ -109,7 +109,7 @@ class AppStateRepository(
                         )
 
                 try {
-                    val mnemonic = AttoMnemonic(decrypted)
+                    val mnemonic = AttoMnemonic.fromPhrase(decrypted)
                     setMnemonic(mnemonic)
                     setPassword(password)
                     startSession()
