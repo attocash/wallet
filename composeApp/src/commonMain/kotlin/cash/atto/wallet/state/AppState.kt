@@ -1,18 +1,19 @@
 package cash.atto.wallet.state
 
-import cash.atto.commons.AttoMnemonic
 import cash.atto.commons.toPrivateKey
 import cash.atto.commons.toPublicKey
-import cash.atto.commons.toSeed
 
 data class AppState(
-    val encryptedSeed: String?,
-    val mnemonic: AttoMnemonic?,
     val authState: AuthState,
-    val password: String?,
+    val unlockedWallet: UnlockedWallet? = null,
     val index: UInt = 0U,
 ) {
-    suspend fun getSeed() = mnemonic?.toSeed()
+    val mnemonic get() = authenticatedWallet()?.mnemonic
+    val password get() = authenticatedWallet()?.password
+
+    private fun authenticatedWallet() = unlockedWallet.takeIf { authState == AuthState.SESSION_VALID }
+
+    suspend fun getSeed() = authenticatedWallet()?.takeIf { it.mnemonic != null }?.getSeed()
 
     suspend fun getPrivateKey() = getSeed()?.toPrivateKey(index)
 
@@ -30,10 +31,7 @@ data class AppState(
     companion object {
         val DEFAULT =
             AppState(
-                encryptedSeed = null,
-                mnemonic = null,
                 authState = AuthState.UNKNOWN,
-                password = null,
             )
     }
 }

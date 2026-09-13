@@ -47,7 +47,7 @@ val repositoryModule =
         includes(dataSourceModule)
 //    single { AttoNetwork.DEV }
         single { AttoNetwork.LIVE }
-        singleOf(::AppStateRepository)
+        single { AppStateRepository(get(), get(), get(), get()) }
         singleOf(::PersistentAccountEntryRepository)
         singleOf(::PersistentWorkCache)
         singleOf(::HomeRepository)

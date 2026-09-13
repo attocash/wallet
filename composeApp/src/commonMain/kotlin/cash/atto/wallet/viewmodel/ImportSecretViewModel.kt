@@ -31,6 +31,7 @@ class ImportSecretViewModel(
         }
 
         appStateRepository.importSecret(input.split(' '))
+        _state.value = ImportSecretUiState.DEFAULT
 
         return true
     }

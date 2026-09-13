@@ -1,13 +1,13 @@
 package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoMnemonic
-import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.datasource.TempSeedDataSource
-import cash.atto.wallet.getPlatform
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState
+import cash.atto.wallet.state.AppState.AuthState
+import cash.atto.wallet.state.UnlockedWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -15,215 +15,107 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
-class AppStateRepository(
-    private val seedDataSource: SeedDataSource,
+class AppStateRepository internal constructor(
+    private val keyStore: WalletKeyStore,
     private val tempSeedDataSource: TempSeedDataSource,
-    private val passwordDataSource: PasswordDataSource,
-    private val seedAESInteractor: SeedAESInteractor,
+    private val scope: CoroutineScope,
 ) {
+    constructor(
+        seedDataSource: SeedDataSource,
+        tempSeedDataSource: TempSeedDataSource,
+        passwordDataSource: PasswordDataSource,
+        seedAESInteractor: SeedAESInteractor,
+    ) : this(
+        PlatformWalletKeyStore(seedDataSource, passwordDataSource, seedAESInteractor),
+        tempSeedDataSource,
+        CoroutineScope(Dispatchers.Default),
+    )
+
     private val _state = MutableStateFlow(AppState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val sessionScope = CoroutineScope(Dispatchers.Default)
-    private var sessionJob: Job? = null
+    // Authentication changes and storage writes share one ordering, including lock during unlock.
+    private val mutex = Mutex()
+    private var expiryJob: Job? = null
 
     init {
-        CoroutineScope(Dispatchers.Default).launch {
-            seedDataSource.seed.collect { seed ->
-                if (getPlatform().type == PlatformType.WEB) {
-                    if (seed != null) {
-                        setPassword(null)
-                        setAuthState(AppState.AuthState.NO_PASSWORD)
-                        setEncryptedSeed(seed)
-                    } else {
-                        setAuthState(AppState.AuthState.NO_SEED)
-                        setEncryptedSeed(null)
-                        setMnemonic(null)
-                        setPassword(null)
-                    }
-
-                    return@collect
-                }
-
-                val mnemonic = seed?.let { AttoMnemonic.fromPhrase(it) }
-                setMnemonic(mnemonic)
-
-                seed?.let {
-                    val password = passwordDataSource.getPassword(it)
-                    if (state.value.authState != AppState.AuthState.NEW_ACCOUNT &&
-                        state.value.authState != AppState.AuthState.SESSION_VALID
-                    ) {
-                        setPassword(password)
-                        setAuthState(
-                            password?.let {
-                                AppState.AuthState.SESSION_INVALID
-                            } ?: AppState.AuthState.NO_PASSWORD,
-                        )
-                    }
-                } ?: setAuthState(AppState.AuthState.NO_SEED)
-            }
-        }
-    }
-
-    suspend fun generateNewSecret(): List<String> {
-        val mnemonic = AttoMnemonic.generate()
-        val seed = mnemonic.words.joinToString(" ")
-
-        // If in web, don't store the seed yet
-        if (getPlatform().type == PlatformType.WEB) {
-            tempSeedDataSource.seed = seed
-        } else {
-            seedDataSource.setSeed(seed)
-        }
-
-        setAuthState(AppState.AuthState.NEW_ACCOUNT)
-
-        return mnemonic.words
-    }
-
-    suspend fun importSecret(secret: List<String>) {
-        val seed = secret.joinToString(" ")
-
-        // If in web, don't store the seed yet
-        if (getPlatform().type == PlatformType.WEB) {
-            tempSeedDataSource.seed = seed
-        } else {
-            seedDataSource.setSeed(seed)
-        }
-
-        val password = passwordDataSource.getPassword(seed)
-        if (password == null) {
-            setAuthState(AppState.AuthState.NEW_ACCOUNT)
-        }
-    }
-
-    suspend fun submitPassword(password: String): Boolean {
-        when (getPlatform().type) {
-            PlatformType.WEB -> {
-                val decrypted =
-                    seedAESInteractor
-                        .decryptSeed(
-                            encryptedSeed = state.value.encryptedSeed.orEmpty(),
-                            password = password,
-                        )
-
-                try {
-                    val mnemonic = AttoMnemonic.fromPhrase(decrypted)
-                    setMnemonic(mnemonic)
-                    setPassword(password)
-                    startSession()
-
-                    return true
-                } catch (ex: Exception) {
-                    return false
+        scope.launch {
+            mutex.withLock {
+                if (state.value.authState == AuthState.UNKNOWN) {
+                    _state.value = AppState(authState = keyStore.authState())
                 }
             }
+        }
+    }
 
-            else -> {
-                if (password == state.value.password) {
-                    startSession()
-                    return true
-                }
-
-                return false
-            }
+    suspend fun generateNewSecret(): List<String> =
+        mutex.withLock {
+            val mnemonic = AttoMnemonic.generate()
+            revoke(AuthState.NEW_ACCOUNT)
+            tempSeedDataSource.seed = mnemonic.words.joinToString(" ")
+            mnemonic.words
         }
 
-        return false
-    }
-
-    suspend fun savePassword(password: String) {
-        // If the platform is web, we store the seed
-        if (getPlatform().type == PlatformType.WEB) {
-            tempSeedDataSource.seed?.let {
-                seedDataSource.setSeed(
-                    seedAESInteractor.encryptSeed(it, password),
-                )
-            }
+    suspend fun importSecret(secret: List<String>) =
+        mutex.withLock {
+            val mnemonic = AttoMnemonic.fromWords(secret)
+            revoke(AuthState.NEW_ACCOUNT)
+            tempSeedDataSource.seed = mnemonic.words.joinToString(" ")
         }
 
-        state.value
-            .mnemonic
-            ?.words
-            ?.let {
-                passwordDataSource.setPassword(
-                    seed = it.joinToString(" "),
-                    password = password,
-                )
-
-                setPassword(password)
-                startSession()
-            }
-    }
-
-    suspend fun deleteKeys() {
-        seedDataSource.clearSeed()
-        setPassword(null)
-    }
-
-    suspend fun lock() {
-        sessionJob?.cancel()
-        sessionJob = null
-
-        if (getPlatform().type == PlatformType.WEB) {
-            setMnemonic(null)
+    suspend fun submitPassword(password: String): Boolean =
+        mutex.withLock {
+            val mnemonic = keyStore.unlock(password) ?: return@withLock false
+            startSession(mnemonic, password)
+            true
         }
 
-        setPassword(null)
-        setAuthState(AppState.AuthState.SESSION_INVALID)
+    suspend fun savePassword(password: String) =
+        mutex.withLock {
+            check(state.value.authState == AuthState.NEW_ACCOUNT || state.value.authState == AuthState.NO_PASSWORD) {
+                "No wallet is awaiting a password"
+            }
+            val mnemonic = keyStore.savePassword(tempSeedDataSource.seed, password)
+            startSession(mnemonic, password)
+        }
+
+    suspend fun deleteKeys() =
+        mutex.withLock {
+            revoke(AuthState.NO_SEED)
+            keyStore.clear()
+        }
+
+    suspend fun lock() =
+        mutex.withLock {
+            revoke(if (state.value.authState == AuthState.NO_SEED) AuthState.NO_SEED else AuthState.SESSION_INVALID)
+        }
+
+    private fun revoke(authState: AuthState) {
+        expiryJob?.cancel()
+        expiryJob = null
+        state.value.unlockedWallet?.close()
+        tempSeedDataSource.seed = null
+        _state.value = AppState(authState = authState)
     }
 
-    private suspend fun setEncryptedSeed(encryptedSeed: String?) {
-        _state.emit(
-            state.value.copy(
-                encryptedSeed = encryptedSeed,
-            ),
-        )
-    }
-
-    private suspend fun setMnemonic(mnemonic: AttoMnemonic?) {
-        _state.emit(
-            state.value.copy(
-                mnemonic = mnemonic,
-            ),
-        )
-    }
-
-    private suspend fun setAuthState(authState: AppState.AuthState) {
-        _state.emit(
-            state.value.copy(
-                authState = authState,
-            ),
-        )
-    }
-
-    private suspend fun setPassword(password: String?) {
-        _state.emit(
-            state.value.copy(
-                password = password,
-            ),
-        )
-    }
-
-    private suspend fun startSession() {
-        _state.emit(
-            state.value.copy(
-                authState = AppState.AuthState.SESSION_VALID,
-            ),
-        )
-
-        sessionJob?.cancel()
-        sessionJob =
-            sessionScope.launch {
+    private fun startSession(
+        mnemonic: AttoMnemonic,
+        password: String,
+    ) {
+        revoke(AuthState.SESSION_INVALID)
+        val unlockedWallet = UnlockedWallet(mnemonic, password, scope.coroutineContext)
+        _state.value = AppState(authState = AuthState.SESSION_VALID, unlockedWallet = unlockedWallet)
+        expiryJob =
+            scope.launch {
                 delay(SESSION_DURATION)
-
-                _state.emit(
-                    state.value.copy(
-                        password = null,
-                        authState = AppState.AuthState.SESSION_INVALID,
-                    ),
-                )
+                mutex.withLock {
+                    if (state.value.unlockedWallet === unlockedWallet) {
+                        revoke(AuthState.SESSION_INVALID)
+                    }
+                }
             }
     }
 

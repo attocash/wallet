@@ -17,11 +17,14 @@ import cash.atto.commons.wallet.AttoWallet
 import cash.atto.commons.wallet.AttoWalletAccount
 import cash.atto.wallet.model.AccountPreference
 import cash.atto.wallet.model.AccountPreferenceStatus
+import cash.atto.wallet.state.UnlockedWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 internal class WalletSession(
@@ -32,8 +35,9 @@ internal class WalletSession(
     private val accountPreferences: Map<String, AccountPreference>,
     private val accountMonitor: AttoAccountMonitor,
     private val worker: PersistentWorkCachingWorker,
+    private val unlockedWallet: UnlockedWallet,
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob(unlockedWallet.job))
     private val walletAccountsByPublicKey = walletAccounts.values.associateBy { it.address.publicKey }
 
     fun launch(block: suspend CoroutineScope.() -> Unit): Job = scope.launch(block = block)
@@ -85,47 +89,50 @@ internal class WalletSession(
         receiverAddress: AttoAddress,
         amount: AttoAmount,
         timestampProvider: suspend () -> AttoInstant,
-    ): WalletSendResult {
-        val walletAccount = walletAccount(index) ?: throw IllegalStateException("Wallet is not ready yet")
-        val account = walletAccount.account ?: throw IllegalStateException("Account is not open yet")
+    ): WalletSendResult =
+        run {
+            val walletAccount = walletAccount(index) ?: throw IllegalStateException("Wallet is not ready yet")
+            val account = walletAccount.account ?: throw IllegalStateException("Account is not open yet")
 
-        require(receiverAddress.publicKey != walletAccount.address.publicKey) { "You can't send $amount to yourself" }
-        if (amount > account.balance) {
-            throw IllegalStateException("${account.balance} balance is not enough to send $amount")
-        }
+            require(receiverAddress.publicKey != walletAccount.address.publicKey) { "You can't send $amount to yourself" }
+            if (amount > account.balance) {
+                throw IllegalStateException("${account.balance} balance is not enough to send $amount")
+            }
 
-        val timestamp = timestampProvider()
-        client.resetLastPublishMs()
-        val transaction =
-            wallet.send(
-                index = index,
-                receiverAddress = receiverAddress,
-                amount = amount,
-                timestamp = timestamp,
+            val timestamp = timestampProvider()
+            client.resetLastPublishMs()
+            val transaction =
+                wallet.send(
+                    index = index,
+                    receiverAddress = receiverAddress,
+                    amount = amount,
+                    timestamp = timestamp,
+                )
+
+            val block =
+                transaction.block as? AttoSendBlock
+                    ?: throw IllegalStateException("Expected send block but received ${transaction.block::class}")
+
+            WalletSendResult(
+                block = block,
+                publishMs = client.lastPublishMs,
             )
-
-        val block =
-            transaction.block as? AttoSendBlock
-                ?: throw IllegalStateException("Expected send block but received ${transaction.block::class}")
-
-        return WalletSendResult(
-            block = block,
-            publishMs = client.lastPublishMs,
-        )
-    }
+        }
 
     suspend fun changeRepresentative(
         index: AttoKeyIndex,
         representative: AttoAddress,
-    ) {
+    ) = run {
         wallet.change(index, representative)
+        Unit
     }
 
     suspend fun receive(
         receivable: AttoReceivable,
         representative: AttoAddress,
-    ) {
+    ) = run {
         wallet.receive(receivable, representative)
+        Unit
     }
 
     fun cacheNextWorkForActiveAccounts() {
@@ -159,6 +166,17 @@ internal class WalletSession(
     fun accountEntryStream(nextHeight: suspend (AttoAddress) -> AttoHeight) = accountMonitor.toAccountEntryMonitor(nextHeight).stream()
 
     fun receivableStream() = accountMonitor.receivableStream(minAmount = 1UL.toAttoAmount())
+
+    private suspend fun <T> run(action: suspend CoroutineScope.() -> T): T {
+        unlockedWallet.ensureActive()
+        scope.coroutineContext.ensureActive()
+        val operation = scope.async(block = action)
+        return try {
+            operation.await()
+        } finally {
+            operation.cancel()
+        }
+    }
 
     fun close() {
         scope.cancel()

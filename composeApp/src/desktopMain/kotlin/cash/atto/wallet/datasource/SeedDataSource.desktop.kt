@@ -2,7 +2,6 @@ package cash.atto.wallet.datasource
 
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.getPlatform
-import kotlinx.coroutines.flow.Flow
 
 actual class SeedDataSource {
     private val dataSourceDesktopImpl =
@@ -13,8 +12,7 @@ actual class SeedDataSource {
             else -> throw UnsupportedOperationException("Unsupported platform ${getPlatform()}")
         }
 
-    actual val seed: Flow<String?>
-        get() = dataSourceDesktopImpl.seed
+    actual suspend fun getSeed(): String? = dataSourceDesktopImpl.getSeed()
 
     actual suspend fun setSeed(seed: String) = dataSourceDesktopImpl.setSeed(seed)
 

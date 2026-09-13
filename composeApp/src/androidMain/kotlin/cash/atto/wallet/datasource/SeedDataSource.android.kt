@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import cash.atto.wallet.util.SecurityUtil
 import cash.atto.wallet.util.dataStore
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 actual class SeedDataSource(
@@ -18,7 +19,7 @@ actual class SeedDataSource(
     private val dataStore = context.dataStore
     private val key = stringPreferencesKey(SEED_KEY)
 
-    actual val seed =
+    private val seed =
         dataStore.data
             .map { preferences ->
                 with(preferences[key] ?: return@map null) {
@@ -39,6 +40,8 @@ actual class SeedDataSource(
                     )
                 }
             }
+
+    actual suspend fun getSeed(): String? = seed.first()
 
     actual suspend fun setSeed(seed: String) {
         val (iv, encryptedValue) = securityUtil.encryptData(securityKeyAlias, seed)
