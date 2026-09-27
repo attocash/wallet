@@ -2,6 +2,7 @@ package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoMnemonic
 import cash.atto.wallet.datasource.PasswordDataSource
+import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.datasource.TempSeedDataSource
 import cash.atto.wallet.interactor.SeedAESInteractor
@@ -28,8 +29,9 @@ class AppStateRepository internal constructor(
         tempSeedDataSource: TempSeedDataSource,
         passwordDataSource: PasswordDataSource,
         seedAESInteractor: SeedAESInteractor,
+        preferencesDataSource: PreferencesDataSource,
     ) : this(
-        PlatformWalletKeyStore(seedDataSource, passwordDataSource, seedAESInteractor),
+        PlatformWalletKeyStore(seedDataSource, passwordDataSource, seedAESInteractor, preferencesDataSource),
         tempSeedDataSource,
         CoroutineScope(Dispatchers.Default),
     )

@@ -6,6 +6,7 @@ import cash.atto.wallet.getPlatform
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.TermsAndConditionsRepository
+import cash.atto.wallet.repository.WalletStorageException
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.uistate.AppUiState
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AppViewModel(
@@ -24,6 +26,8 @@ class AppViewModel(
     private val _state = MutableStateFlow(AppUiState.DEFAULT)
     val state = _state.asStateFlow()
 
+    private val authenticationError = MutableStateFlow<String?>(null)
+
     private val scope = CoroutineScope(Dispatchers.Default)
 
     init {
@@ -31,9 +35,11 @@ class AppViewModel(
             combine(
                 appStateRepository.state,
                 termsAndConditionsRepository.accepted,
-            ) { appState, termsAndConditionsAccepted ->
+                authenticationError,
+            ) { appState, termsAndConditionsAccepted, error ->
                 AppUiState(
                     shownScreen = appState.shownScreen(),
+                    authenticationError = error,
                     termsAndConditionsAccepted = termsAndConditionsAccepted,
                 )
             }.collect { uiState ->
@@ -43,9 +49,16 @@ class AppViewModel(
     }
 
     suspend fun enterPassword(password: String?): Boolean {
+        authenticationError.value = null
+        if (!termsAndConditionsRepository.accepted.first()) return false
         val checkResult = checkPasswordInteractor.invoke(password)
         if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
-            return appStateRepository.submitPassword(password!!)
+            return try {
+                appStateRepository.submitPassword(password!!)
+            } catch (error: WalletStorageException) {
+                authenticationError.value = error.message
+                false
+            }
         }
 
         return false

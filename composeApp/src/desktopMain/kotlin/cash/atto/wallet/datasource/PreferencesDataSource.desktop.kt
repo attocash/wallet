@@ -57,6 +57,8 @@ actual class PreferencesDataSource {
         }
     }
 
+    actual suspend fun migrateStorage() = Unit
+
     private companion object {
         val blobKey = stringPreferencesKey("user_preferences_blob")
         val termsAndConditionsDateKey = stringPreferencesKey("terms_and_conditions_date")

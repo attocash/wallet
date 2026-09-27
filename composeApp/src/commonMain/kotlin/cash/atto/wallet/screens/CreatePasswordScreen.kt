@@ -22,6 +22,7 @@ import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPasswordField
 import cash.atto.wallet.components.common.AttoScreenSubtitle
 import cash.atto.wallet.components.common.AttoScreenTitle
+import cash.atto.wallet.components.login.AttoTermsAcceptance
 import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_bg
 import cash.atto.wallet.ui.dark_border
@@ -45,10 +46,15 @@ fun CreatePasswordScreen(
 ) {
     val viewModel = koinViewModel<CreatePasswordViewModel>()
     val uiState = viewModel.state.collectAsState()
+    val termsAccepted = viewModel.termsAndConditionsAccepted.collectAsState(false)
     val coroutineScope = rememberCoroutineScope()
 
     CreatePassword(
         uiState = uiState.value,
+        termsAndConditionsAccepted = termsAccepted.value,
+        onTermsAndConditionsAcceptedChange = { accepted ->
+            coroutineScope.launch { viewModel.setTermsAndConditionsAccepted(accepted) }
+        },
         onBackNavigation = onBackNavigation,
         onConfirmClick = {
             coroutineScope.launch {
@@ -78,6 +84,8 @@ fun CreatePassword(
     onConfirmClick: () -> Unit,
     onPasswordChanged: (String) -> Unit,
     onPasswordConfirmChanged: (String) -> Unit,
+    termsAndConditionsAccepted: Boolean = false,
+    onTermsAndConditionsAcceptedChange: (Boolean) -> Unit = {},
 ) {
     var showPassword by remember { mutableStateOf(false) }
     var showPasswordConfirm by remember { mutableStateOf(false) }
@@ -92,7 +100,7 @@ fun CreatePassword(
     val allRequirementsMet = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecial
     val passwordsMatch = password.isNotEmpty() && passwordConfirm.isNotEmpty() && password == passwordConfirm
     val showMismatch = passwordConfirm.isNotEmpty() && !passwordsMatch
-    val canProceed = allRequirementsMet && passwordsMatch
+    val canProceed = allRequirementsMet && passwordsMatch && termsAndConditionsAccepted
     val scrollState = rememberScrollState()
 
     Box(
@@ -198,15 +206,29 @@ fun CreatePassword(
                         )
                     }
 
+                    AttoTermsAcceptance(
+                        accepted = termsAndConditionsAccepted,
+                        onAcceptedChange = onTermsAndConditionsAcceptedChange,
+                        modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    )
+
                     AttoButton(
                         text = stringResource(Res.string.password_create_next),
                         onClick = onConfirmClick,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(top = 32.dp),
+                                .padding(top = 16.dp),
                         enabled = canProceed,
                     )
+                    uiState.storageError?.let { message ->
+                        Text(
+                            text = message,
+                            color = dark_danger,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                        )
+                    }
                 }
             }
         }

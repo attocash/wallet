@@ -4,6 +4,7 @@ import cash.atto.wallet.model.TermsAndConditions
 
 data class AppUiState(
     val shownScreen: ShownScreen,
+    val authenticationError: String? = null,
     val termsAndConditionsAccepted: Boolean = false,
     val termsAndConditionsDate: String = TermsAndConditions.EFFECTIVE_DATE,
 ) {

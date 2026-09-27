@@ -1,0 +1,10 @@
+{
+  "name": "password-crypto-worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "hash-wasm": "4.12.0"
+  }
+}

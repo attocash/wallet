@@ -4,10 +4,17 @@ import cash.atto.commons.AttoMnemonic
 import cash.atto.commons.AttoMnemonicException
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PasswordDataSource
+import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.getPlatform
+import cash.atto.wallet.interactor.DecryptedWalletData
+import cash.atto.wallet.interactor.EncryptedDataPurpose
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState.AuthState
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
 
 internal interface WalletKeyStore {
     suspend fun authState(): AuthState
@@ -26,6 +33,7 @@ internal class PlatformWalletKeyStore(
     private val seedDataSource: SeedDataSource,
     private val passwordDataSource: PasswordDataSource,
     private val seedAESInteractor: SeedAESInteractor,
+    private val preferencesDataSource: PreferencesDataSource,
 ) : WalletKeyStore {
     private val isWeb = getPlatform().type == PlatformType.WEB
 
@@ -40,17 +48,62 @@ internal class PlatformWalletKeyStore(
 
     override suspend fun unlock(password: String): AttoMnemonic? {
         val storedSeed = seedDataSource.getSeed() ?: return null
-        val phrase =
+        val decrypted =
             if (isWeb) {
-                seedAESInteractor.decryptSeed(storedSeed, password)
+                seedAESInteractor.decryptSeed(storedSeed, password, EncryptedDataPurpose.SEED) ?: return null
             } else {
                 if (passwordDataSource.getPassword(storedSeed) != password) return null
-                storedSeed
+                DecryptedWalletData(storedSeed, needsMigration = false)
             }
-        return try {
-            AttoMnemonic.fromPhrase(phrase)
-        } catch (_: AttoMnemonicException) {
-            null
+        val mnemonic =
+            try {
+                AttoMnemonic.fromPhrase(decrypted.plaintext)
+            } catch (_: AttoMnemonicException) {
+                return null
+            }
+        if (isWeb) migrateEncryptedWallet(storedSeed, decrypted, password)
+        return mnemonic
+    }
+
+    private suspend fun migrateEncryptedWallet(
+        storedSeed: String,
+        seed: DecryptedWalletData,
+        password: String,
+    ) {
+        try {
+            val storedPreferences = preferencesDataSource.blob.first()
+            val preferences =
+                if (storedPreferences.isNullOrBlank()) {
+                    null
+                } else {
+                    // Logout can leave preferences belonging to a previous password. Preserve unreadable records.
+                    seedAESInteractor.decryptSeed(storedPreferences, password, EncryptedDataPurpose.PREFERENCES)
+                }
+            val updatedPreferences =
+                if (preferences?.needsMigration == true) {
+                    seedAESInteractor.encryptSeed(preferences.plaintext, password, EncryptedDataPurpose.PREFERENCES)
+                } else {
+                    null
+                }
+            val updatedSeed =
+                if (seed.needsMigration) {
+                    seedAESInteractor.encryptSeed(seed.plaintext, password, EncryptedDataPurpose.SEED)
+                } else {
+                    null
+                }
+
+            currentCoroutineContext().ensureActive()
+            // Each record is independently versioned and replaced atomically. An interrupted pair resumes on unlock.
+            if (updatedPreferences != null) preferencesDataSource.setBlob(updatedPreferences)
+            preferencesDataSource.migrateStorage()
+            currentCoroutineContext().ensureActive()
+            seedDataSource.setSeed(updatedSeed ?: storedSeed)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: WalletStorageException) {
+            throw error
+        } catch (error: Throwable) {
+            throw WalletStorageException("Could not update wallet storage. Please try again.", error)
         }
     }
 
@@ -67,7 +120,7 @@ internal class PlatformWalletKeyStore(
             }
         val mnemonic = AttoMnemonic.fromPhrase(pendingPhrase)
         if (isWeb) {
-            seedDataSource.setSeed(seedAESInteractor.encryptSeed(pendingPhrase, password))
+            seedDataSource.setSeed(seedAESInteractor.encryptSeed(pendingPhrase, password, EncryptedDataPurpose.SEED))
         } else {
             passwordDataSource.setPassword(pendingPhrase, password)
             seedDataSource.setSeed(pendingPhrase)

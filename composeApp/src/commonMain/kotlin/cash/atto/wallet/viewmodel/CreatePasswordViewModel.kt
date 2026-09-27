@@ -3,16 +3,25 @@ package cash.atto.wallet.viewmodel
 import androidx.lifecycle.ViewModel
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.TermsAndConditionsRepository
+import cash.atto.wallet.repository.WalletStorageException
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 
 class CreatePasswordViewModel(
     private val appStateRepository: AppStateRepository,
     private val checkPasswordInteractor: CheckPasswordInteractor,
+    private val termsAndConditionsRepository: TermsAndConditionsRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CreatePasswordUIState.DEFAULT)
     val state = _state.asStateFlow()
+    val termsAndConditionsAccepted = termsAndConditionsRepository.accepted
+
+    suspend fun setTermsAndConditionsAccepted(accepted: Boolean) {
+        termsAndConditionsRepository.setCurrentTermsAccepted(accepted)
+    }
 
     suspend fun setPassword(password: String?) {
         _state.emit(
@@ -31,6 +40,7 @@ class CreatePasswordViewModel(
     }
 
     suspend fun savePassword(): Boolean {
+        if (!termsAndConditionsAccepted.first()) return false
         var checkResult = checkPasswordInteractor.invoke(state.value.password)
         if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
             checkResult = checkPasswordsMatch()
@@ -39,11 +49,17 @@ class CreatePasswordViewModel(
         _state.emit(
             state.value.copy(
                 checkState = checkResult,
+                storageError = null,
             ),
         )
 
         if (checkResult == CreatePasswordUIState.PasswordCheckState.VALID) {
-            appStateRepository.savePassword(state.value.password!!)
+            try {
+                appStateRepository.savePassword(state.value.password!!)
+            } catch (error: WalletStorageException) {
+                _state.emit(state.value.copy(storageError = error.message))
+                return false
+            }
         }
 
         return checkResult == CreatePasswordUIState.PasswordCheckState.VALID

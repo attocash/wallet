@@ -3,6 +3,7 @@ package cash.atto.wallet.repository
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.getPlatform
+import cash.atto.wallet.interactor.EncryptedDataPurpose
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.model.UserPreferences
@@ -161,6 +162,7 @@ class PreferencesRepository(
                 seedAESInteractor.encryptSeed(
                     seed = rawJson,
                     password = password,
+                    purpose = EncryptedDataPurpose.PREFERENCES,
                 )
             } else {
                 rawJson
@@ -183,10 +185,13 @@ class PreferencesRepository(
                     return UserPreferences.EMPTY
                 }
 
-                seedAESInteractor.decryptSeed(
-                    encryptedSeed = storedPreferences,
-                    password = password,
-                )
+                seedAESInteractor
+                    .decryptSeed(
+                        encryptedSeed = storedPreferences,
+                        password = password,
+                        purpose = EncryptedDataPurpose.PREFERENCES,
+                    )?.plaintext
+                    .orEmpty()
             } else {
                 storedPreferences
             }

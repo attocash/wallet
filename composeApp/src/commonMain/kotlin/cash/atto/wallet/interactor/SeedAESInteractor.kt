@@ -4,10 +4,12 @@ expect class SeedAESInteractor {
     suspend fun encryptSeed(
         seed: String,
         password: String,
+        purpose: EncryptedDataPurpose,
     ): String
 
     suspend fun decryptSeed(
         encryptedSeed: String,
         password: String,
-    ): String
+        purpose: EncryptedDataPurpose,
+    ): DecryptedWalletData?
 }

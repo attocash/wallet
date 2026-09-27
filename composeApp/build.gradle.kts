@@ -200,11 +200,10 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.atto.commons.worker.web)
-            implementation(libs.androidx.datastore.core.okio)
-            implementation(libs.androidx.datastore.preferences.core)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             implementation(libs.sqlite.web)
             implementation(npm("@zxing/library", "0.23.0"))
+            implementation(npm("password-crypto-worker", layout.projectDirectory.dir("password-crypto-worker").asFile))
             implementation(
                 npm(
                     "sqlite-web-worker",
@@ -220,7 +219,11 @@ kotlin {
         }
 
         wasmJsTest.dependencies {
+            // Produce legacy fixtures with the original serializer to verify storage compatibility.
+            implementation(libs.androidx.datastore.core.okio)
+            implementation(libs.androidx.datastore.preferences.core)
             implementation(devNpm("puppeteer", "latest"))
+            implementation(devNpm("hash-wasm", "4.12.0"))
         }
     }
 

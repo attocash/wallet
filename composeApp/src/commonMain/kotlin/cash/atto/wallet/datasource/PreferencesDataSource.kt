@@ -14,4 +14,6 @@ expect class PreferencesDataSource {
     suspend fun clearTermsAndConditionsDate()
 
     suspend fun setWork(work: String)
+
+    suspend fun migrateStorage()
 }

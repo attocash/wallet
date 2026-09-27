@@ -4,6 +4,7 @@ data class CreatePasswordUIState(
     val password: String?,
     val passwordConfirm: String?,
     val checkState: PasswordCheckState,
+    val storageError: String? = null,
 ) {
     val showError
         get() =

@@ -131,6 +131,7 @@ fun AttoNavHost(
                 }
             },
             passwordValid = passwordValid.value,
+            errorMessage = uiState.authenticationError,
             termsAndConditionsAccepted = uiState.termsAndConditionsAccepted,
             termsAndConditionsDate = uiState.termsAndConditionsDate,
             onTermsAndConditionsAcceptedChange = { accepted ->
@@ -183,6 +184,7 @@ fun AttoNavHost(
                     }
                 },
                 passwordValid = passwordValid.value,
+                errorMessage = uiState.authenticationError,
                 termsAndConditionsAccepted = uiState.termsAndConditionsAccepted,
                 termsAndConditionsDate = uiState.termsAndConditionsDate,
                 onTermsAndConditionsAcceptedChange = { accepted ->
