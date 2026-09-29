@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import attowallet.composeapp.generated.resources.Res
+import attowallet.composeapp.generated.resources.send_scan_qr
 import cash.atto.wallet.components.common.*
 import cash.atto.wallet.components.send.SavedAddressesDialog
 import cash.atto.wallet.model.LabeledPreferenceEntry
@@ -34,6 +36,7 @@ import cash.atto.wallet.viewmodel.OverviewViewModel
 import cash.atto.wallet.viewmodel.SendTransactionViewModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -254,7 +257,7 @@ private fun SendFromContent(
 
     if (showQrScanner.value && qrScannerContent != null) {
         AttoModal(
-            title = "Scan QR Code",
+            title = stringResource(Res.string.send_scan_qr),
             onDismiss = { showQrScanner.value = false },
             scrollable = false,
         ) {
@@ -503,7 +506,7 @@ private fun SendFormPanel(
                                     if (hasQrScanner) {
                                         AttoCircleIconButton(
                                             icon = Icons.Default.QrCodeScanner,
-                                            contentDescription = "Scan QR",
+                                            contentDescription = stringResource(Res.string.send_scan_qr),
                                             tint = dark_accent,
                                             background = Color.Transparent,
                                             onClick = onShowQr,
