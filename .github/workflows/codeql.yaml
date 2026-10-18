@@ -37,8 +37,9 @@ jobs:
           languages: java-kotlin
           build-mode: manual
 
-      - name: Manual Build
-        run: ./gradlew :composeApp:compileKotlinWasmJs
+      - name: Build JVM target for CodeQL
+        # CodeQL's Kotlin extractor requires JVM compilation of the shared code.
+        run: ./gradlew --no-daemon --no-build-cache --rerun-tasks :composeApp:compileKotlinDesktop
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
