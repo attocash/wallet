@@ -40,6 +40,7 @@
 - Treat `DESIGN.md` as the canonical product design system for colors, typography, spacing, shape scale, component tokens, and resolved design conflicts. `evidence-matrix.md` records the evidence and conflict decisions behind that system.
 - Reuse shared Compose primitives under `composeApp/src/commonMain/kotlin/cash/atto/wallet/components/common` before adding new screen-local widgets. The repo already ships wallet-specific wrappers such as `AttoButton`, `AttoTextField`, `AttoCard`, `AttoModal`, and `AttoTransactionCard`.
 - For Compose UI changes, use `.agents/skills/atto-components` for component reuse workflow and `.agents/skills/atto-style` for implementation workflow. If either skill conflicts with `DESIGN.md`, `DESIGN.md` wins and the skill should be updated.
+- For logo/icon resource changes, use `.agents/skills/logo-assets`. The canonical mark is `composeApp/src/commonMain/composeResources/drawable/logo.svg`; regenerate platform exports with `node scripts/generate-logo-assets.mjs` rather than editing copies independently.
 
 ## Testing Reality
 

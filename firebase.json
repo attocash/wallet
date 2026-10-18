@@ -83,6 +83,15 @@
         ]
       },
       {
+        "source": "**/@(logo*|app_logo*|og-image).@(svg|ico|png)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
         "source": "**/service-worker*.js",
         "headers": [
           {

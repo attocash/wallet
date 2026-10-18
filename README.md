@@ -254,7 +254,17 @@ Repository deployment shape:
 
 If you are wiring up manual deployment outside CI, keep that artifact path mismatch in mind.
 
-The social preview image is generated from a hidden Compose route so it stays in the same design system as the wallet. Start the web dev server, open or capture `?screen=og-image` at `1200x630`, then write the result to `composeApp/src/wasmJsMain/resources/og-image.png`:
+The canonical logo is `composeApp/src/commonMain/composeResources/drawable/logo.svg`. Edit that file, then regenerate all platform variants with Node.js and ImageMagick (including its librsvg delegate):
+
+```bash
+node scripts/generate-logo-assets.mjs
+```
+
+The generator exports the browser SVGs, PNG/ICO fallbacks, desktop package icons, Android launcher/store icons, and the iOS catalog icon. These checked-in exports let normal builds run without ImageMagick and keep packaging portable across Windows, macOS, and Linux. Keep the generated copies in sync rather than editing them separately or replacing them with filesystem symlinks.
+
+The regular mark has transparent bounds for in-app use and favicons. The opaque maskable SVG and its PNG exports keep the entire mark inside a centered circle of roughly 76% of the canvas width, with room inside the standard 80% safe circle. Both SVG and PNG entries are declared in the manifest; the browser chooses the supported icon. The Apple touch icon uses the same opaque padded layout. Native Android icons retain their white backgrounds and use Android-specific adaptive padding. The unused black SVG variant is retained as a vector source alternative. Stable logo/social-preview URLs revalidate through Firebase Hosting; worker updates reload their precached files, including the shared Compose SVG, rather than reusing an older HTTP-cache copy.
+
+The social preview image embeds the shared logo and is generated separately from a hidden Compose route so it stays in the same design system as the wallet. After changing the canonical logo, start the web dev server, open or capture `?screen=og-image` at `1200x630`, then write the result to `composeApp/src/wasmJsMain/resources/og-image.png`:
 
 ```bash
 ./gradlew wasmJsBrowserDevelopmentRun
