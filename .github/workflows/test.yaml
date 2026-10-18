@@ -21,6 +21,6 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - uses: gradle/actions/setup-gradle@v6.2.0
+      - uses: gradle/actions/setup-gradle@v6
 
       - run: ./gradlew allTests
