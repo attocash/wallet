@@ -32,7 +32,7 @@ kotlinx-serialization = "1.11.0"
 ksp = "2.3.12"
 ktor = "3.6.0"
 ktlint = "14.2.0"
-slf4j = "2.0.19"
+slf4j = "2.0.20"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
