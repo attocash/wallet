@@ -1,3 +1,4 @@
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -240,6 +241,15 @@ tasks.configureEach {
         name.endsWith("ProcessResources")
     ) {
         dependsOn(generateAppVersionArtifacts)
+    }
+}
+
+tasks.withType<Sync>().matching { it.name.startsWith("wasmJsBrowser") && it.name.endsWith("Distribution") }.configureEach {
+    val processedResources = tasks.named<ProcessResources>("wasmJsProcessResources")
+    filesMatching(listOf("manifest.webmanifest", "service-worker.js")) {
+        if (file.parentFile == processedResources.get().destinationDir) {
+            exclude()
+        }
     }
 }
 

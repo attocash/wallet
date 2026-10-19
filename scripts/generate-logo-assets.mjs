@@ -26,17 +26,21 @@ if (!logoSvg.includes('viewBox="-2.5 -3.2 61 61"') || !logoSvg.includes("</defs>
 // Preserve the mark's center (28, 27.3), adding equal padding on every side.
 // The complete mark occupies about 76% of this square's diameter, inside the
 // maskable icon's guaranteed central circle with diameter 80% of the canvas.
-const maskableSvg = logoSvg
-  .replace('viewBox="-2.5 -3.2 61 61"', 'viewBox="-8 -8.7 72 72"')
+const paddedSvg = logoSvg.replace('viewBox="-2.5 -3.2 61 61"', 'viewBox="-8 -8.7 72 72"');
+const maskableSvg = paddedSvg
   .replace("</defs>", '</defs>\n  <rect x="-8" y="-8.7" width="72" height="72" fill="#111113"/>');
+// Monochrome consumers select the shape from alpha and supply their own colors.
+const monochromeSvg = paddedSvg.replace(/fill="#[0-9a-fA-F]{6}"/g, 'fill="#FFFFFF"');
 
 writeFileSync(resolve(web, "logo.svg"), generatedNotice + logoSvg);
 writeFileSync(resolve(web, "logo-black.svg"), generatedNotice + logoSvg.replace(/fill="#[0-9a-fA-F]{6}"/g, 'fill="black"'));
 writeFileSync(resolve(web, "logo-maskable.svg"), generatedNotice + maskableSvg);
+writeFileSync(resolve(web, "logo-monochrome.svg"), generatedNotice + monochromeSvg);
 
 for (const size of [192, 512]) {
   renderSvg(logoSvg, size, resolve(web, `logo-${size}.png`));
   renderSvg(maskableSvg, size, resolve(web, `logo-maskable-${size}.png`), { opaque: true });
+  renderSvg(monochromeSvg, size, resolve(web, `logo-monochrome-${size}.png`));
 }
 renderSvg(maskableSvg, 180, resolve(web, "logo-touch-180.png"), { opaque: true });
 renderSvg(logoSvg, 48, resolve(web, "logo.ico"));

@@ -12,9 +12,12 @@ const APP_SHELL = [
   "./logo-512.png",
   "./logo-maskable-192.png",
   "./logo-maskable-512.png",
+  "./logo-monochrome-192.png",
+  "./logo-monochrome-512.png",
   "./og-image.png",
   "./logo.svg",
   "./logo-maskable.svg",
+  "./logo-monochrome.svg",
   "./logo.ico",
   "./composeResources/attowallet.composeapp.generated.resources/drawable/logo.svg",
   "./composeResources/attowallet.composeapp.generated.resources/font/noto_sans_variable.ttf"
