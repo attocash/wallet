@@ -36,7 +36,7 @@ jobs:
       - id: semantic
         name: Semantic Release Dry Run
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v8
         with:
           semantic_version: 24.2.7
           dry_run: true
@@ -114,7 +114,7 @@ jobs:
           tar -C artifacts/web -czf "build/release-assets/AttoWallet-web-${{ needs.version.outputs.version }}.tar.gz" .
 
       - name: Publish Release
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v8
         with:
           semantic_version: 24.2.7
         env:
