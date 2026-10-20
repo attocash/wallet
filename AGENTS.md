@@ -1,48 +1,41 @@
-# AGENTS
+# Repository Guidelines
 
-## Scope
+## Project Structure & Module Organization
 
-- Treat the web/Wasm target as the source of truth. `README.md` and CI both treat `wasmJs` as the actively supported target; desktop and Android remain in the repo but are not regularly validated.
-- The repo has one Gradle module: `:composeApp`. Most app work lives under `composeApp/src/commonMain`; platform-specific code is in `androidMain`, `desktopMain`, and `wasmJsMain`.
+Atto Wallet is a Kotlin/Compose Multiplatform app with one Gradle module, `:composeApp`. Wasm is the only stable target. Desktop works and is maintained on a best-effort basis. Android is unreleased: its code evolves, but we do not run or test it. iOS scaffolding is inactive.
 
-## Commands
+Under `composeApp/src/`, `commonMain` holds shared UI, repositories, and domain logic; `wasmJsMain`, `desktopMain`, and `androidMain` contain platform implementations. Tests live in `commonTest`, `wasmJsTest`, and `androidInstrumentedTest`. Assets live in `commonMain/composeResources` and `wasmJsMain/resources`; Room schemas are in `composeApp/schemas/`.
 
-- Run the main CI-equivalent verification with `./gradlew allTests`.
-- Run formatting with `./gradlew ktlintFormat`. Do not run `./gradlew ktlintCheck` unless explicitly requested; CI does not run ktlint for you.
-- Start the main dev target with `./gradlew wasmJsBrowserDevelopmentRun`.
-- Build the production web artifact with `./gradlew wasmJsBrowserDistribution`.
-- Run the desktop app with `./gradlew composeApp:run`.
-- Install the Android debug build with `./gradlew composeApp:installDebug`.
-- For a focused Wasm compile check, use `./gradlew :composeApp:compileKotlinWasmJs`.
+## Build, Test, and Development Commands
 
-## Commit Messages
+Use JDK 17 and Node.js/npm for web development. Run from the repository root:
 
-- Use Conventional Commit-style SemVer prefixes for commit subjects, such as `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, or `build:`.
-- Use the prefix that matches the user-facing version impact or maintenance category.
+- `./gradlew wasmJsBrowserDevelopmentRun` — start the web development server.
+- `./gradlew composeApp:run` — run desktop.
+- `./gradlew :composeApp:compileKotlinWasmJs` — compile Wasm.
+- `./gradlew wasmJsBrowserDistribution` — build the production web bundle.
+- `./gradlew allTests` — run the main CI test task.
+- `./gradlew :composeApp:wasmJsBrowserTest` — run browser tests, as web-build CI does.
+- `./gradlew ktlintFormat` — format Kotlin sources.
 
-## Verified Gotchas
+Rerun a failing Wasm incremental compilation task once with `--rerun-tasks`. CI does not run ktlint; run `ktlintCheck` only when explicitly requested.
 
-- If Kotlin/Wasm incremental compilation flakes, rerun the failing Wasm task once with `--rerun-tasks`; `README.md` calls this out explicitly for `wasmJsBrowserDevelopmentRun` and `:composeApp:compileKotlinWasmJs`.
-- Web builds require Node/npm because `composeApp/sqlite-web-worker/package.json` provides the local `sqlite-web-worker` npm dependency used by `wasmJsMain`.
-- Firebase hosting serves `artifacts/web` (`firebase.json`), but Gradle outputs the web bundle to `composeApp/build/dist/wasmJs/productionExecutable`; CI bridges that mismatch by downloading the uploaded web artifact into `artifacts/` before deploy.
-- Builds use `app.version` when passed explicitly with `-Papp.version=...`; otherwise `composeApp/build.gradle.kts` falls back to `git rev-parse --short HEAD` for app-facing unreleased versioning. Desktop package metadata still needs a valid numeric version, so unreleased packaging falls back to `0.0.0`.
-- The app is hard-wired to `AttoNetwork.LIVE` in `composeApp/src/commonMain/kotlin/cash/atto/wallet/di/Modules.kt`.
+## Coding Style & Naming Conventions
 
-## Architecture
+Follow `.editorconfig`: four-space Kotlin/Kotlin DSL indentation, two spaces otherwise, LF endings, and 140-character code lines. Use official Kotlin style, PascalCase types/Composables, camelCase members, and explicit imports. Keep shared logic in `commonMain` and platform details behind existing `expect`/`actual` boundaries.
 
-- Real web entrypoint: `composeApp/src/wasmJsMain/kotlin/cash/atto/wallet/Main.kt`.
-- Shared app shell/navigation: `composeApp/src/commonMain/kotlin/cash/atto/wallet/AttoNavHost.kt`, `DWNavigation.kt`, and `AttoDestination.kt`.
-- Shared DI starts from `composeApp/src/commonMain/kotlin/cash/atto/wallet/di/Modules.kt` and `Koin.kt`; platform storage/database bindings come from `expect`/`actual` modules (`databaseModule`, `dataSourceModule`).
-- Repositories called out by the repo docs and DI are the main data flow boundaries: `AppStateRepository`, `HomeRepository`, `MetricsRepository`, `VotersRepository`, and `WalletManagerRepository`.
+## Testing Guidelines
 
-## UI Conventions
+Shared and Wasm tests use `kotlin.test` and coroutine test utilities. Android instrumented tests use AndroidX/JUnit but are not run. Name files `*Test.kt` and use descriptive backtick test names. Add focused behavior tests in the appropriate source set. No coverage percentage is enforced. Report automated checks and manual browser validation separately.
 
-- Treat `DESIGN.md` as the canonical product design system for colors, typography, spacing, shape scale, component tokens, and resolved design conflicts. `evidence-matrix.md` records the evidence and conflict decisions behind that system.
-- Reuse shared Compose primitives under `composeApp/src/commonMain/kotlin/cash/atto/wallet/components/common` before adding new screen-local widgets. The repo already ships wallet-specific wrappers such as `AttoButton`, `AttoTextField`, `AttoCard`, `AttoModal`, and `AttoTransactionCard`.
-- For Compose UI changes, use `.agents/skills/atto-components` for component reuse workflow and `.agents/skills/atto-style` for implementation workflow. If either skill conflicts with `DESIGN.md`, `DESIGN.md` wins and the skill should be updated.
-- For logo/icon resource changes, use `.agents/skills/logo-assets`. The canonical mark is `composeApp/src/commonMain/composeResources/drawable/logo.svg`; regenerate platform exports with `node scripts/generate-logo-assets.mjs` rather than editing copies independently.
+## UI & Assets
 
-## Testing Reality
+Follow canonical `DESIGN.md`; reuse `components/common/Atto*` primitives. For Compose changes, use `.agents/skills/atto-components` and `.agents/skills/atto-style`; `DESIGN.md` wins conflicts. For branding, use `.agents/skills/logo-assets`, edit `composeApp/src/commonMain/composeResources/drawable/logo.svg`, and regenerate exports with `node scripts/generate-logo-assets.mjs`.
 
-- CI runs only `./gradlew allTests` on Linux/macOS/Windows plus packaging/web build workflows. It does not run ktlint.
-- Checked-in test coverage is currently sparse. The only obvious test source in the repo is Android instrumented: `composeApp/src/androidInstrumentedTest/kotlin/cash/atto/wallet/PasswordDataSourceTest.kt`. Do not assume broad automated coverage across targets.
+## Commit & Pull Request Guidelines
+
+Use Conventional Commit prefixes matching scope and impact, such as `fix:`, `feat:`, or `chore(deps):`. Keep changes focused. Describe behavior changes, link relevant issues, record validation, and include screenshots for UI changes.
+
+## Configuration Notes
+
+DI selects `AttoNetwork.LIVE`. Production bundles land in `composeApp/build/dist/wasmJs/productionExecutable`; Firebase serves `artifacts/web`, populated by CI. Use `-Papp.version=...` for releases; otherwise app versions use the Git SHA and desktop packaging uses `0.0.0`.
