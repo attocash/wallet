@@ -9,6 +9,7 @@ import cash.atto.commons.AttoHeight
 import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoUnit
+import cash.atto.commons.toAddress
 
 private const val ACCOUNT_PUBLIC_KEY_HEX = "1111111111111111111111111111111111111111111111111111111111111111"
 private const val SUBJECT_PUBLIC_KEY_HEX = "2222222222222222222222222222222222222222222222222222222222222222"
@@ -22,12 +23,10 @@ fun testAccountEntry(
 ): AttoAccountEntry =
     AttoAccountEntry(
         hash = AttoHash.parse(hashHex),
-        algorithm = AttoAlgorithm.V1,
-        publicKey = AttoPublicKey.parse(ACCOUNT_PUBLIC_KEY_HEX),
+        address = AttoPublicKey.parse(ACCOUNT_PUBLIC_KEY_HEX).toAddress(AttoAlgorithm.V1),
         height = AttoHeight(height),
         blockType = blockType,
-        subjectAlgorithm = AttoAlgorithm.V1,
-        subjectPublicKey = AttoPublicKey.parse(SUBJECT_PUBLIC_KEY_HEX),
+        subjectAddress = AttoPublicKey.parse(SUBJECT_PUBLIC_KEY_HEX).toAddress(AttoAlgorithm.V1),
         previousBalance = AttoAmount.from(AttoUnit.ATTO, previousBalanceAtto),
         balance = AttoAmount.from(AttoUnit.ATTO, balanceAtto),
         timestamp = AttoInstant.fromEpochMilliseconds(height.toLong() * 1_000L),

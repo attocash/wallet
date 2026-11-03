@@ -1,6 +1,7 @@
 package cash.atto.wallet.repository
 
 import cash.atto.commons.AttoAccountEntry
+import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoBlockType
 import cash.atto.commons.AttoPublicKey
@@ -73,16 +74,18 @@ class PersistentAccountEntryRepository(
         )
     }
 
-    override suspend fun stream(publicKey: AttoPublicKey): Flow<AttoAccountEntry> {
+    override suspend fun stream(address: AttoAddress): Flow<AttoAccountEntry> {
         val lastEntryFlow =
             flow {
-                last(publicKey)?.let { emit(it) }
+                last(address)?.let { emit(it) }
             }
 
-        return merge(lastEntryFlow, flow(publicKey))
+        return merge(lastEntryFlow, flow(address.publicKey))
     }
 
-    override suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? =
+    override suspend fun last(address: AttoAddress): AttoAccountEntry? = last(address.publicKey)
+
+    suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? =
         dao.last(publicKey.value)?.let { json.decodeFromString<AttoAccountEntry>(it) }
 
     fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> = flow.filter { it.publicKey == publicKey }

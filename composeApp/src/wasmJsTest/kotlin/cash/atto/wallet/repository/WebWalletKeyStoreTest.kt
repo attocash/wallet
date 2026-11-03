@@ -78,7 +78,7 @@ class WebWalletKeyStoreTest {
                 PlatformWalletKeyStore(seedStorage, PasswordDataSource(), SeedAESInteractor(SaltDataSource()), preferencesStorage)
             val temporary = TempSeedDataSource()
             val repository = AppStateRepository(keyStore, temporary, backgroundScope)
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val password = "Synthetic7!"
             try {
                 repository.importSecret(mnemonic.words)
@@ -235,7 +235,7 @@ class WebWalletKeyStoreTest {
             // Given
             installLegacyWallet()
             val oldPreferences = preferencesStorage.blob.first()
-            val replacement = AttoMnemonic.fromEntropy(ByteArray(33) { 1 })
+            val replacement = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE) { 1 })
             val replacementPassword = "Replacement8!"
             keyStore().clear()
             keyStore().savePassword(replacement.phrase, replacementPassword)
@@ -252,7 +252,7 @@ class WebWalletKeyStoreTest {
     fun `PBKDF2 envelopes migrate to Argon2 without changing the password or plaintext`() =
         runTest {
             // Given
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val oldSeed = encryptPbkdf2Envelope(mnemonic.phrase, PASSWORD, "seed")
             val oldPreferences = encryptPbkdf2Envelope(PREFERENCES, PASSWORD, "preferences")
             SeedDataSource().setSeed(oldSeed)
@@ -282,7 +282,7 @@ class WebWalletKeyStoreTest {
     fun `already upgraded mnemonic moves to the new key without reencryption and migrates public settings`() =
         runTest {
             // Given
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val encrypted = SeedAESInteractor(SaltDataSource()).encryptSeed(mnemonic.phrase, PASSWORD, EncryptedDataPurpose.SEED)
             localStorage.removeItem("mnemonic")
             localStorage.setItem("seed", encrypted)
@@ -400,7 +400,7 @@ class WebWalletKeyStoreTest {
     private suspend fun installLegacyWallet(): AttoMnemonic {
         restoreStorageWrites()
         localStorage.setItem("salt", LEGACY_SALT)
-        val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+        val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
         localStorage.removeItem("mnemonic")
         localStorage.setItem("seed", encryptLegacy(mnemonic.phrase, PASSWORD))
         installLegacyPreferences(encryptLegacy(PREFERENCES, PASSWORD), terms = TermsAndConditions.EFFECTIVE_DATE, work = "{}")

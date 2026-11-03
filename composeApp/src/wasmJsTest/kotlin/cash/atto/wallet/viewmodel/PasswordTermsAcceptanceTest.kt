@@ -33,7 +33,7 @@ class PasswordTermsAcceptanceTest {
             val terms = TermsAndConditionsRepository(preferences)
             val temporary = TempSeedDataSource()
             val repository = AppStateRepository(keyStore(preferences), temporary, backgroundScope)
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             repository.importSecret(mnemonic.words)
             val viewModel = CreatePasswordViewModel(repository, CheckPasswordInteractor(), terms)
             viewModel.setPassword(PASSWORD)
@@ -65,7 +65,7 @@ class PasswordTermsAcceptanceTest {
             // Given
             localStorage.clear()
             localStorage.setItem("salt", LEGACY_SALT)
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val encrypted = encryptLegacy(mnemonic.phrase, PASSWORD)
             SeedDataSource().setSeed(encrypted)
             val preferences = PreferencesDataSource()

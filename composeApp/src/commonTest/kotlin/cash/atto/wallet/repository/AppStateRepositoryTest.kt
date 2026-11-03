@@ -34,7 +34,7 @@ class AppStateRepositoryTest {
             // Given
             // Browser key derivation uses real asynchronous work, so keep its session timer on real time.
             val repositoryScope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
-            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(33)))
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
             val repository = AppStateRepository(store, TempSeedDataSource(), repositoryScope)
             repository.state.first { it.authState != AuthState.UNKNOWN }
 
@@ -55,7 +55,7 @@ class AppStateRepositoryTest {
             // Given
             // Browser key derivation uses real asynchronous work, so keep its session timer on real time.
             val repositoryScope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
-            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(33))
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val temporary = TempSeedDataSource()
             val store = TestKeyStore(null)
             val repository = AppStateRepository(store, temporary, repositoryScope)
@@ -83,7 +83,7 @@ class AppStateRepositoryTest {
             val repositoryScope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
             val repository =
                 AppStateRepository(
-                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(33))),
+                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))),
                     TempSeedDataSource(),
                     repositoryScope,
                 )
@@ -113,7 +113,7 @@ class AppStateRepositoryTest {
             // Given
             val repository =
                 AppStateRepository(
-                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(33))),
+                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))),
                     TempSeedDataSource(),
                     backgroundScope,
                 )
@@ -150,7 +150,7 @@ class AppStateRepositoryTest {
     fun `logout revokes keys and cancels the expiry timer`() =
         runTest {
             // Given
-            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(33)))
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
             val temporary = TempSeedDataSource()
             val repository = AppStateRepository(store, temporary, backgroundScope)
             repository.submitPassword(PASSWORD)
@@ -196,7 +196,7 @@ class AppStateRepositoryTest {
             val repositoryScope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
             val repository =
                 AppStateRepository(
-                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(33))),
+                    TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))),
                     TempSeedDataSource(),
                     repositoryScope,
                 )
