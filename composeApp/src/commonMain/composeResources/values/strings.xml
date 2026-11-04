@@ -59,18 +59,20 @@
     <string name="password_field_label">Password</string>
     <string name="password_confirm_label">Confirm Password</string>
     <string name="password_match">Passwords match</string>
-    <string name="password_requirements_title">Password Requirements</string>
-    <string name="password_requirement_length">At least 8 characters</string>
-    <string name="password_requirement_upper">One uppercase letter</string>
-    <string name="password_requirement_lower">One lowercase letter</string>
-    <string name="password_requirement_number">One number</string>
-    <string name="password_requirement_special">One special character</string>
+    <string name="password_strength_title">Estimated strength</string>
+    <string name="password_strength_empty">Enter a password</string>
+    <string name="password_strength_very_weak">Very weak</string>
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_fair">Fair</string>
+    <string name="password_strength_good">Good</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_guidance">Use at least %1$d characters and reach %2$s (%3$d/4) or higher.</string>
     <string name="password_enter_hint">Enter password</string>
     <string name="password_enter_submit">Submit</string>
     <string name="password_enter_title">Enter password</string>
     <string name="password_enter_subtitle">Unlock your wallet to access balances, transactions, and settings on this device.</string>
     <string name="password_no_match">Passwords don't match.</string>
-    <string name="password_weak">Password must contain at least 8 characters, uppercase and lowercase letters, numbers and special symbols.</string>
+    <string name="password_weak">Use at least 15 characters and Fair (2/4) strength or higher.</string>
     <string name="password_wrong">Incorrect password.</string>
 
     <!-- profile -->

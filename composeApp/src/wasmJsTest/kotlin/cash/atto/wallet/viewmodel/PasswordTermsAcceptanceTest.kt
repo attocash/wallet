@@ -25,6 +25,32 @@ import kotlin.test.assertTrue
 
 class PasswordTermsAcceptanceTest {
     @Test
+    fun `weak matching passwords cannot persist a wallet even with accepted terms`() =
+        runTest {
+            // Given
+            localStorage.clear()
+            val preferences = PreferencesDataSource()
+            val terms = TermsAndConditionsRepository(preferences)
+            terms.setCurrentTermsAccepted(true)
+            val temporary = TempSeedDataSource()
+            val repository = AppStateRepository(keyStore(preferences), temporary, backgroundScope)
+            val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
+            repository.importSecret(mnemonic.words)
+            val viewModel = CreatePasswordViewModel(repository, CheckPasswordInteractor(), terms)
+            viewModel.setPassword("passwordpassword")
+            viewModel.setPasswordConfirm("passwordpassword")
+
+            // When
+            val saved = viewModel.savePassword()
+
+            // Then
+            assertFalse(saved)
+            assertNull(SeedDataSource().getSeed())
+            assertEquals(mnemonic.phrase, temporary.seed)
+            assertEquals(AuthState.NEW_ACCOUNT, repository.state.value.authState)
+        }
+
+    @Test
     fun `reimported mnemonic cannot start a session until current terms are accepted`() =
         runTest {
             // Given
@@ -36,8 +62,9 @@ class PasswordTermsAcceptanceTest {
             val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             repository.importSecret(mnemonic.words)
             val viewModel = CreatePasswordViewModel(repository, CheckPasswordInteractor(), terms)
-            viewModel.setPassword(PASSWORD)
-            viewModel.setPasswordConfirm(PASSWORD)
+            assertEquals(2, CheckPasswordInteractor().assess(CREATION_PASSWORD).score)
+            viewModel.setPassword(CREATION_PASSWORD)
+            viewModel.setPasswordConfirm(CREATION_PASSWORD)
 
             // When / Then: neither missing nor obsolete acceptance permits authentication or storage.
             assertFalse(viewModel.savePassword())
@@ -71,7 +98,7 @@ class PasswordTermsAcceptanceTest {
             val preferences = PreferencesDataSource()
             val terms = TermsAndConditionsRepository(preferences)
             val repository = AppStateRepository(keyStore(preferences), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, CheckPasswordInteractor(), terms)
+            val viewModel = AppViewModel(repository, terms)
 
             // When / Then
             assertFalse(viewModel.enterPassword(PASSWORD))
@@ -80,6 +107,7 @@ class PasswordTermsAcceptanceTest {
             assertNull(repository.state.value.mnemonic)
             assertEquals(encrypted, SeedDataSource().getSeed())
             terms.setCurrentTermsAccepted(true)
+            assertFalse(CheckPasswordInteractor().assess(PASSWORD).isAcceptable)
             assertTrue(viewModel.enterPassword(PASSWORD))
             assertEquals(AuthState.SESSION_VALID, repository.state.value.authState)
             repository.lock()
@@ -93,5 +121,6 @@ class PasswordTermsAcceptanceTest {
 
     private companion object {
         const val PASSWORD = "Synthetic7!"
+        const val CREATION_PASSWORD = "Password123456!"
     }
 }

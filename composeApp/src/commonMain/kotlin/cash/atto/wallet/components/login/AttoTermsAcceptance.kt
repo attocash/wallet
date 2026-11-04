@@ -11,9 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,10 +36,50 @@ fun AttoTermsAcceptance(
     onAcceptedChange: (Boolean) -> Unit,
     effectiveDate: String = TermsAndConditions.EFFECTIVE_DATE,
     modifier: Modifier = Modifier,
+    onDialogVisibilityChanged: (Boolean) -> Unit = {},
 ) {
     var showTerms by remember { mutableStateOf(false) }
-    val nextAccepted = !accepted
+    val currentVisibilityChanged = rememberUpdatedState(onDialogVisibilityChanged)
+    DisposableEffect(showTerms) {
+        currentVisibilityChanged.value(showTerms)
+        onDispose { currentVisibilityChanged.value(false) }
+    }
 
+    PlatformTermsAcceptance(
+        accepted = accepted,
+        onAcceptedChange = onAcceptedChange,
+        onShowTerms = { showTerms = true },
+        modifier = modifier,
+    )
+    if (showTerms) {
+        TermsAndConditionsDialog(
+            effectiveDate = effectiveDate,
+            accepted = accepted,
+            onAccept = {
+                onAcceptedChange(true)
+                showTerms = false
+            },
+            onDismiss = { showTerms = false },
+        )
+    }
+}
+
+@Composable
+internal expect fun PlatformTermsAcceptance(
+    accepted: Boolean,
+    onAcceptedChange: (Boolean) -> Unit,
+    onShowTerms: () -> Unit,
+    modifier: Modifier,
+)
+
+@Composable
+internal fun ComposeTermsAcceptance(
+    accepted: Boolean,
+    onAcceptedChange: (Boolean) -> Unit,
+    onShowTerms: () -> Unit,
+    modifier: Modifier,
+) {
+    val nextAccepted = !accepted
     Row(
         modifier =
             modifier
@@ -86,7 +128,7 @@ fun AttoTermsAcceptance(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
-                                onClick = { showTerms = true },
+                                onClick = onShowTerms,
                             ),
                     style =
                         MaterialTheme.typography.bodySmall.copy(
@@ -97,16 +139,5 @@ fun AttoTermsAcceptance(
                 )
             }
         }
-    }
-    if (showTerms) {
-        TermsAndConditionsDialog(
-            effectiveDate = effectiveDate,
-            accepted = accepted,
-            onAccept = {
-                onAcceptedChange(true)
-                showTerms = false
-            },
-            onDismiss = { showTerms = false },
-        )
     }
 }

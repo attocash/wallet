@@ -196,7 +196,7 @@ class WebWalletKeyStoreTest {
             installLegacyWallet()
             val seed = SeedDataSource().getSeed()
             val repository = AppStateRepository(keyStore(), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, CheckPasswordInteractor(), TermsAndConditionsRepository(preferencesStorage))
+            val viewModel = AppViewModel(repository, TermsAndConditionsRepository(preferencesStorage))
             failStorageWritesTo("mnemonic")
             try {
                 // When
@@ -311,7 +311,7 @@ class WebWalletKeyStoreTest {
             val seed = SeedDataSource().getSeed()
             val preferences = preferencesStorage.blob.first()
             val repository = AppStateRepository(keyStore(), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, CheckPasswordInteractor(), TermsAndConditionsRepository(preferencesStorage))
+            val viewModel = AppViewModel(repository, TermsAndConditionsRepository(preferencesStorage))
             observeArgon2Workers("constructor")
             try {
                 // When
@@ -343,8 +343,8 @@ class WebWalletKeyStoreTest {
                 )
             repository.importSecret(mnemonic.words)
             val viewModel = CreatePasswordViewModel(repository, CheckPasswordInteractor(), TermsAndConditionsRepository(preferencesStorage))
-            viewModel.setPassword(PASSWORD)
-            viewModel.setPasswordConfirm(PASSWORD)
+            viewModel.setPassword("fK7q9Vm2xT6n4Rb8")
+            viewModel.setPasswordConfirm("fK7q9Vm2xT6n4Rb8")
             observeArgon2Workers("constructor")
             try {
                 // When

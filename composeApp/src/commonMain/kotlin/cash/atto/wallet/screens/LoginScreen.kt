@@ -22,9 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.password_wrong
-import cash.atto.wallet.components.common.AttoButton
 import cash.atto.wallet.components.common.AttoPasswordField
+import cash.atto.wallet.components.common.AttoPasswordForm
+import cash.atto.wallet.components.common.AttoPasswordSubmitButton
 import cash.atto.wallet.components.common.AttoRoundButton
+import cash.atto.wallet.components.common.PasswordFormValues
 import cash.atto.wallet.components.login.AttoTermsAcceptance
 import cash.atto.wallet.components.settings.LogoutDialog
 import cash.atto.wallet.model.TermsAndConditions
@@ -45,6 +47,7 @@ fun LoginScreen(
     var input by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showTermsDialog by remember { mutableStateOf(false) }
     val canSubmit = termsAndConditionsAccepted
 
     Box(
@@ -81,121 +84,130 @@ fun LoginScreen(
         ) {
             val shellWidth = if (maxWidth > 480.dp) 480.dp else maxWidth
 
-            Column(
-                modifier = Modifier.width(shellWidth),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            AttoPasswordForm(
+                id = "wallet-unlock",
+                values = PasswordFormValues(password = input),
+                obscured = showLogoutDialog || showTermsDialog,
+                onSubmit = { submitted ->
+                    if (canSubmit && !showLogoutDialog && !showTermsDialog) onSubmitPassword(submitted.password)
+                },
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(68.dp)
-                            .background(dark_surface, RoundedCornerShape(16.dp))
-                            .border(1.dp, dark_border_subtle, RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Lock,
-                        contentDescription = null,
-                        tint = dark_accent,
-                        modifier = Modifier.size(29.dp),
-                    )
-                }
-
-                Text(
-                    text = "Unlock Wallet",
-                    modifier = Modifier.padding(top = 24.dp),
-                    color = dark_text_primary,
-                    style =
-                        MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 35.sp,
-                            lineHeight = 39.sp,
-                            letterSpacing = (-0.3).sp,
-                        ),
-                )
-
-                Text(
-                    text = "Your wallet is locked. Enter your password to continue.",
-                    modifier = Modifier.padding(top = 9.dp),
-                    color = dark_text_secondary,
-                    textAlign = TextAlign.Center,
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.W400,
-                            fontSize = 12.sp,
-                            lineHeight = 18.sp,
-                        ),
-                )
-
                 Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 22.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.width(shellWidth),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    AttoPasswordField(
-                        value = input,
-                        onValueChange = { input = it },
-                        label = "Password",
-                        placeholder = "Enter your password",
-                        revealed = showPassword,
-                        onRevealToggle = { showPassword = !showPassword },
-                        isError = !passwordValid,
-                        contentType = ContentType.Password,
-                        imeAction = ImeAction.Done,
-                        onDone = {
-                            if (canSubmit) {
-                                onSubmitPassword(input)
-                            }
-                        },
-                    )
-
-                    if (!passwordValid) {
-                        Text(
-                            text = errorMessage ?: stringResource(Res.string.password_wrong),
-                            color = dark_danger,
-                            style =
-                                MaterialTheme.typography.bodySmall.copy(
-                                    fontSize = 11.sp,
-                                ),
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(68.dp)
+                                .background(dark_surface, RoundedCornerShape(16.dp))
+                                .border(1.dp, dark_border_subtle, RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Lock,
+                            contentDescription = null,
+                            tint = dark_accent,
+                            modifier = Modifier.size(29.dp),
                         )
                     }
 
-                    AttoTermsAcceptance(
-                        accepted = termsAndConditionsAccepted,
-                        onAcceptedChange = onTermsAndConditionsAcceptedChange,
-                        effectiveDate = termsAndConditionsDate,
+                    Text(
+                        text = "Unlock Wallet",
+                        modifier = Modifier.padding(top = 24.dp),
+                        color = dark_text_primary,
+                        style =
+                            MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 35.sp,
+                                lineHeight = 39.sp,
+                                letterSpacing = (-0.3).sp,
+                            ),
+                    )
+
+                    Text(
+                        text = "Your wallet is locked. Enter your password to continue.",
+                        modifier = Modifier.padding(top = 9.dp),
+                        color = dark_text_secondary,
+                        textAlign = TextAlign.Center,
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.W400,
+                                fontSize = 12.sp,
+                                lineHeight = 18.sp,
+                            ),
+                    )
+
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 22.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        AttoPasswordField(
+                            value = input,
+                            onValueChange = { input = it },
+                            label = "Password",
+                            placeholder = "Enter your password",
+                            revealed = showPassword,
+                            onRevealToggle = { showPassword = !showPassword },
+                            isError = !passwordValid,
+                            contentType = ContentType.Password,
+                            imeAction = ImeAction.Done,
+                            onDone = {
+                                if (canSubmit) {
+                                    onSubmitPassword(input)
+                                }
+                            },
+                        )
+
+                        if (!passwordValid) {
+                            Text(
+                                text = errorMessage ?: stringResource(Res.string.password_wrong),
+                                color = dark_danger,
+                                style =
+                                    MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 11.sp,
+                                    ),
+                            )
+                        }
+
+                        AttoTermsAcceptance(
+                            accepted = termsAndConditionsAccepted,
+                            onAcceptedChange = onTermsAndConditionsAcceptedChange,
+                            effectiveDate = termsAndConditionsDate,
+                            onDialogVisibilityChanged = { showTermsDialog = it },
+                        )
+                    }
+
+                    AttoPasswordSubmitButton(
+                        text = "Unlock",
+                        enabled = canSubmit,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                    )
+
+                    HorizontalDivider(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
+                        color = dark_border_subtle,
+                    )
+
+                    Text(
+                        text = "Forgot your password? Log out and re-import your recovery phrase",
+                        modifier = Modifier.padding(top = 11.dp),
+                        color = dark_text_secondary,
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 11.sp,
+                            ),
                     )
                 }
-
-                AttoButton(
-                    text = "Unlock",
-                    onClick = { onSubmitPassword(input) },
-                    enabled = canSubmit,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                )
-
-                HorizontalDivider(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp),
-                    color = dark_border_subtle,
-                )
-
-                Text(
-                    text = "Forgot your password? Log out and re-import your recovery phrase",
-                    modifier = Modifier.padding(top = 11.dp),
-                    color = dark_text_secondary,
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 11.sp,
-                        ),
-                )
             }
         }
 

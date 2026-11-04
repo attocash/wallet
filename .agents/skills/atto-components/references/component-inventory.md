@@ -14,7 +14,9 @@ Shared reusable components live in `composeApp/src/commonMain/kotlin/cash/atto/w
 - `AttoCopyField`: display field with copy affordance.
 - `AttoLoader`: loading indicator component.
 - `AttoModal`: shared modal container.
-- `AttoPasswordField`: password entry built on the project field styling.
+- `AttoPasswordForm`: shared password-form scope; associates native web controls with one HTML form and reads live autofilled values on submit.
+- `AttoPasswordField`: styled password entry; use inside `AttoPasswordForm`. Set `name = "confirm-password"` for confirmation inputs.
+- `AttoPasswordSubmitButton`: password-form action; use inside `AttoPasswordForm` so web submission follows the native form lifecycle.
 - `AttoScreenTitle`: screen heading component.
 - `AttoTextField`: shared text field wrapper with done handling and error slot.
 - `AttoTransactionCard`: transaction summary row/card for overview and history screens.
@@ -38,3 +40,14 @@ Shared reusable components live in `composeApp/src/commonMain/kotlin/cash/atto/w
 - Search call sites before changing a shared component API.
 - Prefer adding parameters with safe defaults over forking a near-duplicate component.
 - Keep previews wrapped in `AttoWalletTheme`.
+- Password creation must use the shared strength policy for both the meter and submission. Keep password-manager generation hints
+  separate from acceptance rules, and preserve existing-wallet unlock when changing creation policy.
+
+## Native browser controls and dialogs
+
+- When a Compose dialog obscures `HtmlElementView` controls, remove the interop views and preserve their layout with same-size spacers.
+  Hiding only the native child leaves Compose's wrapper intercepting clicks over the dialog.
+- Keep retained password bindings outside that visibility branch and dispose them when the owning composition ends, so dismissing a dialog
+  restores live controls and their values.
+- Verify actual mouse clicks and typing across modal fields on wide and compact viewports, then dismiss/reopen and check password input,
+  reveal, Enter submission, and Escape. Programmatic focus alone misses intercepting wrappers.

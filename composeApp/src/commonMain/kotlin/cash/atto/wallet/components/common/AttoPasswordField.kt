@@ -50,7 +50,23 @@ import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 
 @Composable
-fun AttoPasswordField(
+expect fun AttoPasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+    placeholder: String = "Enter your password",
+    revealed: Boolean = false,
+    onRevealToggle: () -> Unit = {},
+    isError: Boolean = false,
+    contentType: ContentType = ContentType.Password,
+    name: String = "password",
+    imeAction: ImeAction = ImeAction.Done,
+    onDone: () -> Unit = {},
+)
+
+@Composable
+internal fun ComposePasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
