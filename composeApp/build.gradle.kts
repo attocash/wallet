@@ -45,7 +45,6 @@ val releaseVersion = providers.gradleProperty("app.version").orNull
 val appVersion = releaseVersion ?: gitShortSha()
 val packageVersion = releaseVersion ?: "0.0.0"
 val generatedVersionKotlinDir = layout.buildDirectory.dir("generated/appVersion/commonMain/kotlin")
-
 val generateAppVersionArtifacts =
     tasks.register("generateAppVersionArtifacts") {
         outputs.dir(generatedVersionKotlinDir)
