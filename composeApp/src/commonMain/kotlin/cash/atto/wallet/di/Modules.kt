@@ -14,6 +14,7 @@ import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.BackupSecretViewModel
+import cash.atto.wallet.viewmodel.ChangePasswordViewModel
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import cash.atto.wallet.viewmodel.ImportSecretViewModel
 import cash.atto.wallet.viewmodel.MainScreenViewModel
@@ -69,6 +70,7 @@ val viewModelModule =
         includes(interactorModule)
         viewModelOf(::AppViewModel)
         viewModelOf(::BackupSecretViewModel)
+        viewModelOf(::ChangePasswordViewModel)
         viewModelOf(::CreatePasswordViewModel)
         viewModelOf(::ImportSecretViewModel)
         viewModelOf(::MainScreenViewModel)

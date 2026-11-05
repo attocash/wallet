@@ -226,6 +226,120 @@ class AppStateRepositoryTest {
             assertNotNull(repository.state.value.getSeed())
         }
 
+    @Test
+    fun `password rotation replaces persisted credentials and revokes the old session`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            assertTrue(repository.submitPassword(PASSWORD))
+            val previous = repository.state.value
+            val mnemonic = previous.mnemonic
+
+            // When
+            assertTrue(repository.changePassword(PASSWORD, NEW_PASSWORD))
+
+            // Then
+            assertEquals(NEW_PASSWORD, repository.state.value.password)
+            assertEquals(mnemonic, repository.state.value.mnemonic)
+            assertNull(previous.password)
+            repository.lock()
+            val restarted = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            assertFalse(restarted.submitPassword(PASSWORD))
+            assertTrue(restarted.submitPassword(NEW_PASSWORD))
+            assertEquals(mnemonic, restarted.state.value.mnemonic)
+        }
+
+    @Test
+    fun `wrong current weak identical and locked password changes preserve the wallet`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            assertTrue(repository.submitPassword(PASSWORD))
+            val session = repository.state.value.unlockedWallet
+
+            // When
+            assertFalse(repository.changePassword("wrong", NEW_PASSWORD))
+            assertFailsWith<IllegalArgumentException> { repository.changePassword(PASSWORD, PASSWORD) }
+            assertFailsWith<IllegalArgumentException> { repository.changePassword(PASSWORD, "weak") }
+
+            // Then
+            assertTrue(session === repository.state.value.unlockedWallet)
+            assertEquals(PASSWORD, store.password)
+            repository.lock()
+            assertFailsWith<IllegalStateException> { repository.changePassword(PASSWORD, NEW_PASSWORD) }
+            assertTrue(repository.submitPassword(PASSWORD))
+        }
+
+    @Test
+    fun `failed password commit preserves the authenticated session and original password`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            repository.submitPassword(PASSWORD)
+            val session = repository.state.value.unlockedWallet
+            store.failSave = true
+
+            // When
+            assertFailsWith<IllegalStateException> { repository.changePassword(PASSWORD, NEW_PASSWORD) }
+
+            // Then
+            assertTrue(session === repository.state.value.unlockedWallet)
+            assertEquals(PASSWORD, repository.state.value.password)
+            repository.lock()
+            assertTrue(repository.submitPassword(PASSWORD))
+            assertFalse(repository.submitPassword(NEW_PASSWORD))
+        }
+
+    @Test
+    fun `cancelling password preparation leaves credentials unchanged`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            repository.submitPassword(PASSWORD)
+            store.preparationStarted = CompletableDeferred()
+            store.continuePreparation = CompletableDeferred()
+            val changing = async { repository.changePassword(PASSWORD, NEW_PASSWORD) }
+            store.preparationStarted!!.await()
+
+            // When
+            changing.cancel()
+            assertFailsWith<CancellationException> { changing.await() }
+
+            // Then
+            assertEquals(PASSWORD, store.password)
+            assertEquals(PASSWORD, repository.state.value.password)
+            assertNotNull(repository.state.value.mnemonic)
+        }
+
+    @Test
+    fun `cancellation after commit starts completes the matching session transition`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            repository.submitPassword(PASSWORD)
+            store.commitStarted = CompletableDeferred()
+            store.continueCommit = CompletableDeferred()
+            val changing = async { repository.changePassword(PASSWORD, NEW_PASSWORD) }
+            store.commitStarted!!.await()
+
+            // When
+            changing.cancel()
+            store.continueCommit!!.complete(Unit)
+            changing.join()
+
+            // Then
+            assertEquals(NEW_PASSWORD, store.password)
+            assertEquals(NEW_PASSWORD, repository.state.value.password)
+            assertNotNull(repository.state.value.mnemonic)
+            repository.lock()
+            assertTrue(repository.submitPassword(NEW_PASSWORD))
+        }
+
     private suspend fun assertRevoked(state: AppState) {
         assertEquals(AuthState.SESSION_INVALID, state.authState)
         assertNull(state.mnemonic)
@@ -237,10 +351,15 @@ class AppStateRepositoryTest {
         var mnemonic: AttoMnemonic?,
     ) : WalletKeyStore {
         var failSave = false
+        var password = PASSWORD
+        var preparationStarted: CompletableDeferred<Unit>? = null
+        var continuePreparation: CompletableDeferred<Unit>? = null
+        var commitStarted: CompletableDeferred<Unit>? = null
+        var continueCommit: CompletableDeferred<Unit>? = null
 
         override suspend fun authState() = if (mnemonic == null) AuthState.NO_SEED else AuthState.SESSION_INVALID
 
-        override suspend fun unlock(password: String) = mnemonic.takeIf { password == PASSWORD }
+        override suspend fun unlock(password: String) = mnemonic.takeIf { password == this.password }
 
         override suspend fun savePassword(
             phrase: String?,
@@ -253,6 +372,21 @@ class AppStateRepositoryTest {
             return saved
         }
 
+        override suspend fun preparePasswordChange(
+            mnemonic: AttoMnemonic,
+            currentPassword: String,
+            newPassword: String,
+        ): suspend () -> Unit {
+            preparationStarted?.complete(Unit)
+            continuePreparation?.await()
+            return {
+                commitStarted?.complete(Unit)
+                continueCommit?.await()
+                check(!failSave) { "Storage failed" }
+                password = newPassword
+            }
+        }
+
         override suspend fun clear() {
             mnemonic = null
         }
@@ -260,5 +394,6 @@ class AppStateRepositoryTest {
 
     private companion object {
         const val PASSWORD = "Synthetic7!"
+        const val NEW_PASSWORD = "fK7q9Vm2xT6n4Rb8"
     }
 }

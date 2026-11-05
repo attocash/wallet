@@ -1,15 +1,12 @@
 package cash.atto.wallet.datasource
 
 actual class SeedDataSource {
-    actual suspend fun getSeed(): String? = BrowserStorage.get("mnemonic") ?: BrowserStorage.get("seed")
+    private val preferences = PreferencesDataSource()
 
-    actual suspend fun setSeed(seed: String) {
-        BrowserStorage.set("mnemonic", seed)
-        BrowserStorage.remove("seed")
-    }
+    actual suspend fun getSeed(): String? =
+        if (preferences.containsMnemonic()) preferences.getMnemonic() else BrowserStorage.get("mnemonic") ?: BrowserStorage.get("seed")
 
-    actual suspend fun clearSeed() {
-        BrowserStorage.remove("seed")
-        BrowserStorage.remove("mnemonic")
-    }
+    actual suspend fun setSeed(seed: String) = BrowserStorage.withWalletLock { preferences.setMnemonicWithoutLock(seed) }
+
+    actual suspend fun clearSeed() = BrowserStorage.withWalletLock { preferences.clearMnemonicWithoutLock() }
 }

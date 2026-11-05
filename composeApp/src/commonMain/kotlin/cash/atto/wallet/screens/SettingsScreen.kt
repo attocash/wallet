@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Memory
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import cash.atto.wallet.components.common.AttoModal
 import cash.atto.wallet.components.common.AttoPageFrame
 import cash.atto.wallet.components.common.AttoPanelCard
 import cash.atto.wallet.components.common.AttoTag
+import cash.atto.wallet.components.settings.ChangePasswordDialog
 import cash.atto.wallet.config.AppVersion
 import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.ui.dark_accent
@@ -57,6 +59,8 @@ import cash.atto.wallet.ui.dark_success
 import cash.atto.wallet.ui.dark_text_dim
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
+import cash.atto.wallet.ui.dark_violet
+import cash.atto.wallet.ui.dark_warning
 import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.worker.isLocalWorkerSupported
 
@@ -71,6 +75,12 @@ fun SettingsScreen(
     onDismissPreferencesMessage: () -> Unit,
     onLogoutClick: () -> Unit,
 ) {
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+
+    if (showChangePasswordDialog) {
+        ChangePasswordDialog(onDismiss = { showChangePasswordDialog = false })
+    }
+
     AttoPageFrame(
         title = "Settings",
         subtitle = "Manage wallet recovery, device security, and application information.",
@@ -87,6 +97,7 @@ fun SettingsScreen(
                     SettingsActionsPanel(
                         modifier = Modifier.fillMaxWidth(),
                         onBackupClick = onBackupClick,
+                        onChangePasswordClick = { showChangePasswordDialog = true },
                         onExportClick = onExportClick,
                         onImportClick = onImportClick,
                         workSource = uiState.workSource,
@@ -103,6 +114,7 @@ fun SettingsScreen(
                     SettingsActionsPanel(
                         modifier = Modifier.weight(5f).fillMaxSize(),
                         onBackupClick = onBackupClick,
+                        onChangePasswordClick = { showChangePasswordDialog = true },
                         onExportClick = onExportClick,
                         onImportClick = onImportClick,
                         workSource = uiState.workSource,
@@ -124,6 +136,7 @@ fun SettingsScreen(
 @Composable
 private fun SettingsActionsPanel(
     modifier: Modifier,
+    onChangePasswordClick: () -> Unit,
     onBackupClick: () -> Unit,
     onExportClick: () -> Unit,
     onImportClick: () -> Unit,
@@ -147,7 +160,16 @@ private fun SettingsActionsPanel(
             icon = Icons.Outlined.Key,
             title = "Recovery Phrase",
             subtitle = "View your 24-word recovery phrase",
+            accent = dark_accent,
             onClick = onBackupClick,
+        )
+
+        AttoSettingsActionRow(
+            icon = Icons.Outlined.Lock,
+            title = "Change Password",
+            subtitle = "Update the password that unlocks this wallet",
+            accent = dark_violet,
+            onClick = onChangePasswordClick,
         )
 
         WorkerSourceSection(
@@ -167,6 +189,7 @@ private fun SettingsActionsPanel(
             icon = Icons.Outlined.Download,
             title = "Export Preferences",
             subtitle = "Download address and transaction labels",
+            accent = dark_success,
             onClick = onExportClick,
         )
 
@@ -174,6 +197,7 @@ private fun SettingsActionsPanel(
             icon = Icons.Outlined.SyncAlt,
             title = "Import Preferences",
             subtitle = "Replace saved address and transaction labels",
+            accent = dark_violet,
             onClick = onImportClick,
         )
 
@@ -216,6 +240,7 @@ private fun WorkerSourceSection(
             icon = Icons.Outlined.Memory,
             title = "Work Source",
             subtitle = "${selectedSource.label()} worker selected",
+            accent = dark_warning,
             trailingIcon = if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
             onClick = onToggleExpanded,
         )

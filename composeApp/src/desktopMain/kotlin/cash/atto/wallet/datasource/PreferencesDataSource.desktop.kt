@@ -3,6 +3,7 @@ package cash.atto.wallet.datasource
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okio.Path.Companion.toPath
 import java.io.File
@@ -56,6 +57,16 @@ actual class PreferencesDataSource {
             preferences[workKey] = work
         }
     }
+
+    internal actual suspend fun walletSnapshot() = WalletStorageSnapshot(null, blob.first())
+
+    internal actual suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot) = setBlob(blob)
+
+    internal actual suspend fun migrateEncryptedWallet(seed: String, blob: String?, expected: WalletStorageSnapshot): Unit =
+        error("Encrypted wallet storage is only used on web")
+
+    internal actual suspend fun replaceEncryptedWallet(seed: String, blob: String, expected: WalletStorageSnapshot): Unit =
+        error("Encrypted wallet storage is only used on web")
 
     actual suspend fun migrateStorage() = Unit
 

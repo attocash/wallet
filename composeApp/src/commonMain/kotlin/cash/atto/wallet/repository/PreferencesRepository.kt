@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -47,13 +48,11 @@ class PreferencesRepository(
             combine(
                 preferencesDataSource.blob,
                 appStateRepository.state,
-            ) { storedPreferences, appState ->
-                decodePreferences(
-                    storedPreferences = storedPreferences,
-                    password = appState.password,
-                )
-            }.collect { preferences ->
-                _state.emit(preferences)
+            ) { _, _ -> Unit }.collect {
+                appStateRepository.withWalletStorage { appState ->
+                    // Re-read both values inside the same ordering as rotation and preference writes.
+                    _state.emit(decodePreferences(preferencesDataSource.blob.first(), appState.password))
+                }
             }
         }
 
@@ -70,54 +69,42 @@ class PreferencesRepository(
         address: String,
         label: String,
     ) {
-        savePreferences(
-            state.value.withAddressLabel(
-                value = address,
-                label = label,
-            ),
-        )
+        updatePreferences { it.withAddressLabel(value = address, label = label) }
     }
 
     suspend fun saveHashLabel(
         hash: String,
         label: String,
     ) {
-        savePreferences(
-            state.value.withHashLabel(
-                value = hash,
-                label = label,
-            ),
-        )
+        updatePreferences { it.withHashLabel(value = hash, label = label) }
     }
 
     suspend fun setAccountStatus(
         index: UInt,
         status: AccountPreferenceStatus,
     ) {
-        val preferences = state.value
-        val isActivating = status == AccountPreferenceStatus.ACTIVATED
-        val alreadyActive = preferences.accountStatus(index) == AccountPreferenceStatus.ACTIVATED
-        if (isActivating && !alreadyActive && preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
-            error("Only ${UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT} active accounts are supported.")
+        updatePreferences { preferences ->
+            val isActivating = status == AccountPreferenceStatus.ACTIVATED
+            val alreadyActive = preferences.accountStatus(index) == AccountPreferenceStatus.ACTIVATED
+            if (isActivating && !alreadyActive && preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
+                error("Only ${UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT} active accounts are supported.")
+            }
+            preferences.withAccountStatus(index = index, status = status)
         }
-
-        savePreferences(
-            preferences.withAccountStatus(
-                index = index,
-                status = status,
-            ),
-        )
     }
 
     suspend fun addAccount(): UInt? {
-        val preferences = state.value
-        if (preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
-            return null
+        var addedIndex: UInt? = null
+        updatePreferences { preferences ->
+            if (preferences.activeAccountIndexes().size >= UserPreferences.MAX_ACTIVE_ACCOUNT_COUNT) {
+                preferences
+            } else {
+                val nextIndex = preferences.nextAvailableAccountIndex()
+                addedIndex = nextIndex
+                if (nextIndex == null) preferences else preferences.withAccountStatus(nextIndex, AccountPreferenceStatus.ACTIVATED)
+            }
         }
-
-        val nextIndex = preferences.nextAvailableAccountIndex() ?: return null
-        savePreferences(preferences.withAccountStatus(nextIndex, AccountPreferenceStatus.ACTIVATED))
-        return nextIndex
+        return addedIndex
     }
 
     suspend fun setWorkSource(workSource: WorkSourcePreference) {
@@ -146,34 +133,35 @@ class PreferencesRepository(
                 error("Invalid preferences JSON.")
             }.normalized()
 
-        savePreferences(importedPreferences)
+        updatePreferences { importedPreferences }
     }
 
-    private suspend fun savePreferences(preferences: UserPreferences) {
-        val normalizedPreferences = preferences.normalized()
-        _state.emit(normalizedPreferences)
-
-        val rawJson = json.encodeToString(UserPreferences.serializer(), normalizedPreferences)
-        val storedJson =
-            if (getPlatform().type == PlatformType.WEB) {
-                val password =
-                    appStateRepository.state.value.password
-                        ?: error("Password is required to store encrypted preferences on web.")
-                seedAESInteractor.encryptSeed(
-                    seed = rawJson,
-                    password = password,
-                    purpose = EncryptedDataPurpose.PREFERENCES,
-                )
-            } else {
-                rawJson
-            }
-
-        preferencesDataSource.setBlob(storedJson)
+    private suspend fun updatePreferences(update: (UserPreferences) -> UserPreferences) {
+        appStateRepository.withWalletStorage { appState ->
+            val snapshot = preferencesDataSource.walletSnapshot()
+            val currentPreferences = decodePreferences(snapshot.blob, appState.password, requireReadable = true)
+            val normalizedPreferences = update(currentPreferences).normalized()
+            val rawJson = json.encodeToString(UserPreferences.serializer(), normalizedPreferences)
+            val storedJson =
+                if (getPlatform().type == PlatformType.WEB) {
+                    val password = appState.password ?: error("Password is required to store encrypted preferences on web.")
+                    seedAESInteractor.encryptSeed(
+                        seed = rawJson,
+                        password = password,
+                        purpose = EncryptedDataPurpose.PREFERENCES,
+                    )
+                } else {
+                    rawJson
+                }
+            preferencesDataSource.setWalletBlob(storedJson, snapshot)
+            _state.emit(normalizedPreferences)
+        }
     }
 
     private suspend fun decodePreferences(
         storedPreferences: String?,
         password: String?,
+        requireReadable: Boolean = false,
     ): UserPreferences {
         if (storedPreferences.isNullOrBlank()) {
             return UserPreferences.EMPTY
@@ -185,13 +173,16 @@ class PreferencesRepository(
                     return UserPreferences.EMPTY
                 }
 
-                seedAESInteractor
+                val decrypted = seedAESInteractor
                     .decryptSeed(
                         encryptedSeed = storedPreferences,
                         password = password,
                         purpose = EncryptedDataPurpose.PREFERENCES,
                     )?.plaintext
-                    .orEmpty()
+                if (decrypted == null && requireReadable) {
+                    throw WalletStorageException("Could not read wallet preferences. Lock and unlock this wallet, then try again.")
+                }
+                decrypted.orEmpty()
             } else {
                 storedPreferences
             }

@@ -1,9 +1,11 @@
 package cash.atto.wallet.datasource
 
+import cash.atto.wallet.repository.WalletStorageException
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
@@ -14,16 +16,86 @@ actual class PreferencesDataSource {
     actual val termsAndConditionsDate = observe(TERMS)
     actual val work = observe(WORK)
 
-    actual suspend fun setBlob(blob: String) = update(WALLET, recordValue(blob))
+    actual suspend fun setBlob(blob: String) = BrowserStorage.withWalletLock { update(WALLET, recordValue(blob)) }
 
-    actual suspend fun setTermsAndConditionsDate(date: String) = update(TERMS, JsonPrimitive(date))
+    actual suspend fun setTermsAndConditionsDate(date: String) = BrowserStorage.withWalletLock { update(TERMS, JsonPrimitive(date)) }
 
-    actual suspend fun clearTermsAndConditionsDate() = update(TERMS, null)
+    actual suspend fun clearTermsAndConditionsDate() = BrowserStorage.withWalletLock { update(TERMS, null) }
 
-    actual suspend fun setWork(work: String) = update(WORK, recordValue(work))
+    actual suspend fun setWork(work: String) = BrowserStorage.withWalletLock { update(WORK, recordValue(work)) }
 
-    actual suspend fun migrateStorage() {
+    internal actual suspend fun walletSnapshot(): WalletStorageSnapshot = snapshot()
+
+    internal actual suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot) =
+        BrowserStorage.withWalletLock {
+            requireCurrent(expected)
+            update(WALLET, recordValue(blob))
+        }
+
+    internal actual suspend fun migrateEncryptedWallet(seed: String, blob: String?, expected: WalletStorageSnapshot) =
+        BrowserStorage.withWalletLock {
+            requireCurrent(expected)
+            if (blob != expected.blob && blob != null) update(WALLET, recordValue(blob))
+            migrateLegacyStorage()
+            setMnemonicWithoutLock(seed)
+        }
+
+    internal actual suspend fun replaceEncryptedWallet(seed: String, blob: String, expected: WalletStorageSnapshot) =
+        BrowserStorage.withWalletLock {
+            requireCurrent(expected)
+            val original = read().toMutableMap()
+            if (MNEMONIC !in original) {
+                // Preserve the old credentials before requiring removal of their standalone aliases.
+                original[MNEMONIC] = expected.seed?.let(::recordValue) ?: JsonNull
+                BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+            }
+            for (key in listOf(LEGACY_KEY, "seed", "mnemonic")) {
+                if (BrowserStorage.get(key) != null) BrowserStorage.remove(key)
+            }
+            original[MNEMONIC] = recordValue(seed)
+            original[WALLET] = recordValue(blob)
+            // No fallible cleanup follows the one replacement that changes the password.
+            BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+        }
+
+    internal fun containsMnemonic(): Boolean = MNEMONIC in read()
+
+    internal fun getMnemonic(): String? = read()[MNEMONIC]?.takeUnless { it == JsonNull }?.storedValue()
+
+    internal fun setMnemonicWithoutLock(seed: String?) {
+        if (containsMnemonic()) {
+            update(MNEMONIC, seed?.let(::recordValue) ?: JsonNull)
+        } else if (seed != null) {
+            BrowserStorage.set("mnemonic", seed)
+        }
+        BrowserStorage.remove("seed")
+    }
+
+    internal fun clearMnemonicWithoutLock() {
+        if (containsMnemonic()) update(MNEMONIC, JsonNull)
+        BrowserStorage.remove("seed")
+        BrowserStorage.remove("mnemonic")
+    }
+
+    actual suspend fun migrateStorage() = BrowserStorage.withWalletLock { migrateLegacyStorage() }
+
+    private fun migrateLegacyStorage() {
         if (BrowserStorage.get(LEGACY_KEY) != null) write(read())
+    }
+
+    private fun snapshot(): WalletStorageSnapshot {
+        val values = read()
+        val seed =
+            if (MNEMONIC in values) {
+                values[MNEMONIC]?.takeUnless { it == JsonNull }?.storedValue()
+            } else {
+                BrowserStorage.get("mnemonic") ?: BrowserStorage.get("seed")
+            }
+        return WalletStorageSnapshot(seed, values[WALLET]?.storedValue())
+    }
+
+    private fun requireCurrent(expected: WalletStorageSnapshot) {
+        if (snapshot() != expected) throw WalletStorageException("Wallet data changed in another tab. Lock and unlock this wallet, then try again.")
     }
 
     private fun observe(key: String) = BrowserStorage.updates().map { read()[key]?.storedValue() }.distinctUntilChanged()
@@ -75,6 +147,7 @@ actual class PreferencesDataSource {
         const val STORAGE_KEY = "preferences"
         const val LEGACY_KEY = "user-preferences.preferences_pb"
         const val WALLET = "wallet"
+        const val MNEMONIC = "mnemonic"
         const val TERMS = "termsAcceptedAt"
         const val WORK = "work"
     }

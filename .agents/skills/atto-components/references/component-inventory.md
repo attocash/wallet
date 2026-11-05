@@ -15,7 +15,10 @@ Shared reusable components live in `composeApp/src/commonMain/kotlin/cash/atto/w
 - `AttoLoader`: loading indicator component.
 - `AttoModal`: shared modal container.
 - `AttoPasswordForm`: shared password-form scope; associates native web controls with one HTML form and reads live autofilled values on submit.
-- `AttoPasswordField`: styled password entry; use inside `AttoPasswordForm`. Set `name = "confirm-password"` for confirmation inputs.
+- `AttoPasswordField`: styled password entry; use inside `AttoPasswordForm`. Keep `name = "password"` for the password being submitted,
+  `name = "confirm-password"` for confirmation, and `name = "current-password"` for the existing password during a change.
+  Use `ContentType.Password` for the current password and `ContentType.NewPassword` for both new-password fields.
+- `AttoPasswordStrengthMeter`: shared strength feedback for password creation and changes; supply the shared policy assessment.
 - `AttoPasswordSubmitButton`: password-form action; use inside `AttoPasswordForm` so web submission follows the native form lifecycle.
 - `AttoScreenTitle`: screen heading component.
 - `AttoTextField`: shared text field wrapper with done handling and error slot.

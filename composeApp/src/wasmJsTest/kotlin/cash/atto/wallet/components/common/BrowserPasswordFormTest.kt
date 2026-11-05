@@ -147,6 +147,36 @@ class BrowserPasswordFormTest {
         }
 
     @Test
+    fun `change password submission reads all three silently filled native values`() =
+        withPasswordForm { form, container ->
+            // Given
+            val currentPassword = input(form, container, "current-password", ImeAction.Next)
+            val password = input(form, container, "password", ImeAction.Next)
+            val confirmation = input(form, container, "confirm-password")
+            var submitted: PasswordFormValues? = null
+            form.onSubmit = { submitted = it }
+            currentPassword.element.value = "Existing7!"
+            password.element.value = "Replacement8!"
+            confirmation.element.value = "Replacement8!confirmation"
+
+            // When
+            currentPassword.updateValue("")
+            password.updateValue("")
+            confirmation.updateValue("")
+            form.requestSubmit()
+
+            // Then
+            assertEquals(
+                PasswordFormValues(
+                    password = "Replacement8!",
+                    confirmation = "Replacement8!confirmation",
+                    currentPassword = "Existing7!",
+                ),
+                submitted,
+            )
+        }
+
+    @Test
     fun `native button submission is canceled before the latest callback`() =
         withPasswordForm { form, container ->
             // Given

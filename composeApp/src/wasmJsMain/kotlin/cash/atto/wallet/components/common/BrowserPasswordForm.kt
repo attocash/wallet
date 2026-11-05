@@ -34,6 +34,7 @@ internal class BrowserPasswordForm(
                             ?.value
                             .orEmpty(),
                     confirmation = inputs.firstOrNull { it.element.name == "confirm-password" }?.element?.value,
+                    currentPassword = inputs.firstOrNull { it.element.name == "current-password" }?.element?.value,
                 ),
             )
         }

@@ -1,14 +1,21 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package cash.atto.wallet.datasource
 
 import cash.atto.wallet.repository.WalletStorageException
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.await
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.events.Event
+import kotlin.js.Promise
 
 internal object BrowserStorage {
     private val changes = MutableStateFlow(0L)
@@ -26,6 +33,24 @@ internal object BrowserStorage {
 
     fun remove(key: String) {
         mutate { localStorage.removeItem(key) }
+    }
+
+    suspend fun withWalletLock(action: () -> Unit) {
+        val context = currentCoroutineContext()
+        var outcome: Result<Unit>? = null
+        try {
+            requestWalletLock {
+                outcome = runCatching {
+                    context.ensureActive()
+                    action()
+                }
+            }.await<JsAny?>()
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            throw WalletStorageException("Could not lock wallet storage. Please use a browser that supports Web Locks.", error)
+        }
+        checkNotNull(outcome).getOrThrow()
     }
 
     // Local writes and other tabs both invalidate readers; collection owns the browser listener.
@@ -49,3 +74,12 @@ internal object BrowserStorage {
         }
     }
 }
+
+private fun requestWalletLock(action: () -> Unit): Promise<JsAny?> =
+    js(
+        """
+        navigator.locks
+            ? navigator.locks.request('atto-wallet-storage', () => { action(); return null; })
+            : Promise.reject(new Error('Web Locks are unavailable'))
+        """,
+    )

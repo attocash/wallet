@@ -5,6 +5,7 @@ import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.SeedDataSource
 import cash.atto.wallet.datasource.TempSeedDataSource
+import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.state.AppState.AuthState
@@ -12,6 +13,10 @@ import cash.atto.wallet.state.UnlockedWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,6 +89,30 @@ class AppStateRepository internal constructor(
             startSession(mnemonic, password)
         }
 
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+    ): Boolean =
+        mutex.withLock {
+            val wallet = checkNotNull(state.value.unlockedWallet) { "Unlock the wallet before changing its password" }
+            wallet.ensureActive()
+            if (wallet.password != currentPassword) return@withLock false
+            require(newPassword != currentPassword) { "Choose a different password" }
+            require(CheckPasswordInteractor().assess(newPassword).isAcceptable) { "Choose a stronger password" }
+            val mnemonic = checkNotNull(wallet.mnemonic)
+            val commit = keyStore.preparePasswordChange(mnemonic, currentPassword, newPassword)
+            currentCoroutineContext().ensureActive()
+            // Once persistence starts, finish the matching session transition even if the caller is cancelled.
+            withContext(NonCancellable) {
+                commit()
+                startSession(mnemonic, newPassword)
+            }
+            true
+        }
+
+    internal suspend fun <T> withWalletStorage(action: suspend (AppState) -> T): T =
+        mutex.withLock { action(state.value) }
+
     suspend fun deleteKeys() =
         mutex.withLock {
             revoke(AuthState.NO_SEED)
@@ -96,18 +125,22 @@ class AppStateRepository internal constructor(
         }
 
     private fun revoke(authState: AuthState) {
+        clearSession()
+        _state.value = AppState(authState = authState)
+    }
+
+    private fun clearSession() {
         expiryJob?.cancel()
         expiryJob = null
         state.value.unlockedWallet?.close()
         tempSeedDataSource.seed = null
-        _state.value = AppState(authState = authState)
     }
 
     private fun startSession(
         mnemonic: AttoMnemonic,
         password: String,
     ) {
-        revoke(AuthState.SESSION_INVALID)
+        clearSession()
         val unlockedWallet = UnlockedWallet(mnemonic, password, scope.coroutineContext)
         _state.value = AppState(authState = AuthState.SESSION_VALID, unlockedWallet = unlockedWallet)
         expiryJob =

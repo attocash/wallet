@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 internal data class PasswordFormValues(
     val password: String,
     val confirmation: String? = null,
+    val currentPassword: String? = null,
 )
 
 // CMP-9861: Compose Web does not map password autofill semantics to native HTML inputs.
