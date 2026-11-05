@@ -204,7 +204,7 @@ private fun SettingsActionsPanel(
         AttoSettingsActionRow(
             icon = Icons.AutoMirrored.Outlined.Logout,
             title = "Logout",
-            subtitle = "Clear keys and return to welcome screen",
+            subtitle = "Remove this wallet and its saved preferences",
             accent = dark_danger,
             onClick = onLogoutClick,
         )

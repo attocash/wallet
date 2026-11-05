@@ -60,6 +60,14 @@ actual class PreferencesDataSource(
         }
     }
 
+    actual suspend fun clearWallet(seedDataSource: SeedDataSource) {
+        seedDataSource.clearSeed()
+        dataStore.edit { preferences ->
+            preferences.remove(blobKey)
+            preferences.remove(termsAndConditionsDateKey)
+        }
+    }
+
     internal actual suspend fun walletSnapshot() = WalletStorageSnapshot(null, blob.first())
 
     internal actual suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot) = setBlob(blob)

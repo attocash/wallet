@@ -115,8 +115,12 @@ class AppStateRepository internal constructor(
 
     suspend fun deleteKeys() =
         mutex.withLock {
-            revoke(AuthState.NO_SEED)
-            keyStore.clear()
+            revoke(AuthState.SESSION_INVALID)
+            // Finish persistence and the matching state transition together after revoking active work.
+            withContext(NonCancellable) {
+                keyStore.clear()
+                revoke(AuthState.NO_SEED)
+            }
         }
 
     suspend fun lock() =

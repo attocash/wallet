@@ -41,13 +41,13 @@ fun LogoutDialog(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = "Logging out clears the wallet keys stored on this device.",
+                text = "Logging out removes this wallet, saved labels, account settings, and terms acceptance from this device.",
                 color = dark_text_secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                text = "Make sure you have your recovery phrase saved before continuing.",
+                text = "Save your recovery phrase and export any preferences you want to keep before continuing.",
                 color = dark_text_secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),

@@ -83,7 +83,7 @@ internal class PlatformWalletKeyStore(
                 if (storedPreferences.isNullOrBlank()) {
                     null
                 } else {
-                    // Logout can leave preferences belonging to a previous password. Preserve unreadable records.
+                    // Preserve unreadable records from older clients or interrupted storage updates.
                     seedAESInteractor.decryptSeed(storedPreferences, password, EncryptedDataPurpose.PREFERENCES)
                 }
             val updatedPreferences =
@@ -169,5 +169,5 @@ internal class PlatformWalletKeyStore(
         return { preferencesDataSource.replaceEncryptedWallet(encryptedSeed, encryptedPreferences, snapshot) }
     }
 
-    override suspend fun clear() = seedDataSource.clearSeed()
+    override suspend fun clear() = preferencesDataSource.clearWallet(seedDataSource)
 }

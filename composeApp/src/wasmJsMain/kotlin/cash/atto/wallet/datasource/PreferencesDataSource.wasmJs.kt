@@ -24,6 +24,24 @@ actual class PreferencesDataSource {
 
     actual suspend fun setWork(work: String) = BrowserStorage.withWalletLock { update(WORK, recordValue(work)) }
 
+    actual suspend fun clearWallet(seedDataSource: SeedDataSource) =
+        BrowserStorage.withWalletLock {
+            val original = read().toMutableMap()
+            if (MNEMONIC !in original) {
+                // Keep the old wallet recoverable if removing an alias or the final write fails.
+                original[MNEMONIC] = snapshot().seed?.let(::recordValue) ?: JsonNull
+                BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+            }
+            for (key in listOf(LEGACY_KEY, "seed", "mnemonic")) {
+                if (BrowserStorage.get(key) != null) BrowserStorage.remove(key)
+            }
+            original[MNEMONIC] = JsonNull
+            original.remove(WALLET)
+            original.remove(TERMS)
+            // The tombstone prevents fallback to old seed aliases. No fallible cleanup follows this commit.
+            BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+        }
+
     internal actual suspend fun walletSnapshot(): WalletStorageSnapshot = snapshot()
 
     internal actual suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot) =

@@ -172,6 +172,68 @@ class AppStateRepositoryTest {
         }
 
     @Test
+    fun `failed logout stays locked while the stored wallet can still be unlocked`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repositoryScope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
+            val repository = AppStateRepository(store, TempSeedDataSource(), repositoryScope)
+            repository.submitPassword(PASSWORD)
+            val snapshot = repository.state.value
+            val signer = assertNotNull(snapshot.unlockedWallet).signer(0U.toAttoIndex())
+            store.failClear = true
+
+            // When
+            assertFailsWith<IllegalStateException> { repository.deleteKeys() }
+
+            // Then
+            assertRevoked(repository.state.value)
+            assertNull(snapshot.mnemonic)
+            assertNull(snapshot.password)
+            assertFailsWith<CancellationException> { signer.sign(AttoHash.parse("01".repeat(32))) }
+            assertNotNull(store.mnemonic)
+            assertTrue(repository.submitPassword(PASSWORD))
+            store.failClear = false
+            repository.deleteKeys()
+            assertEquals(AuthState.NO_SEED, repository.state.value.authState)
+        }
+
+    @Test
+    fun `cancelling logout after storage starts completes deletion and the state transition`() =
+        runTest {
+            // Given
+            val store = TestKeyStore(AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE)))
+            val repository = AppStateRepository(store, TempSeedDataSource(), backgroundScope)
+            repository.submitPassword(PASSWORD)
+            val snapshot = repository.state.value
+            val wallet = assertNotNull(snapshot.unlockedWallet)
+            val workStarted = CompletableDeferred<Unit>()
+            val work = async {
+                wallet.run {
+                    workStarted.complete(Unit)
+                    awaitCancellation()
+                }
+            }
+            workStarted.await()
+            store.clearStarted = CompletableDeferred()
+            store.continueClear = CompletableDeferred()
+            val deleting = async { repository.deleteKeys() }
+            store.clearStarted!!.await()
+
+            // When
+            deleting.cancel()
+            store.continueClear!!.complete(Unit)
+            deleting.join()
+
+            // Then
+            assertFailsWith<CancellationException> { work.await() }
+            assertNull(snapshot.mnemonic)
+            assertNull(snapshot.password)
+            assertNull(store.mnemonic)
+            assertEquals(AuthState.NO_SEED, repository.state.value.authState)
+        }
+
+    @Test
     fun `locking abandoned onboarding discards the pending phrase`() =
         runTest {
             // Given
@@ -351,11 +413,14 @@ class AppStateRepositoryTest {
         var mnemonic: AttoMnemonic?,
     ) : WalletKeyStore {
         var failSave = false
+        var failClear = false
         var password = PASSWORD
         var preparationStarted: CompletableDeferred<Unit>? = null
         var continuePreparation: CompletableDeferred<Unit>? = null
         var commitStarted: CompletableDeferred<Unit>? = null
         var continueCommit: CompletableDeferred<Unit>? = null
+        var clearStarted: CompletableDeferred<Unit>? = null
+        var continueClear: CompletableDeferred<Unit>? = null
 
         override suspend fun authState() = if (mnemonic == null) AuthState.NO_SEED else AuthState.SESSION_INVALID
 
@@ -388,6 +453,9 @@ class AppStateRepositoryTest {
         }
 
         override suspend fun clear() {
+            clearStarted?.complete(Unit)
+            continueClear?.await()
+            check(!failClear) { "Storage failed" }
             mnemonic = null
         }
     }

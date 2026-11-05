@@ -230,11 +230,10 @@ class WebWalletKeyStoreTest {
         }
 
     @Test
-    fun `replacing a wallet with a different password does not make old preferences block unlock`() =
+    fun `replacing a wallet with a different password removes old preferences`() =
         runTest {
             // Given
             installLegacyWallet()
-            val oldPreferences = preferencesStorage.blob.first()
             val replacement = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE) { 1 })
             val replacementPassword = "Replacement8!"
             keyStore().clear()
@@ -245,13 +244,14 @@ class WebWalletKeyStoreTest {
 
             // Then
             assertEquals(replacement, unlocked)
-            assertEquals(oldPreferences, preferencesStorage.blob.first())
+            assertNull(preferencesStorage.blob.first())
         }
 
     @Test
     fun `PBKDF2 envelopes migrate to Argon2 without changing the password or plaintext`() =
         runTest {
             // Given
+            localStorage.clear()
             val mnemonic = AttoMnemonic.fromEntropy(ByteArray(AttoMnemonic.ENTROPY_SIZE))
             val oldSeed = encryptPbkdf2Envelope(mnemonic.phrase, PASSWORD, "seed")
             val oldPreferences = encryptPbkdf2Envelope(PREFERENCES, PASSWORD, "preferences")

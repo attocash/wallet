@@ -15,6 +15,8 @@ expect class PreferencesDataSource {
 
     suspend fun setWork(work: String)
 
+    suspend fun clearWallet(seedDataSource: SeedDataSource)
+
     internal suspend fun walletSnapshot(): WalletStorageSnapshot
 
     internal suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot)

@@ -138,7 +138,17 @@ class PreferencesRepository(
 
     private suspend fun updatePreferences(update: (UserPreferences) -> UserPreferences) {
         appStateRepository.withWalletStorage { appState ->
+            val wallet = appState.unlockedWallet ?: throw WalletStorageException("Unlock the wallet before changing its preferences.")
+            wallet.ensureActive()
             val snapshot = preferencesDataSource.walletSnapshot()
+            if (getPlatform().type == PlatformType.WEB) {
+                val password = checkNotNull(wallet.password)
+                val seed = snapshot.seed
+                val persistedPhrase = seed?.let { seedAESInteractor.decryptSeed(it, password, EncryptedDataPurpose.SEED)?.plaintext }
+                if (persistedPhrase == null || persistedPhrase != wallet.mnemonic?.phrase) {
+                    throw WalletStorageException("Wallet data changed in another tab. Lock and unlock this wallet, then try again.")
+                }
+            }
             val currentPreferences = decodePreferences(snapshot.blob, appState.password, requireReadable = true)
             val normalizedPreferences = update(currentPreferences).normalized()
             val rawJson = json.encodeToString(UserPreferences.serializer(), normalizedPreferences)
