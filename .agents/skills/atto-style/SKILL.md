@@ -50,6 +50,12 @@ Keep screens dark, calm, premium, and structured. Use gold and semantic accents 
 - Supporting copy plain, readable, slightly muted.
 - Use monospace only for machine-like values: heights, confirmation timing, some metrics.
 
+## Web Font Startup
+
+- Keep the first screen behind `AttoFontLoader` until Compose resources have loaded every weight in `attoFontWeights`. Resolver `preload()` alone does not wait for the resource-backed `Font()` to stop returning its fallback.
+- Native password controls also need their `AttoPassword` variable font loaded and registered through `document.fonts` before mounting. Keep their selector styles with the form; a stylesheet in the document head does not style controls inside the Compose shadow root.
+- Verify startup by holding font requests, releasing Compose `fetch` and browser `font` requests separately, and comparing the first visible screen with its settled layout on compact and wide viewports. Reject each request type to check the reload path. Kotlin/Wasm JavaScript rejections can be `JsException`, which extends `Throwable`; preserve coroutine cancellation when catching load failures.
+
 ## Interaction Rules
 
 - Hover subtle. Usually `dark_surface` -> `dark_surface_alt`, or soft accent fill -> slightly stronger soft accent fill.

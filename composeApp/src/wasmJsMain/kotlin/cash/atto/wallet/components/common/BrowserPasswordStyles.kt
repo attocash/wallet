@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package cash.atto.wallet.components.common
 
 import androidx.compose.ui.graphics.Color
@@ -13,18 +15,28 @@ import cash.atto.wallet.ui.dark_text_muted
 import cash.atto.wallet.ui.dark_text_primary
 import cash.atto.wallet.ui.dark_text_secondary
 import kotlinx.browser.document
+import kotlinx.coroutines.await
 import org.w3c.dom.HTMLElement
+import kotlin.js.JsAny
+import kotlin.js.Promise
+
+internal suspend fun preloadBrowserPasswordFont() {
+    loadBrowserPasswordFont(Res.getUri("font/noto_sans_variable.ttf")).await<JsAny?>()
+}
+
+private fun loadBrowserPasswordFont(url: String): Promise<JsAny?> =
+    js(
+        """
+        new FontFace('AttoPassword', 'url(' + JSON.stringify(url) + ')', { weight: '100 900' })
+          .load()
+          .then(font => { document.fonts.add(font); return null; })
+        """,
+    )
 
 internal fun createBrowserPasswordStyles(): HTMLElement =
     (document.createElement("style") as HTMLElement).apply {
         textContent =
             """
-            @font-face {
-              font-family: AttoPassword;
-              src: url('${Res.getUri("font/noto_sans_variable.ttf")}') format('truetype');
-              font-weight: 100 900;
-              font-style: normal;
-            }
             .atto-password-field, .atto-password-submit, .atto-password-terms {
               font-family: AttoPassword, sans-serif;
               box-sizing: border-box;

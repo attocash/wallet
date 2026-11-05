@@ -10,20 +10,19 @@ import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.noto_sans_variable
 import org.jetbrains.compose.resources.Font
 
-@Composable
-private fun notoSans(weight: FontWeight) = Font(Res.font.noto_sans_variable, weight)
+internal val attoFontWeights =
+    listOf(
+        FontWeight.W400,
+        FontWeight.W500,
+        FontWeight.W600,
+        FontWeight.W700,
+        FontWeight.W800,
+    )
 
 @Composable
 fun attoFontFamily() =
     FontFamily(
-        fonts =
-            listOf(
-                notoSans(FontWeight.W400),
-                notoSans(FontWeight.W500),
-                notoSans(FontWeight.W600),
-                notoSans(FontWeight.W700),
-                notoSans(FontWeight.W800),
-            ),
+        fonts = attoFontWeights.map { Font(Res.font.noto_sans_variable, it) },
     )
 
 @Composable

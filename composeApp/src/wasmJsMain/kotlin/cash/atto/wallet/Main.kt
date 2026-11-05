@@ -8,6 +8,7 @@ import cash.atto.wallet.components.common.QrScannerView
 import cash.atto.wallet.components.common.isQrScannerSupported
 import cash.atto.wallet.di.viewModelModule
 import cash.atto.wallet.screens.OgImageScreen
+import cash.atto.wallet.ui.AttoFontLoader
 import cash.atto.wallet.ui.AttoWalletTheme
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -18,8 +19,10 @@ import org.koin.core.context.startKoin
 fun main() {
     if (isOgImagePreview()) {
         ComposeViewport(viewportContainerId = "AttoWallet") {
-            AttoWalletTheme {
-                OgImageScreen()
+            AttoFontLoader {
+                AttoWalletTheme {
+                    OgImageScreen()
+                }
             }
         }
         return
@@ -38,34 +41,36 @@ fun main() {
     val qrScannerAvailable = isQrScannerSupported()
 
     ComposeViewport(viewportContainerId = "AttoWallet") {
-        AttoApp(
-            component = navComponent,
+        AttoFontLoader {
+            AttoApp(
+                component = navComponent,
 //            debugScreen = webDebugScreen(),
 //            debugPassword = webDebugPassword(),
 //            initialNavOverride = webDebugMainScreen(),
-            initialNavOverride = launchRequest?.let { MainScreenNavDestination.SEND },
-            initialSendPaymentRequest = launchRequest?.paymentRequest,
-            initialOpenSendConfirm = launchRequest?.openConfirm == true,
-            onAuthenticated = {
-                if (launchRequest != null) {
-                    clearWebQueryParams()
-                }
-            },
-            qrScannerContent =
-                if (qrScannerAvailable) {
-                    { onResult, onError, _ ->
-                        QrScannerView(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth(),
-                            onQrCodeScanned = onResult,
-                            onScanError = onError,
-                        )
+                initialNavOverride = launchRequest?.let { MainScreenNavDestination.SEND },
+                initialSendPaymentRequest = launchRequest?.paymentRequest,
+                initialOpenSendConfirm = launchRequest?.openConfirm == true,
+                onAuthenticated = {
+                    if (launchRequest != null) {
+                        clearWebQueryParams()
                     }
-                } else {
-                    null
                 },
-        )
+                qrScannerContent =
+                    if (qrScannerAvailable) {
+                        { onResult, onError, _ ->
+                            QrScannerView(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth(),
+                                onQrCodeScanned = onResult,
+                                onScanError = onError,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+            )
+        }
     }
 }
 
