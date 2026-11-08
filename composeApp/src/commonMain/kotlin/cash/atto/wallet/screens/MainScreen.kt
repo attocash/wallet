@@ -14,7 +14,9 @@ import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.uistate.desktop.MainScreenUiState
+import cash.atto.wallet.uistate.settings.SettingsUiState
 import cash.atto.wallet.viewmodel.MainScreenViewModel
+import cash.atto.wallet.viewmodel.SettingsViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -33,8 +35,10 @@ fun MainScreen(
     )? = null,
 ) {
     val viewModel = koinViewModel<MainScreenViewModel>()
+    val settingsViewModel = koinViewModel<SettingsViewModel>()
     val walletManagerRepository = koinInject<WalletManagerRepository>()
     val uiState = viewModel.state.collectAsState()
+    val settingsUiState = settingsViewModel.state.collectAsState()
     val hasCachedWork = walletManagerRepository.workReadyState.collectAsState()
 
     val navState =
@@ -46,22 +50,23 @@ fun MainScreen(
 
     MainScreenContent(
         uiState = uiState.value,
+        settingsUiState = settingsUiState.value,
         navState = navState.value,
         onNavStateChanged = { navState.value = it },
         showBackupDialog = showBackupDialog.value,
         onBackupClick = { showBackupDialog.value = true },
         onDismissBackup = { showBackupDialog.value = false },
         hasCachedWork = hasCachedWork.value,
-        onLock = { viewModel.lock() },
-        onShowLogout = { viewModel.showLogoutDialog() },
-        onDismissLogout = { viewModel.hideLogoutDialog() },
-        onExportPreferences = { viewModel.exportPreferences() },
-        onImportPreferences = { viewModel.importPreferences() },
-        onWorkSourceSelected = { viewModel.setWorkSource(it) },
-        onDismissPreferencesMessage = { viewModel.clearPreferencesMessage() },
+        onLock = { settingsViewModel.lock() },
+        onShowLogout = { settingsViewModel.showLogoutDialog() },
+        onDismissLogout = { settingsViewModel.hideLogoutDialog() },
+        onExportPreferences = { settingsViewModel.exportPreferences() },
+        onImportPreferences = { settingsViewModel.importPreferences() },
+        onWorkSourceSelected = { settingsViewModel.setWorkSource(it) },
+        onDismissPreferencesMessage = { settingsViewModel.clearPreferencesMessage() },
         onConfirmLogout = {
-            viewModel.logout()
-            viewModel.hideLogoutDialog()
+            settingsViewModel.logout()
+            settingsViewModel.hideLogoutDialog()
             onLogoutNavigation()
         },
         initialSendPaymentRequest = initialSendPaymentRequest,
@@ -73,6 +78,7 @@ fun MainScreen(
 @Composable
 fun MainScreenContent(
     uiState: MainScreenUiState,
+    settingsUiState: SettingsUiState,
     navState: MainScreenNavDestination,
     onNavStateChanged: (MainScreenNavDestination) -> Unit,
     showBackupDialog: Boolean,
@@ -168,7 +174,7 @@ fun MainScreenContent(
 
                 MainScreenNavDestination.SETTINGS -> {
                     SettingsScreen(
-                        uiState = uiState.settingsUiState,
+                        uiState = settingsUiState,
                         onBackClick = { onNavStateChanged(MainScreenNavDestination.OVERVIEW) },
                         onBackupClick = onBackupClick,
                         onExportClick = onExportPreferences,
@@ -182,7 +188,7 @@ fun MainScreenContent(
         }
     }
 
-    if (uiState.showLogoutDialog) {
+    if (settingsUiState.showLogoutDialog) {
         LogoutDialog(
             onDismiss = onDismissLogout,
             onConfirm = onConfirmLogout,

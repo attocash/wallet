@@ -26,55 +26,61 @@ actual class PreferencesDataSource {
 
     actual suspend fun clearWallet(seedDataSource: SeedDataSource) =
         BrowserStorage.withWalletLock {
-            val original = read().toMutableMap()
-            if (MNEMONIC !in original) {
-                // Keep the old wallet recoverable if removing an alias or the final write fails.
-                original[MNEMONIC] = snapshot().seed?.let(::recordValue) ?: JsonNull
-                BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+            changeCredentials {
+                this[MNEMONIC] = JsonNull
+                remove(WALLET)
+                remove(TERMS)
             }
-            for (key in listOf(LEGACY_KEY, "seed", "mnemonic")) {
-                if (BrowserStorage.get(key) != null) BrowserStorage.remove(key)
-            }
-            original[MNEMONIC] = JsonNull
-            original.remove(WALLET)
-            original.remove(TERMS)
-            // The tombstone prevents fallback to old seed aliases. No fallible cleanup follows this commit.
-            BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
         }
 
     internal actual suspend fun walletSnapshot(): WalletStorageSnapshot = snapshot()
 
-    internal actual suspend fun setWalletBlob(blob: String, expected: WalletStorageSnapshot) =
-        BrowserStorage.withWalletLock {
-            requireCurrent(expected)
-            update(WALLET, recordValue(blob))
-        }
+    internal actual suspend fun setWalletBlob(
+        blob: String,
+        expected: WalletStorageSnapshot,
+    ) = BrowserStorage.withWalletLock {
+        requireCurrent(expected)
+        update(WALLET, recordValue(blob))
+    }
 
-    internal actual suspend fun migrateEncryptedWallet(seed: String, blob: String?, expected: WalletStorageSnapshot) =
-        BrowserStorage.withWalletLock {
-            requireCurrent(expected)
-            if (blob != expected.blob && blob != null) update(WALLET, recordValue(blob))
-            migrateLegacyStorage()
-            setMnemonicWithoutLock(seed)
-        }
+    internal actual suspend fun migrateEncryptedWallet(
+        seed: String,
+        blob: String?,
+        expected: WalletStorageSnapshot,
+    ) = BrowserStorage.withWalletLock {
+        requireCurrent(expected)
+        if (blob != expected.blob && blob != null) update(WALLET, recordValue(blob))
+        migrateLegacyStorage()
+        setMnemonicWithoutLock(seed)
+    }
 
-    internal actual suspend fun replaceEncryptedWallet(seed: String, blob: String, expected: WalletStorageSnapshot) =
-        BrowserStorage.withWalletLock {
-            requireCurrent(expected)
-            val original = read().toMutableMap()
-            if (MNEMONIC !in original) {
-                // Preserve the old credentials before requiring removal of their standalone aliases.
-                original[MNEMONIC] = expected.seed?.let(::recordValue) ?: JsonNull
-                BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
-            }
-            for (key in listOf(LEGACY_KEY, "seed", "mnemonic")) {
-                if (BrowserStorage.get(key) != null) BrowserStorage.remove(key)
-            }
-            original[MNEMONIC] = recordValue(seed)
-            original[WALLET] = recordValue(blob)
-            // No fallible cleanup follows the one replacement that changes the password.
+    internal actual suspend fun replaceEncryptedWallet(
+        seed: String,
+        blob: String,
+        expected: WalletStorageSnapshot,
+    ) = BrowserStorage.withWalletLock {
+        requireCurrent(expected)
+        changeCredentials {
+            this[MNEMONIC] = recordValue(seed)
+            this[WALLET] = recordValue(blob)
+        }
+    }
+
+    // Called under the wallet lock for both password replacement and the logout tombstone.
+    private fun changeCredentials(change: MutableMap<String, JsonElement>.() -> Unit) {
+        val original = read().toMutableMap()
+        if (MNEMONIC !in original) {
+            // Keep old credentials authoritative if alias removal or the final write fails.
+            original[MNEMONIC] = snapshot().seed?.let(::recordValue) ?: JsonNull
             BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
         }
+        for (key in listOf(LEGACY_KEY, "seed", "mnemonic")) {
+            if (BrowserStorage.get(key) != null) BrowserStorage.remove(key)
+        }
+        original.change()
+        // Commit replacement credentials or the tombstone last; no fallible cleanup may follow.
+        BrowserStorage.set(STORAGE_KEY, JsonObject(original).toString())
+    }
 
     internal fun containsMnemonic(): Boolean = MNEMONIC in read()
 
@@ -113,7 +119,11 @@ actual class PreferencesDataSource {
     }
 
     private fun requireCurrent(expected: WalletStorageSnapshot) {
-        if (snapshot() != expected) throw WalletStorageException("Wallet data changed in another tab. Lock and unlock this wallet, then try again.")
+        if (snapshot() !=
+            expected
+        ) {
+            throw WalletStorageException("Wallet data changed in another tab. Lock and unlock this wallet, then try again.")
+        }
     }
 
     private fun observe(key: String) = BrowserStorage.updates().map { read()[key]?.storedValue() }.distinctUntilChanged()

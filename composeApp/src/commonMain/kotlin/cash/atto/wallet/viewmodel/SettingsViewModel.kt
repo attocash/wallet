@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.toAddress
 import cash.atto.wallet.model.WorkSourcePreference
@@ -10,9 +11,8 @@ import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.uistate.settings.ProfileUiState
 import cash.atto.wallet.uistate.settings.SettingsUiState
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,16 +23,11 @@ class SettingsViewModel(
     private val appStateRepository: AppStateRepository,
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
-    private val viewModelScope = CoroutineScope(Dispatchers.Default)
-
-    private var appStateCollectorJob: Job? = null
-    private var preferencesCollectorJob: Job? = null
-
     private val _state = MutableStateFlow(SettingsUiState.PREVIEW)
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.value =
                 SettingsUiState(
                     profileUiState = ProfileUiState.DEFAULT,
@@ -40,45 +35,41 @@ class SettingsViewModel(
 
             delay(100)
 
-            appStateCollectorJob?.cancel()
-            appStateCollectorJob =
-                viewModelScope.launch {
-                    appStateRepository.state.collect { appState ->
-                        appState.getPublicKey()?.let {
-                            _state.update { settingsUiState ->
-                                settingsUiState.copy(
-                                    profileUiState =
-                                        ProfileUiState(
-                                            name = "Main Account",
-                                            hash = it.toAddress(AttoAlgorithm.V1).value,
-                                        ),
-                                )
-                            }
-                        }
-                    }
-                }
-
-            preferencesCollectorJob?.cancel()
-            preferencesCollectorJob =
-                viewModelScope.launch {
-                    preferencesRepository.workSource.collect { workSource ->
+            viewModelScope.launch(Dispatchers.Default) {
+                appStateRepository.state.collect { appState ->
+                    appState.getPublicKey()?.let {
                         _state.update { settingsUiState ->
                             settingsUiState.copy(
-                                workSource = workSource,
+                                profileUiState =
+                                    ProfileUiState(
+                                        name = "Main Account",
+                                        hash = it.toAddress(AttoAlgorithm.V1).value,
+                                    ),
                             )
                         }
                     }
                 }
+            }
+
+            viewModelScope.launch(Dispatchers.Default) {
+                preferencesRepository.workSource.collect { workSource ->
+                    _state.update { settingsUiState ->
+                        settingsUiState.copy(
+                            workSource = workSource,
+                        )
+                    }
+                }
+            }
         }
     }
 
     fun hideLogoutDialog() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.update { it.copy(showLogoutDialog = false) }
         }
 
     fun exportPreferences() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val message =
                 runCatching {
                     val export =
@@ -89,6 +80,7 @@ class SettingsViewModel(
                         )
                     "Preferences exported to ${export.location}"
                 }.getOrElse { error ->
+                    if (error is CancellationException) throw error
                     error.message ?: "Unable to export preferences."
                 }
 
@@ -96,7 +88,7 @@ class SettingsViewModel(
         }
 
     fun importPreferences() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val importedFile =
                 runCatching {
                     importTextFile(
@@ -104,6 +96,7 @@ class SettingsViewModel(
                         extensions = listOf(".json"),
                     )
                 }.getOrElse { error ->
+                    if (error is CancellationException) throw error
                     showPreferencesMessage(error.message ?: "Unable to import preferences.")
                     return@launch
                 } ?: return@launch
@@ -113,6 +106,7 @@ class SettingsViewModel(
                     preferencesRepository.importPlainJson(importedFile.content)
                     "Preferences imported from ${importedFile.location}"
                 }.getOrElse { error ->
+                    if (error is CancellationException) throw error
                     error.message ?: "Unable to import preferences."
                 }
 
@@ -120,27 +114,27 @@ class SettingsViewModel(
         }
 
     fun setWorkSource(workSource: WorkSourcePreference) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             preferencesRepository.setWorkSource(workSource)
         }
 
     fun clearPreferencesMessage() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.update { it.copy(preferencesMessage = null) }
         }
 
     fun lock() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             appStateRepository.lock()
         }
 
     fun logout() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             appStateRepository.deleteKeys()
         }
 
     fun showLogoutDialog() =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.update { it.copy(showLogoutDialog = true) }
         }
 

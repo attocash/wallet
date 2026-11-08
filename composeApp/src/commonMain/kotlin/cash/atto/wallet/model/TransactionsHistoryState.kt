@@ -8,13 +8,14 @@ data class TransactionsHistoryState(
     val hasMore: Boolean = true,
     val fullHistorySummary: TransactionHistorySummary = TransactionHistorySummary(),
     val isSummaryLoading: Boolean = true,
+    private val summaryThroughHeight: ULong = 0UL,
 ) {
     fun withInitialPage(
         page: List<AttoAccountEntry>,
         pageSize: Int,
     ): TransactionsHistoryState =
         copy(
-            loadedEntries = mergeAccountEntries(emptyList(), page),
+            loadedEntries = mergeAccountEntries(loadedEntries, page),
             nextBeforeHeightExclusive =
                 page
                     .lastOrNull()
@@ -46,7 +47,7 @@ data class TransactionsHistoryState(
         return copy(
             loadedEntries = mergedEntries,
             fullHistorySummary =
-                if (!isSummaryLoading && isNewEntry) {
+                if (!isSummaryLoading && isNewEntry && entry.height.value > summaryThroughHeight) {
                     fullHistorySummary + entry.toTransactionHistorySummary()
                 } else {
                     fullHistorySummary
@@ -54,9 +55,14 @@ data class TransactionsHistoryState(
         )
     }
 
-    fun withSummary(summary: TransactionHistorySummary): TransactionsHistoryState =
+    // Notifications can arrive before or after this snapshot finishes; count only entries beyond its fixed watermark.
+    fun withSummary(snapshot: TransactionHistorySnapshot): TransactionsHistoryState =
         copy(
-            fullHistorySummary = summary,
+            fullHistorySummary =
+                loadedEntries
+                    .filter { it.height.value > snapshot.throughHeight }
+                    .fold(snapshot.summary) { summary, entry -> summary + entry.toTransactionHistorySummary() },
             isSummaryLoading = false,
+            summaryThroughHeight = snapshot.throughHeight,
         )
 }

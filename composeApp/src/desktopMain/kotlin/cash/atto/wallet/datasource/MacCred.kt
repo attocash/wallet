@@ -5,7 +5,6 @@ package cash.atto.wallet.datasource
 import com.sun.jna.Library
 import com.sun.jna.Native
 import com.sun.jna.Pointer
-import com.sun.jna.Structure
 import com.sun.jna.ptr.PointerByReference
 import java.nio.charset.StandardCharsets
 
@@ -44,69 +43,23 @@ interface Security : Library {
     ): Int
 }
 
-@Structure.FieldOrder("name", "flags", "attributes")
-class MacSecretSchema(
-    key: String,
-) : Structure() {
-    private val schemaName = "atto_wallet_${key}_schema"
-
-    companion object {
-        const val SECRET_SCHEMA_NONE = 0
-        const val SECRET_SCHEMA_ATTRIBUTE_STRING = 0
-    }
-
-    @JvmField
-    var name: String = schemaName
-
-    @JvmField
-    var flags: Int = SECRET_SCHEMA_NONE
-
-    @JvmField
-    var attributes: Array<Attribute> =
-        arrayOf(
-            Attribute("key_type", SECRET_SCHEMA_ATTRIBUTE_STRING),
-            Attribute(key, SECRET_SCHEMA_ATTRIBUTE_STRING),
-        )
-
-    @Structure.FieldOrder("name", "type")
-    class Attribute() : Structure() {
-        @JvmField
-        var name: String = "" // Default value for name
-
-        @JvmField
-        var type: Int = 0 // Default value for type (0 for string)
-
-        constructor(name: String, type: Int) : this() {
-            this.name = name
-            this.type = type
-        }
-    }
-
-    init {
-        this.write() // Write the structure
-    }
-}
-
 class MacCred {
     val serviceName = "Atto Wallet"
 
-    private val seedSecretSchema = SecretSchema(SEED_SCHEMA_KEY)
-    private val passwordSecretSchema = SecretSchema(PASSWORD_SCHEMA_KEY)
+    fun getSeed() = get(SEED_ACCOUNT_NAME)
 
-    fun getSeed() = get(seedSecretSchema)
+    fun storeSeed(seed: String) = store(SEED_ACCOUNT_NAME, seed)
 
-    fun storeSeed(seed: String) = store(seedSecretSchema, seed)
+    fun deleteSeed() = delete(SEED_ACCOUNT_NAME)
 
-    fun deleteSeed() = delete(seedSecretSchema)
+    fun getPassword() = get(PASSWORD_ACCOUNT_NAME)
 
-    fun getPassword() = get(passwordSecretSchema)
+    fun storePassword(password: String) = store(PASSWORD_ACCOUNT_NAME, password)
 
-    fun storePassword(password: String) = store(passwordSecretSchema, password)
+    fun deletePassword() = delete(PASSWORD_ACCOUNT_NAME)
 
-    fun deletePassword() = delete(passwordSecretSchema)
-
-    fun store(
-        schema: SecretSchema,
+    private fun store(
+        accountName: String,
         password: String,
     ): Boolean {
         val passwordData = password.toByteArray(StandardCharsets.UTF_8)
@@ -115,8 +68,8 @@ class MacCred {
                 null,
                 serviceName.length,
                 serviceName,
-                schema.name.length,
-                schema.name,
+                accountName.length,
+                accountName,
                 passwordData.size,
                 passwordData,
                 null,
@@ -127,7 +80,7 @@ class MacCred {
         return true
     }
 
-    fun get(schema: SecretSchema): String? {
+    private fun get(accountName: String): String? {
         val passwordLength = IntArray(1)
         val passwordData = PointerByReference()
         val itemRef = PointerByReference()
@@ -137,8 +90,8 @@ class MacCred {
                 null,
                 serviceName.length,
                 serviceName,
-                schema.name.length,
-                schema.name,
+                accountName.length,
+                accountName,
                 passwordLength,
                 passwordData,
                 itemRef,
@@ -153,15 +106,15 @@ class MacCred {
         }
     }
 
-    fun delete(schema: SecretSchema): Boolean {
+    private fun delete(accountName: String): Boolean {
         val itemRef = PointerByReference()
         val result =
             Security.INSTANCE.SecKeychainFindGenericPassword(
                 null,
                 serviceName.length,
                 serviceName,
-                schema.name.length,
-                schema.name,
+                accountName.length,
+                accountName,
                 null,
                 null,
                 itemRef,
@@ -179,7 +132,8 @@ class MacCred {
     }
 
     companion object {
-        private const val SEED_SCHEMA_KEY = "seed"
-        private const val PASSWORD_SCHEMA_KEY = "password"
+        // These existing Keychain account names must remain stable across wallet versions.
+        private const val SEED_ACCOUNT_NAME = "atto_wallet_seed_schema"
+        private const val PASSWORD_ACCOUNT_NAME = "atto_wallet_password_schema"
     }
 }

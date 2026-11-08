@@ -57,16 +57,14 @@ interface AccountEntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(entry: AccountEntry)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveAll(entries: List<AccountEntry>)
-
     @Query(
-        "SELECT blockType, balanceRaw, previousBalanceRaw FROM accountEntries " +
+        "SELECT height, blockType, balanceRaw, previousBalanceRaw FROM accountEntries " +
             "WHERE publicKey = :publicKey AND blockType != ''",
     )
     suspend fun summaryRows(publicKey: ByteArray): List<SummaryRow>
 
     data class SummaryRow(
+        val height: Long,
         val blockType: String,
         val balanceRaw: String,
         val previousBalanceRaw: String,

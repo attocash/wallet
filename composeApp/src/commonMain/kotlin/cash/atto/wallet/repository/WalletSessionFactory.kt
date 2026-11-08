@@ -20,6 +20,7 @@ import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.worker.createLocalWorker
 import cash.atto.wallet.worker.isLocalWorkerSupported
+import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
 
 internal class WalletSessionFactory(
@@ -50,6 +51,7 @@ internal class WalletSessionFactory(
                     network = network,
                     workCache = workCache,
                     delegate = workerDelegate.retry(retryDelay).cached(),
+                    context = Dispatchers.Default + unlockedWallet.job,
                 )
             try {
                 val signerProvider: suspend (AttoKeyIndex) -> AttoSigner = unlockedWallet::signer

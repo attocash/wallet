@@ -1,6 +1,7 @@
 package cash.atto.wallet.di
 
 import cash.atto.commons.AttoNetwork
+import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.TempSeedDataSource
 import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.repository.AppStateRepository
@@ -49,8 +50,8 @@ val repositoryModule =
 //    single { AttoNetwork.DEV }
         single { AttoNetwork.LIVE }
         single { AppStateRepository(get(), get(), get(), get(), get()) }
-        singleOf(::PersistentAccountEntryRepository)
-        singleOf(::PersistentWorkCache)
+        single { PersistentAccountEntryRepository(get<AppDatabase>()) }
+        single { PersistentWorkCache(get<AppDatabase>()) }
         singleOf(::HomeRepository)
         singleOf(::MetricsRepository)
         singleOf(::PreferencesRepository)

@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.getPlatform
 import cash.atto.wallet.repository.AppStateRepository
@@ -8,7 +9,6 @@ import cash.atto.wallet.repository.TermsAndConditionsRepository
 import cash.atto.wallet.repository.WalletStorageException
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.uistate.AppUiState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,10 +25,8 @@ class AppViewModel(
 
     private val authenticationError = MutableStateFlow<String?>(null)
 
-    private val scope = CoroutineScope(Dispatchers.Default)
-
     init {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             combine(
                 appStateRepository.state,
                 termsAndConditionsRepository.accepted,
@@ -63,7 +61,7 @@ class AppViewModel(
     }
 
     fun logout() {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             appStateRepository.deleteKeys()
         }
     }

@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoUnit
@@ -8,6 +9,7 @@ import cash.atto.wallet.model.TransactionHistorySummary
 import cash.atto.wallet.model.TransactionsHistoryState
 import cash.atto.wallet.model.getAddressLabel
 import cash.atto.wallet.model.getVoterLabel
+import cash.atto.wallet.platform.exportCsv
 import cash.atto.wallet.repository.HomeRepository
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PreferencesRepository
@@ -19,12 +21,14 @@ import cash.atto.wallet.uistate.overview.buildTransactionListUiState
 import cash.atto.wallet.uistate.transactions.TransactionsSummaryUiState
 import cash.atto.wallet.uistate.transactions.TransactionsUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.parseString
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.io.Sink
 
@@ -37,14 +41,14 @@ class TransactionsViewModel(
     private val _state = MutableStateFlow(TransactionsUiState())
     val state = _state.asStateFlow()
 
-    private val scope = CoroutineScope(Dispatchers.Default)
     private var accountEntriesCollectorJob: Job? = null
     private var summaryCollectorJob: Job? = null
     private var currentPublicKey: AttoPublicKey? = null
-    private var historyState = TransactionsHistoryState()
+    private val history = MutableStateFlow(TransactionsHistoryState())
+    private val historyState get() = history.value
 
     init {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             preferencesRepository.state.collect {
                 emitState(
                     isLoadingInitial = state.value.isLoadingInitial,
@@ -54,40 +58,40 @@ class TransactionsViewModel(
             }
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.publicKeyState
                 .filterNotNull()
                 .collect { publicKey ->
+                    accountEntriesCollectorJob?.cancelAndJoin()
+                    summaryCollectorJob?.cancelAndJoin()
                     currentPublicKey = publicKey
-                    historyState = TransactionsHistoryState()
+                    history.value = TransactionsHistoryState()
                     _state.emit(
                         TransactionsUiState(
                             fullHistorySummary = buildSummaryUiState(),
                         ),
                     )
 
-                    loadInitialPage(publicKey)
-
-                    summaryCollectorJob?.cancel()
-                    summaryCollectorJob =
-                        scope.launch {
-                            loadSummary(publicKey)
-                        }
-
-                    accountEntriesCollectorJob?.cancel()
                     accountEntriesCollectorJob =
-                        scope.launch {
+                        viewModelScope.launch(Dispatchers.Default, start = CoroutineStart.UNDISPATCHED) {
                             persistentAccountEntryRepository.flow(publicKey).collect { entry ->
                                 if (entry.publicKey != currentPublicKey) return@collect
 
-                                historyState = historyState.withLiveEntry(entry)
+                                history.update { it.withLiveEntry(entry) }
 
                                 emitState(
-                                    isLoadingInitial = false,
-                                    isLoadingMore = false,
+                                    isLoadingInitial = state.value.isLoadingInitial,
+                                    isLoadingMore = state.value.isLoadingMore,
                                     hasMore = historyState.hasMore,
                                 )
                             }
+                        }
+
+                    loadInitialPage(publicKey)
+
+                    summaryCollectorJob =
+                        viewModelScope.launch(Dispatchers.Default) {
+                            loadSummary(publicKey)
                         }
                 }
         }
@@ -101,7 +105,7 @@ class TransactionsViewModel(
             return
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.emit(currentState.copy(isLoadingMore = true))
 
             val page =
@@ -115,7 +119,7 @@ class TransactionsViewModel(
                 return@launch
             }
 
-            historyState = historyState.withOlderPage(page, PAGE_SIZE)
+            history.update { it.withOlderPage(page, PAGE_SIZE) }
 
             emitState(
                 isLoadingInitial = false,
@@ -151,7 +155,7 @@ class TransactionsViewModel(
             return
         }
 
-        historyState = historyState.withInitialPage(page, PAGE_SIZE)
+        history.update { it.withInitialPage(page, PAGE_SIZE) }
 
         emitState(
             isLoadingInitial = false,
@@ -167,7 +171,7 @@ class TransactionsViewModel(
             return
         }
 
-        historyState = historyState.withSummary(summary)
+        history.update { it.withSummary(summary) }
         emitState(
             isLoadingInitial = state.value.isLoadingInitial,
             isLoadingMore = state.value.isLoadingMore,

@@ -5,12 +5,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import cash.atto.wallet.util.SecurityUtil
 import cash.atto.wallet.util.dataStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 actual class PasswordDataSource(
     context: Context,
@@ -21,9 +17,6 @@ actual class PasswordDataSource(
     private val ivToStringSeparator = ":iv:"
 
     private val dataStore = context.dataStore
-
-    private val dataSourceScope = CoroutineScope(Dispatchers.IO)
-    private var dataSourceJob: Job? = null
 
     actual suspend fun getPassword(seed: String): String? {
         val encryptedSeed = encryptSeed(seed)
@@ -50,17 +43,7 @@ actual class PasswordDataSource(
                     }
                 }
 
-        val passwordChannel = Channel<String?>()
-
-        dataSourceJob?.cancel()
-        dataSourceJob =
-            dataSourceScope.launch {
-                passwordFlow.collect {
-                    passwordChannel.send(it)
-                }
-            }
-
-        return passwordChannel.receive()
+        return passwordFlow.first()
     }
 
     actual suspend fun setPassword(

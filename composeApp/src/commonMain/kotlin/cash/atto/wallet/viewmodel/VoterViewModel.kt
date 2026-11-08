@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
@@ -10,7 +11,6 @@ import cash.atto.wallet.model.calculateEntityWeightPercentage
 import cash.atto.wallet.repository.VotersRepository
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.settings.VoterUIState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,10 +23,8 @@ class VoterViewModel(
     private val _state = MutableStateFlow(VoterUIState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val viewModelScope = CoroutineScope(Dispatchers.Default)
-
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.emit(state.value.copy(isLoading = true))
 
             // Fetch voters data first

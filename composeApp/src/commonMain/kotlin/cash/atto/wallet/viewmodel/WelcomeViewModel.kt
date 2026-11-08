@@ -1,10 +1,10 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.wallet.repository.MetricsRepository
 import cash.atto.wallet.uistate.welcome.WelcomeMetricsUiState
 import cash.atto.wallet.uistate.welcome.toWelcomeMetricsUiState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ class WelcomeViewModel(
     val state = _state.asStateFlow()
 
     init {
-        CoroutineScope(Dispatchers.Default).launch {
+        viewModelScope.launch(Dispatchers.Default) {
             metricsRepository.metricsResponse.collect { metricsResponse ->
                 _state.emit(
                     metricsResponse?.toWelcomeMetricsUiState() ?: WelcomeMetricsUiState.DEFAULT,

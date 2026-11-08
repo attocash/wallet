@@ -1,10 +1,10 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAccount
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoUnit
-import cash.atto.wallet.model.WorkSourcePreference
 import cash.atto.wallet.model.getStakingApy
 import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.repository.HomeRepository
@@ -15,9 +15,7 @@ import cash.atto.wallet.uistate.desktop.MainScreenUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -25,23 +23,17 @@ import kotlinx.coroutines.launch
 
 class MainScreenViewModel(
     private val walletManagerRepository: WalletManagerRepository,
-    private val settingsViewModel: SettingsViewModel,
     private val homeRepository: HomeRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainScreenUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private var settingsCollectorJob: Job? = null
-    private var homeCollectorJob: Job? = null
-    private var receivablesCollectorJob: Job? = null
     private var currentBalance: BigDecimal? = null
     private var currentRepresentativeAddress: String? = null
     private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
 
-    private val scope = CoroutineScope(Dispatchers.Default)
-
     init {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountState
                 .filterNotNull()
                 .collect { account ->
@@ -49,51 +41,19 @@ class MainScreenViewModel(
                 }
         }
 
-        settingsCollectorJob?.cancel()
-        settingsCollectorJob =
-            scope.launch {
-                settingsViewModel.state.collect {
-                    _state.emit(
-                        state.value.copy(
-                            settingsUiState = it,
-                        ),
-                    )
-                }
+        viewModelScope.launch(Dispatchers.Default) {
+            homeRepository.homeResponse.collect {
+                updateBalanceWithUsd()
             }
+        }
 
-        homeCollectorJob?.cancel()
-        homeCollectorJob =
-            scope.launch {
-                homeRepository.homeResponse.collect {
-                    updateBalanceWithUsd()
-                }
+        viewModelScope.launch(Dispatchers.Default) {
+            walletManagerRepository.pendingReceivablesState.collect {
+                pendingReceivablesState = it
+                updateBalanceWithUsd()
             }
-
-        receivablesCollectorJob?.cancel()
-        receivablesCollectorJob =
-            scope.launch {
-                walletManagerRepository.pendingReceivablesState.collect {
-                    pendingReceivablesState = it
-                    updateBalanceWithUsd()
-                }
-            }
+        }
     }
-
-    fun hideLogoutDialog() = settingsViewModel.hideLogoutDialog()
-
-    fun showLogoutDialog() = settingsViewModel.showLogoutDialog()
-
-    fun lock() = settingsViewModel.lock()
-
-    fun logout() = settingsViewModel.logout()
-
-    fun exportPreferences() = settingsViewModel.exportPreferences()
-
-    fun importPreferences() = settingsViewModel.importPreferences()
-
-    fun setWorkSource(workSource: WorkSourcePreference) = settingsViewModel.setWorkSource(workSource)
-
-    fun clearPreferencesMessage() = settingsViewModel.clearPreferencesMessage()
 
     private suspend fun handleAccount(account: AttoAccount) {
         println("Account $account")

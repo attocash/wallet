@@ -12,20 +12,27 @@ import cash.atto.commons.worker.AttoWorker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.CoroutineContext
 
 internal class PersistentWorkCachingWorker(
     private val network: AttoNetwork,
     private val workCache: PersistentWorkCache,
     private val delegate: AttoWorker,
+    context: CoroutineContext = Dispatchers.Default,
 ) : AttoWorker {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private class WorkRequest(
+        val target: AttoWorkTarget,
+    )
+
+    private val scope = CoroutineScope(context + SupervisorJob(context[Job]))
     private val inFlightMutex = Mutex()
-    private val inFlightTargets = mutableMapOf<AttoPublicKey, AttoWorkTarget>()
+    private val inFlightRequests = mutableMapOf<AttoPublicKey, WorkRequest>()
 
     override suspend fun work(
         threshold: ULong,
@@ -47,14 +54,8 @@ internal class PersistentWorkCachingWorker(
                 timestamp = block.timestamp,
                 target = target,
             )
-        val work =
-            if (cachedWork != null) {
-                workCache.clear(block.publicKey)
-                cachedWork
-            } else {
-                workCache.clear(block.publicKey)
-                delegate.work(block)
-            }
+        workCache.clear(block.publicKey)
+        val work = cachedWork ?: delegate.work(block)
 
         cacheNextWork(block)
         return work
@@ -77,13 +78,6 @@ internal class PersistentWorkCachingWorker(
         )
     }
 
-    private suspend fun cachedWork(
-        publicKey: AttoPublicKey,
-        network: AttoNetwork,
-        timestamp: AttoInstant,
-        target: AttoWorkTarget,
-    ): AttoWork? = workCache.getValid(publicKey, network, timestamp, target)
-
     private fun cacheNextWork(block: AttoBlock) {
         cacheWork(
             publicKey = block.publicKey,
@@ -99,34 +93,28 @@ internal class PersistentWorkCachingWorker(
     ) {
         scope.launch {
             val timestamp = AttoInstant.now()
-            if (cachedWork(publicKey, network, timestamp, target) != null) {
+            if (workCache.hasValid(publicKey, network, timestamp, target)) {
                 return@launch
             }
 
-            val shouldLaunch =
+            val request =
                 inFlightMutex.withLock {
-                    if (inFlightTargets[publicKey] == target) {
-                        false
+                    if (inFlightRequests[publicKey]?.target == target) {
+                        null
                     } else {
-                        inFlightTargets[publicKey] = target
-                        true
+                        WorkRequest(target).also { inFlightRequests[publicKey] = it }
                     }
-                }
-            if (!shouldLaunch) {
-                return@launch
-            }
+                } ?: return@launch
 
             try {
                 val work = delegate.work(network, timestamp, target)
-                val isLatestTarget =
-                    inFlightMutex.withLock {
-                        inFlightTargets[publicKey] == target
+                inFlightMutex.withLock {
+                    if (inFlightRequests[publicKey] === request) {
+                        workCache.save(
+                            publicKey = publicKey,
+                            work = work,
+                        )
                     }
-                if (isLatestTarget) {
-                    workCache.save(
-                        publicKey = publicKey,
-                        work = work,
-                    )
                 }
             } catch (ex: CancellationException) {
                 throw ex
@@ -134,8 +122,8 @@ internal class PersistentWorkCachingWorker(
                 println("Failed to cache work for $description: ${ex.message}")
             } finally {
                 inFlightMutex.withLock {
-                    if (inFlightTargets[publicKey] == target) {
-                        inFlightTargets.remove(publicKey)
+                    if (inFlightRequests[publicKey] === request) {
+                        inFlightRequests.remove(publicKey)
                     }
                 }
             }

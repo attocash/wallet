@@ -1,6 +1,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAccountEntry
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
@@ -24,7 +25,6 @@ import cash.atto.wallet.uistate.overview.buildTransactionListUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +41,6 @@ class OverviewViewModel(
     val state = _state.asStateFlow()
 
     private var accountEntriesCollectorJob: Job? = null
-    private var receivablesCollectorJob: Job? = null
     private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
     private var currentRepresentativeAddress: String? = null
     private var recentEntries: List<AttoAccountEntry> = emptyList()
@@ -49,34 +48,32 @@ class OverviewViewModel(
     private var accounts: List<WalletAccountState> = emptyList()
     private var selectedAccountIndex: UInt = 0U
 
-    private val scope = CoroutineScope(Dispatchers.Default)
-
     init {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _state.value = OverviewUiState.empty()
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountsState.collect {
                 accounts = it
                 emitUpdatedState()
             }
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.selectedAccountIndexState.collect {
                 selectedAccountIndex = it.value
                 emitUpdatedState()
             }
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             preferencesRepository.state.collect {
                 emitUpdatedState()
             }
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountState.collect { account ->
                 if (account == null) {
                     currentRepresentativeAddress = null
@@ -102,7 +99,7 @@ class OverviewViewModel(
             }
         }
 
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.publicKeyState.collect { publicKey ->
                 accountEntriesCollectorJob?.cancel()
                 recentEntries = emptyList()
@@ -122,7 +119,7 @@ class OverviewViewModel(
                 clearAccountData(receiveAddress = receiveAddress)
 
                 accountEntriesCollectorJob =
-                    scope.launch {
+                    viewModelScope.launch(Dispatchers.Default) {
                         // Load persisted entries from DB so they show after a page refresh.
                         val persisted =
                             persistentAccountEntryRepository.listRecent(
@@ -147,19 +144,17 @@ class OverviewViewModel(
             }
         }
 
-        receivablesCollectorJob?.cancel()
-        receivablesCollectorJob =
-            scope.launch {
-                walletManagerRepository.pendingReceivablesState.collect {
-                    pendingReceivablesState = it
-                    _state.emit(
-                        state.value.copy(
-                            pendingReceivableCount = it.count,
-                            pendingReceivableAmount = it.totalAmount,
-                        ),
-                    )
-                }
+        viewModelScope.launch(Dispatchers.Default) {
+            walletManagerRepository.pendingReceivablesState.collect {
+                pendingReceivablesState = it
+                _state.emit(
+                    state.value.copy(
+                        pendingReceivableCount = it.count,
+                        pendingReceivableAmount = it.totalAmount,
+                    ),
+                )
             }
+        }
     }
 
     private fun calculateApy(): BigDecimal? {
@@ -233,13 +228,13 @@ class OverviewViewModel(
         }
 
     fun selectAccount(index: UInt) {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.selectAccount(index)
         }
     }
 
     fun addAccount(name: String) {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.addAccount(name)
         }
     }
@@ -248,7 +243,7 @@ class OverviewViewModel(
         index: UInt,
         active: Boolean,
     ) {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.setAccountActive(
                 index = index,
                 active = active,
@@ -260,7 +255,7 @@ class OverviewViewModel(
         index: UInt,
         name: String,
     ) {
-        scope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.nameAccount(
                 index = index,
                 name = name,

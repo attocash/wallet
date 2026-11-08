@@ -1,5 +1,7 @@
 package cash.atto.wallet.viewmodel
 
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoMnemonic
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.PreferencesDataSource
@@ -15,8 +17,12 @@ import cash.atto.wallet.state.AppState.AuthState
 import cash.atto.wallet.support.LEGACY_SALT
 import cash.atto.wallet.support.encryptLegacy
 import kotlinx.browser.localStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -114,6 +120,32 @@ class PasswordTermsAcceptanceTest {
             terms.setCurrentTermsAccepted(false)
             assertFalse(viewModel.enterPassword(PASSWORD))
             assertNull(repository.state.value.mnemonic)
+        }
+
+    @Test
+    fun `clearing app view model stops updates from accepted terms`() =
+        runTest {
+            // Given
+            localStorage.clear()
+            val preferences = PreferencesDataSource()
+            val terms = TermsAndConditionsRepository(preferences)
+            val repository = AppStateRepository(keyStore(preferences), TempSeedDataSource(), backgroundScope)
+            val viewModel = AppViewModel(repository, terms)
+            val store = ViewModelStore()
+            store.put("app", viewModel)
+            terms.setCurrentTermsAccepted(true)
+            viewModel.state.first { it.termsAndConditionsAccepted }
+
+            // When
+            store.clear()
+            terms.setCurrentTermsAccepted(false)
+            // Give Default-dispatched collectors a browser event-loop turn after the storage update.
+            withContext(Dispatchers.Default) { delay(10) }
+
+            // Then
+            assertFalse(viewModel.viewModelScope.isActive)
+            assertFalse(terms.accepted.first())
+            assertTrue(viewModel.state.value.termsAndConditionsAccepted)
         }
 
     private fun keyStore(preferences: PreferencesDataSource) =

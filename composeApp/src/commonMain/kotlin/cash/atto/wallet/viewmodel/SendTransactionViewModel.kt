@@ -3,6 +3,7 @@
 package cash.atto.wallet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
@@ -20,11 +21,8 @@ import com.ionspin.kotlin.bignum.decimal.DecimalMode
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +45,6 @@ class SendTransactionViewModel(
     private val _state = MutableStateFlow(SendTransactionUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private val viewModelScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var accounts: List<WalletAccountState> = emptyList()
     private var selectedAccountIndex: UInt = 0U
     private var nodeTimestampPollingJob: Job? = null
@@ -55,7 +52,7 @@ class SendTransactionViewModel(
     val nodeTimeDifferenceState = nodeTimeDifference.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             homeRepository.homeResponse
                 .map { homeRepository.getPriceUsd() }
                 .distinctUntilChanged()
@@ -68,27 +65,27 @@ class SendTransactionViewModel(
                 }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountsState.collect {
                 accounts = it
                 emitSelectedAccountName()
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.selectedAccountIndexState.collect {
                 selectedAccountIndex = it.value
                 emitSelectedAccountName()
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             preferencesRepository.state.collect {
                 emitSelectedAccountName()
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountState.collect { account ->
                 if (account == null) {
                     _state.emit(state.value.copy(account = null))
@@ -220,7 +217,7 @@ class SendTransactionViewModel(
         if (nodeTimestampPollingJob?.isActive == true) return
 
         nodeTimestampPollingJob =
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Default) {
                 while (true) {
                     try {
                         nodeTimeDifference.value =
@@ -403,11 +400,6 @@ class SendTransactionViewModel(
             unit = AttoUnit.ATTO,
             string = amount.toStringExpanded(),
         )
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
-    }
 
     private companion object {
         val NODE_TIMESTAMP_POLL_INTERVAL = 1.seconds
