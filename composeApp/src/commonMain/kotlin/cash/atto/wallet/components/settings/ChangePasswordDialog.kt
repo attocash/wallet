@@ -118,7 +118,7 @@ fun ChangePasswordDialog(onDismiss: () -> Unit) {
                         isError = unchanged,
                         imeAction = ImeAction.Next,
                     )
-                    AttoPasswordStrengthMeter(assessment = assessment, isEmpty = newPassword.isEmpty())
+                    AttoPasswordStrengthMeter(assessment = assessment)
                     AttoPasswordField(
                         value = confirmation,
                         onValueChange = {

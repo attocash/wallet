@@ -12,7 +12,7 @@ class CheckPasswordInteractor {
         return PasswordStrength(
             // The estimator bounds its work; storage/encryption still receive the entire password.
             score = if (value.isEmpty()) 0 else passwordEstimator.analyze(value).score,
-            minimumLengthMet = codePointLength(value) >= PasswordStrength.MINIMUM_LENGTH,
+            characterCount = codePointLength(value),
         )
     }
 

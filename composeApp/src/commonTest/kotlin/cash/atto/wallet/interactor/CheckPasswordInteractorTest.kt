@@ -76,13 +76,50 @@ class CheckPasswordInteractorTest {
     @Test
     fun `short passwords remain ineligible even if their characters look random`() {
         // Given
-        val password = "fK7q9Vm2xT6n4R"
+        val password = "fK7q9Vm"
 
         // When
         val assessment = checkPassword.assess(password)
 
         // Then
+        assertEquals(7, password.length)
+        assertEquals(7, assessment.characterCount)
+        assertTrue(assessment.score > 0)
         assertFalse(assessment.minimumLengthMet)
+        assertFalse(assessment.isAcceptable)
+        assertEquals(PasswordCheckState.INVALID, checkPassword.invoke(password))
+    }
+
+    @Test
+    fun `random eight character passwords meet the creation requirements`() {
+        // Given
+        val password = "fK7q9Vm2"
+
+        // When
+        val assessment = checkPassword.assess(password)
+
+        // Then
+        assertEquals(8, password.length)
+        assertEquals(8, assessment.characterCount)
+        assertTrue(assessment.minimumLengthMet)
+        assertTrue(assessment.score >= 2)
+        assertTrue(assessment.isAcceptable)
+        assertEquals(PasswordCheckState.VALID, checkPassword.invoke(password))
+    }
+
+    @Test
+    fun `predictable eight character passwords still fail the strength requirement`() {
+        // Given
+        val password = "password"
+
+        // When
+        val assessment = checkPassword.assess(password)
+
+        // Then
+        assertEquals(8, password.length)
+        assertEquals(8, assessment.characterCount)
+        assertTrue(assessment.minimumLengthMet)
+        assertTrue(assessment.score < 2)
         assertFalse(assessment.isAcceptable)
         assertEquals(PasswordCheckState.INVALID, checkPassword.invoke(password))
     }
@@ -90,17 +127,32 @@ class CheckPasswordInteractorTest {
     @Test
     fun `minimum length counts Unicode code points rather than surrogate halves`() {
         // Given
+        val sevenCharacters = "😀".repeat(7)
         val eightCharacters = "😀".repeat(8)
-        val fifteenCharacters = "😀".repeat(15)
 
         // When
-        val short = checkPassword.assess(eightCharacters)
-        val long = checkPassword.assess(fifteenCharacters)
+        val short = checkPassword.assess(sevenCharacters)
+        val long = checkPassword.assess(eightCharacters)
 
         // Then
+        assertEquals(7, short.characterCount)
+        assertEquals(8, long.characterCount)
         assertFalse(short.minimumLengthMet)
         assertTrue(long.minimumLengthMet)
         assertFalse(long.isAcceptable)
+    }
+
+    @Test
+    fun `unpaired surrogates each count as one character`() {
+        // Given
+        val passwords = listOf("fK7q9V\uD83D", "fK7q9Vm\uDE00")
+
+        // When
+        val assessments = passwords.map(checkPassword::assess)
+
+        // Then
+        assertEquals(listOf(7, 8), assessments.map { it.characterCount })
+        assertEquals(listOf(false, true), assessments.map { it.minimumLengthMet })
     }
 
     @Test
@@ -125,6 +177,7 @@ class CheckPasswordInteractorTest {
         val assessments = passwords.map(checkPassword::assess)
 
         // Then
+        assertTrue(assessments.all { it.characterCount == 0 })
         assertTrue(assessments.all { it.score == 0 })
         assertTrue(assessments.none { it.isAcceptable })
     }

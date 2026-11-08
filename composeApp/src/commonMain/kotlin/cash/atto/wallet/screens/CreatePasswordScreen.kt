@@ -187,7 +187,6 @@ fun CreatePassword(
                                 )
                                 AttoPasswordStrengthMeter(
                                     assessment = assessment,
-                                    isEmpty = password.isEmpty(),
                                 )
                             }
 

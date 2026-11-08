@@ -57,17 +57,16 @@ If you are deciding where to spend time, assume the web build is the source of t
 The web password screens use native HTML inputs and form submission through `HtmlElementView` so browsers and password managers can
 recognize existing and new passwords. These controls retain the shared wallet validation and local storage flows.
 
-Creation fields declare a 15-character minimum. Safari's `passwordrules` request generated passwords with at least 20 characters,
+Creation fields declare an 8-character minimum. Safari's `passwordrules` request generated passwords with at least 20 characters,
 including uppercase, lowercase, digits, and symbols. These stricter generation hints are separate from wallet acceptance, which requires
-at least 15 characters and a sufficient estimated strength without character composition rules. Chrome does not consume `passwordrules`
+at least 8 characters and a sufficient estimated strength without character composition rules. Chrome does not consume `passwordrules`
 for generation. The strength meter is an estimate, not a guarantee of password security.
 
 Strength is evaluated by a shared Kotlin port of the fixed zxcvbn-ts 4.2.0 matching and scoring behavior; creation requires score 2 out of 4
-(Fair) or higher, together with the 15-character minimum.
-The estimator adds no npm or JVM-library dependency. This product threshold
-uses [NIST's length/composition guidance](https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver) and
+(Fair) or higher, together with the 8-character minimum. These requirements are wallet creation policy.
+The estimator adds no npm or JVM-library dependency. The meter follows
 [OWASP's strength-meter recommendation](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#implement-proper-password-strength-controls)
-as guidance for usability. Offline wallet protection also depends on the password derivation cost. The meter makes no crack-time claims,
+for usability. Offline wallet protection also depends on the password derivation cost. The meter makes no crack-time claims,
 and no password is sent to a service for evaluation. Existing wallet passwords can still unlock regardless of the creation policy.
 
 The reviewed dictionaries and keyboard graphs are checked-in readable Kotlin under

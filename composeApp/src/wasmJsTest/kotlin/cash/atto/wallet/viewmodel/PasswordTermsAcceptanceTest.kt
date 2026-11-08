@@ -120,7 +120,7 @@ class PasswordTermsAcceptanceTest {
         PlatformWalletKeyStore(SeedDataSource(), PasswordDataSource(), SeedAESInteractor(SaltDataSource()), preferences)
 
     private companion object {
-        const val PASSWORD = "Synthetic7!"
+        const val PASSWORD = "Old7!"
         const val CREATION_PASSWORD = "Password123456!"
     }
 }
