@@ -300,7 +300,11 @@ room3 {
 }
 
 dependencies {
-    implementation(libs.transport.runtime)
+    constraints {
+        implementation(libs.transport.runtime) {
+            because("Keep the existing version while ML Kit requires transport runtime")
+        }
+    }
 
     listOf(
         "kspAndroid",
