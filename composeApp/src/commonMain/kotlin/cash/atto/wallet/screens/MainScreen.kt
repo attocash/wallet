@@ -22,7 +22,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(
-    onLogoutNavigation: () -> Unit,
+    onLogout: () -> Unit,
     initialNavOverride: MainScreenNavDestination? = null,
     initialSendPaymentRequest: String? = null,
     initialOpenSendConfirm: Boolean = false,
@@ -65,9 +65,8 @@ fun MainScreen(
         onWorkSourceSelected = { settingsViewModel.setWorkSource(it) },
         onDismissPreferencesMessage = { settingsViewModel.clearPreferencesMessage() },
         onConfirmLogout = {
-            settingsViewModel.logout()
             settingsViewModel.hideLogoutDialog()
-            onLogoutNavigation()
+            onLogout()
         },
         initialSendPaymentRequest = initialSendPaymentRequest,
         initialOpenSendConfirm = initialOpenSendConfirm,

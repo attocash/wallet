@@ -37,7 +37,7 @@ If you are deciding where to spend time, assume the web build is the source of t
 - Compose Multiplatform `1.10.3`
 - Android Gradle Plugin `8.13.0`
 - Koin for DI and view model wiring
-- Decompose for navigation/state routing
+- Compose Navigation for typed routes, screen lifecycles, and browser history
 - Ktor for HTTP access to Atto projections
 - `cash.atto:commons-*` for wallet, node, worker, and network integration
 - Room 3 plus SQLite for local persistence

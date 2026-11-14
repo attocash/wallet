@@ -4,18 +4,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeViewport
+import androidx.navigation.ExperimentalBrowserHistoryApi
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.bindToBrowserNavigation
 import cash.atto.wallet.components.common.QrScannerView
 import cash.atto.wallet.components.common.isQrScannerSupported
 import cash.atto.wallet.di.viewModelModule
 import cash.atto.wallet.screens.OgImageScreen
 import cash.atto.wallet.ui.AttoFontLoader
 import cash.atto.wallet.ui.AttoWalletTheme
-import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import kotlinx.browser.window
+import kotlinx.coroutines.flow.first
 import org.koin.core.context.startKoin
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
     if (isOgImagePreview()) {
         ComposeViewport(viewportContainerId = "AttoWallet") {
@@ -28,13 +30,8 @@ fun main() {
         return
     }
 
-    val lifecycle = LifecycleRegistry()
     val launchRequest = initialWebSendRequest()
-    val navComponent =
-        DWNavigationComponent(
-            componentContext = DefaultComponentContext(lifecycle),
-            initialDestination = initialWebDestination(launchRequest),
-        )
+    val initialDestination = initialWebDestination(launchRequest)
 
     startKoin { modules(viewModelModule) }
 
@@ -43,7 +40,7 @@ fun main() {
     ComposeViewport(viewportContainerId = "AttoWallet") {
         AttoFontLoader {
             AttoApp(
-                component = navComponent,
+                initialDestination = initialDestination,
 //            debugScreen = webDebugScreen(),
 //            debugPassword = webDebugPassword(),
 //            initialNavOverride = webDebugMainScreen(),
@@ -54,6 +51,14 @@ fun main() {
                     if (launchRequest != null) {
                         clearWebQueryParams()
                     }
+                },
+                onAuthenticationNavigation = { replaceWebNavigationHistoryEntry() },
+                onNavHostReady = { navController ->
+                    if (launchRequest != null) {
+                        // Browser binding removes query parameters; keep payment links reloadable until unlocked.
+                        navController.currentBackStackEntryFlow.first { it.destination.hasRoute<AttoDestination.DesktopMain>() }
+                    }
+                    navController.bindToBrowserNavigation()
                 },
                 qrScannerContent =
                     if (qrScannerAvailable) {
@@ -170,7 +175,13 @@ private fun clearWebQueryParams() {
     js(
         """
         const url = new URL(window.location.href);
-        window.history.replaceState({}, document.title, url.pathname + url.hash);
+        window.history.replaceState(window.history.state, document.title, url.pathname + url.hash);
         """,
     )
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun replaceWebNavigationHistoryEntry() {
+    // Make authentication redirects replace browser history so Back can continue past old protected routes.
+    js("window.history.replaceState(null, document.title, window.location.href);")
 }

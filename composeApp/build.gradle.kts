@@ -135,8 +135,7 @@ kotlin {
 
             implementation(libs.material3.window.size)
 
-            implementation(libs.decompose)
-            implementation(libs.decompose.extensions.compose)
+            implementation(libs.androidx.navigation.compose)
             implementation(libs.bignum)
             implementation(libs.qrose)
 
@@ -159,7 +158,6 @@ kotlin {
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.core.splashscreen)
 
             // Koin support for Android
