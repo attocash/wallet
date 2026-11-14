@@ -4,6 +4,7 @@ if (!CACHE_VERSION) {
 }
 const CACHE_NAME = "atto-wallet-" + CACHE_VERSION;
 const APP_SHELL = [
+  /* __QR_DECODER_PRECACHE__ */
   "./",
   "./index.html",
   "./manifest.webmanifest",
