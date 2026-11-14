@@ -56,9 +56,21 @@ class WebLogoHashPlugin {
       compilation.hooks.processAssets.tap(
         { name: pluginName, stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL },
         () => {
+          // Preserve module/compiler diagnostics instead of replacing them with a missing-asset error.
+          if (compilation.errors.length) return;
           const { RawSource } = compiler.webpack.sources;
           compilation.emitAsset("manifest.webmanifest", new RawSource(versionIcons(manifest)));
-          compilation.emitAsset("service-worker.js", new RawSource(versionIcons(worker)));
+          const decoderAssets = compilation.getAssets()
+            .filter(({ info }) => /(?:^|[\\/])zxing_reader\.wasm$/.test(info.sourceFilename || ""))
+            .map(({ name }) => `./${name}`);
+          if (decoderAssets.length !== 1 || !worker.includes("/* __QR_DECODER_PRECACHE__ */")) {
+            throw new Error("QR decoder Wasm asset or service-worker precache marker is missing");
+          }
+          const precachedWorker = versionIcons(worker).replace(
+            "/* __QR_DECODER_PRECACHE__ */",
+            `${JSON.stringify(decoderAssets[0])},`
+          );
+          compilation.emitAsset("service-worker.js", new RawSource(precachedWorker));
         }
       );
       HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tap(pluginName, (data) => {

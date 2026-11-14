@@ -7,13 +7,35 @@ import org.w3c.dom.HTMLVideoElement
 import kotlin.js.JsAny
 import kotlin.js.JsModule
 import kotlin.js.JsString
+import kotlin.js.Promise
 
-@JsModule("@zxing/library")
-external object ZXingModule : JsAny
+@JsModule("zxing-cpp-qr")
+internal external object QrDecoderModule : JsAny {
+    fun initialize(): Promise<JsAny>
 
-internal fun loadZXingScript() = Unit
+    fun decodeFromCanvas(canvas: HTMLCanvasElement): JsString?
+}
 
-internal fun isZXingReady(): Boolean = true
+internal fun initializeQrDecoder(
+    onReady: () -> Unit,
+    onError: (JsString) -> Unit,
+): Unit = initializeQrDecoder(QrDecoderModule, onReady, onError)
+
+private fun initializeQrDecoder(
+    module: QrDecoderModule,
+    onReady: () -> Unit,
+    onError: (JsString) -> Unit,
+): Unit =
+    js(
+        """
+        {
+            module.initialize().then(
+                function () { onReady(); },
+                function () { onError('Could not initialize QR decoder. Please try again.'); }
+            );
+        }
+        """,
+    )
 
 internal fun isQrScannerSupported(): Boolean =
     js(
@@ -33,36 +55,13 @@ internal fun isQrScannerSupported(): Boolean =
 internal fun decodeQrFromCanvas(
     canvas: HTMLCanvasElement,
     onDecoderError: (String) -> Unit = {},
-): String? {
-    val width = canvas.width
-    val height = canvas.height
-    if (width == 0 || height == 0) return null
-
-    val luminanceData = canvasLuminanceData(canvas) ?: return null
-
-    return try {
-        val source =
-            createRGBLuminanceSource(
-                module = ZXingModule,
-                luminances = luminanceData,
-                width = width,
-                height = height,
-            )
-        val bitmap =
-            createBinaryBitmap(
-                module = ZXingModule,
-                source = source,
-            )
-        decodeBitmapOrNull(
-            module = ZXingModule,
-            bitmap = bitmap,
-        )?.takeIf(String::isNotBlank)
+): String? =
+    try {
+        QrDecoderModule.decodeFromCanvas(canvas)?.toString()?.takeIf(String::isNotBlank)
     } catch (_: Throwable) {
         onDecoderError("Decoder error")
-        println("QR decode error")
         null
     }
-}
 
 internal fun createVideoElement(): HTMLVideoElement =
     js(
@@ -188,78 +187,4 @@ internal fun setIntervalMs(
 internal fun clearIntervalId(id: Int): Unit =
     js(
         """(clearInterval(id))""",
-    )
-
-private fun canvasLuminanceData(canvas: HTMLCanvasElement): JsAny? =
-    js(
-        """
-    {
-        var ctx = canvas.__attoCtx || canvas.getContext('2d');
-        if (!ctx) return null;
-        var width = canvas.width;
-        var height = canvas.height;
-        if (width === 0 || height === 0) return null;
-        var rgba = ctx.getImageData(0, 0, width, height).data;
-        var len = width * height;
-        var luminances = new Uint8ClampedArray(len);
-        for (var i = 0; i < len; i++) {
-            var offset = i * 4;
-            luminances[i] =
-                ((rgba[offset] * 306 + rgba[offset + 1] * 601 + rgba[offset + 2] * 117 + 0x200) >> 10);
-        }
-        return luminances;
-    }
-""",
-    )
-
-private fun createRGBLuminanceSource(
-    module: ZXingModule,
-    luminances: JsAny,
-    width: Int,
-    height: Int,
-): JsAny =
-    js(
-        """
-    new module.RGBLuminanceSource(luminances, width, height)
-""",
-    )
-
-private fun createBinaryBitmap(
-    module: ZXingModule,
-    source: JsAny,
-): JsAny =
-    js(
-        """
-    new module.BinaryBitmap(new module.HybridBinarizer(source))
-""",
-    )
-
-private fun decodeBitmapOrNull(
-    module: ZXingModule,
-    bitmap: JsAny,
-): String? =
-    js(
-        """
-    {
-        var hints = new Map();
-        hints.set(module.DecodeHintType.TRY_HARDER, true);
-        try {
-            var reader = new module.QRCodeReader();
-            var result = reader.decode(bitmap, hints);
-            return result ? result.getText() : null;
-        } catch (error) {
-            if (
-                error &&
-                (
-                    error.name === 'NotFoundException' ||
-                    error.name === 'ChecksumException' ||
-                    error.name === 'FormatException'
-                )
-            ) {
-                return null;
-            }
-            throw error;
-        }
-    }
-""",
     )

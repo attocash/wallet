@@ -108,6 +108,7 @@ kotlin {
         val androidMain by getting
 
         commonMain.kotlin.srcDir(generatedVersionKotlinDir)
+        wasmJsMain.resources.srcDir(layout.projectDirectory.dir("zxing-cpp-qr/notices"))
 
         val jvmMain by creating {
             dependsOn(commonMain)
@@ -196,7 +197,7 @@ kotlin {
             implementation(libs.atto.commons.worker.web)
             implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             implementation(libs.sqlite.web)
-            implementation(npm("@zxing/library", "0.23.0"))
+            implementation(npm("zxing-cpp-qr", layout.projectDirectory.dir("zxing-cpp-qr").asFile))
             implementation(npm("password-crypto-worker", layout.projectDirectory.dir("password-crypto-worker").asFile))
             implementation(
                 npm(
