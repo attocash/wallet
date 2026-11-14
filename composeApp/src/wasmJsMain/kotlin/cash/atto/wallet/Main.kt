@@ -94,9 +94,7 @@ private suspend fun NavHostController.bindWebNavigation() {
         }
     window.addEventListener("popstate", fragmentNavigation)
     try {
-        bindToBrowserNavigation { entry ->
-            if (entry.destination.hasRoute<AttoDestination.DesktopMain>()) "" else "#${checkNotNull(entry.destination.route)}"
-        }
+        bindToBrowserNavigation { "" }
     } finally {
         window.removeEventListener("popstate", fragmentNavigation)
     }
