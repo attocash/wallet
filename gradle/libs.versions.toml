@@ -1,5 +1,4 @@
 [versions]
-accompanist-permissions = "0.37.3"
 agp = "9.5.1"
 android-compileSdk = "37"
 android-minSdk = "26"
@@ -33,7 +32,6 @@ ktlint = "14.2.0"
 slf4j = "2.0.20"
 
 [libraries]
-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx-camera" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx-camera" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "androidx-camera" }

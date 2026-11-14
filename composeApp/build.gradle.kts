@@ -163,9 +163,6 @@ kotlin {
             // Koin support for Android
             implementation(libs.koin.android)
 
-            // Permissions
-            implementation(libs.accompanist.permissions)
-
             implementation(libs.slf4j.simple)
 
             // QR scanning
