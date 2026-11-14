@@ -128,11 +128,6 @@ class SettingsViewModel(
             appStateRepository.lock()
         }
 
-    fun logout() =
-        viewModelScope.launch(Dispatchers.Default) {
-            appStateRepository.deleteKeys()
-        }
-
     fun showLogoutDialog() =
         viewModelScope.launch(Dispatchers.Default) {
             _state.update { it.copy(showLogoutDialog = true) }
