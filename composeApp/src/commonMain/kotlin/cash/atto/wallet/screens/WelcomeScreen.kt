@@ -22,9 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -72,12 +69,12 @@ import cash.atto.wallet.ui.dark_text_tertiary
 import cash.atto.wallet.ui.dark_violet
 import cash.atto.wallet.ui.dark_violet_soft
 import cash.atto.wallet.ui.dark_violet_soft_hover
+import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.viewmodel.WelcomeViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun WelcomeScreen(
     onCreateSecretClicked: () -> Unit,
@@ -85,8 +82,7 @@ fun WelcomeScreen(
 ) {
     val viewModel = koinViewModel<WelcomeViewModel>()
     val metrics by viewModel.state.collectAsState()
-    val windowSizeClass = calculateWindowSizeClass()
-    val compact = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+    val compact = isCompactWidth()
     val scrollState = rememberScrollState()
 
     Column(
