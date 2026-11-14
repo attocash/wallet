@@ -133,7 +133,6 @@ kotlin {
 
             implementation(libs.koin.composeVM)
 
-            implementation(libs.material3.window.size)
 
             implementation(libs.androidx.navigation.compose)
             implementation(libs.bignum)

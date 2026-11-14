@@ -16,7 +16,6 @@ androidx-test-ext-junit = "1.3.0"
 alexzhirkevich-qrose = "1.3.1"
 atto-commons = "9.0.0"
 compose-plugin = "1.12.2"
-chrisbanes-material3-window-size = "0.5.0"
 google-datatransport = "5.0.0"
 google-mlkit-barcode-scanning = "17.3.0"
 ionspin-bignum = "0.3.10"
@@ -59,7 +58,6 @@ androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", nam
 # Koin dependencies
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
-material3-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "chrisbanes-material3-window-size" }
 qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "alexzhirkevich-qrose" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "google-datatransport" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity" }
