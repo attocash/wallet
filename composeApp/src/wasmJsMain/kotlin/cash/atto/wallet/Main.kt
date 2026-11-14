@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavHostController
 import androidx.navigation.bindToBrowserNavigation
 import cash.atto.wallet.components.common.QrScannerView
 import cash.atto.wallet.components.common.isQrScannerSupported
@@ -16,6 +17,8 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.first
 import org.koin.core.context.startKoin
+import org.w3c.dom.PopStateEvent
+import org.w3c.dom.events.Event
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
@@ -58,7 +61,7 @@ fun main() {
                         // Browser binding removes query parameters; keep payment links reloadable until unlocked.
                         navController.currentBackStackEntryFlow.first { it.destination.hasRoute<AttoDestination.DesktopMain>() }
                     }
-                    navController.bindToBrowserNavigation()
+                    navController.bindWebNavigation()
                 },
                 qrScannerContent =
                     if (qrScannerAvailable) {
@@ -77,6 +80,47 @@ fun main() {
             )
         }
     }
+}
+
+@OptIn(ExperimentalBrowserHistoryApi::class, ExperimentalWasmJsInterop::class)
+private suspend fun NavHostController.bindWebNavigation() {
+    // Custom URL formatting disables the binding's built-in fragment parsing.
+    navigateToWebFragment()
+    val fragmentNavigation: (Event) -> Unit =
+        { event ->
+            if ((event as PopStateEvent).state == null) {
+                navigateToWebFragment()
+            }
+        }
+    window.addEventListener("popstate", fragmentNavigation)
+    try {
+        bindToBrowserNavigation { entry ->
+            if (entry.destination.hasRoute<AttoDestination.DesktopMain>()) "" else "#${checkNotNull(entry.destination.route)}"
+        }
+    } finally {
+        window.removeEventListener("popstate", fragmentNavigation)
+    }
+}
+
+private fun NavHostController.navigateToWebFragment() {
+    val fragment =
+        try {
+            decodeQueryComponent(window.location.hash.removePrefix("#"))
+        } catch (_: Throwable) {
+            return
+        }
+    val destination =
+        when (fragment) {
+            "loading" -> AttoDestination.Loading
+            "login" -> AttoDestination.Login
+            "welcome" -> AttoDestination.Welcome
+            "recovery-phrase" -> AttoDestination.RecoveryPhrase
+            "import-phrase" -> AttoDestination.ImportPhrase
+            "create-password" -> AttoDestination.CreatePassword
+            "wallet" -> AttoDestination.DesktopMain
+            else -> return
+        }
+    navigate(destination) { launchSingleTop = true }
 }
 
 private fun initialWebDestination(launchRequest: WebSendLaunchRequest?): AttoDestination =
