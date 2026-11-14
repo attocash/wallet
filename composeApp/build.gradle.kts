@@ -304,7 +304,6 @@ room3 {
 
 dependencies {
     implementation(libs.transport.runtime)
-    testImplementation(libs.junit.jupiter)
 
     listOf(
         "kspAndroid",
