@@ -29,9 +29,16 @@ let nextStatementId = 0;
 function openRequest(id, requestData) {
     try {
         const newDatabaseId = nextDatabaseId++;
-        const newDatabase = new sqlite3.oo1.OpfsDb(requestData.fileName);
+        const persistent = typeof sqlite3.oo1.OpfsDb === 'function';
+        const Database = persistent ? sqlite3.oo1.OpfsDb : sqlite3.oo1.DB;
+        // A named file on the default volatile WASM filesystem is shared by Room's
+        // connections and survives closes within this worker, unlike ':memory:'.
+        const newDatabase = new Database(requestData.fileName);
         databases.set(newDatabaseId, newDatabase);
-        postMessage({'id': id, data: {'databaseId': newDatabaseId}});
+        postMessage({'id': id, data: {
+            'databaseId': newDatabaseId,
+            'storageMode': persistent ? 'persistent' : 'temporary'
+        }});
     } catch (error) {
         postMessage({'id': id, error: error.message});
     }
@@ -164,7 +171,25 @@ onmessage = (e) => {
     }
 };
 
-sqlite3InitModule().then(instance => {
+async function disableOpfsIfDenied() {
+    const storage = globalThis.navigator?.storage;
+    if (typeof storage?.getDirectory !== 'function') return;
+
+    try {
+        await storage.getDirectory();
+    } catch (error) {
+        if (error?.name !== 'SecurityError') return;
+
+        // Avoid SQLite's OPFS installer timeouts when the browser denies access.
+        const config = globalThis.sqlite3ApiConfig ??= {};
+        const disable = config.disable ??= {};
+        const vfs = disable.vfs ??= {};
+        vfs.opfs = true;
+        vfs['opfs-wl'] = true;
+    }
+}
+
+disableOpfsIfDenied().then(() => sqlite3InitModule()).then(instance => {
     sqlite3 = instance;
     while (messageQueue.length > 0) {
         handleMessage(messageQueue.shift());

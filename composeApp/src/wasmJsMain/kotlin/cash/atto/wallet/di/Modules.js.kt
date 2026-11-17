@@ -4,6 +4,7 @@ import androidx.room3.Room
 import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
 import cash.atto.wallet.datasource.AppDatabase
 import cash.atto.wallet.datasource.AppDatabaseConstructor
+import cash.atto.wallet.datasource.BrowserDatabaseStorage
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.datasource.SaltDataSource
@@ -18,7 +19,7 @@ private val database by lazy {
         .databaseBuilder<AppDatabase>(
             name = "atto-wallet.db",
             factory = AppDatabaseConstructor::initialize,
-        ).setDriver(WebWorkerSQLiteDriver(createWorker()))
+        ).setDriver(WebWorkerSQLiteDriver(createWorker().also(BrowserDatabaseStorage::observe)))
         .fallbackToDestructiveMigration(dropAllTables = true)
         .build()
 }

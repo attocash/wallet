@@ -334,12 +334,7 @@ class WalletManagerRepository(
                         ?: AttoHeight.MIN
                 }
 
-            entries.collect { message ->
-                retryWalletOperation("save account entry ${message.value.hash}", retryDelay) {
-                    persistentAccountEntryRepository.save(message.value)
-                    message.acknowledge()
-                }
-            }
+            persistAccountEntryStream(entries, retryDelay, persistentAccountEntryRepository::saveAll)
         }
     }
 
