@@ -2,6 +2,9 @@
   "name": "sqlite-web-worker",
   "version": "0.0.0",
   "license": "APACHE-2.0",
+  "scripts": {
+    "test": "node --test worker.test.mjs"
+  },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "^3.53.0-build1"
   }

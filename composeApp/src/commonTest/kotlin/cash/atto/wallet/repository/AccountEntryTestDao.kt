@@ -4,17 +4,19 @@ import cash.atto.wallet.datasource.AccountEntry
 import cash.atto.wallet.datasource.AccountEntryDao
 
 internal class AccountEntryTestDao : AccountEntryDao {
-    private val entries = mutableListOf<AccountEntry>()
+    private val storedEntries = mutableListOf<AccountEntry>()
     var beforeSave: suspend () -> Unit = {}
     var afterSave: suspend () -> Unit = {}
     var saveAttempts = 0
     val pageRequests = mutableListOf<Pair<Long?, Int>>()
 
-    override suspend fun save(entry: AccountEntry) {
+    override suspend fun saveAll(entries: List<AccountEntry>) {
         saveAttempts++
         beforeSave()
-        entries.removeAll { it.hash.contentEquals(entry.hash) }
-        entries.add(entry)
+        for (entry in entries) {
+            storedEntries.removeAll { it.hash.contentEquals(entry.hash) }
+            storedEntries.add(entry)
+        }
         afterSave()
     }
 
@@ -43,5 +45,5 @@ internal class AccountEntryTestDao : AccountEntryDao {
         }
 
     private fun matching(publicKey: ByteArray): List<AccountEntry> =
-        entries.filter { it.publicKey.contentEquals(publicKey) }.sortedByDescending { it.height }
+        storedEntries.filter { it.publicKey.contentEquals(publicKey) }.sortedByDescending { it.height }
 }

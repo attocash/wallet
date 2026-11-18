@@ -13,9 +13,9 @@ import cash.atto.wallet.model.TransactionHistorySnapshot
 import cash.atto.wallet.model.TransactionHistorySummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.transform
 import kotlinx.serialization.json.Json
 
 class PersistentAccountEntryRepository internal constructor(
@@ -23,24 +23,27 @@ class PersistentAccountEntryRepository internal constructor(
 ) : AttoAccountEntryRepository {
     constructor(appDatabase: AppDatabase) : this(appDatabase.accountEntryDao())
 
-    private val flow = MutableSharedFlow<AttoAccountEntry>()
+    private val committedBatches = MutableSharedFlow<List<AttoAccountEntry>>()
     private val json = Json
 
-    override suspend fun save(entry: AttoAccountEntry) {
-        val jsonStr = json.encodeToString(entry)
-        dao.save(
-            AccountEntry(
-                hash = entry.hash.value,
-                publicKey = entry.publicKey.value,
-                height = entry.height.value.toLong(),
-                entry = jsonStr,
-                blockType = entry.blockType.name,
-                balanceRaw = entry.balance.raw.toString(),
-                previousBalanceRaw = entry.previousBalance.raw.toString(),
-            ),
-        )
-        // Stream acknowledgements and observers must only advance past persisted entries.
-        flow.emit(entry)
+    override suspend fun save(entry: AttoAccountEntry) = saveAll(listOf(entry))
+
+    internal suspend fun saveAll(entries: List<AttoAccountEntry>) {
+        val rows =
+            entries.map { entry ->
+                AccountEntry(
+                    hash = entry.hash.value,
+                    publicKey = entry.publicKey.value,
+                    height = entry.height.value.toLong(),
+                    entry = json.encodeToString(entry),
+                    blockType = entry.blockType.name,
+                    balanceRaw = entry.balance.raw.toString(),
+                    previousBalanceRaw = entry.previousBalance.raw.toString(),
+                )
+            }
+        dao.saveAll(rows)
+        // Hand off the whole commit so the writer need not wait for each observer update.
+        committedBatches.emit(entries)
     }
 
     override suspend fun stream(address: AttoAddress): Flow<AttoAccountEntry> {
@@ -57,7 +60,12 @@ class PersistentAccountEntryRepository internal constructor(
     suspend fun last(publicKey: AttoPublicKey): AttoAccountEntry? =
         dao.last(publicKey.value)?.let { json.decodeFromString<AttoAccountEntry>(it) }
 
-    fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> = flow.filter { it.publicKey == publicKey }
+    fun flow(publicKey: AttoPublicKey): Flow<AttoAccountEntry> =
+        committedBatches.transform { entries ->
+            for (entry in entries) {
+                if (entry.publicKey == publicKey) emit(entry)
+            }
+        }
 
     suspend fun listBefore(
         publicKey: AttoPublicKey,

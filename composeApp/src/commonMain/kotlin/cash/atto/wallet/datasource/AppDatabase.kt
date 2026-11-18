@@ -55,7 +55,7 @@ interface AccountEntryDao {
     ): List<String>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun save(entry: AccountEntry)
+    suspend fun saveAll(entries: List<AccountEntry>)
 
     @Query(
         "SELECT height, blockType, balanceRaw, previousBalanceRaw FROM accountEntries " +

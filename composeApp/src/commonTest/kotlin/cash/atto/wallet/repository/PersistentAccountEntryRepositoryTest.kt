@@ -22,33 +22,43 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalCoroutinesApi::class)
 class PersistentAccountEntryRepositoryTest {
     @Test
-    fun `save completes and notifies observers only after history is persisted`() =
+    fun `saveAll writes the whole batch before notifying observers in order`() =
         runTest {
             // Given
             val dao = AccountEntryTestDao()
             val repository = PersistentAccountEntryRepository(dao)
-            val entry = testAccountEntry(1UL, AttoBlockType.RECEIVE, "0", "1")
+            val first = testAccountEntry(1UL, AttoBlockType.RECEIVE, "0", "1")
+            val second = testAccountEntry(2UL, AttoBlockType.RECEIVE, "1", "2")
             val continueSave = CompletableDeferred<Unit>()
             dao.beforeSave = { continueSave.await() }
-            val observations = mutableListOf<Boolean>()
+            val observations = mutableListOf<Pair<AttoAccountEntry, AttoAccountEntry?>>()
+            val continueObserving = CompletableDeferred<Unit>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                repository.flow(entry.publicKey).collect { received ->
-                    observations.add(repository.last(entry.publicKey) == received)
+                repository.flow(first.publicKey).collect { received ->
+                    observations.add(received to repository.last(first.publicKey))
+                    if (received == first) continueObserving.await()
                 }
             }
 
             // When
-            val saving = async { repository.save(entry) }
+            val saving = async { repository.saveAll(listOf(first, second)) }
             runCurrent()
 
             // Then
             assertFalse(saving.isCompleted)
             assertTrue(observations.isEmpty())
-            assertNull(repository.last(entry.publicKey))
+            assertNull(repository.last(first.publicKey))
             continueSave.complete(Unit)
+            runCurrent()
+            assertTrue(saving.isCompleted)
             saving.await()
-            assertEquals(listOf(true), observations)
-            assertEquals(entry, repository.last(entry.publicKey))
+            assertEquals(1, dao.saveAttempts)
+            assertEquals(first, observations.single().first)
+            continueObserving.complete(Unit)
+            runCurrent()
+            assertEquals(listOf(first, second), observations.map { it.first })
+            assertTrue(observations.all { it.second == second })
+            assertEquals(listOf(second, first), repository.listRecent(first.publicKey, 10))
         }
 
     @Test
