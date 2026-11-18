@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.getPlatform
 import cash.atto.wallet.repository.AppStateRepository
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.TermsAndConditionsRepository
 import cash.atto.wallet.repository.WalletStorageException
 import cash.atto.wallet.state.AppState
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class AppViewModel(
     private val appStateRepository: AppStateRepository,
     private val termsAndConditionsRepository: TermsAndConditionsRepository,
+    preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AppUiState.DEFAULT)
     val state = _state.asStateFlow()
@@ -29,13 +31,34 @@ class AppViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             combine(
                 appStateRepository.state,
+                preferencesRepository.configuration,
                 termsAndConditionsRepository.accepted,
                 authenticationError,
-            ) { appState, termsAndConditionsAccepted, error ->
+            ) { appState, configuration, termsAndConditionsAccepted, error ->
+                val screen = appState.shownScreen()
+                val walletConfiguration = configuration?.takeIf { it.wallet === appState.unlockedWallet }?.result
+                val waitingForConfiguration = screen == AppUiState.ShownScreen.OVERVIEW && walletConfiguration == null
                 AppUiState(
-                    shownScreen = appState.shownScreen(),
-                    authenticationError = error,
+                    shownScreen =
+                        when {
+                            waitingForConfiguration -> {
+                                when (val currentScreen = state.value.shownScreen) {
+                                    AppUiState.ShownScreen.PASSWORD_ENTER, AppUiState.ShownScreen.OVERVIEW -> currentScreen
+                                    else -> AppUiState.ShownScreen.LOADER
+                                }
+                            }
+
+                            walletConfiguration?.isFailure == true -> {
+                                AppUiState.ShownScreen.PASSWORD_ENTER
+                            }
+
+                            else -> {
+                                screen
+                            }
+                        },
+                    authenticationError = error ?: walletConfiguration?.exceptionOrNull()?.message,
                     termsAndConditionsAccepted = termsAndConditionsAccepted,
+                    unlockingWallet = waitingForConfiguration,
                 )
             }.collect { uiState ->
                 _state.emit(uiState)

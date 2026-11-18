@@ -1,5 +1,9 @@
 package cash.atto.wallet.repository
 
+import cash.atto.commons.AttoAddress
+import cash.atto.commons.AttoKeyIndex
+import cash.atto.commons.toAttoIndex
+import cash.atto.commons.toSigner
 import cash.atto.wallet.PlatformType
 import cash.atto.wallet.datasource.PreferencesDataSource
 import cash.atto.wallet.getPlatform
@@ -9,14 +13,26 @@ import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.model.UserPreferences
 import cash.atto.wallet.model.WorkPreference
 import cash.atto.wallet.model.WorkSourcePreference
+import cash.atto.wallet.state.UnlockedWallet
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+
+internal data class UnlockedWalletConfiguration(
+    val wallet: UnlockedWallet,
+    val result: Result<UserPreferences>,
+    val addresses: Map<AttoKeyIndex, AttoAddress> = emptyMap(),
+)
 
 class PreferencesRepository(
     private val preferencesDataSource: PreferencesDataSource,
@@ -25,10 +41,12 @@ class PreferencesRepository(
 ) {
     private val _state = MutableStateFlow(UserPreferences.EMPTY)
     val state = _state.asStateFlow()
-    private val _work = MutableStateFlow(WorkPreference())
-    val work = _work.asStateFlow()
-    private val _workSource = MutableStateFlow(_work.value.source)
-    val workSource = _workSource.asStateFlow()
+    private val unlockedPreferences = MutableStateFlow<UnlockedPreferences?>(null)
+    private val currentConfiguration = MutableStateFlow<UnlockedWalletConfiguration?>(null)
+    internal val configuration = currentConfiguration.asStateFlow()
+    private val _work = MutableStateFlow<WorkPreference?>(null)
+    val work = _work.filterNotNull()
+    val workSource = work.map { it.source }.distinctUntilChanged()
 
     private val json =
         Json {
@@ -51,7 +69,52 @@ class PreferencesRepository(
             ) { _, _ -> Unit }.collect {
                 appStateRepository.withWalletStorage { appState ->
                     // Re-read both values inside the same ordering as rotation and preference writes.
-                    _state.emit(decodePreferences(preferencesDataSource.blob.first(), appState.password))
+                    val wallet = appState.unlockedWallet
+                    try {
+                        val stored = preferencesDataSource.blob.first()
+                        val initial = wallet?.initialPreferences?.takeIf { it.storedBlob == stored }
+                        val preferences =
+                            if (initial != null) {
+                                parsePreferences(initial.plaintext.orEmpty())
+                            } else {
+                                decodePreferences(stored, appState.password)
+                            }
+                        publishPreferences(wallet, preferences)
+                    } catch (error: CancellationException) {
+                        throw error
+                    } catch (error: Throwable) {
+                        if (currentConfiguration.value?.wallet !== wallet) {
+                            unlockedPreferences.value = null
+                            currentConfiguration.value =
+                                wallet?.let {
+                                    val failure = WalletStorageException("Could not read wallet preferences. Try unlocking again.", error)
+                                    UnlockedWalletConfiguration(it, Result.failure(failure))
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
+        scope.launch {
+            unlockedPreferences.collectLatest { snapshot ->
+                if (snapshot == null) return@collectLatest
+                val wallet = snapshot.wallet
+                // Address derivation can be cancelled by locking the wallet.
+                val configuration =
+                    try {
+                        wallet.run { configureAccounts(wallet, snapshot.preferences) }
+                    } catch (error: CancellationException) {
+                        throw error
+                    } catch (error: Throwable) {
+                        val failure = WalletStorageException("Could not configure wallet accounts. Try unlocking again.", error)
+                        UnlockedWalletConfiguration(wallet, Result.failure(failure))
+                    }
+
+                appStateRepository.withWalletStorage { appState ->
+                    if (appState.unlockedWallet === wallet && unlockedPreferences.value == snapshot) {
+                        currentConfiguration.value = configuration
+                    }
                 }
             }
         }
@@ -60,7 +123,6 @@ class PreferencesRepository(
             preferencesDataSource.work.collect { storedWork ->
                 val work = decodeWorkPreference(storedWork).normalized()
                 _work.emit(work)
-                _workSource.emit(work.source)
             }
         }
     }
@@ -110,7 +172,6 @@ class PreferencesRepository(
     suspend fun setWorkSource(workSource: WorkSourcePreference) {
         val work = WorkPreference.forSource(workSource)
         _work.emit(work)
-        _workSource.emit(work.source)
         val storedWork =
             workJson.encodeToString(
                 WorkPreference.serializer(),
@@ -164,9 +225,46 @@ class PreferencesRepository(
                     rawJson
                 }
             preferencesDataSource.setWalletBlob(storedJson, snapshot)
-            _state.emit(normalizedPreferences)
+            publishPreferences(wallet, normalizedPreferences)
         }
     }
+
+    private suspend fun configureAccounts(
+        wallet: UnlockedWallet,
+        preferences: UserPreferences,
+    ): UnlockedWalletConfiguration {
+        val indexes = preferences.accounts.keys.map { it.toUInt().toAttoIndex() }
+        val previous =
+            configuration.value
+                ?.takeIf { it.wallet === wallet }
+                ?.addresses
+                .orEmpty()
+        val addresses = previous.filterKeys { it in indexes }.toMutableMap()
+        val missing = indexes.filterNot { it in addresses }
+        if (missing.isNotEmpty()) {
+            val seed = wallet.getSeed()
+            for (index in missing) {
+                wallet.ensureActive()
+                addresses[index] = seed.toSigner(index).address
+            }
+        }
+        wallet.ensureActive()
+        return UnlockedWalletConfiguration(wallet, Result.success(preferences), addresses)
+    }
+
+    private fun publishPreferences(
+        wallet: UnlockedWallet?,
+        preferences: UserPreferences,
+    ) {
+        _state.value = preferences
+        unlockedPreferences.value = wallet?.let { UnlockedPreferences(it, preferences) }
+        if (wallet == null) currentConfiguration.value = null
+    }
+
+    private data class UnlockedPreferences(
+        val wallet: UnlockedWallet,
+        val preferences: UserPreferences,
+    )
 
     private suspend fun decodePreferences(
         storedPreferences: String?,
@@ -183,12 +281,13 @@ class PreferencesRepository(
                     return UserPreferences.EMPTY
                 }
 
-                val decrypted = seedAESInteractor
-                    .decryptSeed(
-                        encryptedSeed = storedPreferences,
-                        password = password,
-                        purpose = EncryptedDataPurpose.PREFERENCES,
-                    )?.plaintext
+                val decrypted =
+                    seedAESInteractor
+                        .decryptSeed(
+                            encryptedSeed = storedPreferences,
+                            password = password,
+                            purpose = EncryptedDataPurpose.PREFERENCES,
+                        )?.plaintext
                 if (decrypted == null && requireReadable) {
                     throw WalletStorageException("Could not read wallet preferences. Lock and unlock this wallet, then try again.")
                 }
@@ -197,6 +296,10 @@ class PreferencesRepository(
                 storedPreferences
             }
 
+        return parsePreferences(rawJson)
+    }
+
+    private fun parsePreferences(rawJson: String): UserPreferences {
         if (rawJson.isBlank()) {
             return UserPreferences.EMPTY
         }

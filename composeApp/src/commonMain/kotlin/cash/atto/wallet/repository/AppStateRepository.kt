@@ -9,6 +9,7 @@ import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState
 import cash.atto.wallet.state.AppState.AuthState
+import cash.atto.wallet.state.InitialWalletPreferences
 import cash.atto.wallet.state.UnlockedWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,8 +76,8 @@ class AppStateRepository internal constructor(
 
     suspend fun submitPassword(password: String): Boolean =
         mutex.withLock {
-            val mnemonic = keyStore.unlock(password) ?: return@withLock false
-            startSession(mnemonic, password)
+            val unlocked = keyStore.unlock(password) ?: return@withLock false
+            startSession(unlocked.mnemonic, password, unlocked.preferences)
             true
         }
 
@@ -143,9 +144,10 @@ class AppStateRepository internal constructor(
     private fun startSession(
         mnemonic: AttoMnemonic,
         password: String,
+        initialPreferences: InitialWalletPreferences? = null,
     ) {
         clearSession()
-        val unlockedWallet = UnlockedWallet(mnemonic, password, scope.coroutineContext)
+        val unlockedWallet = UnlockedWallet(mnemonic, password, scope.coroutineContext, initialPreferences)
         _state.value = AppState(authState = AuthState.SESSION_VALID, unlockedWallet = unlockedWallet)
         expiryJob =
             scope.launch {

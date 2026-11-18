@@ -194,19 +194,24 @@ private fun ReceiveQrColumn(
                         .padding(24.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                if (paymentRequest.isNotBlank()) {
-                    qrCodeImage(
-                        modifier = Modifier.size(280.dp),
-                        url = paymentRequest,
-                        contentDescription = "Receive QR",
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Outlined.QrCode2,
-                        contentDescription = "Receive QR",
-                        tint = dark_text_secondary,
-                        modifier = Modifier.size(120.dp),
-                    )
+                Box(
+                    modifier = Modifier.widthIn(max = 280.dp).fillMaxWidth().aspectRatio(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (paymentRequest.isNotBlank()) {
+                        qrCodeImage(
+                            modifier = Modifier.fillMaxSize(),
+                            url = paymentRequest,
+                            contentDescription = "Receive QR",
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.QrCode2,
+                            contentDescription = "Receive QR",
+                            tint = dark_text_secondary,
+                            modifier = Modifier.size(120.dp),
+                        )
+                    }
                 }
             }
 

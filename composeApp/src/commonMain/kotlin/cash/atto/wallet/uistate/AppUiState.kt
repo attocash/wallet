@@ -7,6 +7,7 @@ data class AppUiState(
     val authenticationError: String? = null,
     val termsAndConditionsAccepted: Boolean = false,
     val termsAndConditionsDate: String = TermsAndConditions.EFFECTIVE_DATE,
+    val unlockingWallet: Boolean = false,
 ) {
     enum class ShownScreen {
         LOADER,

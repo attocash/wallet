@@ -1,5 +1,6 @@
 package cash.atto.wallet.repository
 
+import androidx.lifecycle.ViewModelStore
 import cash.atto.commons.AttoMnemonic
 import cash.atto.wallet.datasource.PasswordDataSource
 import cash.atto.wallet.datasource.PreferencesDataSource
@@ -24,6 +25,7 @@ import cash.atto.wallet.support.installLegacyPreferences
 import cash.atto.wallet.support.observeArgon2Workers
 import cash.atto.wallet.support.restoreArgon2Workers
 import cash.atto.wallet.support.restoreStorageWrites
+import cash.atto.wallet.uistate.AppUiState.ShownScreen
 import cash.atto.wallet.viewmodel.AppViewModel
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import kotlinx.browser.localStorage
@@ -58,7 +60,7 @@ class WebWalletKeyStoreTest {
                     val unlocked = keyStore().unlock(PASSWORD)
 
                     // Then: unlock succeeds even when any write to this record would fail.
-                    assertEquals(mnemonic, unlocked)
+                    assertEquals(mnemonic, unlocked?.mnemonic)
                     assertEquals(ARGON2_MNEMONIC_RECORD, localStorage.getItem("mnemonic"))
                     assertEquals(preferences, localStorage.getItem("preferences"))
                 } finally {
@@ -131,7 +133,7 @@ class WebWalletKeyStoreTest {
             val mnemonic = installLegacyWallet()
 
             // When
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             val seed = assertNotNull(SeedDataSource().getSeed())
             val preferences = assertNotNull(preferencesStorage.blob.first())
 
@@ -140,7 +142,7 @@ class WebWalletKeyStoreTest {
             assertTrue(preferences.startsWith("{"))
             assertEquals(mnemonic.phrase, decryptEnvelopeIndependently(seed, PASSWORD))
             assertEquals(PREFERENCES, decryptEnvelopeIndependently(preferences, PASSWORD))
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             assertEquals(seed, SeedDataSource().getSeed())
             assertEquals(preferences, preferencesStorage.blob.first())
         }
@@ -163,7 +165,7 @@ class WebWalletKeyStoreTest {
             } finally {
                 restoreStorageWrites()
             }
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
         }
 
     @Test
@@ -184,7 +186,7 @@ class WebWalletKeyStoreTest {
                 restoreStorageWrites()
             }
             val preferences = preferencesStorage.blob.first()
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             assertEquals(preferences, preferencesStorage.blob.first())
             assertEquals(mnemonic.phrase, decryptEnvelopeIndependently(assertNotNull(SeedDataSource().getSeed()), PASSWORD))
         }
@@ -196,7 +198,12 @@ class WebWalletKeyStoreTest {
             installLegacyWallet()
             val seed = SeedDataSource().getSeed()
             val repository = AppStateRepository(keyStore(), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, TermsAndConditionsRepository(preferencesStorage))
+            val viewModel =
+                AppViewModel(
+                    repository,
+                    TermsAndConditionsRepository(preferencesStorage),
+                    PreferencesRepository(preferencesStorage, repository, SeedAESInteractor(SaltDataSource())),
+                )
             failStorageWritesTo("mnemonic")
             try {
                 // When
@@ -224,7 +231,7 @@ class WebWalletKeyStoreTest {
             val unlocked = keyStore().unlock(PASSWORD)
 
             // Then
-            assertEquals(mnemonic, unlocked)
+            assertEquals(mnemonic, unlocked?.mnemonic)
             assertEquals(mnemonic.phrase, decryptEnvelopeIndependently(assertNotNull(SeedDataSource().getSeed()), PASSWORD))
             assertEquals("broken preferences", preferencesStorage.blob.first())
         }
@@ -243,7 +250,7 @@ class WebWalletKeyStoreTest {
             val unlocked = keyStore().unlock(replacementPassword)
 
             // Then
-            assertEquals(replacement, unlocked)
+            assertEquals(replacement, unlocked?.mnemonic)
             assertNull(preferencesStorage.blob.first())
         }
 
@@ -262,7 +269,7 @@ class WebWalletKeyStoreTest {
             assertNull(keyStore().unlock("WrongPassword7!"))
             assertEquals(oldSeed, SeedDataSource().getSeed())
             assertEquals(oldPreferences, preferencesStorage.blob.first())
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             val seed = assertNotNull(SeedDataSource().getSeed())
             val preferences = assertNotNull(preferencesStorage.blob.first())
             assertTrue(seed.contains("Argon2id"))
@@ -273,7 +280,7 @@ class WebWalletKeyStoreTest {
             assertNotNull(localStorage.getItem("preferences"))
             assertNull(localStorage.getItem("seed"))
             assertNull(localStorage.getItem(LEGACY_PREFERENCES_KEY))
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             assertEquals(seed, SeedDataSource().getSeed())
             assertEquals(preferences, preferencesStorage.blob.first())
         }
@@ -289,7 +296,7 @@ class WebWalletKeyStoreTest {
             installLegacyPreferences(null, work = "{}")
 
             // When
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
 
             // Then
             assertEquals(encrypted, localStorage.getItem("mnemonic"))
@@ -298,7 +305,7 @@ class WebWalletKeyStoreTest {
             assertNull(preferencesStorage.blob.first())
             assertEquals("2026-09-14", preferencesStorage.termsAndConditionsDate.first())
             assertEquals("{}", preferencesStorage.work.first())
-            assertEquals(mnemonic, keyStore().unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore().unlock(PASSWORD)?.mnemonic)
             assertEquals(encrypted, localStorage.getItem("mnemonic"))
         }
 
@@ -311,7 +318,12 @@ class WebWalletKeyStoreTest {
             val seed = SeedDataSource().getSeed()
             val preferences = preferencesStorage.blob.first()
             val repository = AppStateRepository(keyStore(), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, TermsAndConditionsRepository(preferencesStorage))
+            val viewModel =
+                AppViewModel(
+                    repository,
+                    TermsAndConditionsRepository(preferencesStorage),
+                    PreferencesRepository(preferencesStorage, repository, SeedAESInteractor(SaltDataSource())),
+                )
             observeArgon2Workers("constructor")
             try {
                 // When
@@ -395,6 +407,44 @@ class WebWalletKeyStoreTest {
             assertTrue(repository.submitPassword(PASSWORD))
             assertEquals(after, preferencesStorage.blob.first())
             repository.lock()
+        }
+
+    @Test
+    fun `overview becomes visible with the saved accounts already loaded`() =
+        runTest {
+            // Given
+            localStorage.clear()
+            SeedDataSource().setSeed(ARGON2_MNEMONIC_RECORD)
+            val crypto = SeedAESInteractor(SaltDataSource())
+            val savedAccounts = """{"accounts":{"0":{"status":"ACTIVATED"},"1":{"status":"ACTIVATED"}}}"""
+            preferencesStorage.setBlob(crypto.encryptSeed(savedAccounts, PASSWORD, EncryptedDataPurpose.PREFERENCES))
+            val terms = TermsAndConditionsRepository(preferencesStorage)
+            terms.setCurrentTermsAccepted(true)
+            val scope = CoroutineScope(backgroundScope.coroutineContext + Dispatchers.Default)
+            val repository = AppStateRepository(keyStore(), TempSeedDataSource(), scope)
+            val preferences = PreferencesRepository(preferencesStorage, repository, crypto)
+            val viewModel = AppViewModel(repository, terms, preferences)
+            val viewModels = ViewModelStore().apply { put("app", viewModel) }
+            try {
+                viewModel.state.first { it.shownScreen == ShownScreen.PASSWORD_ENTER }
+
+                // When
+                assertTrue(terms.accepted.first(), "The fixture must have accepted the current terms")
+                assertTrue(viewModel.enterPassword(PASSWORD), "The fixture must unlock")
+                viewModel.state.first { it.shownScreen == ShownScreen.OVERVIEW }
+
+                // Then
+                val configuration = assertNotNull(preferences.configuration.value)
+                assertTrue(
+                    configuration.wallet === repository.state.value.unlockedWallet,
+                    "The displayed configuration must belong to the active session",
+                )
+                assertEquals(listOf(0U, 1U), configuration.result.getOrThrow().activeAccountIndexes())
+                assertEquals(listOf(0U, 1U), configuration.addresses.keys.map { it.value })
+            } finally {
+                viewModels.clear()
+                repository.lock()
+            }
         }
 
     private suspend fun installLegacyWallet(): AttoMnemonic {

@@ -364,62 +364,30 @@ private fun TransactionsSummaryGrid(
                 Triple("Net Change", summary.netChangeText, dark_success),
             )
 
-        if (compact) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (summary.isLoading) {
-                    Text(
-                        text = "Calculating full-history totals...",
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                if (isFilterActive) {
-                    Text(
-                        text = "Filter active: showing ${displayedTransactions.size} matching loaded transactions.",
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                rows.chunked(2).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        rowItems.forEach { (label, value, accent) ->
-                            TransactionsSummaryCard(
-                                modifier = Modifier.weight(1f),
-                                label = label,
-                                value = value,
-                                accent = accent,
-                            )
-                        }
-                    }
-                }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = if (summary.isLoading) "Calculating totals…" else "Synced transaction totals",
+                maxLines = 1,
+                color = dark_text_secondary,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            if (isFilterActive) {
+                Text(
+                    text = "Filter active: showing ${displayedTransactions.size} matching loaded transactions.",
+                    color = dark_text_secondary,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-        } else {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                if (summary.isLoading) {
-                    Text(
-                        text = "Calculating full-history totals...",
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                if (isFilterActive) {
-                    Text(
-                        text = "Filter active: showing ${displayedTransactions.size} matching loaded transactions.",
-                        color = dark_text_secondary,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+            val cardRows = if (compact) rows.chunked(2) else listOf(rows)
+            cardRows.forEach { rowItems ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp),
                 ) {
-                    rows.forEach { (label, value, accent) ->
+                    rowItems.forEach { (label, value, accent) ->
                         TransactionsSummaryCard(
                             modifier = Modifier.weight(1f),
                             label = label,

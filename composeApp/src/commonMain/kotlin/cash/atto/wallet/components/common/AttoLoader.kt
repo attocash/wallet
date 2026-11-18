@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -20,7 +21,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun AttoLoader(
     modifier: Modifier = Modifier,
     alpha: Float = 1f,
-    darkMode: Boolean = false,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
 ) {
     Box(
         modifier =
@@ -31,13 +32,6 @@ fun AttoLoader(
                     detectTapGestures {}
                 },
     ) {
-        val backgroundColor =
-            if (darkMode) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-
         Box(
             Modifier
                 .fillMaxSize()

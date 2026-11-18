@@ -1,9 +1,7 @@
 package cash.atto.wallet
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeViewport
@@ -46,47 +44,43 @@ fun main() {
 
     ComposeViewport(viewportContainerId = "AttoWallet") {
         AttoFontLoader {
-            Column(modifier = Modifier.fillMaxSize()) {
-                BrowserDatabaseNotice()
-                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                    AttoApp(
-                        initialDestination = initialDestination,
-                        //            debugScreen = webDebugScreen(),
-                        //            debugPassword = webDebugPassword(),
-                        //            initialNavOverride = webDebugMainScreen(),
-                        initialNavOverride = launchRequest?.let { MainScreenNavDestination.SEND },
-                        initialSendPaymentRequest = launchRequest?.paymentRequest,
-                        initialOpenSendConfirm = launchRequest?.openConfirm == true,
-                        onAuthenticated = {
-                            if (launchRequest != null) {
-                                clearWebQueryParams()
-                            }
-                        },
-                        onAuthenticationNavigation = { replaceWebNavigationHistoryEntry() },
-                        onNavHostReady = { navController ->
-                            if (launchRequest != null) {
-                                // Browser binding removes query parameters; keep payment links reloadable until unlocked.
-                                navController.currentBackStackEntryFlow.first { it.destination.hasRoute<AttoDestination.DesktopMain>() }
-                            }
-                            navController.bindWebNavigation()
-                        },
-                        qrScannerContent =
-                            if (qrScannerAvailable) {
-                                { onResult, onError, _ ->
-                                    QrScannerView(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth(),
-                                        onQrCodeScanned = onResult,
-                                        onScanError = onError,
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                    )
-                }
-            }
+            AttoApp(
+                initialDestination = initialDestination,
+                //            debugScreen = webDebugScreen(),
+                //            debugPassword = webDebugPassword(),
+                //            initialNavOverride = webDebugMainScreen(),
+                initialNavOverride = launchRequest?.let { MainScreenNavDestination.SEND },
+                initialSendPaymentRequest = launchRequest?.paymentRequest,
+                initialOpenSendConfirm = launchRequest?.openConfirm == true,
+                onAuthenticated = {
+                    if (launchRequest != null) {
+                        clearWebQueryParams()
+                    }
+                },
+                onAuthenticationNavigation = { replaceWebNavigationHistoryEntry() },
+                onNavHostReady = { navController ->
+                    if (launchRequest != null) {
+                        // Browser binding removes query parameters; keep payment links reloadable until unlocked.
+                        navController.currentBackStackEntryFlow.first { it.destination.hasRoute<AttoDestination.DesktopMain>() }
+                    }
+                    navController.bindWebNavigation()
+                },
+                walletOverlay = { BrowserDatabaseNotice(Modifier.align(Alignment.BottomCenter)) },
+                qrScannerContent =
+                    if (qrScannerAvailable) {
+                        { onResult, onError, _ ->
+                            QrScannerView(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth(),
+                                onQrCodeScanned = onResult,
+                                onScanError = onError,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+            )
         }
     }
 }

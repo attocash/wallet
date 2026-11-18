@@ -25,8 +25,6 @@ class VoterViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            _state.emit(state.value.copy(isLoading = true))
-
             // Fetch voters data first
             votersRepository.fetchVoters()
 

@@ -56,7 +56,7 @@ fun SendConfirmScreen(
 
     Box(Modifier.fillMaxSize()) {
         if (uiState.value.sendConfirmUiState.showLoader) {
-            AttoLoader(alpha = 0.4f, darkMode = true)
+            AttoLoader(alpha = 0.4f, backgroundColor = MaterialTheme.colorScheme.onSurface)
         }
 
         SendConfirmContent(

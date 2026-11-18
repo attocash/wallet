@@ -12,14 +12,20 @@ import cash.atto.wallet.interactor.DecryptedWalletData
 import cash.atto.wallet.interactor.EncryptedDataPurpose
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.state.AppState.AuthState
+import cash.atto.wallet.state.InitialWalletPreferences
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
+internal class WalletUnlock(
+    val mnemonic: AttoMnemonic,
+    val preferences: InitialWalletPreferences? = null,
+)
+
 internal interface WalletKeyStore {
     suspend fun authState(): AuthState
 
-    suspend fun unlock(password: String): AttoMnemonic?
+    suspend fun unlock(password: String): WalletUnlock?
 
     suspend fun savePassword(
         phrase: String?,
@@ -52,7 +58,7 @@ internal class PlatformWalletKeyStore(
         }
     }
 
-    override suspend fun unlock(password: String): AttoMnemonic? {
+    override suspend fun unlock(password: String): WalletUnlock? {
         val snapshot = if (isWeb) preferencesDataSource.walletSnapshot() else null
         val storedSeed = (if (isWeb) snapshot?.seed else seedDataSource.getSeed()) ?: return null
         val decrypted =
@@ -68,15 +74,15 @@ internal class PlatformWalletKeyStore(
             } catch (_: AttoMnemonicException) {
                 return null
             }
-        if (isWeb) migrateEncryptedWallet(checkNotNull(snapshot), decrypted, password)
-        return mnemonic
+        val preferences = snapshot?.let { migrateEncryptedWallet(it, decrypted, password) }
+        return WalletUnlock(mnemonic, preferences)
     }
 
     private suspend fun migrateEncryptedWallet(
         snapshot: WalletStorageSnapshot,
         seed: DecryptedWalletData,
         password: String,
-    ) {
+    ): InitialWalletPreferences {
         try {
             val storedPreferences = snapshot.blob
             val preferences =
@@ -105,6 +111,7 @@ internal class PlatformWalletKeyStore(
                 blob = updatedPreferences ?: storedPreferences,
                 expected = snapshot,
             )
+            return InitialWalletPreferences(updatedPreferences ?: storedPreferences, preferences?.plaintext)
         } catch (error: CancellationException) {
             throw error
         } catch (error: WalletStorageException) {

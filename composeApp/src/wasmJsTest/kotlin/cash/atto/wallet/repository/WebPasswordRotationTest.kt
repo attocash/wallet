@@ -188,7 +188,7 @@ class WebPasswordRotationTest {
 
             // Then
             assertEquals(committed, localStorage.getItem("preferences"))
-            assertEquals(mnemonic, keyStore.unlock(PASSWORD))
+            assertEquals(mnemonic, keyStore.unlock(PASSWORD)?.mnemonic)
         }
 
     @Test

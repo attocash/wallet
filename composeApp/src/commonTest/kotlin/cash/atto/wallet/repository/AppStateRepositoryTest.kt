@@ -424,7 +424,7 @@ class AppStateRepositoryTest {
 
         override suspend fun authState() = if (mnemonic == null) AuthState.NO_SEED else AuthState.SESSION_INVALID
 
-        override suspend fun unlock(password: String) = mnemonic.takeIf { password == this.password }
+        override suspend fun unlock(password: String) = mnemonic?.takeIf { password == this.password }?.let { WalletUnlock(it) }
 
         override suspend fun savePassword(
             phrase: String?,

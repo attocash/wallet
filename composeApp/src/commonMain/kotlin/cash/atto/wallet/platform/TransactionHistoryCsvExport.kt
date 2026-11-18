@@ -3,7 +3,7 @@ package cash.atto.wallet.platform
 import cash.atto.commons.AttoPublicKey
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.uistate.overview.TransactionType
-import cash.atto.wallet.uistate.overview.buildTransactionListUiState
+import cash.atto.wallet.uistate.overview.buildTransactionUiStates
 import kotlinx.io.Sink
 
 internal suspend fun PersistentAccountEntryRepository.exportCsv(
@@ -36,14 +36,12 @@ internal suspend fun PersistentAccountEntryRepository.exportCsv(
         }
 
         val transactions =
-            buildTransactionListUiState(
+            buildTransactionUiStates(
                 entries = page,
                 addressLabelResolver = addressLabelResolver,
                 voterLabelResolver = voterLabelResolver,
                 hashLabelResolver = hashLabelResolver,
-            ).transactions
-                .filterNotNull()
-                .filter { it.type in selectedTypes }
+            ).filter { it.type in selectedTypes }
 
         appendTransactionsCsvRows(sink, transactions)
 

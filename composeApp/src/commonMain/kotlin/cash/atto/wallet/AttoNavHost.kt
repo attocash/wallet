@@ -2,6 +2,9 @@ package cash.atto.wallet
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +47,7 @@ fun AttoApp(
     onAuthenticated: (() -> Unit)? = null,
     onAuthenticationNavigation: () -> Unit = {},
     onNavHostReady: suspend (NavHostController) -> Unit = {},
+    walletOverlay: @Composable BoxScope.() -> Unit = {},
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -76,6 +80,7 @@ fun AttoApp(
             onAuthenticated = onAuthenticated,
             onAuthenticationNavigation = onAuthenticationNavigation,
             onNavHostReady = onNavHostReady,
+            walletOverlay = walletOverlay,
             qrScannerContent = qrScannerContent,
             submitPassword = {
                 viewModel.enterPassword(it)
@@ -104,6 +109,7 @@ fun AttoNavHost(
     onAuthenticated: (() -> Unit)? = null,
     onAuthenticationNavigation: () -> Unit = {},
     onNavHostReady: suspend (NavHostController) -> Unit = {},
+    walletOverlay: @Composable BoxScope.() -> Unit = {},
     qrScannerContent: (
         @Composable (
             onResult: (String) -> Unit,
@@ -198,8 +204,9 @@ fun AttoNavHost(
     ) {
         composable<AttoDestination.Loading> { AttoLoader() }
         composable<AttoDestination.Login> {
-            if (shownScreen == AppUiState.ShownScreen.PASSWORD_ENTER) {
+            if (shownScreen == AppUiState.ShownScreen.PASSWORD_ENTER || shownScreen == AppUiState.ShownScreen.OVERVIEW) {
                 val passwordValid = remember { mutableStateOf(true) }
+                val submitting = remember { mutableStateOf(false) }
                 val attemptedDebugPassword = remember { mutableStateOf<String?>(null) }
                 val coroutineScope = rememberCoroutineScope()
 
@@ -215,13 +222,19 @@ fun AttoNavHost(
                 }
 
                 LoginScreen(
-                    onSubmitPassword = {
-                        coroutineScope.launch {
-                            if (uiState.termsAndConditionsAccepted) {
-                                passwordValid.value = submitPassword(it)
+                    onSubmitPassword = { password ->
+                        if (!submitting.value && !uiState.unlockingWallet && shownScreen == AppUiState.ShownScreen.PASSWORD_ENTER) {
+                            submitting.value = true
+                            coroutineScope.launch {
+                                try {
+                                    passwordValid.value = submitPassword(password)
+                                } finally {
+                                    submitting.value = false
+                                }
                             }
                         }
                     },
+                    unlocking = submitting.value || uiState.unlockingWallet || shownScreen == AppUiState.ShownScreen.OVERVIEW,
                     passwordValid = passwordValid.value,
                     errorMessage = uiState.authenticationError,
                     termsAndConditionsAccepted = uiState.termsAndConditionsAccepted,
@@ -250,13 +263,16 @@ fun AttoNavHost(
             val walletStateHolder = rememberSaveableStateHolder()
             if (shownScreen == AppUiState.ShownScreen.OVERVIEW) {
                 walletStateHolder.SaveableStateProvider("wallet") {
-                    MainScreen(
-                        onLogout = onLogout,
-                        initialNavOverride = initialNavOverride,
-                        initialSendPaymentRequest = initialSendPaymentRequest,
-                        initialOpenSendConfirm = initialOpenSendConfirm,
-                        qrScannerContent = qrScannerContent,
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        MainScreen(
+                            onLogout = onLogout,
+                            initialNavOverride = initialNavOverride,
+                            initialSendPaymentRequest = initialSendPaymentRequest,
+                            initialOpenSendConfirm = initialOpenSendConfirm,
+                            qrScannerContent = qrScannerContent,
+                        )
+                        walletOverlay()
+                    }
                 }
             } else {
                 AttoLoader()

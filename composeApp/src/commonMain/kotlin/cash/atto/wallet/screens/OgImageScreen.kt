@@ -244,7 +244,6 @@ private fun ogImageOverviewState() =
                             hash = "8d39045bade6d4ba229f27d65ab5c914",
                         ),
                     ),
-                showHint = false,
             ),
     )
 

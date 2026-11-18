@@ -17,7 +17,7 @@ import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.ui.AttoFormatter
 import cash.atto.wallet.uistate.overview.TransactionType
 import cash.atto.wallet.uistate.overview.TransactionUiState
-import cash.atto.wallet.uistate.overview.buildTransactionListUiState
+import cash.atto.wallet.uistate.overview.buildTransactionUiStates
 import cash.atto.wallet.uistate.transactions.TransactionsSummaryUiState
 import cash.atto.wallet.uistate.transactions.TransactionsUiState
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.parseString
@@ -196,13 +196,12 @@ class TransactionsViewModel(
     }
 
     private fun buildLoadedTransactions(): List<TransactionUiState> =
-        buildTransactionListUiState(
+        buildTransactionUiStates(
             entries = historyState.loadedEntries,
             addressLabelResolver = ::resolveAddressLabel,
             voterLabelResolver = ::resolveChangeLabel,
             hashLabelResolver = ::resolveHashLabel,
-        ).transactions
-            .filterNotNull()
+        )
 
     private fun resolveAddressLabel(address: String): String? =
         preferencesRepository.getAddressLabel(address)
