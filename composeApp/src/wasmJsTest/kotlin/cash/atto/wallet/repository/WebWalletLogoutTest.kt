@@ -199,7 +199,7 @@ class WebWalletLogoutTest {
             assertFailsWith<WalletStorageException> { oldPreferences.saveHashLabel("stale-hash", "Stale") }
             assertEquals(replaced, localStorage.getItem("preferences"))
             assertNull(storage.blob.first())
-            assertEquals(replacement, keyStore().unlock(NEW_PASSWORD))
+            assertEquals(replacement, keyStore().unlock(NEW_PASSWORD)?.mnemonic)
             stale.lock()
         }
 

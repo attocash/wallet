@@ -34,18 +34,6 @@ data class OverviewUiState(
                 transactionListUiState = TransactionListUiState.DEFAULT,
                 receiveAddress = null,
             )
-
-        suspend fun empty() =
-            OverviewUiState(
-                balance = null,
-                priceUsd = null,
-                transactionListUiState =
-                    TransactionListUiState(
-                        transactions = emptyList(),
-                        showHint = true,
-                    ),
-                receiveAddress = null,
-            )
     }
 }
 
@@ -58,23 +46,19 @@ data class OverviewAccountUiState(
 )
 
 @OptIn(ExperimentalTime::class)
-fun buildTransactionListUiState(
+fun buildTransactionUiStates(
     entries: List<AttoAccountEntry>,
     addressLabelResolver: (String) -> String? = { null },
     voterLabelResolver: (String) -> String? = { null },
     hashLabelResolver: (String) -> String? = { null },
-): TransactionListUiState =
-    TransactionListUiState(
-        transactions =
-            entries.mapNotNull { entry ->
-                entry.toTransactionUiState(
-                    addressLabelResolver = addressLabelResolver,
-                    voterLabelResolver = voterLabelResolver,
-                    hashLabelResolver = hashLabelResolver,
-                )
-            },
-        showHint = entries.isEmpty(),
-    )
+): List<TransactionUiState> =
+    entries.mapNotNull { entry ->
+        entry.toTransactionUiState(
+            addressLabelResolver = addressLabelResolver,
+            voterLabelResolver = voterLabelResolver,
+            hashLabelResolver = hashLabelResolver,
+        )
+    }
 
 @OptIn(ExperimentalTime::class)
 private fun AttoAccountEntry.toTransactionUiState(

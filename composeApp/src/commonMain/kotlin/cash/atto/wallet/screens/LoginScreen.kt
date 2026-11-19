@@ -43,12 +43,13 @@ fun LoginScreen(
     termsAndConditionsDate: String = TermsAndConditions.EFFECTIVE_DATE,
     onTermsAndConditionsAcceptedChange: (Boolean) -> Unit = {},
     onLogout: () -> Unit = {},
+    unlocking: Boolean = false,
 ) {
     var input by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showTermsDialog by remember { mutableStateOf(false) }
-    val canSubmit = termsAndConditionsAccepted
+    val canSubmit = termsAndConditionsAccepted && !unlocking
 
     Box(
         modifier =
@@ -152,7 +153,7 @@ fun LoginScreen(
                             placeholder = "Enter your password",
                             revealed = showPassword,
                             onRevealToggle = { showPassword = !showPassword },
-                            isError = !passwordValid,
+                            isError = !passwordValid || errorMessage != null,
                             contentType = ContentType.Password,
                             imeAction = ImeAction.Done,
                             onDone = {
@@ -162,7 +163,7 @@ fun LoginScreen(
                             },
                         )
 
-                        if (!passwordValid) {
+                        if (!passwordValid || errorMessage != null) {
                             Text(
                                 text = errorMessage ?: stringResource(Res.string.password_wrong),
                                 color = dark_danger,

@@ -12,6 +12,7 @@ import cash.atto.wallet.interactor.CheckPasswordInteractor
 import cash.atto.wallet.interactor.SeedAESInteractor
 import cash.atto.wallet.repository.AppStateRepository
 import cash.atto.wallet.repository.PlatformWalletKeyStore
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.TermsAndConditionsRepository
 import cash.atto.wallet.state.AppState.AuthState
 import cash.atto.wallet.support.LEGACY_SALT
@@ -104,7 +105,8 @@ class PasswordTermsAcceptanceTest {
             val preferences = PreferencesDataSource()
             val terms = TermsAndConditionsRepository(preferences)
             val repository = AppStateRepository(keyStore(preferences), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, terms)
+            val preferencesRepository = PreferencesRepository(preferences, repository, SeedAESInteractor(SaltDataSource()))
+            val viewModel = AppViewModel(repository, terms, preferencesRepository)
 
             // When / Then
             assertFalse(viewModel.enterPassword(PASSWORD))
@@ -130,7 +132,8 @@ class PasswordTermsAcceptanceTest {
             val preferences = PreferencesDataSource()
             val terms = TermsAndConditionsRepository(preferences)
             val repository = AppStateRepository(keyStore(preferences), TempSeedDataSource(), backgroundScope)
-            val viewModel = AppViewModel(repository, terms)
+            val preferencesRepository = PreferencesRepository(preferences, repository, SeedAESInteractor(SaltDataSource()))
+            val viewModel = AppViewModel(repository, terms, preferencesRepository)
             val store = ViewModelStore()
             store.put("app", viewModel)
             terms.setCurrentTermsAccepted(true)

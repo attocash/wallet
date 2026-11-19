@@ -17,17 +17,24 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.coroutines.CoroutineContext
 
+internal class InitialWalletPreferences(
+    val storedBlob: String?,
+    val plaintext: String?,
+)
+
 class UnlockedWallet internal constructor(
     mnemonic: AttoMnemonic,
     password: String,
     context: CoroutineContext = Dispatchers.Default,
+    initialPreferences: InitialWalletPreferences? = null,
 ) {
     private class Credentials(
         val mnemonic: AttoMnemonic,
         val password: String,
+        val initialPreferences: InitialWalletPreferences?,
     )
 
-    private val credentials = MutableStateFlow<Credentials?>(Credentials(mnemonic, password))
+    private val credentials = MutableStateFlow<Credentials?>(Credentials(mnemonic, password, initialPreferences))
     internal val job: Job = SupervisorJob(context[Job])
     private val scope = CoroutineScope(context + job)
 
@@ -37,6 +44,7 @@ class UnlockedWallet internal constructor(
 
     val mnemonic: AttoMnemonic? get() = credentials.value?.mnemonic
     val password: String? get() = credentials.value?.password
+    internal val initialPreferences: InitialWalletPreferences? get() = credentials.value?.initialPreferences
 
     internal fun ensureActive() {
         job.ensureActive()

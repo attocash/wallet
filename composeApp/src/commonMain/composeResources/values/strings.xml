@@ -195,22 +195,4 @@
     <string name="receive_copy_address">Copy Wallet Address</string>
     <string name="receive_hint_title">Receiving Tips</string>
     <string name="receive_hint_body">Use the QR code for in-person transfers, or copy the address when sharing it digitally.</string>
-
-    <!-- welcome -->
-    <string name="welcome_create_wallet">Create new wallet</string>
-    <string name="welcome_create_wallet_description">Generate a new recovery phrase and set up a secure wallet</string>
-    <string name="welcome_import_wallet">Import existing wallet</string>
-    <string name="welcome_import_wallet_description">Use your 24-word recovery phrase to restore access</string>
-    <string name="welcome_message">Manage your Atto with a wallet designed for speed, simplicity, and a digital currency built to move without fees.</string>
-    <string name="welcome_title">Atto Wallet</string>
-    <string name="welcome_stats_market_cap">Market Cap</string>
-    <string name="welcome_stats_market_cap_description">Total value locked</string>
-    <string name="welcome_stats_market_cap_value">$8.4M</string>
-    <string name="welcome_stats_confirmation">Avg Confirmation</string>
-    <string name="welcome_stats_confirmation_description">Near-instant transfers</string>
-    <string name="welcome_stats_confirmation_unit">ms</string>
-    <string name="welcome_stats_confirmation_value">143</string>
-    <string name="welcome_stats_price">Price (USD)</string>
-    <string name="welcome_stats_price_description">Current market price</string>
-    <string name="welcome_stats_price_value">$0.082</string>
 </resources>

@@ -14,21 +14,25 @@ import cash.atto.wallet.model.getVoter
 import cash.atto.wallet.model.getVoterLabel
 import cash.atto.wallet.model.mergeAccountEntries
 import cash.atto.wallet.repository.HomeRepository
-import cash.atto.wallet.repository.PendingReceivablesState
 import cash.atto.wallet.repository.PersistentAccountEntryRepository
 import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.repository.WalletAccountState
 import cash.atto.wallet.repository.WalletManagerRepository
 import cash.atto.wallet.uistate.overview.OverviewAccountUiState
 import cash.atto.wallet.uistate.overview.OverviewUiState
-import cash.atto.wallet.uistate.overview.buildTransactionListUiState
+import cash.atto.wallet.uistate.overview.TransactionListUiState
+import cash.atto.wallet.uistate.overview.buildTransactionUiStates
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class OverviewViewModel(
@@ -40,19 +44,13 @@ class OverviewViewModel(
     private val _state = MutableStateFlow(OverviewUiState.DEFAULT)
     val state = _state.asStateFlow()
 
-    private var accountEntriesCollectorJob: Job? = null
-    private var pendingReceivablesState: PendingReceivablesState = PendingReceivablesState.EMPTY
     private var currentRepresentativeAddress: String? = null
-    private var recentEntries: List<AttoAccountEntry> = emptyList()
+    private val recentActivity = MutableStateFlow(RecentActivity())
     private var currentBalance: BigDecimal? = null
     private var accounts: List<WalletAccountState> = emptyList()
     private var selectedAccountIndex: UInt = 0U
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            _state.value = OverviewUiState.empty()
-        }
-
         viewModelScope.launch(Dispatchers.Default) {
             walletManagerRepository.accountsState.collect {
                 accounts = it
@@ -100,59 +98,67 @@ class OverviewViewModel(
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            walletManagerRepository.publicKeyState.collect { publicKey ->
-                accountEntriesCollectorJob?.cancel()
-                recentEntries = emptyList()
-
-                if (publicKey == null) {
-                    currentRepresentativeAddress = null
-                    currentBalance = null
-                    clearAccountData(receiveAddress = null)
-                    return@collect
+            walletManagerRepository.publicKeyState.collectLatest { publicKey ->
+                recentActivity.value = RecentActivity()
+                _state.update {
+                    it.copy(
+                        receiveAddress = publicKey?.toAddress(AttoAlgorithm.V1)?.value,
+                        transactionListUiState = TransactionListUiState.DEFAULT,
+                    )
                 }
+                if (publicKey == null) return@collectLatest
 
-                val receiveAddress =
-                    publicKey
-                        .toAddress(AttoAlgorithm.V1)
-                        .value
-
-                clearAccountData(receiveAddress = receiveAddress)
-
-                accountEntriesCollectorJob =
-                    viewModelScope.launch(Dispatchers.Default) {
-                        // Load persisted entries from DB so they show after a page refresh.
-                        val persisted =
-                            persistentAccountEntryRepository.listRecent(
-                                publicKey,
-                                RECENT_TRANSACTION_LIMIT,
-                            )
-                        if (persisted.isNotEmpty()) {
-                            recentEntries = persisted
-                            emitUpdatedState()
-                        }
-
+                coroutineScope {
+                    // Subscribe before reading so a commit during the read is also included.
+                    launch(start = CoroutineStart.UNDISPATCHED) {
                         persistentAccountEntryRepository.flow(publicKey).collect { entry ->
-                            recentEntries =
-                                mergeAccountEntries(
-                                    current = recentEntries,
-                                    incoming = entry,
-                                    limit = RECENT_TRANSACTION_LIMIT,
+                            recentActivity.update {
+                                it.copy(
+                                    entries = mergeAccountEntries(it.entries, entry, RECENT_TRANSACTION_LIMIT),
                                 )
+                            }
                             emitUpdatedState()
                         }
                     }
+
+                    val initialEntries =
+                        try {
+                            persistentAccountEntryRepository.listRecent(publicKey, RECENT_TRANSACTION_LIMIT)
+                        } catch (error: CancellationException) {
+                            throw error
+                        } catch (error: Exception) {
+                            println("Failed to load recent activity: ${error.message}")
+                            null
+                        }
+                    recentActivity.update {
+                        if (initialEntries == null) {
+                            it.copy(status = TransactionListUiState.Status.UNAVAILABLE)
+                        } else {
+                            it.copy(
+                                entries = mergeAccountEntries(initialEntries, it.entries, RECENT_TRANSACTION_LIMIT),
+                                status = TransactionListUiState.Status.READY,
+                            )
+                        }
+                    }
+                    emitUpdatedState()
+                }
             }
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            walletManagerRepository.pendingReceivablesState.collect {
-                pendingReceivablesState = it
-                _state.emit(
-                    state.value.copy(
-                        pendingReceivableCount = it.count,
-                        pendingReceivableAmount = it.totalAmount,
-                    ),
-                )
+            homeRepository.homeResponse.collect {
+                emitUpdatedState()
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            walletManagerRepository.pendingReceivablesState.collect { pending ->
+                _state.update {
+                    it.copy(
+                        pendingReceivableCount = pending.count,
+                        pendingReceivableAmount = pending.totalAmount,
+                    )
+                }
             }
         }
     }
@@ -173,9 +179,9 @@ class OverviewViewModel(
         )
     }
 
-    private suspend fun emitUpdatedState() {
-        _state.emit(
-            state.value.copy(
+    private fun emitUpdatedState() {
+        _state.update {
+            it.copy(
                 balance = currentBalance,
                 priceUsd = homeRepository.getPriceUsd(),
                 apy = calculateApy(),
@@ -186,28 +192,8 @@ class OverviewViewModel(
                     currentRepresentativeAddress?.let {
                         homeRepository.homeResponse.value?.getVoterLabel(it)
                     },
-            ),
-        )
-    }
-
-    private suspend fun clearAccountData(receiveAddress: String? = state.value.receiveAddress) {
-        recentEntries = emptyList()
-        currentBalance = null
-        currentRepresentativeAddress = null
-        _state.emit(
-            state.value.copy(
-                balance = null,
-                transactionListUiState =
-                    buildTransactionListUiState(
-                        entries = emptyList(),
-                    ),
-                pendingReceivableCount = pendingReceivablesState.count,
-                pendingReceivableAmount = pendingReceivablesState.totalAmount,
-                receiveAddress = receiveAddress,
-                accounts = buildAccountUiStates(),
-                selectedAccountIndex = selectedAccountIndex,
-            ),
-        )
+            )
+        }
     }
 
     private fun buildAccountUiStates(): List<OverviewAccountUiState> =
@@ -263,13 +249,21 @@ class OverviewViewModel(
         }
     }
 
-    private fun buildRecentTransactionListUiState() =
-        buildTransactionListUiState(
-            entries = recentEntries,
-            addressLabelResolver = ::resolveAddressLabel,
-            voterLabelResolver = ::resolveChangeLabel,
-            hashLabelResolver = ::resolveHashLabel,
+    private fun buildRecentTransactionListUiState(): TransactionListUiState {
+        val (entries, status) = recentActivity.value
+        if (status == TransactionListUiState.Status.LOADING) return TransactionListUiState.DEFAULT
+
+        return TransactionListUiState(
+            transactions =
+                buildTransactionUiStates(
+                    entries = entries,
+                    addressLabelResolver = ::resolveAddressLabel,
+                    voterLabelResolver = ::resolveChangeLabel,
+                    hashLabelResolver = ::resolveHashLabel,
+                ),
+            status = status,
         )
+    }
 
     private fun resolveAddressLabel(address: String): String? =
         preferencesRepository.getAddressLabel(address)
@@ -280,6 +274,11 @@ class OverviewViewModel(
             ?: homeRepository.homeResponse.value?.getVoterLabel(address)
 
     private fun resolveHashLabel(hash: String): String? = preferencesRepository.getHashLabel(hash)
+
+    private data class RecentActivity(
+        val entries: List<AttoAccountEntry> = emptyList(),
+        val status: TransactionListUiState.Status = TransactionListUiState.Status.LOADING,
+    )
 
     companion object {
         private const val RECENT_TRANSACTION_LIMIT = 64

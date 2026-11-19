@@ -20,6 +20,6 @@ data class VoterUIState(
     val showError: Boolean = false,
 ) {
     companion object {
-        val DEFAULT = VoterUIState(null)
+        val DEFAULT = VoterUIState(currentVoter = null, isLoading = true)
     }
 }

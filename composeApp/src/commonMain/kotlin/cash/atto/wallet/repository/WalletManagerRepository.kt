@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -91,6 +90,7 @@ private val defaultRepresentatives =
 private data class WalletPreferencesSnapshot(
     val appState: AppState,
     val accounts: Map<String, AccountPreference>,
+    val addresses: Map<AttoKeyIndex, AttoAddress>,
     val work: WorkPreference,
 )
 
@@ -132,24 +132,16 @@ class WalletManagerRepository(
         scope.launch {
             combine(
                 appStateRepository.state,
-                preferencesRepository.state
-                    .map { preferences ->
-                        preferences.normalizedAccounts()
-                    }.distinctUntilChanged(),
+                preferencesRepository.configuration,
                 preferencesRepository.work,
-            ) { appState, accountPreferences, work ->
-                WalletPreferencesSnapshot(
-                    appState = appState,
-                    accounts = accountPreferences,
-                    work = work,
-                )
-            }.collectLatest { preferences ->
-                replaceWalletSession(
-                    appState = preferences.appState,
-                    accountPreferences = preferences.accounts,
-                    work = preferences.work,
-                )
-            }
+            ) { appState, configuration, work ->
+                configuration?.takeIf { it.wallet === appState.unlockedWallet }?.let { unlocked ->
+                    unlocked.result.getOrNull()?.let { preferences ->
+                        WalletPreferencesSnapshot(appState, preferences.accounts, unlocked.addresses, work)
+                    }
+                }
+            }.distinctUntilChanged()
+                .collectLatest(::replaceWalletSession)
         }
 
         scope.launch {
@@ -274,13 +266,7 @@ class WalletManagerRepository(
         )
     }
 
-    private suspend fun replaceWalletSession(
-        appState: AppState,
-        accountPreferences: Map<String, AccountPreference>,
-        work: WorkPreference,
-    ) {
-        val effectiveWork = work.supportedOnCurrentPlatform()
-
+    private suspend fun replaceWalletSession(configuration: WalletPreferencesSnapshot?) {
         walletSession?.close()
         walletSession = null
         _accountState.emit(null)
@@ -290,10 +276,13 @@ class WalletManagerRepository(
         selectedAccountSnapshot.emit(null)
         _pendingReceivablesState.emit(PendingReceivablesState.EMPTY)
 
+        if (configuration == null) return
+        val effectiveWork = configuration.work.supportedOnCurrentPlatform()
         val session =
             sessionFactory.create(
-                appState = appState,
-                accountPreferences = accountPreferences,
+                appState = configuration.appState,
+                accountPreferences = configuration.accounts,
+                addresses = configuration.addresses,
                 work = effectiveWork,
             ) ?: return
         walletSession = session

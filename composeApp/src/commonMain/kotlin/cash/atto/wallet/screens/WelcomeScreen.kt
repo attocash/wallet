@@ -26,33 +26,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.Res
 import attowallet.composeapp.generated.resources.logo
-import attowallet.composeapp.generated.resources.welcome_create_wallet
-import attowallet.composeapp.generated.resources.welcome_create_wallet_description
-import attowallet.composeapp.generated.resources.welcome_import_wallet
-import attowallet.composeapp.generated.resources.welcome_import_wallet_description
-import attowallet.composeapp.generated.resources.welcome_message
-import attowallet.composeapp.generated.resources.welcome_stats_confirmation
-import attowallet.composeapp.generated.resources.welcome_stats_confirmation_description
-import attowallet.composeapp.generated.resources.welcome_stats_confirmation_unit
-import attowallet.composeapp.generated.resources.welcome_stats_market_cap
-import attowallet.composeapp.generated.resources.welcome_stats_market_cap_description
-import attowallet.composeapp.generated.resources.welcome_stats_price
-import attowallet.composeapp.generated.resources.welcome_stats_price_description
-import attowallet.composeapp.generated.resources.welcome_title
 import cash.atto.wallet.components.common.AttoCard
+import cash.atto.wallet.components.common.AttoValueText
 import cash.atto.wallet.ui.attoFontFamily
 import cash.atto.wallet.ui.dark_accent
 import cash.atto.wallet.ui.dark_accent_soft
@@ -72,7 +62,6 @@ import cash.atto.wallet.ui.dark_violet_soft_hover
 import cash.atto.wallet.ui.isCompactWidth
 import cash.atto.wallet.viewmodel.WelcomeViewModel
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -117,16 +106,16 @@ fun WelcomeScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     WelcomeActionCard(
-                        title = stringResource(Res.string.welcome_create_wallet),
-                        description = stringResource(Res.string.welcome_create_wallet_description),
+                        title = "Create new wallet",
+                        description = "Generate a new recovery phrase and set up a secure wallet",
                         iconBackground = dark_accent_soft,
                         iconBackgroundHover = dark_accent_soft_hover,
                         onClick = onCreateSecretClicked,
                         icon = { WelcomeCreateIcon(dark_accent) },
                     )
                     WelcomeActionCard(
-                        title = stringResource(Res.string.welcome_import_wallet),
-                        description = stringResource(Res.string.welcome_import_wallet_description),
+                        title = "Import existing wallet",
+                        description = "Use your 24-word recovery phrase to restore access",
                         iconBackground = dark_violet_soft,
                         iconBackgroundHover = dark_violet_soft_hover,
                         onClick = onImportSecretClicked,
@@ -142,25 +131,25 @@ fun WelcomeScreen(
                             .padding(top = 32.dp),
                 ) {
                     WelcomeStatCard(
-                        label = stringResource(Res.string.welcome_stats_market_cap),
+                        label = "Market Cap",
                         value = metrics.marketCapValue,
-                        description = stringResource(Res.string.welcome_stats_market_cap_description),
+                        description = "Total value locked",
                         labelColor = dark_accent,
                         textAlign = TextAlign.Center,
                     )
                     WelcomeStatCard(
-                        label = stringResource(Res.string.welcome_stats_confirmation),
+                        label = "Avg Confirmation",
                         value = metrics.confirmationValue,
-                        valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
-                        description = stringResource(Res.string.welcome_stats_confirmation_description),
+                        valueSuffix = "ms",
+                        description = "Near-instant transfers",
                         labelColor = dark_violet,
                         textAlign = TextAlign.Center,
                         monoValue = true,
                     )
                     WelcomeStatCard(
-                        label = stringResource(Res.string.welcome_stats_price),
+                        label = "Price (USD)",
                         value = metrics.priceUsdValue,
-                        description = stringResource(Res.string.welcome_stats_price_description),
+                        description = "Current market price",
                         labelColor = dark_success,
                         textAlign = TextAlign.Center,
                         monoValue = true,
@@ -176,8 +165,8 @@ fun WelcomeScreen(
                 ) {
                     WelcomeActionCard(
                         modifier = Modifier.weight(1f),
-                        title = stringResource(Res.string.welcome_create_wallet),
-                        description = stringResource(Res.string.welcome_create_wallet_description),
+                        title = "Create new wallet",
+                        description = "Generate a new recovery phrase and set up a secure wallet",
                         iconBackground = dark_accent_soft,
                         iconBackgroundHover = dark_accent_soft_hover,
                         onClick = onCreateSecretClicked,
@@ -185,8 +174,8 @@ fun WelcomeScreen(
                     )
                     WelcomeActionCard(
                         modifier = Modifier.weight(1f),
-                        title = stringResource(Res.string.welcome_import_wallet),
-                        description = stringResource(Res.string.welcome_import_wallet_description),
+                        title = "Import existing wallet",
+                        description = "Use your 24-word recovery phrase to restore access",
                         iconBackground = dark_violet_soft,
                         iconBackgroundHover = dark_violet_soft_hover,
                         onClick = onImportSecretClicked,
@@ -204,27 +193,27 @@ fun WelcomeScreen(
                 ) {
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(Res.string.welcome_stats_market_cap),
+                        label = "Market Cap",
                         value = metrics.marketCapValue,
-                        description = stringResource(Res.string.welcome_stats_market_cap_description),
+                        description = "Total value locked",
                         labelColor = dark_accent,
                         textAlign = TextAlign.Start,
                     )
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(Res.string.welcome_stats_confirmation),
+                        label = "Avg Confirmation",
                         value = metrics.confirmationValue,
-                        valueSuffix = stringResource(Res.string.welcome_stats_confirmation_unit),
-                        description = stringResource(Res.string.welcome_stats_confirmation_description),
+                        valueSuffix = "ms",
+                        description = "Near-instant transfers",
                         labelColor = dark_violet,
                         textAlign = TextAlign.Center,
                         monoValue = true,
                     )
                     WelcomeStatCard(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(Res.string.welcome_stats_price),
+                        label = "Price (USD)",
                         value = metrics.priceUsdValue,
-                        description = stringResource(Res.string.welcome_stats_price_description),
+                        description = "Current market price",
                         labelColor = dark_success,
                         textAlign = TextAlign.End,
                         monoValue = true,
@@ -249,7 +238,7 @@ private fun WelcomeHeader(compact: Boolean) {
 
         Text(
             modifier = Modifier.padding(top = 24.dp),
-            text = stringResource(Res.string.welcome_title),
+            text = "Atto Wallet",
             color = dark_text_primary,
             textAlign = TextAlign.Center,
             style =
@@ -267,7 +256,9 @@ private fun WelcomeHeader(compact: Boolean) {
                     .padding(top = 12.dp)
                     .padding(horizontal = 16.dp)
                     .widthIn(max = 672.dp),
-            text = stringResource(Res.string.welcome_message),
+            text =
+                "Manage your Atto with a wallet designed for speed, simplicity, " +
+                    "and a digital currency built to move without fees.",
             color = dark_text_secondary,
             textAlign = TextAlign.Center,
             style =
@@ -392,50 +383,28 @@ private fun WelcomeStatCard(
                 ),
         )
 
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-            horizontalArrangement =
-                when (textAlign) {
-                    TextAlign.Center -> Arrangement.Center
-                    TextAlign.End -> Arrangement.End
-                    else -> Arrangement.Start
+        AttoValueText(
+            text =
+                buildAnnotatedString {
+                    append(value)
+                    if (valueSuffix != null) {
+                        withStyle(SpanStyle(color = dark_text_tertiary, fontWeight = FontWeight.W400, fontSize = 16.sp)) {
+                            append(" ")
+                            append(valueSuffix)
+                        }
+                    }
                 },
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            Text(
-                text = value,
-                color = dark_text_primary,
-                textAlign = textAlign,
-                modifier = Modifier.alignByBaseline(),
-                style =
-                    MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = if (monoValue) FontFamily.Monospace else attoFontFamily(),
-                        fontWeight = FontWeight.W800,
-                        fontSize = 32.sp,
-                        lineHeight = 32.sp,
-                    ),
-            )
-
-            if (valueSuffix != null) {
-                Text(
-                    modifier =
-                        Modifier
-                            .padding(start = 4.dp)
-                            .alignByBaseline(),
-                    text = valueSuffix,
-                    color = dark_text_tertiary,
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.W400,
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                        ),
-                )
-            }
-        }
+            color = dark_text_primary,
+            modifier = Modifier.padding(top = 12.dp),
+            style =
+                MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = if (monoValue) FontFamily.Monospace else attoFontFamily(),
+                    fontWeight = FontWeight.W800,
+                    fontSize = 32.sp,
+                    lineHeight = 32.sp,
+                    textAlign = textAlign,
+                ),
+        )
 
         Text(
             modifier =

@@ -1,5 +1,6 @@
 package cash.atto.wallet.repository
 
+import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoKeyIndex
 import cash.atto.commons.AttoNetwork
 import cash.atto.commons.AttoSigner
@@ -31,13 +32,13 @@ internal class WalletSessionFactory(
     suspend fun create(
         appState: AppState,
         accountPreferences: Map<String, AccountPreference>,
+        addresses: Map<AttoKeyIndex, AttoAddress>,
         work: WorkPreference,
     ): WalletSession? {
         if (appState.authState != AppState.AuthState.SESSION_VALID) return null
         val unlockedWallet = appState.unlockedWallet ?: return null
         if (!unlockedWallet.job.isActive) return null
         return unlockedWallet.run {
-            val accountIndexes = accountPreferences.accountIndexes()
             val activeIndexes = accountPreferences.activeAccountIndexes()
             val gatekeeper = "https://gatekeeper.${network.name.lowercase()}.application.atto.cash"
             val client = TimedAttoNodeClient(AttoNodeClient.remote(gatekeeper), unlockedWallet)
@@ -60,10 +61,6 @@ internal class WalletSessionFactory(
                     retryWalletOperation("open wallet account", retryDelay) {
                         wallet.openAccount(activeIndexes)
                     }.associateBy { it.index }
-                val addresses =
-                    accountIndexes.associateWith { index ->
-                        unlockedWallet.signer(index).address
-                    }
                 val accountMonitor = client.createAccountMonitor()
                 accountMonitor.monitor(activeIndexes.mapNotNull(addresses::get))
 
@@ -84,12 +81,6 @@ internal class WalletSessionFactory(
             }
         }
     }
-
-    private fun Map<String, AccountPreference>.accountIndexes(): List<AttoKeyIndex> =
-        keys
-            .mapNotNull(String::toUIntOrNull)
-            .sorted()
-            .map(UInt::toAttoIndex)
 
     private fun Map<String, AccountPreference>.activeAccountIndexes(): List<AttoKeyIndex> =
         filterValues { it.status == AccountPreferenceStatus.ACTIVATED }

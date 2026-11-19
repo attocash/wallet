@@ -29,28 +29,35 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cash.atto.commons.toAttoIndex
 import cash.atto.wallet.components.common.*
+import cash.atto.wallet.model.AccountPreferenceStatus
 import cash.atto.wallet.model.UserPreferences
 import cash.atto.wallet.model.defaultAccountName
+import cash.atto.wallet.repository.PreferencesRepository
 import cash.atto.wallet.ui.*
+import cash.atto.wallet.uistate.overview.OverviewAccountUiState
 import cash.atto.wallet.uistate.overview.OverviewUiState
+import cash.atto.wallet.uistate.overview.TransactionListUiState
 import cash.atto.wallet.uistate.overview.TransactionUiState
 import cash.atto.wallet.viewmodel.OverviewViewModel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private data class OverviewAccount(
     val id: UInt,
     val name: String,
     val address: String,
-    val balance: Double,
+    val balance: Double?,
     val color: Color,
     val active: Boolean,
 )
@@ -66,9 +73,27 @@ fun OverviewScreen(
     KoinContext {
         val overviewViewModel = koinViewModel<OverviewViewModel>()
         val overviewUiState = overviewViewModel.state.collectAsState()
+        val configuration by koinInject<PreferencesRepository>().configuration.collectAsState()
+        val configuredAccounts =
+            remember(configuration) {
+                val unlocked = configuration ?: return@remember emptyList()
+                val preferences = unlocked.result.getOrNull() ?: return@remember emptyList()
+                preferences.accounts.map { (key, account) ->
+                    val index = key.toUInt()
+                    val address = unlocked.addresses.getValue(index.toAttoIndex()).toString()
+                    OverviewAccountUiState(
+                        index = index,
+                        address = address,
+                        name = preferences.addressLabel(address) ?: defaultAccountName(index),
+                        balance = null,
+                        active = account.status == AccountPreferenceStatus.ACTIVATED,
+                    )
+                }
+            }
 
         OverviewContent(
             uiState = overviewUiState.value,
+            configuredAccounts = configuredAccounts,
             isWalletInitialized = isWalletInitialized,
             onSendClick = onSendClick,
             onReceiveClick = onReceiveClick,
@@ -94,37 +119,41 @@ internal fun OverviewContent(
     onAddAccount: (String) -> Unit,
     onToggleAccount: (UInt, Boolean) -> Unit,
     onNameAccount: (UInt, String) -> Unit,
+    configuredAccounts: List<OverviewAccountUiState> = uiState.accounts,
 ) {
     val currentBalance =
         uiState.headerUiState.attoCoins
             ?.toStringExpanded()
-            ?.toDoubleOrNull() ?: 0.0
-    val priceUsd = uiState.priceUsd
+            ?.toDoubleOrNull()
     val incomingAmount = uiState.pendingReceivableAmount
     val stakingApy = uiState.apy?.toPlainString()
     val voterName = uiState.voterName
     val currentAddress = uiState.receiveAddress?.let(::normalizeAttoUri).orEmpty()
+    val activeAccountIndexes = configuredAccounts.filter { it.active }.map { it.index }
+    val configuredIndex = uiState.selectedAccountIndex.takeIf { it in activeAccountIndexes } ?: activeAccountIndexes.firstOrNull() ?: 0U
 
     val accounts =
-        remember(uiState.accounts, currentBalance, currentAddress) {
-            uiState.accounts
+        remember(uiState.accounts, configuredAccounts, currentBalance, currentAddress, configuredIndex) {
+            val liveAccounts = uiState.accounts.associateBy { it.index }
+            configuredAccounts
                 .map { account ->
+                    val live = liveAccounts[account.index]?.takeIf { account.active && it.active && it.address == account.address }
                     OverviewAccount(
                         id = account.index,
                         name = account.name,
                         address = account.address,
-                        balance = account.balance?.toStringExpanded()?.toDoubleOrNull() ?: 0.0,
+                        balance = live?.let { it.balance?.toStringExpanded()?.toDoubleOrNull() ?: 0.0 },
                         color = accountColor(account.index),
                         active = account.active,
                     )
                 }.ifEmpty {
                     listOf(
                         OverviewAccount(
-                            id = 0U,
-                            name = defaultAccountName(0U),
+                            id = configuredIndex,
+                            name = defaultAccountName(configuredIndex),
                             address = currentAddress,
                             balance = currentBalance,
-                            color = dark_accent,
+                            color = accountColor(configuredIndex),
                             active = true,
                         ),
                     )
@@ -133,13 +162,21 @@ internal fun OverviewContent(
 
     var modalOpen by remember { mutableStateOf(false) }
     var selectedTransaction by remember { mutableStateOf<TransactionUiState?>(null) }
-    val selectedAccount = accounts.firstOrNull { it.id == uiState.selectedAccountIndex } ?: accounts.first()
-    val activeAccountCount = accounts.count { it.active }
-    val globalBalance = accounts.filter { it.active }.sumOf { it.balance }
-    val transactions =
-        uiState.transactionListUiState.transactions
-            .filterNotNull()
-            .take(4)
+    val selectedAccount = accounts.firstOrNull { it.id == configuredIndex } ?: accounts.first()
+    val activeAccounts = accounts.filter { it.active }
+    val globalBalance =
+        if (activeAccounts.all { it.balance != null }) {
+            activeAccounts.sumOf { checkNotNull(it.balance) }
+        } else {
+            null
+        }
+    val activityMessage =
+        when (uiState.transactionListUiState.status) {
+            TransactionListUiState.Status.LOADING -> "Loading recent activity…"
+            TransactionListUiState.Status.READY -> "Recent transactions will appear here."
+            TransactionListUiState.Status.UNAVAILABLE -> "Could not load recent activity."
+        }
+    val transactions = uiState.transactionListUiState.transactions.take(4)
 
     BoxWithConstraints(
         modifier =
@@ -186,54 +223,53 @@ internal fun OverviewContent(
                         .padding(bottom = 0.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
-                if (compact) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(24.dp),
-                    ) {
-                        OverviewLeftColumn(
-                            globalBalance = globalBalance,
-                            selectedAccount = selectedAccount,
-                            accountCount = activeAccountCount,
-                            incomingAmount = incomingAmount,
-                            priceUsd = priceUsd,
-                            stakingApy = stakingApy,
-                            voterName = voterName,
-                            isWalletInitialized = isWalletInitialized,
-                            onSwitchClick = { modalOpen = true },
-                            onStakingClick = onStakingClick,
-                            onSendClick = onSendClick,
-                            onReceiveClick = onReceiveClick,
-                        )
-                        OverviewRightColumn(
-                            transactions = transactions,
-                            onTransactionsClick = onTransactionsClick,
-                            onTransactionClick = { selectedTransaction = it },
-                        )
+                val accountContent: @Composable () -> Unit = {
+                    OverviewAccountColumn(
+                        selectedAccount = selectedAccount,
+                        incomingAmount = incomingAmount,
+                        priceUsd = uiState.priceUsd,
+                        stakingApy = stakingApy,
+                        voterName = voterName,
+                        isWalletInitialized = isWalletInitialized,
+                        onSwitchClick = { modalOpen = true },
+                        onStakingClick = onStakingClick,
+                        onSendClick = onSendClick,
+                        onReceiveClick = onReceiveClick,
+                    )
+                }
+                val globalBalanceContent: @Composable () -> Unit = {
+                    val activeAccountCount = activeAccountIndexes.size
+                    if (activeAccountCount > 1) {
+                        OverviewGlobalBalance(globalBalance, activeAccountCount, uiState.priceUsd)
                     }
+                }
+
+                if (compact) {
+                    globalBalanceContent()
+                    accountContent()
+                    OverviewRecentActivity(
+                        transactions = transactions,
+                        emptyMessage = activityMessage,
+                        onTransactionsClick = onTransactionsClick,
+                        onTransactionClick = { selectedTransaction = it },
+                    )
                 } else {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(32.dp),
                         verticalAlignment = Alignment.Top,
                     ) {
-                        OverviewLeftColumn(
+                        Column(
                             modifier = Modifier.weight(5f),
-                            globalBalance = globalBalance,
-                            selectedAccount = selectedAccount,
-                            accountCount = activeAccountCount,
-                            incomingAmount = incomingAmount,
-                            priceUsd = priceUsd,
-                            stakingApy = stakingApy,
-                            voterName = voterName,
-                            isWalletInitialized = isWalletInitialized,
-                            onSwitchClick = { modalOpen = true },
-                            onStakingClick = onStakingClick,
-                            onSendClick = onSendClick,
-                            onReceiveClick = onReceiveClick,
-                        )
-                        OverviewRightColumn(
+                            verticalArrangement = Arrangement.spacedBy(24.dp),
+                        ) {
+                            globalBalanceContent()
+                            accountContent()
+                        }
+                        OverviewRecentActivity(
                             modifier = Modifier.weight(7f),
                             transactions = transactions,
+                            emptyMessage = activityMessage,
                             onTransactionsClick = onTransactionsClick,
                             onTransactionClick = { selectedTransaction = it },
                         )
@@ -245,12 +281,10 @@ internal fun OverviewContent(
 }
 
 @Composable
-private fun OverviewLeftColumn(
-    globalBalance: Double,
+private fun OverviewAccountColumn(
     selectedAccount: OverviewAccount,
-    accountCount: Int,
-    incomingAmount: com.ionspin.kotlin.bignum.decimal.BigDecimal,
-    priceUsd: com.ionspin.kotlin.bignum.decimal.BigDecimal?,
+    incomingAmount: BigDecimal,
+    priceUsd: BigDecimal?,
     stakingApy: String?,
     voterName: String?,
     isWalletInitialized: Boolean,
@@ -258,56 +292,13 @@ private fun OverviewLeftColumn(
     onStakingClick: () -> Unit,
     onSendClick: () -> Unit,
     onReceiveClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val stakingInteractionSource = remember { MutableInteractionSource() }
     val stakingHovered by stakingInteractionSource.collectIsHoveredAsState()
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        if (accountCount > 1) {
-            OverviewCard {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    OverviewCapsLabel("Global Balance")
-                    OverviewSmallMeta("$accountCount accounts")
-                }
-                Text(
-                    text = formatAmount(globalBalance),
-                    color = dark_text_primary,
-                    modifier = Modifier.padding(top = 16.dp),
-                    style =
-                        MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 40.sp,
-                            lineHeight = 40.sp,
-                            letterSpacing = (-0.8).sp,
-                        ),
-                )
-                priceUsd?.let { price ->
-                    val usdValue = globalBalance * price.doubleValue(exactRequired = false)
-                    val usdFormatted =
-                        (usdValue * 100).toLong().let { cents ->
-                            "${cents / 100}.${(cents % 100).toString().padStart(2, '0')}"
-                        }
-                    Text(
-                        text = "~ $$usdFormatted USD",
-                        color = dark_text_muted,
-                        modifier = Modifier.padding(top = 4.dp),
-                        style =
-                            MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.W400,
-                                fontSize = 14.sp,
-                            ),
-                    )
-                }
-            }
-        }
-
         OverviewCard {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -315,6 +306,7 @@ private fun OverviewLeftColumn(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
+                    modifier = Modifier.weight(1f).padding(end = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -364,8 +356,9 @@ private fun OverviewLeftColumn(
                 }
             }
 
-            Text(
-                text = formatAmount(selectedAccount.balance),
+            AttoValueText(
+                text = AnnotatedString(formatAmount(selectedAccount.balance)),
+                minFontSize = 16.sp,
                 color = dark_text_primary,
                 modifier = Modifier.padding(top = 16.dp),
                 style =
@@ -376,23 +369,7 @@ private fun OverviewLeftColumn(
                         letterSpacing = (-1.28).sp,
                     ),
             )
-            priceUsd?.let { price ->
-                val usdValue = selectedAccount.balance * price.doubleValue(exactRequired = false)
-                val usdFormatted =
-                    (usdValue * 100).toLong().let { cents ->
-                        "${cents / 100}.${(cents % 100).toString().padStart(2, '0')}"
-                    }
-                Text(
-                    text = "~ $$usdFormatted USD",
-                    color = dark_text_muted,
-                    modifier = Modifier.padding(top = 4.dp),
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.W400,
-                            fontSize = 14.sp,
-                        ),
-                )
-            }
+            OverviewUsdValue(selectedAccount.balance, priceUsd)
 
             Row(
                 modifier =
@@ -403,9 +380,11 @@ private fun OverviewLeftColumn(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 OverviewCapsLabel("Incoming")
-                Text(
-                    text = "+${AttoFormatter.format(incomingAmount)}",
+                AttoValueText(
+                    text = AnnotatedString("+${AttoFormatter.format(incomingAmount)}"),
                     color = dark_success,
+                    modifier = Modifier.weight(1f),
+                    minFontSize = 11.sp,
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.W700,
@@ -479,8 +458,13 @@ private fun OverviewLeftColumn(
                             modifier = Modifier.size(18.dp),
                         )
                     }
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Column(
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
                         Text(
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             text = stakingApy?.let { "Earning $it% APY" } ?: "APY unavailable",
                             color = dark_success,
                             style =
@@ -490,6 +474,8 @@ private fun OverviewLeftColumn(
                                 ),
                         )
                         Text(
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             text = voterName ?: "Unknown node",
                             color = dark_text_tertiary,
                             style =
@@ -535,8 +521,62 @@ private fun OverviewLeftColumn(
 }
 
 @Composable
-private fun OverviewRightColumn(
+private fun OverviewGlobalBalance(
+    balance: Double?,
+    accountCount: Int,
+    priceUsd: BigDecimal?,
+) {
+    OverviewCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OverviewCapsLabel("Global Balance")
+            OverviewSmallMeta("$accountCount accounts")
+        }
+        AttoValueText(
+            text = AnnotatedString(formatAmount(balance)),
+            color = dark_text_primary,
+            modifier = Modifier.padding(top = 16.dp),
+            style =
+                MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.W600,
+                    fontSize = 40.sp,
+                    lineHeight = 40.sp,
+                    letterSpacing = (-0.8).sp,
+                ),
+        )
+        OverviewUsdValue(balance, priceUsd)
+    }
+}
+
+@Composable
+private fun OverviewUsdValue(
+    balance: Double?,
+    priceUsd: BigDecimal?,
+) {
+    val value =
+        priceUsd?.takeIf { balance != null }?.let { price ->
+            val cents = (checkNotNull(balance) * price.doubleValue(exactRequired = false) * 100).toLong()
+            val dollars = "${cents / 100}.${(cents % 100).toString().padStart(2, '0')}"
+            "~ $$dollars USD"
+        }
+    Text(
+        text = value.orEmpty(),
+        color = dark_text_muted,
+        modifier = Modifier.padding(top = 4.dp),
+        minLines = 1,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}
+
+@Composable
+private fun OverviewRecentActivity(
     transactions: List<TransactionUiState>,
+    emptyMessage: String,
     onTransactionsClick: () -> Unit,
     onTransactionClick: (TransactionUiState) -> Unit,
     modifier: Modifier = Modifier,
@@ -601,7 +641,7 @@ private fun OverviewRightColumn(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Transactions will appear here once the wallet starts receiving or sending ATTO.",
+                    text = emptyMessage,
                     color = dark_text_secondary,
                     style =
                         MaterialTheme.typography.bodySmall.copy(
@@ -615,10 +655,12 @@ private fun OverviewRightColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 transactions.forEach { transaction ->
-                    AttoTransactionCard(
-                        transaction = transaction,
-                        onClick = { onTransactionClick(transaction) },
-                    )
+                    key(transaction.hash ?: transaction.height) {
+                        AttoTransactionCard(
+                            transaction = transaction,
+                            onClick = { onTransactionClick(transaction) },
+                        )
+                    }
                 }
             }
         }
@@ -980,6 +1022,8 @@ private fun OverviewCapsLabel(text: String) {
     Text(
         text = text,
         color = dark_text_tertiary,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         style =
             MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.W500,
@@ -1010,7 +1054,7 @@ private fun accountNameTextStyle(color: Color) =
         fontSize = 15.sp,
     )
 
-private fun formatAmount(amount: Double): String = AttoFormatter.format(BigDecimal.fromDouble(amount))
+private fun formatAmount(amount: Double?): String = amount?.let { AttoFormatter.format(BigDecimal.fromDouble(it)) } ?: "—"
 
 private fun accountColor(index: UInt): Color =
     when (index % 5U) {

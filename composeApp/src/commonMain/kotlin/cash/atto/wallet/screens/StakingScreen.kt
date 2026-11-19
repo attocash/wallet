@@ -101,79 +101,42 @@ private fun StakingContent(
             )
         }
 
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(color = dark_accent)
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val compact = isCompactWidth()
+
+            val delegation: @Composable () -> Unit = {
+                StakingCurrentCard(uiState)
+                StakingInfoCard(modifier = Modifier.fillMaxWidth())
             }
-        } else {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val compact = isCompactWidth()
 
-                val currentVoter = uiState.voters.find { it.address == uiState.currentVoter }
-                val currentVoterHealthy =
-                    currentVoter?.let {
-                        val globalApy = uiState.globalApy?.toDoubleOrNull() ?: 0.0
-                        !hasVoterWarning(it, globalApy, uiState.voters)
-                    } ?: false
-
-                if (compact) {
-                    Column(
+            if (compact) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    delegation()
+                    StakingVotersSection(
                         modifier = Modifier.fillMaxWidth(),
+                        uiState = uiState,
+                        onSelect = { selectedVoter = it },
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    Column(
+                        modifier = Modifier.weight(5f),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
-                        StakingCurrentCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            voterLabel = uiState.currentVoterLabel ?: "Unknown node",
-                            voterAddress = uiState.currentVoter.orEmpty(),
-                            apy = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
-                            weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                            entityWeight =
-                                uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
-                                    ?: "—",
-                            lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
-                            healthy = currentVoterHealthy,
-                            onChangeClick = { selectedVoter = currentVoter },
-                        )
-                        StakingInfoCard(modifier = Modifier.fillMaxWidth())
-                        StakingVotersSection(
-                            modifier = Modifier.fillMaxWidth(),
-                            uiState = uiState,
-                            onSelect = { selectedVoter = it },
-                        )
+                        delegation()
                     }
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(5f),
-                            verticalArrangement = Arrangement.spacedBy(24.dp),
-                        ) {
-                            StakingCurrentCard(
-                                modifier = Modifier.fillMaxWidth(),
-                                voterLabel = uiState.currentVoterLabel ?: "Unknown node",
-                                voterAddress = uiState.currentVoter.orEmpty(),
-                                apy = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—",
-                                weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—",
-                                entityWeight =
-                                    uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" }
-                                        ?: "—",
-                                lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—",
-                                healthy = currentVoterHealthy,
-                                onChangeClick = { selectedVoter = currentVoter },
-                            )
-                            StakingInfoCard(modifier = Modifier.fillMaxWidth())
-                        }
-                        StakingVotersSection(
-                            modifier = Modifier.weight(7f),
-                            uiState = uiState,
-                            onSelect = { selectedVoter = it },
-                        )
-                    }
+                    StakingVotersSection(
+                        modifier = Modifier.weight(7f),
+                        uiState = uiState,
+                        onSelect = { selectedVoter = it },
+                    )
                 }
             }
         }
@@ -181,18 +144,17 @@ private fun StakingContent(
 }
 
 @Composable
-private fun StakingCurrentCard(
-    modifier: Modifier,
-    voterLabel: String,
-    voterAddress: String,
-    apy: String,
-    weight: String,
-    entityWeight: String,
-    lastVoted: String,
-    healthy: Boolean,
-    onChangeClick: () -> Unit,
-) {
-    AttoPanelCard(modifier = modifier, contentPadding = PaddingValues(20.dp)) {
+private fun StakingCurrentCard(uiState: VoterUIState) {
+    val currentVoter = uiState.voters.find { it.address == uiState.currentVoter }
+    val voterLabel = uiState.currentVoterLabel ?: if (uiState.isLoading) "—" else "Unknown node"
+    val apy = uiState.currentVoterApy?.let { "${it.toPlainString()}%" } ?: "—"
+    val weight = currentVoter?.voteWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—"
+    val entityWeight = uiState.currentVoterEntityWeightPercentage?.let { "${it.toPlainString()}%" } ?: "—"
+    val lastVoted = uiState.currentVoterLastVotedAt?.let { formatLastVoted(it) } ?: "—"
+    val globalApy = uiState.globalApy?.toDoubleOrNull() ?: 0.0
+    val healthy = currentVoter != null && !hasVoterWarning(currentVoter, globalApy, uiState.voters)
+
+    AttoPanelCard(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(20.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = "Current Delegation",
@@ -205,7 +167,7 @@ private fun StakingCurrentCard(
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
             )
             Text(
-                text = voterAddress,
+                text = uiState.currentVoter.orEmpty(),
                 color = dark_text_dim,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -297,6 +259,16 @@ private fun StakingVotersSection(
                 color = dark_text_tertiary,
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = dark_accent)
+            }
+            return
         }
 
         Column(

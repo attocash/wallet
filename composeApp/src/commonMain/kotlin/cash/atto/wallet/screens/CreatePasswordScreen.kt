@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import attowallet.composeapp.generated.resources.*
 import cash.atto.wallet.components.common.AttoBackButton
-import cash.atto.wallet.components.common.AttoPasswordStrengthMeter
 import cash.atto.wallet.components.common.AttoPasswordField
 import cash.atto.wallet.components.common.AttoPasswordForm
+import cash.atto.wallet.components.common.AttoPasswordStrengthMeter
 import cash.atto.wallet.components.common.AttoPasswordSubmitButton
 import cash.atto.wallet.components.common.AttoScreenSubtitle
 import cash.atto.wallet.components.common.AttoScreenTitle
@@ -29,7 +29,6 @@ import cash.atto.wallet.ui.AttoWalletTheme
 import cash.atto.wallet.ui.dark_bg
 import cash.atto.wallet.ui.dark_danger
 import cash.atto.wallet.ui.dark_success
-import cash.atto.wallet.ui.dark_text_secondary
 import cash.atto.wallet.uistate.secret.CreatePasswordUIState
 import cash.atto.wallet.viewmodel.CreatePasswordViewModel
 import kotlinx.coroutines.launch
@@ -46,6 +45,7 @@ fun CreatePasswordScreen(
     val uiState = viewModel.state.collectAsState()
     val termsAccepted = viewModel.termsAndConditionsAccepted.collectAsState(false)
     val coroutineScope = rememberCoroutineScope()
+    var submitting by remember { mutableStateOf(false) }
 
     CreatePassword(
         uiState = uiState.value,
@@ -53,14 +53,24 @@ fun CreatePasswordScreen(
         onTermsAndConditionsAcceptedChange = { accepted ->
             coroutineScope.launch { viewModel.setTermsAndConditionsAccepted(accepted) }
         },
-        onBackNavigation = onBackNavigation,
+        onBackNavigation = { if (!submitting) onBackNavigation() },
+        submitting = submitting,
         onConfirmClick = { password, confirmation ->
-            coroutineScope.launch {
-                viewModel.setPassword(password)
-                viewModel.setPasswordConfirm(confirmation)
-                if (viewModel.savePassword()) {
-                    viewModel.clearPassword()
-                    onConfirmClick()
+            if (!submitting) {
+                submitting = true
+                coroutineScope.launch {
+                    var saved = false
+                    try {
+                        viewModel.setPassword(password)
+                        viewModel.setPasswordConfirm(confirmation)
+                        saved = viewModel.savePassword()
+                        if (saved) {
+                            viewModel.clearPassword()
+                            onConfirmClick()
+                        }
+                    } finally {
+                        if (!saved) submitting = false
+                    }
                 }
             }
         },
@@ -86,6 +96,7 @@ fun CreatePassword(
     onPasswordConfirmChanged: (String) -> Unit,
     termsAndConditionsAccepted: Boolean = false,
     onTermsAndConditionsAcceptedChange: (Boolean) -> Unit = {},
+    submitting: Boolean = false,
 ) {
     var showPassword by remember { mutableStateOf(false) }
     var showPasswordConfirm by remember { mutableStateOf(false) }
@@ -97,7 +108,7 @@ fun CreatePassword(
     val assessment = remember(password) { checkPassword.assess(password) }
     val passwordsMatch = password.isNotEmpty() && passwordConfirm.isNotEmpty() && password == passwordConfirm
     val showMismatch = passwordConfirm.isNotEmpty() && !passwordsMatch
-    val canProceed = assessment.isAcceptable && passwordsMatch && termsAndConditionsAccepted
+    val canProceed = assessment.isAcceptable && passwordsMatch && termsAndConditionsAccepted && !submitting
     val scrollState = rememberScrollState()
 
     Box(
@@ -133,6 +144,7 @@ fun CreatePassword(
                         val confirmation = submitted.confirmation.orEmpty()
                         if (
                             termsAndConditionsAccepted &&
+                            !submitting &&
                             !showTermsDialog &&
                             submitted.password == confirmation &&
                             checkPassword.invoke(submitted.password) == CreatePasswordUIState.PasswordCheckState.VALID
@@ -307,7 +319,6 @@ private fun PasswordMatchState(
         )
     }
 }
-
 
 @Preview
 @Composable

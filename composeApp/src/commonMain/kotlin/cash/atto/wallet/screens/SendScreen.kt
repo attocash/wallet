@@ -191,7 +191,7 @@ private fun SendScreenContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (navState == SendScreenState.SEND && uiState.sendFromUiState.showLoader) {
-            AttoLoader(alpha = 0.7f)
+            AttoLoader(alpha = 0.7f, backgroundColor = MaterialTheme.colorScheme.surface)
         }
 
         SendFromContent(
