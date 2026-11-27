@@ -2,6 +2,8 @@ package cash.atto.wallet.ui
 
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoUnit
+import io.ktor.http.URLDecodeException
+import io.ktor.http.decodeURLQueryComponent
 import io.ktor.http.encodeURLParameter
 
 data class AttoPaymentRequest(
@@ -93,7 +95,14 @@ object AttoPaymentRequests {
                     if (key == "receiverAddress") valuePart else null
                 }.firstOrNull()
 
-        val address = receiverAddressFromQuery ?: parts.firstOrNull() ?: return null
+        val address =
+            receiverAddressFromQuery?.let { encoded ->
+                try {
+                    encoded.decodeURLQueryComponent()
+                } catch (_: URLDecodeException) {
+                    encoded
+                }
+            } ?: parts.firstOrNull() ?: return null
 
         val amountRaw =
             query
